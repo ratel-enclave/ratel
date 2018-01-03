@@ -1,5 +1,0 @@
-/usr/bin/cc  -m64  -fno-strict-aliasing -fno-stack-protector -fvisibility=internal  -std=gnu99 -ggdb3 -fno-omit-frame-pointer -fno-builtin-strcmp -Wall -Werror -Wwrite-strings -Wno-unused-but-set-variable      -Wl,--hash-style=both  CMakeFiles/drrun.dir/drdeploy.c.o  -o ../bin64/drrun -rdynamic ../lib64/libdrconfiglib.a ../lib64/libdrfrontendlib.a ../lib64/libdrinjectlib.a ../lib64/libdrdecode.a ../lib64/libdrhelper.a 
-/bin/cp ../bin64/drrun ../bin64/drrun.full
-/usr/bin/objcopy --only-keep-debug ../bin64/drrun ../bin64/drrun.debug
-/usr/bin/objcopy --add-gnu-debuglink=../bin64/drrun.debug ../bin64/drrun
-/usr/bin/strip -g -x ../bin64/drrun

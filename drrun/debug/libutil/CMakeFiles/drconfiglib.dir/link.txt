@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib64/libdrconfiglib.a  CMakeFiles/drconfiglib.dir/dr_config.c.o CMakeFiles/drconfiglib.dir/utils.c.o CMakeFiles/drconfiglib.dir/__/core/unix/nudgesig.c.o
-/usr/bin/ranlib ../lib64/libdrconfiglib.a

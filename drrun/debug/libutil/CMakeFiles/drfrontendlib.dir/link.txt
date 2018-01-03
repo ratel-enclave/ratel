@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib64/libdrfrontendlib.a  CMakeFiles/drfrontendlib.dir/dr_frontend_unix.c.o CMakeFiles/drfrontendlib.dir/__/core/unix/os.c.o CMakeFiles/drfrontendlib.dir/__/core/unix/module_elf.c.o CMakeFiles/drfrontendlib.dir/dr_frontend_common.c.o
-/usr/bin/ranlib ../lib64/libdrfrontendlib.a

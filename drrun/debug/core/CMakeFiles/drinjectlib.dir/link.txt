@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib64/libdrinjectlib.a  CMakeFiles/drinjectlib.dir/unix/injector.c.o CMakeFiles/drinjectlib.dir/config.c.o CMakeFiles/drinjectlib.dir/unix/os.c.o CMakeFiles/drinjectlib.dir/string.c.o CMakeFiles/drinjectlib.dir/io.c.o CMakeFiles/drinjectlib.dir/unix/module_elf.c.o
-/usr/bin/ranlib ../lib64/libdrinjectlib.a
