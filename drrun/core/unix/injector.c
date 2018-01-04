@@ -257,7 +257,7 @@ pre_execve_ld_preload(const char *dr_path)
     setenv("DYLD_FORCE_FLAT_NAMESPACE", "1", true/*overwrite*/);
 #else
     setenv("LD_LIBRARY_PATH", ld_lib_path, true/*overwrite*/);
-    setenv("LD_PRELOAD", "libdynamorio.so libdrpreload.so", true/*overwrite*/);
+    setenv("LD_PRELOAD", "libapp.so libdrpreload.so", true/*overwrite*/);
 #endif
     if (verbose) {
         printf("Setting LD_USE_LOAD_BIAS for PIEs so the loader will honor "
@@ -1420,11 +1420,11 @@ inject_ptrace(dr_inject_info_t *info, const char *library_path)
             return false;
     }
 
-    /* Open libdynamorio.so as readonly in the child. */
+    /* Open libapp.so as readonly in the child. */
     dr_fd = injectee_open(info, library_path, O_RDONLY, 0);
     if (dr_fd < 0) {
         if (verbose) {
-            fprintf(stderr, "Unable to open libdynamorio.so in injectee (%d): "
+            fprintf(stderr, "Unable to open libapp.so in injectee (%d): "
                     "%s\n", -dr_fd, strerror(-dr_fd));
         }
         return false;
@@ -1444,7 +1444,7 @@ inject_ptrace(dr_inject_info_t *info, const char *library_path)
                                          injectee_prot, 0/*!reachable*/);
     if (injected_base == NULL) {
         if (verbose)
-            fprintf(stderr, "Unable to mmap libdynamorio.so in injectee\n");
+            fprintf(stderr, "Unable to mmap libapp.so in injectee\n");
         return false;
     }
     /* Looking up exports through ptrace is hard, so we use the e_entry from

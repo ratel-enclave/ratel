@@ -1,5 +1,7 @@
 #!/bin/make
 
+all: checkdirs drrun
+
 CC	:= /usr/bin/cc
 CPP	:= /usr/bin/cpp
 LD	:= /usr/bin/cc
@@ -7,6 +9,10 @@ AS	:= /usr/bin/as
 AR	:= /usr/bin/ar
 CMAKE	:= /usr/bin/cmake
 RANDLIB := /usr/bin/ranlib
+CP	:= /bin/cp
+OBJCOPY	:= /usr/bin/objcopy
+STRIP	:= /usr/bin/strip
+
 
 BLD_DIR	?= build
 INC_DIR	:= core core/arch core/arch/x86 core/unix  core/lib libutil extra extra/include/annotations
@@ -109,17 +115,22 @@ $(DRRUN_CC_OBJ): $(BLD_DIR)/%.o: %.c
 .PHONY: all checkdirs clean
 
 
-all: checkdirs drrun
-
-
 drrun: $(DRRUN_CC_OBJ) $(DRLIBS)
 	$(LD)  $(DRRUN_LD_FLAGS) $(DRRUN_CC_OBJ) -o $@ -rdynamic $(DRLIBS) $(DRRUN_EXTRA_LD_FLAGS)
+	$(CP) drrun drrun.full
+	$(OBJCOPY) --only-keep-debug drrun drrun.debug
+	$(OBJCOPY) --add-gnu-debuglink=drrun.debug drrun
+	$(STRIP) -g -x drrun
+
 
 checkdirs: $(BUILD_DIR)
+
 
 $(BUILD_DIR):
 	@mkdir -p $@
 
+
 clean:
-	@rm -rf $(BUILD_DIR)
-	@rm -rf $(BLD_DIR) drrun
+	@rm	-rf $(BUILD_DIR)
+	@rm	-rf $(BLD_DIR)
+	@rm	drrun*

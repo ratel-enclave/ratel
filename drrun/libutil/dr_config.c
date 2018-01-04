@@ -47,10 +47,10 @@
 # include "processes.h"
 # include "mfapi.h" /* for PLATFORM_WIN_2000 */
 
-# define RELEASE32_DLL   _TEXT("\\lib32\\release\\dynamorio.dll")
-# define DEBUG32_DLL     _TEXT("\\lib32\\debug\\dynamorio.dll")
-# define RELEASE64_DLL   _TEXT("\\lib64\\release\\dynamorio.dll")
-# define DEBUG64_DLL     _TEXT("\\lib64\\debug\\dynamorio.dll")
+# define RELEASE32_DLL   _TEXT("\\app.dll")
+# define DEBUG32_DLL     _TEXT("\\app.dll")
+# define RELEASE64_DLL   _TEXT("\\app.dll")
+# define DEBUG64_DLL     _TEXT("\\app.dll")
 # define LOG_SUBDIR      _TEXT("\\logs")
 # define LIB32_SUBDIR    _TEXT("\\lib32")
 # define PREINJECT32_DLL _TEXT("\\lib32\\drpreinject.dll")
@@ -70,10 +70,10 @@ int our_snprintf_wide(wchar_t *s, size_t max, const wchar_t *fmt, ...);
 #  include <syscall.h>
 #endif
 
-# define RELEASE32_DLL   "/lib32/release/libdynamorio.so"
-# define DEBUG32_DLL     "/lib32/debug/libdynamorio.so"
-# define RELEASE64_DLL   "/lib64/release/libdynamorio.so"
-# define DEBUG64_DLL     "/lib64/debug/libdynamorio.so"
+# define RELEASE32_DLL   "/libapp.so"
+# define DEBUG32_DLL     "/libapp.so"
+# define RELEASE64_DLL   "/libapp.so"
+# define DEBUG64_DLL     "/libapp.so"
 # define LOG_SUBDIR      "/logs"
 # define LIB32_SUBDIR    "/lib32/"
 

@@ -363,45 +363,6 @@ print_tool_list(void)
 #endif
 }
 
-/* i#1509: we want to list the available tools for the -t option.
- * Since we don't have a dir iterator we use a list of tools
- * in a text file tools/list{32,64} which we create at
- * install time.  Thus we only expect to have it for a package build.
- */
-static void
-read_tool_list(const char *dr_root, dr_platform_t dr_platform)
-{
-    FILE *f;
-    char list_file[MAXIMUM_PATH];
-    size_t sofar = 0;
-    const char *arch = IF_X64_ELSE("64", "32");
-    if (dr_platform == DR_PLATFORM_32BIT)
-        arch = "32";
-    else if (dr_platform == DR_PLATFORM_64BIT)
-        arch = "64";
-    _snprintf(list_file, BUFFER_SIZE_ELEMENTS(list_file),
-              "%s/tools/list%s", dr_root, arch);
-    NULL_TERMINATE_BUFFER(list_file);
-    f = fopen_utf8(list_file, "r");
-    if (f == NULL) {
-        /* no visible error: we only expect to have a list for a package build */
-        return;
-    }
-    while (fgets(tool_list + sofar,
-                 (int)(BUFFER_SIZE_ELEMENTS(tool_list) - sofar - 1/*space*/),
-                 f) != NULL) {
-        NULL_TERMINATE_BUFFER(tool_list);
-        sofar += strlen(tool_list + sofar);
-        tool_list[sofar - 1] = ','; /* replace newline with comma */
-        /* add space */
-        if (sofar < BUFFER_SIZE_ELEMENTS(tool_list))
-            tool_list[sofar++] = ' ';
-    }
-    fclose(f);
-    tool_list[sofar-2] = '\0';
-    NULL_TERMINATE_BUFFER(tool_list);
-}
-
 #define usage(list_ops, msg, ...) do {                          \
     if ((msg)[0] != '\0')                                       \
       fprintf(stderr, "ERROR: " msg "\n\n", ##__VA_ARGS__);     \
@@ -446,30 +407,14 @@ static bool check_dr_root(const char *dr_root, bool debug,
 
     const char *checked_files[] = {
 #ifdef WINDOWS
-        "lib32\\drpreinject.dll",
-        "lib32\\release\\dynamorio.dll",
-        "lib32\\debug\\dynamorio.dll",
-        "lib64\\drpreinject.dll",
-        "lib64\\release\\dynamorio.dll",
-        "lib64\\debug\\dynamorio.dll"
+        "app.dll",
+        "app.dll"
 #elif defined(MACOS)
-        "lib32/debug/libdrpreload.dylib",
-        "lib32/debug/libdynamorio.dylib",
-        "lib32/release/libdrpreload.dylib",
-        "lib32/release/libdynamorio.dylib",
-        "lib64/debug/libdrpreload.dylib",
-        "lib64/debug/libdynamorio.dylib",
-        "lib64/release/libdrpreload.dylib",
-        "lib64/release/libdynamorio.dylib"
+        "libapp.dylib",
+        "libapp.dylib"
 #else /* LINUX */
-        "lib32/debug/libdrpreload.so",
-        "lib32/debug/libdynamorio.so",
-        "lib32/release/libdrpreload.so",
-        "lib32/release/libdynamorio.so",
-        "lib64/debug/libdrpreload.so",
-        "lib64/debug/libdynamorio.so",
-        "lib64/release/libdrpreload.so",
-        "lib64/release/libdynamorio.so"
+        "libapp.so",
+        "libapp.so"
 #endif
     };
 
@@ -869,15 +814,12 @@ _tmain(int argc, TCHAR *targv[])
     c = buf + strlen(buf) - 1;
     while (*c != '\\' && *c != '/' && c > buf)
         c--;
-    _snprintf(c+1, BUFFER_SIZE_ELEMENTS(buf) - (c+1-buf), "..");
+    //_snprintf(c+1, BUFFER_SIZE_ELEMENTS(buf) - (c+1-buf), "..");
     NULL_TERMINATE_BUFFER(buf);
     get_absolute_path(buf, default_root, BUFFER_SIZE_ELEMENTS(default_root));
     NULL_TERMINATE_BUFFER(default_root);
     dr_root = default_root;
     info("default root: %s", default_root);
-
-    /* we re-read the tool list if the root or platform change */
-    read_tool_list(dr_root, dr_platform);
 
     /* parse command line */
     for (i=1; i<argc; i++) {
@@ -922,12 +864,10 @@ _tmain(int argc, TCHAR *targv[])
 #endif
         else if (strcmp(argv[i], "-32") == 0) {
             dr_platform = DR_PLATFORM_32BIT;
-            read_tool_list(dr_root, dr_platform);
             continue;
         }
         else if (strcmp(argv[i], "-64") == 0) {
             dr_platform = DR_PLATFORM_64BIT;
-            read_tool_list(dr_root, dr_platform);
             continue;
         }
 #if defined(DRRUN) || defined(DRINJECT)
@@ -1008,7 +948,6 @@ _tmain(int argc, TCHAR *targv[])
             /* support -dr_home alias used by script */
             strcmp(argv[i], "-dr_home") == 0) {
             dr_root = argv[++i];
-            read_tool_list(dr_root, dr_platform);
         }
         else if (strcmp(argv[i], "-logdir") == 0) {
             /* Accept this for compatibility with the old drrun shell script. */
@@ -1229,10 +1168,6 @@ _tmain(int argc, TCHAR *targv[])
     }
 
 #ifdef DRCONFIG
-    if (verbose) {
-        dr_get_config_dir(global, true/*use temp*/, buf, BUFFER_SIZE_ELEMENTS(buf));
-        info("configuration directory is \"%s\"", buf);
-    }
     if (action == action_register) {
         if (!register_proc(process, 0, global, dr_root, dr_mode,
                            use_debug, dr_platform, extra_ops))
@@ -1253,11 +1188,6 @@ _tmain(int argc, TCHAR *targv[])
     exitcode = 0;
     goto cleanup;
 #else /* DRCONFIG */
-    if (!global) {
-        /* i#939: attempt to work w/o any HOME/USERPROFILE by using a temp dir */
-        dr_get_config_dir(global, true/*use temp*/, buf, BUFFER_SIZE_ELEMENTS(buf));
-        info("configuration directory is \"%s\"", buf);
-    }
 # ifdef UNIX
     /* i#1676: detect whether under gdb */
     _snprintf(buf, BUFFER_SIZE_ELEMENTS(buf), "/proc/%d/exe", getppid());
