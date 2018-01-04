@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib64/libdrhelper.a  CMakeFiles/drhelper.dir/arch/asm_shared.asm.o CMakeFiles/drhelper.dir/arch/x86/x86_shared.asm.o CMakeFiles/drhelper.dir/lib/dr_helper.c.o
-/usr/bin/ranlib ../lib64/libdrhelper.a
