@@ -1086,7 +1086,7 @@ get_application_name(void)
 /* Note: this is exported so that libdrpreload.so (preload.c) can use it to
  * get process names to do selective process following (PR 212034).  The
  * alternative is to duplicate or compile in this code into libdrpreload.so,
- * which is messy.  Besides, libdynamorio.so is already loaded into the process
+ * which is messy.  Besides, libapp.so is already loaded into the process
  * and avaiable, so cleaner to just use functions from it.
  */
 DYNAMORIO_EXPORT const char *
@@ -5826,7 +5826,7 @@ script_file_reader(const char *pathname, void *buf, size_t count)
 /* For early injection, recognise when the executable is a script ("#!") and
  * modify the syscall parameters to invoke a script interpreter instead. In
  * this case we will have allocated memory here but we expect the caller to
- * do a non-failing execve of libdynamorio.so and therefore not to have to
+ * do a non-failing execve of libapp.so and therefore not to have to
  * free the memory. That is one reason for checking that the (final) script
  * interpreter really is an executable binary.
  * We recognise one error case here and return the non-zero error code (ELOOP)
@@ -5959,7 +5959,7 @@ handle_execve(dcontext_t *dcontext)
 
 #ifdef LINUX
     if (DYNAMO_OPTION(early_inject) && symlink_is_self_exe(fname)) {
-        /* i#907: /proc/self/exe points at libdynamorio.so.  Make sure we run
+        /* i#907: /proc/self/exe points at libapp.so.  Make sure we run
          * the right thing here.
          */
         fname = get_application_name();
@@ -6053,7 +6053,7 @@ handle_execve(dcontext_t *dcontext)
      * and fail the syscall once the kernel execs DR!
      */
     if (should_inject && DYNAMO_OPTION(early_inject) && !expect_to_fail) {
-        /* i#909: change the target image to libdynamorio.so */
+        /* i#909: change the target image to libapp.so */
         const char *drpath = IF_X64_ELSE(x64, !x64) ? dynamorio_library_filepath :
             dynamorio_alt_arch_filepath;
         TRY_EXCEPT(dcontext, /* try */ {
@@ -8610,10 +8610,10 @@ post_system_call(dcontext_t *dcontext)
     case SYS_readlinkat:
         if (success && DYNAMO_OPTION(early_inject)) {
             bool is_at = (sysnum == SYS_readlinkat);
-            /* i#907: /proc/self/exe is a symlink to libdynamorio.so.  We need
+            /* i#907: /proc/self/exe is a symlink to libapp.so.  We need
              * to fix it up if the app queries.  Any thread id can be passed to
              * /proc/%d/exe, so we have to check.  We could instead look for
-             * libdynamorio.so in the result but we've tweaked our injector
+             * libapp.so in the result but we've tweaked our injector
              * in the past to exec different binaries so this seems more robust.
              */
             if (symlink_is_self_exe((const char *)(is_at ? dcontext->sys_param1 :
@@ -10446,7 +10446,7 @@ native_exec_os_init(void)
  */
 
 /* This variable is only used by os_set_page_size and os_page_size, but those
- * functions may be called before libdynamorio.so has been relocated. So check
+ * functions may be called before libapp.so has been relocated. So check
  * the disassembly of those functions: there should be no relocations.
  */
 static size_t page_size = 0;
