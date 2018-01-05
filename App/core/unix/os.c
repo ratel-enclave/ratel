@@ -293,7 +293,7 @@ static void handle_restartable_region_syscall_post(dcontext_t *dcontext, bool su
 
 /* full path to our own library, used for execve */
 static char dynamorio_library_path[MAXIMUM_PATH]; /* just dir */
-static char dynamorio_library_filepath[MAXIMUM_PATH];
+static char app_library_filepath[MAXIMUM_PATH];
 /* Issue 20: path to other architecture */
 static char dynamorio_alt_arch_path[MAXIMUM_PATH];
 static char dynamorio_alt_arch_filepath[MAXIMUM_PATH]; /* just dir */
@@ -5642,7 +5642,7 @@ add_dr_env_vars(dcontext_t *dcontext, char *inject_library_path, const char *app
                 strstr(envp[idx], "LD_PRELOAD=") == envp[idx]) {
                 preload = idx;
                 if (strstr(envp[idx], DYNAMORIO_PRELOAD_NAME) != NULL &&
-                    strstr(envp[idx], DYNAMORIO_LIBRARY_NAME) != NULL) {
+                    strstr(envp[idx], APP_LIBRARY_NAME) != NULL) {
                     preload_us = true;
                 }
             }
@@ -5681,19 +5681,19 @@ add_dr_env_vars(dcontext_t *dcontext, char *inject_library_path, const char *app
         if (preload >= 0) {
             /* replace the existing preload */
             sz = strlen(envp[preload]) + strlen(DYNAMORIO_PRELOAD_NAME)+
-                strlen(DYNAMORIO_LIBRARY_NAME) + 3;
+                strlen(APP_LIBRARY_NAME) + 3;
             var = heap_alloc(dcontext, sizeof(char)*sz HEAPACCT(ACCT_OTHER));
             old = envp[preload] + strlen("LD_PRELOAD=");
             snprintf(var, sz, "LD_PRELOAD=%s %s %s",
-                     DYNAMORIO_PRELOAD_NAME, DYNAMORIO_LIBRARY_NAME, old);
+                     DYNAMORIO_PRELOAD_NAME, APP_LIBRARY_NAME, old);
             idx_preload = preload;
         } else {
             /* add new preload */
             sz = strlen("LD_PRELOAD=") + strlen(DYNAMORIO_PRELOAD_NAME) +
-                strlen(DYNAMORIO_LIBRARY_NAME) + 2;
+                strlen(APP_LIBRARY_NAME) + 2;
             var = heap_alloc(dcontext, sizeof(char)*sz HEAPACCT(ACCT_OTHER));
             snprintf(var, sz, "LD_PRELOAD=%s %s",
-                     DYNAMORIO_PRELOAD_NAME, DYNAMORIO_LIBRARY_NAME);
+                     DYNAMORIO_PRELOAD_NAME, APP_LIBRARY_NAME);
             idx_preload = idx++;
         }
         *(var+sz-1) = '\0'; /* null terminate */
@@ -6054,7 +6054,7 @@ handle_execve(dcontext_t *dcontext)
      */
     if (should_inject && DYNAMO_OPTION(early_inject) && !expect_to_fail) {
         /* i#909: change the target image to libapp.so */
-        const char *drpath = IF_X64_ELSE(x64, !x64) ? dynamorio_library_filepath :
+        const char *drpath = IF_X64_ELSE(x64, !x64) ? app_library_filepath :
             dynamorio_alt_arch_filepath;
         TRY_EXCEPT(dcontext, /* try */ {
             if (symlink_is_self_exe(argv[0])) {
@@ -8688,7 +8688,7 @@ post_system_call(dcontext_t *dcontext)
  * assumed to be called prior to find_executable_vm_areas.
  */
 static int
-get_dynamo_library_bounds(void)
+get_app_library_bounds(void)
 {
     /* Note that we're not counting DYNAMORIO_PRELOAD_NAME as a DR area, to match
      * Windows, so we should unload it like we do there. The other reason not to
@@ -8704,7 +8704,7 @@ get_dynamo_library_bounds(void)
      * address.
      */
     dynamorio_libname = NULL;
-    check_start = (app_pc)&get_dynamo_library_bounds;
+    check_start = (app_pc)&get_app_library_bounds;
 #else /* !STATIC_LIBRARY */
 #  ifdef LINUX
     /* PR 361594: we get our bounds from linker-provided symbols.
@@ -8718,7 +8718,7 @@ get_dynamo_library_bounds(void)
     dynamo_dll_start = module_dynamorio_lib_base();
 #  endif
     check_start = dynamo_dll_start;
-    dynamorio_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,DYNAMORIO_LIBRARY_NAME);
+    dynamorio_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,APP_LIBRARY_NAME);
 #endif /* STATIC_LIBRARY */
     res = memquery_library_bounds(dynamorio_libname,
                                   &check_start, &check_end,
@@ -8726,9 +8726,9 @@ get_dynamo_library_bounds(void)
                                   BUFFER_SIZE_ELEMENTS(dynamorio_library_path));
     LOG(GLOBAL, LOG_VMAREAS, 1, PRODUCT_NAME" library path: %s\n",
         dynamorio_library_path);
-    snprintf(dynamorio_library_filepath, BUFFER_SIZE_ELEMENTS(dynamorio_library_filepath),
+    snprintf(app_library_filepath, BUFFER_SIZE_ELEMENTS(app_library_filepath),
              "%s%s", dynamorio_library_path, dynamorio_libname);
-    NULL_TERMINATE_BUFFER(dynamorio_library_filepath);
+    NULL_TERMINATE_BUFFER(app_library_filepath);
 #if !defined(STATIC_LIBRARY) && defined(LINUX)
     ASSERT(check_start == dynamo_dll_start && check_end == dynamo_dll_end);
 #elif defined(MACOS)
@@ -8767,12 +8767,21 @@ get_dynamo_library_bounds(void)
 
 /* get full path to our own library, (cached), used for forking and message file name */
 char*
-get_dynamorio_library_path(void)
+get_app_library_path(void)
 {
-    if (!dynamorio_library_filepath[0]) { /* not cached */
-        get_dynamo_library_bounds();
+    if (!app_library_filepath[0]) { /* not cached */
+        get_app_library_bounds();
     }
-    return dynamorio_library_filepath;
+    return app_library_filepath;
+}
+
+char*
+get_enclave_library_path(void)
+{
+    if (!app_library_filepath[0]) { /* not cached */
+        get_app_library_bounds();
+    }
+    return app_library_filepath;
 }
 
 #ifdef LINUX
@@ -8891,7 +8900,7 @@ app_pc
 get_dynamorio_dll_start()
 {
     if (dynamo_dll_start == NULL)
-        get_dynamo_library_bounds();
+        get_app_library_bounds();
     ASSERT(dynamo_dll_start != NULL);
     return dynamo_dll_start;
 }
@@ -8900,7 +8909,7 @@ app_pc
 get_dynamorio_dll_end()
 {
     if (dynamo_dll_end == NULL)
-        get_dynamo_library_bounds();
+        get_app_library_bounds();
     ASSERT(dynamo_dll_end != NULL);
     return dynamo_dll_end;
 }
@@ -9193,7 +9202,7 @@ int
 find_dynamo_library_vm_areas(void)
 {
 #ifndef STATIC_LIBRARY
-    /* We didn't add inside get_dynamo_library_bounds b/c it was called pre-alloc.
+    /* We didn't add inside get_app_library_bounds b/c it was called pre-alloc.
      * We don't bother to break down the sub-regions.
      * Assumption: we don't need to have the protection flags for DR sub-regions.
      * For static library builds, DR's code is in the exe and isn't considered
@@ -9201,7 +9210,7 @@ find_dynamo_library_vm_areas(void)
      */
     add_dynamo_vm_area(get_dynamorio_dll_start(), get_dynamorio_dll_end(),
                        MEMPROT_READ|MEMPROT_WRITE|MEMPROT_EXEC,
-                       true /* from image */ _IF_DEBUG(dynamorio_library_filepath));
+                       true /* from image */ _IF_DEBUG(app_library_filepath));
 #endif
 #ifdef VMX86_SERVER
     if (os_in_vmkernel_userworld())

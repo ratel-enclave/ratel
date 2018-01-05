@@ -52,10 +52,12 @@
 
 #ifdef MACOS
 /* We end up de-referencing the symlink so we rely on a prefix match */
-# define DYNAMORIO_LIBRARY_NAME "libdynamorio."
+# define APP_LIBRARY_NAME "libapp.dylib"
+# define ENCLAVE_LIBRARY_NAME "libenclave.dylib"
 # define DYNAMORIO_PRELOAD_NAME "libdrpreload.dylib"
 #else
-# define DYNAMORIO_LIBRARY_NAME "libapp.so"
+# define APP_LIBRARY_NAME "libapp.so"
+# define ENCLAVE_LIBRARY_NAME "libenclave.so"
 # define DYNAMORIO_PRELOAD_NAME "libdrpreload.so"
 #endif
 

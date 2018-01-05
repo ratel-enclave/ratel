@@ -657,7 +657,7 @@ privload_add_subdir_path(const char *subdir)
      * by the same /lib{32,64}/{debug,release}/.
      * XXX: this does not work from a build dir: only using exports!
      */
-    path = get_dynamorio_library_path();
+    path = get_app_library_path();
     mid = strstr(path, LIB_SUBDIR);
     if (mid != NULL &&
         search_paths_idx < SEARCH_PATHS_NUM &&

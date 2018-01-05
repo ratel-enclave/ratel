@@ -1286,15 +1286,16 @@ typedef char liststring_t[MAX_LIST_OPTION_LENGTH];
 #  define L_SVCHOST_EXE_NAME   L_EXPAND_LEVEL(SVCHOST_NAME) L_EXPAND_LEVEL(EXE_SUFFIX)
 
 /* for processview, etc */
-#  define DYNAMORIO_LIBRARY_NAME "dynamorio.dll"
-#  define DLLPATH_RELEASE    "\\lib\\release\\" DYNAMORIO_LIBRARY_NAME
-#  define DLLPATH_DEBUG      "\\lib\\debug\\" DYNAMORIO_LIBRARY_NAME
-#  define DLLPATH_PROFILE    "\\lib\\profile\\" DYNAMORIO_LIBRARY_NAME
+#  define APP_LIBRARY_NAME "app.dll"
+#  define ENCLAVE_LIBRARY_NAME "enclave.dll"
+#  define DLLPATH_RELEASE    "\\lib\\release\\" APP_LIBRARY_NAME
+#  define DLLPATH_DEBUG      "\\lib\\debug\\" APP_LIBRARY_NAME
+#  define DLLPATH_PROFILE    "\\lib\\profile\\" APP_LIBRARY_NAME
 
-#  define L_DYNAMORIO_LIBRARY_NAME L_EXPAND_LEVEL(DYNAMORIO_LIBRARY_NAME)
-#  define L_DLLPATH_RELEASE    L"\\lib\\release\\" L_DYNAMORIO_LIBRARY_NAME
-#  define L_DLLPATH_DEBUG      L"\\lib\\debug\\" L_DYNAMORIO_LIBRARY_NAME
-#  define L_DLLPATH_PROFILE    L"\\lib\\profile\\" L_DYNAMORIO_LIBRARY_NAME
+#  define L_APP_LIBRARY_NAME L_EXPAND_LEVEL(APP_LIBRARY_NAME)
+#  define L_DLLPATH_RELEASE    L"\\lib\\release\\" L_APP_LIBRARY_NAME
+#  define L_DLLPATH_DEBUG      L"\\lib\\debug\\" L_APP_LIBRARY_NAME
+#  define L_DLLPATH_PROFILE    L"\\lib\\profile\\" L_APP_LIBRARY_NAME
 
 #  define INJECT_ALL_DLL_SUBPATH   "\\lib\\" INJECT_DLL_8_3_NAME
 #  define L_INJECT_ALL_DLL_SUBPATH   L"\\lib\\" L_EXPAND_LEVEL(INJECT_DLL_8_3_NAME)

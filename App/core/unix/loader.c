@@ -248,7 +248,7 @@ os_loader_init_prologue(void)
                           get_dynamorio_dll_start(),
                           get_dynamorio_dll_end() - get_dynamorio_dll_start(),
                           get_shared_lib_name(get_dynamorio_dll_start()),
-                          get_dynamorio_library_path());
+                          get_app_library_path());
     ASSERT(mod != NULL);
     /* If DR was loaded by system ld.so, then .dynamic *was* relocated (i#1589) */
     privload_create_os_privmod_data(mod, !DYNAMO_OPTION(early_inject));
@@ -283,13 +283,13 @@ os_loader_init_prologue(void)
         byte *dr_base = get_dynamorio_dll_start(), *pref_base;
         elf_loader_t dr_ld;
         IF_DEBUG(bool success = )
-            elf_loader_read_headers(&dr_ld, get_dynamorio_library_path());
+            elf_loader_read_headers(&dr_ld, get_app_library_path());
         ASSERT(success);
         module_walk_program_headers(dr_base, get_dynamorio_dll_end() - dr_base,
                                     false, false, (byte **)&pref_base,
                                     NULL, NULL, NULL, NULL);
         dr_ld.load_delta = dr_base - pref_base;
-        privload_add_gdb_cmd(&dr_ld, get_dynamorio_library_path(), false/*!reach*/);
+        privload_add_gdb_cmd(&dr_ld, get_app_library_path(), false/*!reach*/);
         elf_loader_destroy(&dr_ld);
     }
 # endif
@@ -1631,7 +1631,7 @@ dynamorio_lib_gap_empty(void)
         while (memquery_iterator_next(&iter) && iter.vm_start < dr_end) {
             if (iter.vm_start >= dr_start && iter.vm_end <= dr_end &&
                 iter.comment[0] != '\0' &&
-                strstr(iter.comment, DYNAMORIO_LIBRARY_NAME) == NULL) {
+                strstr(iter.comment, APP_LIBRARY_NAME) == NULL) {
                 /* There's a non-anon mapping inside: probably vvar and/or vdso. */
                 res = false;
                 break;
@@ -1689,6 +1689,7 @@ relocate_dynamorio(byte *dr_map, size_t dr_size, byte *sp)
 /* i#1227: on a conflict with the app we reload ourselves.
  * Does not return.
  */
+/* The function name is misleading. In fact, libapp.so loads libenclave.so */
 static void
 reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
 {
@@ -1699,61 +1700,15 @@ reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
      * even if they were all in the conflict area.
      */
 #define MAX_TEMP_MAPS 16
-    byte *temp_map[MAX_TEMP_MAPS];
-    size_t temp_size[MAX_TEMP_MAPS];
-    uint num_temp_maps = 0, i;
-    memquery_iter_t iter;
     app_pc entry;
     byte *cur_dr_map = get_dynamorio_dll_start();
     byte *cur_dr_end = get_dynamorio_dll_end();
     size_t dr_size = cur_dr_end - cur_dr_map;
     IF_DEBUG(bool success = )
-        elf_loader_read_headers(&dr_ld, get_dynamorio_library_path());
+        elf_loader_read_headers(&dr_ld, get_app_library_path());
     ASSERT(success);
 
-    /* XXX: have better strategy for picking base: currently we rely on
-     * the kernel picking an address, so we have to block out the conflicting
-     * region first, avoiding any existing mappings (like vvar+vdso: i#2641).
-     */
-    if (memquery_iterator_start(&iter, NULL, false/*no heap*/)) {
-        /* Strategy: track the leading edge ("tocover_start") of the conflict region.
-         * Find the next block beyond that edge so we know the safe endpoint for a
-         * temp mmap.
-         */
-        byte *tocover_start = conflict_start;
-        while (memquery_iterator_next(&iter)) {
-            if (iter.vm_start > tocover_start) {
-                temp_map[num_temp_maps] = tocover_start;
-                temp_size[num_temp_maps] =
-                    MIN(iter.vm_start, conflict_end) - tocover_start;
-                tocover_start = iter.vm_end;
-                if (temp_size[num_temp_maps] > 0) {
-                    temp_map[num_temp_maps] =
-                        os_map_file(-1, &temp_size[num_temp_maps], 0,
-                                    temp_map[num_temp_maps], MEMPROT_NONE,
-                                    MAP_FILE_COPY_ON_WRITE | MAP_FILE_FIXED);
-                    ASSERT(temp_map[num_temp_maps] != NULL);
-                    num_temp_maps++;
-                }
-            } else if (iter.vm_end > tocover_start) {
-                tocover_start = iter.vm_end;
-            }
-            if (iter.vm_start >= conflict_end)
-                break;
-        }
-        memquery_iterator_stop(&iter);
-        if (tocover_start < conflict_end) {
-            temp_map[num_temp_maps] = tocover_start;
-            temp_size[num_temp_maps] = conflict_end - tocover_start;
-            temp_map[num_temp_maps] =
-                os_map_file(-1, &temp_size[num_temp_maps], 0, temp_map[num_temp_maps],
-                            MEMPROT_NONE, MAP_FILE_COPY_ON_WRITE | MAP_FILE_FIXED);
-            ASSERT(temp_map[num_temp_maps] != NULL);
-            num_temp_maps++;
-        }
-    }
-
-    /* Now load the 2nd libapp.so */
+    /* Now load the libenclave.so */
     dr_map = elf_loader_map_phdrs(&dr_ld, false /*!fixed*/, os_map_file,
                                   os_unmap_file, os_set_protection, 0/*!reachable*/);
     ASSERT(dr_map != NULL);
@@ -1768,8 +1723,6 @@ reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
     ASSERT(opd.tls_block_size == 0);
     privload_relocate_os_privmod_data(&opd, dr_map);
 
-    for (i = 0; i < num_temp_maps; i++)
-        os_unmap_file(temp_map[i], temp_size[i]);
 
     entry = (app_pc)dr_ld.ehdr->e_entry + dr_ld.load_delta;
     elf_loader_destroy(&dr_ld);
@@ -1778,7 +1731,7 @@ reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
      * first restoring init_sp.  We pass along the current (old) DR's bounds
      * for removal.
      */
-    xfer_to_new_libdr(entry, init_sp, cur_dr_map, dr_size);
+    xfer_to_new_libdr(entry, init_sp, 0, dr_size);
 
     ASSERT_NOT_REACHED();
 }
@@ -1836,7 +1789,7 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
                     (iter.comment[0] == '\0' /* .bss */ ||
                      /* The kernel sometimes mis-labels our .bss as "[heap]". */
                      strcmp(iter.comment, "[heap]") == 0 ||
-                     strstr(iter.comment, DYNAMORIO_LIBRARY_NAME) != NULL)) {
+                     strstr(iter.comment, APP_LIBRARY_NAME) != NULL)) {
                     os_unmap_file(iter.vm_start, iter.vm_end - iter.vm_start);
                 }
                 if (iter.vm_start >= old_libdr_base + old_libdr_size)
