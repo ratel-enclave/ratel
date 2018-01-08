@@ -3458,7 +3458,7 @@ abort_on_fault(dcontext_t *dcontext, uint dumpcore_flag, app_pc pc, byte *target
                              fmt, prefix,
                              stack_overflow ? STACK_OVERFLOW_NAME : CRASH_NAME,
                              pc, signame, where, pc, get_thread_id(),
-                             get_dynamorio_dll_start(),
+                             get_appso_start(),
 #ifdef X86
                              sc->SC_XAX, sc->SC_XBX, sc->SC_XCX, sc->SC_XDX,
                              sc->SC_XSI, sc->SC_XDI, sc->SC_XSP, sc->SC_XBP,

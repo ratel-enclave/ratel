@@ -427,6 +427,7 @@ shared_library_bounds(IN shlib_handle_t lib, IN byte *addr,
                       OUT byte **start, OUT byte **end);
 #endif
 char *get_app_library_path(void);
+char *get_enclave_library_path(void);
 
 /* DR_API EXPORT TOFILE dr_tools.h */
 /* DR_API EXPORT BEGIN */
@@ -757,8 +758,8 @@ extern uint datasec_writable_cxtswprot;
 void mem_stats_snapshot(void);
 #endif
 
-app_pc get_dynamorio_dll_start(void);
-app_pc get_dynamorio_dll_preferred_base(void);
+app_pc get_appso_start(void);
+app_pc get_appso_preferred_base(void);
 
 bool is_in_dynamo_dll(app_pc pc);
 int find_dynamo_library_vm_areas(void);

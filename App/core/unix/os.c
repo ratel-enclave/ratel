@@ -292,11 +292,13 @@ static void handle_restartable_region_syscall_post(dcontext_t *dcontext, bool su
 #endif
 
 /* full path to our own library, used for execve */
-static char dynamorio_library_path[MAXIMUM_PATH]; /* just dir */
+static char app_library_path[MAXIMUM_PATH]; /* just dir */
 static char app_library_filepath[MAXIMUM_PATH];
+static char enclave_library_path[MAXIMUM_PATH]; /* just dir */
+static char enclave_library_filepath[MAXIMUM_PATH];
 /* Issue 20: path to other architecture */
-static char dynamorio_alt_arch_path[MAXIMUM_PATH];
-static char dynamorio_alt_arch_filepath[MAXIMUM_PATH]; /* just dir */
+static char app_alt_arch_path[MAXIMUM_PATH];
+static char app_alt_arch_filepath[MAXIMUM_PATH]; /* just dir */
 /* Makefile passes us LIBDIR_X{86,64} defines */
 #define DR_LIBDIR_X86 STRINGIFY(LIBDIR_X86)
 #define DR_LIBDIR_X64 STRINGIFY(LIBDIR_X64)
@@ -907,7 +909,7 @@ os_init(void)
 #endif
 
     /* Ensure initialization */
-    get_dynamorio_dll_start();
+    get_appso_start();
 
 #ifdef LINUX
     if (DYNAMO_OPTION(emulate_brk))
@@ -6027,8 +6029,8 @@ handle_execve(dcontext_t *dcontext)
         os_close(file);
     } else
         expect_to_fail = true;
-    inject_library_path = IF_X64_ELSE(x64, !x64) ? dynamorio_library_path :
-        dynamorio_alt_arch_path;
+    inject_library_path = IF_X64_ELSE(x64, !x64) ? app_library_path :
+        app_alt_arch_path;
 
     should_inject = DYNAMO_OPTION(follow_children);
     if (get_config_val_other_app(get_short_name(fname), get_process_id(),
@@ -6055,7 +6057,7 @@ handle_execve(dcontext_t *dcontext)
     if (should_inject && DYNAMO_OPTION(early_inject) && !expect_to_fail) {
         /* i#909: change the target image to libapp.so */
         const char *drpath = IF_X64_ELSE(x64, !x64) ? app_library_filepath :
-            dynamorio_alt_arch_filepath;
+            app_alt_arch_filepath;
         TRY_EXCEPT(dcontext, /* try */ {
             if (symlink_is_self_exe(argv[0])) {
                 /* we're out of sys_param entries so we assume argv[0] == fname */
@@ -8698,12 +8700,12 @@ get_app_library_bounds(void)
     int res;
     app_pc check_start, check_end;
     char *libdir;
-    const char *dynamorio_libname;
+    const char *app_libname;
 #ifdef STATIC_LIBRARY
     /* We don't know our image name, so look up our bounds with an internal
      * address.
      */
-    dynamorio_libname = NULL;
+    app_libname = NULL;
     check_start = (app_pc)&get_app_library_bounds;
 #else /* !STATIC_LIBRARY */
 #  ifdef LINUX
@@ -8718,16 +8720,16 @@ get_app_library_bounds(void)
     dynamo_dll_start = module_dynamorio_lib_base();
 #  endif
     check_start = dynamo_dll_start;
-    dynamorio_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,APP_LIBRARY_NAME);
+    app_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,APP_LIBRARY_NAME);
 #endif /* STATIC_LIBRARY */
-    res = memquery_library_bounds(dynamorio_libname,
+    res = memquery_library_bounds(app_libname,
                                   &check_start, &check_end,
-                                  dynamorio_library_path,
-                                  BUFFER_SIZE_ELEMENTS(dynamorio_library_path));
+                                  app_library_path,
+                                  BUFFER_SIZE_ELEMENTS(app_library_path));
     LOG(GLOBAL, LOG_VMAREAS, 1, PRODUCT_NAME" library path: %s\n",
-        dynamorio_library_path);
+        app_library_path);
     snprintf(app_library_filepath, BUFFER_SIZE_ELEMENTS(app_library_filepath),
-             "%s%s", dynamorio_library_path, dynamorio_libname);
+             "%s%s", app_library_path, app_libname);
     NULL_TERMINATE_BUFFER(app_library_filepath);
 #if !defined(STATIC_LIBRARY) && defined(LINUX)
     ASSERT(check_start == dynamo_dll_start && check_end == dynamo_dll_end);
@@ -8743,24 +8745,24 @@ get_app_library_bounds(void)
     ASSERT(res > 0);
 
     /* Issue 20: we need the path to the alt arch */
-    strncpy(dynamorio_alt_arch_path, dynamorio_library_path,
-            BUFFER_SIZE_ELEMENTS(dynamorio_alt_arch_path));
+    strncpy(app_alt_arch_path, app_library_path,
+            BUFFER_SIZE_ELEMENTS(app_alt_arch_path));
     /* Assumption: libdir name is not repeated elsewhere in path */
-    libdir = strstr(dynamorio_alt_arch_path, IF_X64_ELSE(DR_LIBDIR_X64, DR_LIBDIR_X86));
+    libdir = strstr(app_alt_arch_path, IF_X64_ELSE(DR_LIBDIR_X64, DR_LIBDIR_X86));
     if (libdir != NULL) {
         const char *newdir = IF_X64_ELSE(DR_LIBDIR_X86, DR_LIBDIR_X64);
         /* do NOT place the NULL */
         strncpy(libdir, newdir, strlen(newdir));
     } else {
-        SYSLOG_INTERNAL_WARNING("unable to determine lib path for cross-arch execve");
+        //SYSLOG_INTERNAL_WARNING("unable to determine lib path for cross-arch execve");
     }
-    NULL_TERMINATE_BUFFER(dynamorio_alt_arch_path);
+    NULL_TERMINATE_BUFFER(app_alt_arch_path);
     LOG(GLOBAL, LOG_VMAREAS, 1, PRODUCT_NAME" alt arch path: %s\n",
-        dynamorio_alt_arch_path);
-    snprintf(dynamorio_alt_arch_filepath,
-             BUFFER_SIZE_ELEMENTS(dynamorio_alt_arch_filepath),
-             "%s%s", dynamorio_alt_arch_path, dynamorio_libname);
-    NULL_TERMINATE_BUFFER(dynamorio_alt_arch_filepath);
+        app_alt_arch_path);
+    snprintf(app_alt_arch_filepath,
+             BUFFER_SIZE_ELEMENTS(app_alt_arch_filepath),
+             "%s%s", app_alt_arch_path, app_libname);
+    NULL_TERMINATE_BUFFER(app_alt_arch_filepath);
 
     return res;
 }
@@ -8778,10 +8780,14 @@ get_app_library_path(void)
 char*
 get_enclave_library_path(void)
 {
-    if (!app_library_filepath[0]) { /* not cached */
-        get_app_library_bounds();
+    if (!enclave_library_filepath[0]) { /* not cached */
+        const char *enclave_libname;
+        enclave_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,ENCLAVE_LIBRARY_NAME);
+        snprintf(enclave_library_filepath, BUFFER_SIZE_ELEMENTS(enclave_library_filepath),
+                "%s%s", enclave_library_path, enclave_libname);
+        NULL_TERMINATE_BUFFER(enclave_library_filepath);
     }
-    return app_library_filepath;
+    return enclave_library_filepath;
 }
 
 #ifdef LINUX
@@ -8897,7 +8903,7 @@ is_in_dynamo_dll(app_pc pc)
 }
 
 app_pc
-get_dynamorio_dll_start()
+get_appso_start()
 {
     if (dynamo_dll_start == NULL)
         get_app_library_bounds();
@@ -8906,7 +8912,7 @@ get_dynamorio_dll_start()
 }
 
 app_pc
-get_dynamorio_dll_end()
+get_appso_end()
 {
     if (dynamo_dll_end == NULL)
         get_app_library_bounds();
@@ -8915,11 +8921,11 @@ get_dynamorio_dll_end()
 }
 
 app_pc
-get_dynamorio_dll_preferred_base()
+get_appso_preferred_base()
 {
     /* on Linux there is no preferred base if we're PIC,
      * therefore is always equal to dynamo_dll_start  */
-    return get_dynamorio_dll_start();
+    return get_appso_start();
 }
 
 /* assumed to be called after find_dynamo_library_vm_areas() */
@@ -9208,7 +9214,7 @@ find_dynamo_library_vm_areas(void)
      * For static library builds, DR's code is in the exe and isn't considered
      * to be a DR area.
      */
-    add_dynamo_vm_area(get_dynamorio_dll_start(), get_dynamorio_dll_end(),
+    add_dynamo_vm_area(get_appso_start(), get_appso_end(),
                        MEMPROT_READ|MEMPROT_WRITE|MEMPROT_EXEC,
                        true /* from image */ _IF_DEBUG(app_library_filepath));
 #endif

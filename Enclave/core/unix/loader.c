@@ -1873,7 +1873,9 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
     exe_map = module_vaddr_from_prog_header((app_pc)exe_ld.phdrs,
                                             exe_ld.ehdr->e_phnum, NULL, &exe_end);
     /* i#1227: on a conflict with the app (+ room for the brk): reload ourselves */
-    if (get_dynamorio_dll_start() < exe_end+APP_BRK_GAP &&
+    get_dynamorio_dll_start();
+    if (old_libdr_base != NULL &&
+        get_dynamorio_dll_start() < exe_end+APP_BRK_GAP &&
         get_dynamorio_dll_end() > exe_map) {
         reload_dynamorio(sp, exe_map, exe_end+APP_BRK_GAP);
         ASSERT_NOT_REACHED();

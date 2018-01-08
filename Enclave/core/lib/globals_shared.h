@@ -1286,7 +1286,7 @@ typedef char liststring_t[MAX_LIST_OPTION_LENGTH];
 #  define L_SVCHOST_EXE_NAME   L_EXPAND_LEVEL(SVCHOST_NAME) L_EXPAND_LEVEL(EXE_SUFFIX)
 
 /* for processview, etc */
-#  define DYNAMORIO_LIBRARY_NAME "dynamorio.dll"
+#  define DYNAMORIO_LIBRARY_NAME "enclave.dll"
 #  define DLLPATH_RELEASE    "\\lib\\release\\" DYNAMORIO_LIBRARY_NAME
 #  define DLLPATH_DEBUG      "\\lib\\debug\\" DYNAMORIO_LIBRARY_NAME
 #  define DLLPATH_PROFILE    "\\lib\\profile\\" DYNAMORIO_LIBRARY_NAME

@@ -2031,8 +2031,8 @@ elf_loader_map_phdrs(elf_loader_t *elf, bool fixed, map_fn_t map_func,
                                              elf->ehdr->e_phnum, NULL, &map_end);
 
 #ifndef NOT_DYNAMORIO_CORE_PROPER
-    if (fixed && (get_dynamorio_dll_start() < map_end &&
-                  get_dynamorio_dll_end() > map_base)) {
+    if (fixed && (get_appso_start() < map_end &&
+                  get_appso_end() > map_base)) {
         FATAL_USAGE_ERROR(FIXED_MAP_OVERLAPS_DR, 3,
                           get_application_name(), get_application_pid(),
                           elf->filename);

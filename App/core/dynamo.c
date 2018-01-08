@@ -3231,7 +3231,7 @@ get_data_section_bounds(uint sec)
            TEST(DATASEC_SELFPROT[sec], dynamo_options.protect_mask));
     mutex_lock(&datasec_lock[sec]);
     ASSERT(datasec_start[sec] == NULL);
-    get_named_section_bounds(get_dynamorio_dll_start(), DATASEC_NAMES[sec],
+    get_named_section_bounds(get_appso_start(), DATASEC_NAMES[sec],
                              &datasec_start[sec], &datasec_end[sec]);
     mutex_unlock(&datasec_lock[sec]);
     ASSERT(ALIGNED(datasec_start[sec], PAGE_SIZE));

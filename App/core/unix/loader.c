@@ -245,9 +245,9 @@ os_loader_init_prologue(void)
 #ifndef STATIC_LIBRARY
     /* insert libapp.so */
     mod = privload_insert(NULL,
-                          get_dynamorio_dll_start(),
-                          get_dynamorio_dll_end() - get_dynamorio_dll_start(),
-                          get_shared_lib_name(get_dynamorio_dll_start()),
+                          get_appso_start(),
+                          get_appso_end() - get_appso_start(),
+                          get_shared_lib_name(get_appso_start()),
                           get_app_library_path());
     ASSERT(mod != NULL);
     /* If DR was loaded by system ld.so, then .dynamic *was* relocated (i#1589) */
@@ -280,12 +280,12 @@ os_loader_init_prologue(void)
 # if defined(LINUX)/*i#1285*/ && (defined(INTERNAL) || defined(CLIENT_INTERFACE))
     if (DYNAMO_OPTION(early_inject)) {
         /* libdynamorio isn't visible to gdb so add to the cmd list */
-        byte *dr_base = get_dynamorio_dll_start(), *pref_base;
+        byte *dr_base = get_appso_start(), *pref_base;
         elf_loader_t dr_ld;
         IF_DEBUG(bool success = )
             elf_loader_read_headers(&dr_ld, get_app_library_path());
         ASSERT(success);
-        module_walk_program_headers(dr_base, get_dynamorio_dll_end() - dr_base,
+        module_walk_program_headers(dr_base, get_appso_end() - dr_base,
                                     false, false, (byte **)&pref_base,
                                     NULL, NULL, NULL, NULL);
         dr_ld.load_delta = dr_base - pref_base;
@@ -537,7 +537,7 @@ privload_process_imports(privmod_t *mod)
                     return false;
 #ifdef CLIENT_INTERFACE
                 /* i#852: identify all libs that import from DR as client libs */
-                if (impmod->base == get_dynamorio_dll_start())
+                if (impmod->base == get_appso_start())
                     mod->is_client = true;
 #endif
             }
@@ -1249,7 +1249,7 @@ redirect_dl_iterate_phdr(int (*callback)(struct dl_phdr_info *info,
         /* We do want to include externally loaded (if any) and clients as
          * clients can contain C++ exception code, which will call here.
          */
-        if (mod->base == get_dynamorio_dll_start())
+        if (mod->base == get_appso_start())
             continue;
         info.dlpi_addr = opd->load_delta;
         info.dlpi_name = mod->name;
@@ -1386,131 +1386,6 @@ privload_redirect_sym(ptr_uint_t *r_addr, const char *name)
 
 #ifdef LINUX
 # if !defined(STANDALONE_UNIT_TEST) && !defined(STATIC_LIBRARY)
-/* Find the auxiliary vector and adjust it to look as if the kernel had set up
- * the stack for the ELF mapped at map.  The auxiliary vector starts after the
- * terminating NULL pointer in the envp array.
- */
-static void
-privload_setup_auxv(char **envp, app_pc map, ptr_int_t delta, app_pc interp_map,
-                    const char *exe_path/*must be persistent*/)
-{
-    ELF_AUXV_TYPE *auxv;
-    ELF_HEADER_TYPE *elf = (ELF_HEADER_TYPE *) map;
-
-    /* The aux vector is after the last environment pointer. */
-    while (*envp != NULL)
-        envp++;
-    auxv = (ELF_AUXV_TYPE *)(envp + 1);
-
-    /* fix up the auxv entries that refer to the executable */
-    for (; auxv->a_type != AT_NULL; auxv++) {
-        /* the actual addr should be: (base + offs) or (v_addr + delta) */
-        switch (auxv->a_type) {
-        case AT_ENTRY:
-            auxv->a_un.a_val = (ptr_int_t) elf->e_entry + delta;
-            LOG(GLOBAL, LOG_LOADER, 2, "AT_ENTRY: "PFX"\n", auxv->a_un.a_val);
-            break;
-        case AT_PHDR:
-            auxv->a_un.a_val = (ptr_int_t) map + elf->e_phoff;
-            LOG(GLOBAL, LOG_LOADER, 2, "AT_PHDR: "PFX"\n", auxv->a_un.a_val);
-            break;
-        case AT_PHENT:
-            auxv->a_un.a_val = (ptr_int_t) elf->e_phentsize;
-            break;
-        case AT_PHNUM:
-            auxv->a_un.a_val = (ptr_int_t) elf->e_phnum;
-            break;
-        case AT_BASE: /* Android loader reads this */
-            auxv->a_un.a_val = (ptr_int_t) interp_map;
-            LOG(GLOBAL, LOG_LOADER, 2, "AT_BASE: "PFX"\n", auxv->a_un.a_val);
-            break;
-        case AT_EXECFN: /* Android loader references this, unclear what for */
-            auxv->a_un.a_val = (ptr_int_t) exe_path;
-            LOG(GLOBAL, LOG_LOADER, 2, "AT_EXECFN: "PFX" %s\n",
-                       auxv->a_un.a_val, (char*)auxv->a_un.a_val);
-            break;
-
-        /* The rest of these AT_* values don't seem to be important to the
-         * loader, but we log them.
-         */
-        case AT_EXECFD:
-            LOG(GLOBAL, LOG_LOADER, 2, "AT_EXECFD: %d\n", auxv->a_un.a_val);
-            break;
-        }
-    }
-}
-
-/* Entry point for ptrace injection. */
-static void
-takeover_ptrace(ptrace_stack_args_t *args)
-{
-    static char home_var[MAXIMUM_PATH+6/*HOME=path\0*/];
-    static char *fake_envp[] = {home_var, NULL};
-
-    /* When we come in via ptrace, we have no idea where the environment
-     * pointer is.  We could use /proc/self/environ to read it or go searching
-     * near the stack base.  However, both are fragile and we don't really need
-     * the environment for anything except for option passing.  In the initial
-     * ptraced process, we can assume our options are in a config file and not
-     * the environment, so we just set an environment with HOME.
-     */
-    snprintf(home_var, BUFFER_SIZE_ELEMENTS(home_var),
-             "HOME=%s", args->home_dir);
-    NULL_TERMINATE_BUFFER(home_var);
-    dynamorio_set_envp(fake_envp);
-
-    dynamorio_app_init();
-
-    /* FIXME i#37: takeover other threads */
-
-    /* We need to wait until dr_inject_process_run() is called to finish
-     * takeover, and this is an easy way to stop and return control to the
-     * injector.
-     */
-    dynamorio_syscall(SYS_kill, 2, get_process_id(), SIGTRAP);
-
-    dynamo_start(&args->mc);
-}
-
-static void
-reserve_brk(app_pc post_app)
-{
-    /* We haven't parsed the options yet, so we rely on drinjectlib
-     * setting this env var if the user passed -no_emulate_brk:
-     */
-    if (getenv(DYNAMORIO_VAR_NO_EMULATE_BRK) == NULL) {
-        /* i#1004: we're going to emulate the brk via our own mmap.
-         * Reserve the initial brk now before any of DR's mmaps to avoid overlap.
-         * XXX: reserve larger APP_BRK_GAP here and then unmap back to 1 page
-         * in os_init() to ensure no DR mmap limits its size?
-         */
-        dynamo_options.emulate_brk = true; /* not parsed yet */
-        init_emulated_brk(post_app);
-    } else {
-        /* i#1004: as a workaround, reserve some space for sbrk() during early injection
-         * before initializing DR's heap.  With early injection, the program break comes
-         * somewhere after DR's bss section, subject to some ASLR.  When we allocate our
-         * heap, sometimes we mmap right over the break, so any brk() calls will fail.
-         * When brk() fails, most malloc() implementations fall back to mmap().
-         * However, sometimes libc startup code needs to allocate memory before libc is
-         * initialized.  In this case it calls brk(), and will crash if it fails.
-         *
-         * Ideally we'd just set the break to follow the app's exe, but the kernel
-         * forbids setting the break to a value less than the current break.  I also
-         * tried to reserve memory by increasing the break by ~20 pages and then
-         * resetting it, but the kernel unreserves it.  The current work around is to
-         * increase the break by 1.  The loader needs to allocate more than a page of
-         * memory, so this doesn't guarantee that further brk() calls will succeed.
-         * However, I haven't observed any brk() failures after adding this workaround.
-         */
-        ptr_int_t start_brk;
-        ASSERT(!dynamo_heap_initialized);
-        start_brk = dynamorio_syscall(SYS_brk, 1, 0);
-        dynamorio_syscall(SYS_brk, 1, start_brk + 1);
-        /* I'd log the results, but logs aren't initialized yet. */
-    }
-}
-
 byte *
 map_exe_file_and_brk(file_t f, size_t *size INOUT, uint64 offs, app_pc addr, uint prot,
                      map_flags_t map_flags)
@@ -1611,53 +1486,6 @@ privload_mem_is_elf_so_header(byte *mem)
     return true;
 }
 
-/* Returns false if the text-data gap is not empty.  Else, fills the gap with
- * no-access mappings and returns true.
- */
-static bool
-dynamorio_lib_gap_empty(void)
-{
-    /* XXX: get_dynamorio_dll_start() is already calling
-     * memquery_library_bounds_by_iterator() which is doing this maps walk: can we
-     * avoid this extra walk by somehow passing info back to us?  Have an
-     * "interrupted" output param or sthg and is_dynamorio_dll_interrupted()?
-     */
-    memquery_iter_t iter;
-    bool res = true;
-    if (memquery_iterator_start(&iter, NULL, false/*no heap*/)) {
-        byte *dr_start = get_dynamorio_dll_start();
-        byte *dr_end = get_dynamorio_dll_end();
-        byte *gap_start = dr_start;
-        while (memquery_iterator_next(&iter) && iter.vm_start < dr_end) {
-            if (iter.vm_start >= dr_start && iter.vm_end <= dr_end &&
-                iter.comment[0] != '\0' &&
-                strstr(iter.comment, APP_LIBRARY_NAME) == NULL) {
-                /* There's a non-anon mapping inside: probably vvar and/or vdso. */
-                res = false;
-                break;
-            }
-            /* i#1659: fill in the text-data segment gap to ensure no mmaps in between.
-             * The kernel does not do this.  Our private loader does, so if we reloaded
-             * ourselves this is already in place.  We do this now rather than in
-             * os_loader_init_prologue() to prevent our brk mmap from landing here.
-             */
-            if (iter.vm_start > gap_start) {
-                size_t sz = iter.vm_start - gap_start;
-                ASSERT(sz > 0);
-                DEBUG_DECLARE(byte *fill =)
-                    os_map_file(-1, &sz, 0, gap_start,
-                                MEMPROT_NONE, MAP_FILE_COPY_ON_WRITE|MAP_FILE_FIXED);
-                ASSERT(fill != NULL);
-                gap_start = iter.vm_end;
-            } else if (iter.vm_end > gap_start) {
-                gap_start = iter.vm_end;
-            }
-        }
-        memquery_iterator_stop(&iter);
-    }
-    return res;
-}
-
 /* XXX: This routine is called before dynamorio relocation when we are in a
  * fragile state and thus no globals access or use of ASSERT/LOG/STATS!
  */
@@ -1689,9 +1517,8 @@ relocate_dynamorio(byte *dr_map, size_t dr_size, byte *sp)
 /* i#1227: on a conflict with the app we reload ourselves.
  * Does not return.
  */
-/* The function name is misleading. In fact, libapp.so loads libenclave.so */
 static void
-reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
+load_enclave_dll(void **init_sp, app_pc conflict_start, app_pc conflict_end)
 {
     elf_loader_t dr_ld;
     os_privmod_data_t opd;
@@ -1701,11 +1528,11 @@ reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
      */
 #define MAX_TEMP_MAPS 16
     app_pc entry;
-    byte *cur_dr_map = get_dynamorio_dll_start();
-    byte *cur_dr_end = get_dynamorio_dll_end();
+    byte *cur_dr_map = get_appso_start();
+    byte *cur_dr_end = get_appso_end();
     size_t dr_size = cur_dr_end - cur_dr_map;
     IF_DEBUG(bool success = )
-        elf_loader_read_headers(&dr_ld, get_app_library_path());
+        elf_loader_read_headers(&dr_ld, get_enclave_library_path());
     ASSERT(success);
 
     /* Now load the libenclave.so */
@@ -1750,16 +1577,10 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
     ptr_int_t *argc = (ptr_int_t *)sp;  /* Kernel writes an elf_addr_t. */
     char **argv = (char **)sp + 1;
     char **envp = argv + *argc + 1;
-    app_pc entry = NULL;
     char *exe_path;
-    char *exe_basename;
     app_pc exe_map, exe_end;
     elf_loader_t exe_ld;
-    const char *interp;
-    priv_mcontext_t mc;
     bool success;
-    memquery_iter_t iter;
-    app_pc interp_map;
 
     kernel_init_sp = (void *)sp;
 
@@ -1767,37 +1588,6 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
      * code like get_application_short_name() called from drpreload before
      * even _init is run needs to have a non-early default.
      */
-    dynamo_options.early_inject = true;
-
-    if (*argc == ARGC_PTRACE_SENTINEL) {
-        /* XXX: Teach the injector to look up takeover_ptrace() and call it
-         * directly instead of using this sentinel.  We come here because we
-         * can easily find the address of _start in the ELF header.
-         */
-        takeover_ptrace((ptrace_stack_args_t *) sp);
-    }
-
-    /* i#1227: if we reloaded ourselves, unload the old libdynamorio */
-    if (old_libdr_base != NULL) {
-        /* i#2641: we can't blindly unload the whole region as vvar+vdso may be
-         * in the text-data gap.
-         */
-        if (memquery_iterator_start(&iter, NULL, false/*no heap*/)) {
-            while (memquery_iterator_next(&iter)) {
-                if (iter.vm_start >= old_libdr_base &&
-                    iter.vm_end <= old_libdr_base + old_libdr_size &&
-                    (iter.comment[0] == '\0' /* .bss */ ||
-                     /* The kernel sometimes mis-labels our .bss as "[heap]". */
-                     strcmp(iter.comment, "[heap]") == 0 ||
-                     strstr(iter.comment, APP_LIBRARY_NAME) != NULL)) {
-                    os_unmap_file(iter.vm_start, iter.vm_end - iter.vm_start);
-                }
-                if (iter.vm_start >= old_libdr_base + old_libdr_size)
-                    break;
-            }
-            memquery_iterator_stop(&iter);
-        }
-    }
 
     dynamorio_set_envp(envp);
 
@@ -1824,135 +1614,10 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
 
     /* Find range of app */
     exe_map = module_vaddr_from_prog_header((app_pc)exe_ld.phdrs,
-                                            exe_ld.ehdr->e_phnum, NULL, &exe_end);
+            exe_ld.ehdr->e_phnum, NULL, &exe_end);
     /* i#1227: on a conflict with the app (+ room for the brk): reload ourselves */
-    if (get_dynamorio_dll_start() < exe_end+APP_BRK_GAP &&
-        get_dynamorio_dll_end() > exe_map) {
-        reload_dynamorio(sp, exe_map, exe_end+APP_BRK_GAP);
-        ASSERT_NOT_REACHED();
-    }
-    /* i#2641: we can't handle something in the text-data gap.
-     * Various parts of DR assume there's nothing inside (and we even fill the
-     * gap with a PROT_NONE mmap later: i#1659), so we reload to avoid it,
-     * under the assumption that it's rare and we're not paying this cost
-     * very often.
-     */
-    if (!dynamorio_lib_gap_empty()) {
-        reload_dynamorio(sp, get_dynamorio_dll_start(), get_dynamorio_dll_end());
-        ASSERT_NOT_REACHED();
-    }
-
-    exe_map = elf_loader_map_phdrs(&exe_ld,
-                                   /* fixed at preferred address,
-                                    * will be overridden if preferred base is 0
-                                    */
-                                   true,
-                                   /* ensure there's space for the brk */
-                                   map_exe_file_and_brk,
-                                   os_unmap_file, os_set_protection, 0/*!reachable*/);
-    apicheck(exe_map != NULL, "Failed to load application.  "
-             "Check path and architecture.");
-    ASSERT(is_elf_so_header(exe_map, 0));
-
-    /* i#1660: the app may have passed a relative path or a symlink to execve,
-     * yet the kernel will put a resolved path into /proc/self/maps.
-     * Rather than us here or in pre-execve, plus in drrun or drinjectlib,
-     * making paths absolute and resolving symlinks to try and match what the
-     * kernel does, we just read the kernel's resolved path.
-     * This is prior to memquery_init() but that's fine (it's already being
-     * called by is_elf_so_header() above).
-     */
-    if (memquery_iterator_start(&iter, exe_map, false/*no heap*/)) {
-        while (memquery_iterator_next(&iter)) {
-            if (iter.vm_start == exe_map) {
-                set_executable_path(iter.comment);
-                break;
-            }
-        }
-        memquery_iterator_stop(&iter);
-    }
-
-    /* Set the process name with prctl PR_SET_NAME.  This makes killall <app>
-     * work.
-     */
-    exe_basename = strrchr(exe_path, '/');
-    if (exe_basename == NULL) {
-        exe_basename = exe_path;
-    } else {
-        exe_basename++;
-    }
-    dynamorio_syscall(SYS_prctl, 5, PR_SET_NAME, (ptr_uint_t)exe_basename,
-                      0, 0, 0);
-
-    reserve_brk(exe_map + exe_ld.image_size +
-                (INTERNAL_OPTION(separate_private_bss) ? PAGE_SIZE : 0));
-
-    interp = elf_loader_find_pt_interp(&exe_ld);
-    if (interp != NULL) {
-        /* Load the ELF pointed at by PT_INTERP, usually ld.so. */
-        elf_loader_t interp_ld;
-        success = elf_loader_read_headers(&interp_ld, interp);
-        apicheck(success, "Failed to read ELF interpreter headers.");
-        interp_map = elf_loader_map_phdrs(&interp_ld, false /* fixed */,
-                                          os_map_file, os_unmap_file,
-                                          os_set_protection, 0/*!reachable*/);
-        apicheck(interp_map != NULL && is_elf_so_header(interp_map, 0),
-                 "Failed to map ELF interpreter.");
-        /* On Android, the system loader /system/bin/linker sets itself
-         * as the interpreter in the ELF header .interp field.
-        */
-        ASSERT_CURIOSITY_ONCE((strcmp(interp, "/system/bin/linker") == 0 ||
-                               elf_loader_find_pt_interp(&interp_ld) == NULL) &&
-                              "The interpreter shouldn't have an interpreter");
-        entry = (app_pc)interp_ld.ehdr->e_entry + interp_ld.load_delta;
-        elf_loader_destroy(&interp_ld);
-    } else {
-        /* No PT_INTERP, so this is a static exe. */
-        interp_map = NULL;
-        entry = (app_pc)exe_ld.ehdr->e_entry + exe_ld.load_delta;
-    }
-
-    privload_setup_auxv(envp, exe_map, exe_ld.load_delta, interp_map, exe_path);
-
-    elf_loader_destroy(&exe_ld);
-
-    /* Initialize DR *after* we map the app image.  This is consistent with our
-     * old behavior, and allows the client to do things like call
-     * dr_get_proc_address() on the app from dr_client_main().  We let
-     * find_executable_vm_areas re-discover the mappings we made for the app and
-     * interp images.
-     */
-    dynamorio_app_init();
-
-    LOG(GLOBAL, LOG_TOP, 1, "early injected into app with this cmdline:\n");
-    DOLOG(1, LOG_TOP, {
-        int i;
-        for (i = 0; i < *argc; i++) {
-            LOG(GLOBAL, LOG_TOP, 1, "%s ", argv[i]);
-        }
-        LOG(GLOBAL, LOG_TOP, 1, "\n");
-    });
-
-    if (RUNNING_WITHOUT_CODE_CACHE()) {
-        /* Reset the stack pointer back to the beginning and jump to the entry
-         * point to execute the app natively.  This is also useful for testing
-         * if the app has been mapped correctly without involving DR's code
-         * cache.
-         */
-#  ifdef X86
-        asm ("mov %0, %%"ASM_XSP"\n\t"
-             "jmp *%1\n\t"
-             : : "r"(sp), "r"(entry));
-#  elif defined(ARM)
-        /* FIXME i#1551: NYI on ARM */
-        ASSERT_NOT_REACHED();
-#  endif
-    }
-
-    memset(&mc, 0, sizeof(mc));
-    mc.xsp = (reg_t) sp;
-    mc.pc = entry;
-    dynamo_start(&mc);
+    load_enclave_dll(sp, exe_map, exe_end+APP_BRK_GAP);
+    ASSERT_NOT_REACHED();
 }
 # endif /* !defined(STANDALONE_UNIT_TEST) && !defined(STATIC_LIBRARY) */
 #else

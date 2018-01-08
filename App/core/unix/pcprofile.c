@@ -432,7 +432,7 @@ pcprofile_results(thread_pc_info_t *info)
         total += info->where[i];
 
     print_file(info->file, "DynamoRIO library: "PFX"-"PFX"\n",
-               get_dynamorio_dll_start(), get_dynamorio_dll_end());
+               get_appso_start(), get_appso_end());
 #ifdef CLIENT_INTERFACE
     {
         app_pc client_start, client_end;

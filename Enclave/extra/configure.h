@@ -133,7 +133,7 @@
 #      if not set: client reg spill slots won't work, and may hit asserts
 #      after fork.
 #    $(D)HAVE_SIGALTSTACK - set if SYS_sigaltstack is available
-#    $(D)INIT_TAKE_OVER - libdynamorio.so init() takes over so no preload needed
+#    $(D)INIT_TAKE_OVER - libenclave.so init() takes over so no preload needed
 # not supported but still in code because may be useful later
 #    $(D)STEAL_REGISTER
 #    $(D)DCONTEXT_IN_EDI
