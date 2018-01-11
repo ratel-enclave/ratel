@@ -78,7 +78,7 @@ DYNAMORIO_CC_SRC	:= $(foreach sdir,$(DYNAMORIO_SRC_DIR),$(wildcard $(sdir)/*.c))
 DYNAMORIO_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DYNAMORIO_CC_SRC))
 DYNAMORIO_CC_FLAGS	:= $(BASIC_CC_FLAGS) -Ddynamorio_EXPORTS -fPIC
 DYNAMORIO_LDSCRIPT	:= core/dynamorio.ldscript
-DYNAMORIO_LD_FLAGS	:= $(BASIC_CC_FLAGS) -Xlinker -z -Xlinker now -Xlinker -Bsymbolic -nostdlib -Wl,--entry,_start -Wl,-dT,$(DYNAMORIO_LDSCRIPT) -Wl,--hash-style=both -shared -Wl,-soname,libdynamorio.so
+DYNAMORIO_LD_FLAGS	:= $(BASIC_CC_FLAGS) -Xlinker -z -Xlinker now -Xlinker -Bsymbolic -nostdlib -Wl,--entry,dynamorio_start -Wl,-dT,$(DYNAMORIO_LDSCRIPT) -Wl,--hash-style=both -shared -Wl,-soname,libdynamorio.so
 DYNAMORIO_LD_FLAGS	+= $(SGX_Enclave_Link_Flags)
 
 $(DYNAMORIO_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm

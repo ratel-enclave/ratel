@@ -36,6 +36,7 @@
  * original case: i#157
  */
 
+#include "../../dynamorio_u.h"
 #include "../globals.h"
 #include "../module_shared.h"
 #include "os_private.h"
@@ -1518,7 +1519,7 @@ relocate_dynamorio(byte *dr_map, size_t dr_size, byte *sp)
  * Does not return.
  */
 static void
-load_enclave_dll(void **init_sp, app_pc conflict_start, app_pc conflict_end)
+create_dynamo_enclave(void **init_sp, app_pc conflict_start, app_pc conflict_end)
 {
     elf_loader_t dr_ld;
     os_privmod_data_t opd;
@@ -1554,6 +1555,7 @@ load_enclave_dll(void **init_sp, app_pc conflict_start, app_pc conflict_end)
     entry = (app_pc)dr_ld.ehdr->e_entry + dr_ld.load_delta;
     elf_loader_destroy(&dr_ld);
 
+    dynamorio_start((sgx_enclave_id_t)0);
     /* Now we transfer control unconditionally to the new DR's _start, after
      * first restoring init_sp.  We pass along the current (old) DR's bounds
      * for removal.
@@ -1616,7 +1618,7 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
     exe_map = module_vaddr_from_prog_header((app_pc)exe_ld.phdrs,
             exe_ld.ehdr->e_phnum, NULL, &exe_end);
     /* i#1227: on a conflict with the app (+ room for the brk): reload ourselves */
-    load_enclave_dll(sp, exe_map, exe_end+APP_BRK_GAP);
+    create_dynamo_enclave(sp, exe_map, exe_end+APP_BRK_GAP);
     ASSERT_NOT_REACHED();
 }
 # endif /* !defined(STANDALONE_UNIT_TEST) && !defined(STATIC_LIBRARY) */

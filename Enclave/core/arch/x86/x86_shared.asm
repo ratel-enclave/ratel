@@ -47,6 +47,7 @@ START_FILE
 DECL_EXTERN(unexpected_return)
 DECL_EXTERN(log_syscall_ready)
 DECL_EXTERN(log_app_syscall)
+DECL_EXTERN(ocall_all_syscalls)
 
 /* we share dynamorio_syscall w/ preload */
 #ifdef UNIX
@@ -202,7 +203,8 @@ GLOBAL_LABEL(sgx_syscall:)
         PUSHGPR
         //call log_app_syscall
         POPGPR
-        syscall
+        //syscall
+        call ocall_all_syscalls
         ret
         END_FUNC(sgx_syscall)
 
