@@ -327,14 +327,14 @@ privload_tls_init(void *app_tp)
         void *dest;
         /* now copy the tls memory from the image */
         dest = dr_tp - tls_info.offs[i];
-        memcpy(dest, opd->tls_image, opd->tls_image_size);
+        dynamo_memcpy(dest, opd->tls_image, opd->tls_image_size);
         /* set all 0 to the rest of memory.
          * tls_block_size refers to the size in memory, and
          * tls_image_size refers to the size in file.
          * We use the same way as libc to name them.
          */
         ASSERT(opd->tls_block_size >= opd->tls_image_size);
-        memset(dest + opd->tls_image_size, 0,
+        dynamo_memset(dest + opd->tls_image_size, 0,
                opd->tls_block_size - opd->tls_image_size);
     }
     return dr_tp;

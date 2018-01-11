@@ -442,7 +442,7 @@ check_return_too_deep(dcontext_t *dcontext,
     LOG(THREAD, LOG_ALL, 3, "\tjust copied registers\n");
 
     /* we want 0..31 into our stack, that's the first 64 bytes */
-    memcpy(stack->retaddr, xmm[0], 64);
+    dynamo_memcpy(stack->retaddr, xmm[0], 64);
 
 #ifdef DEBUG
     if (stats->loglevel >= 3) {
@@ -468,7 +468,7 @@ check_return_too_deep(dcontext_t *dcontext,
 #endif
 
     /* now slide 32..63 down */
-    memcpy(xmm[0], xmm[4], 64);
+    dynamo_memcpy(xmm[0], xmm[4], 64);
 
     /* move back into registers */
 #ifdef UNIX
@@ -948,7 +948,7 @@ check_return_too_deep(dcontext_t *dcontext,
     LOG(THREAD, LOG_ALL, 3, "\tjust copied registers\n");
 
     /* we want 31..62 into our stack, that's the last 64 bytes before index */
-    memcpy(stack->retaddr, &xmm[3][14], 64);
+    dynamo_memcpy(stack->retaddr, &xmm[3][14], 64);
 
 #ifdef DEBUG
     if (stats->loglevel >= 3) {

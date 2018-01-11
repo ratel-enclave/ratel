@@ -466,13 +466,13 @@ get_sigcontext_from_rt_frame(sigframe_rt_t *frame);
 static inline void
 kernel_sigemptyset(kernel_sigset_t *set)
 {
-    memset(set, 0, sizeof(kernel_sigset_t));
+    dynamo_memset(set, 0, sizeof(kernel_sigset_t));
 }
 
 static inline void
 kernel_sigfillset(kernel_sigset_t *set)
 {
-    memset(set, -1, sizeof(kernel_sigset_t));
+    dynamo_memset(set, -1, sizeof(kernel_sigset_t));
 }
 
 static inline void

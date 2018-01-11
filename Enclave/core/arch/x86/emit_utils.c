@@ -489,7 +489,7 @@ insert_inlined_ibl(dcontext_t *dcontext, fragment_t *f, linkstub_t *l, byte *pc,
     ASSERT(linkstub_owned_by_fragment(dcontext, f, l));
     ASSERT(ibl_code->ibl_head_is_inlined);
     ASSERT(EXIT_HAS_STUB(l->flags, f->flags));
-    memcpy(start_pc, ibl_code->inline_ibl_stub_template, ibl_code->inline_stub_length);
+    dynamo_memcpy(start_pc, ibl_code->inline_ibl_stub_template, ibl_code->inline_stub_length);
 
     /* exit should be unlinked initially */
     patch_branch(FRAG_ISA_MODE(f->flags), EXIT_CTI_PC(f, l),

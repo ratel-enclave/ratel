@@ -1240,7 +1240,7 @@ void
 clean_call_info_init(clean_call_info_t *cci, void *callee,
                      bool save_fpstate, uint num_args)
 {
-    memset(cci, 0, sizeof(*cci));
+    dynamo_memset(cci, 0, sizeof(*cci));
     cci->callee        = callee;
     cci->num_args      = num_args;
     cci->save_fpstate  = save_fpstate;

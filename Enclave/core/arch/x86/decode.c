@@ -2070,13 +2070,13 @@ decode_common(dcontext_t *dcontext, byte *pc, byte *orig_pc, instr_t *instr)
     /* now copy operands into their real slots */
     instr_set_num_opnds(dcontext, instr, instr_num_dsts, instr_num_srcs);
     if (instr_num_dsts > 0) {
-        memcpy(instr->dsts, dsts, instr_num_dsts*sizeof(opnd_t));
+        dynamo_memcpy(instr->dsts, dsts, instr_num_dsts*sizeof(opnd_t));
     }
     if (instr_num_srcs > 0) {
         /* remember that src0 is static */
         instr->src0 = srcs[0];
         if (instr_num_srcs > 1) {
-            memcpy(instr->srcs, &(srcs[1]), (instr_num_srcs-1)*sizeof(opnd_t));
+            dynamo_memcpy(instr->srcs, &(srcs[1]), (instr_num_srcs-1)*sizeof(opnd_t));
         }
     }
 

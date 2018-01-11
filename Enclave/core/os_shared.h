@@ -583,7 +583,7 @@ bool set_protection(byte *pc, size_t size, uint prot);
  * as part of protect from app and is safe with respect to stats and changing
  * the protection of the data segment. */
 /* returns false if out of memory */
-bool change_protection(byte *pc, size_t size, bool writable);
+bool dynamo_dynamo_change_protection(byte *pc, size_t size, bool writable);
 #ifdef WINDOWS
 /* makes pc:pc+size (page_padded) writable preserving other flags
  * returns false if out of memory

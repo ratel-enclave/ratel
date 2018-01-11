@@ -123,7 +123,7 @@ module_area_create(app_pc base, size_t view_size, bool at_map, const char *filep
 {
     module_area_t *ma =
         HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, module_area_t, ACCT_VMAREAS, PROTECTED);
-    memset(ma, 0, sizeof(*ma));
+    dynamo_memset(ma, 0, sizeof(*ma));
     ma->start = base;
     ma->end = base + view_size; /* updated in os_module_area_init () */
     os_module_area_init(ma, base, view_size, at_map, filepath _IF_UNIX(inode)

@@ -79,7 +79,7 @@ kstat_merge_var(kstat_variable_t *destination, kstat_variable_t *source);
 static void
 kstat_init_variable(kstat_variable_t *kv)
 {
-    memset(kv, 0x0, sizeof(kstat_variable_t));
+    dynamo_memset(kv, 0x0, sizeof(kstat_variable_t));
     kv->min_cum = (timestamp_t)-1;
 }
 

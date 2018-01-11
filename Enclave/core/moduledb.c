@@ -252,7 +252,7 @@ moduledb_init()
     exemption_lists = (char **)
         global_heap_alloc(exempt_array_size HEAPACCT(ACCT_OTHER));
     ASSERT(exemption_lists != NULL);
-    memset(exemption_lists, 0, exempt_array_size);
+    dynamo_memset(exemption_lists, 0, exempt_array_size);
     DOCHECK(1, {
         int i;
         for (i = 0; i < MODULEDB_EXEMPT_NUM_LISTS; i++)

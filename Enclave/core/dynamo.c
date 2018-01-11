@@ -484,7 +484,7 @@ dynamorio_app_init(void)
          */
         instrument_load_client_libs();
 #endif
-        heap_init();
+        dynamo_heap_init();
         dynamo_heap_initialized = true;
 
         /* The process start event should be done after os_init() but before
@@ -598,7 +598,7 @@ dynamorio_app_init(void)
         size = HASHTABLE_SIZE(ALL_THREADS_HASH_BITS) * sizeof(thread_record_t*);
         all_threads =
             (thread_record_t**) global_heap_alloc(size HEAPACCT(ACCT_THREAD_MGT));
-        memset(all_threads, 0, size);
+        dynamo_memset(all_threads, 0, size);
         if (!INTERNAL_OPTION(nop_initial_bblock)
             IF_WINDOWS(|| !check_sole_thread())) /* some other thread is already here! */
             bb_lock_start = true;
@@ -861,7 +861,7 @@ standalone_init(void)
     config_init();
     options_init();
     vmm_heap_init();
-    heap_init();
+    dynamo_heap_init();
     dynamo_heap_initialized = true;
     dynamo_vm_areas_init();
     decode_init();
@@ -1586,7 +1586,7 @@ create_new_dynamo_context(bool initial, byte *dstack_in, priv_mcontext_t *mc)
      * fields across callback dcontexts for the same thread.
      */
     /* must set to 0 so can tell if initialized for callbacks! */
-    memset(dcontext, 0x0, sizeof(dcontext_t));
+    dynamo_memset(dcontext, 0x0, sizeof(dcontext_t));
     dcontext->allocated_start = alloc_start;
 
     /* we share a single dstack across all callbacks */
@@ -1686,12 +1686,12 @@ initialize_dynamo_context(dcontext_t *dcontext)
      * (fields kept across callbacks, like dstack, module-private fields, next &
      * prev, etc.)
      */
-    memset(dcontext->upcontext_ptr, 0, sizeof(unprotected_context_t));
+    dynamo_memset(dcontext->upcontext_ptr, 0, sizeof(unprotected_context_t));
     dcontext->initialized = true;
     dcontext->whereami = WHERE_APP;
     dcontext->next_tag = NULL;
     dcontext->native_exec_postsyscall = NULL;
-    memset(dcontext->native_retstack, 0, sizeof(dcontext->native_retstack));
+    dynamo_memset(dcontext->native_retstack, 0, sizeof(dcontext->native_retstack));
     dcontext->native_retstack_cur = 0;
     dcontext->isa_mode = DEFAULT_ISA_MODE;
 #ifdef ARM
@@ -1860,7 +1860,7 @@ create_callback_dcontext(dcontext_t *old_dcontext)
      */
     DOCHECK(1, {
         dr_jmp_buf_t empty;
-        memset(&empty, -1, sizeof(dr_jmp_buf_t));
+        dynamo_memset(&empty, -1, sizeof(dr_jmp_buf_t));
         ASSERT(memcmp(&old_dcontext->hotp_excpt_state, &empty,
                       sizeof(dr_jmp_buf_t)) == 0);
     });

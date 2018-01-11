@@ -1569,7 +1569,7 @@ heap_reset_init()
 
 /* initialization */
 void
-heap_init()
+dynamo_heap_init()
 {
     int i;
     uint prev_sz = 0;
@@ -1608,9 +1608,9 @@ heap_init()
 
     heapmgt = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, heap_management_t, ACCT_MEM_MGT,
                               PROTECTED);
-    memset(heapmgt, 0, sizeof(*heapmgt));
+    dynamo_memset(heapmgt, 0, sizeof(*heapmgt));
     ASSERT(sizeof(temp_heapmgt) == sizeof(*heapmgt));
-    memcpy(heapmgt, &temp_heapmgt, sizeof(temp_heapmgt));
+    dynamo_memcpy(heapmgt, &temp_heapmgt, sizeof(temp_heapmgt));
 
     threadunits_init(GLOBAL_DCONTEXT, &heapmgt->global_unprotected_units,
                      GLOBAL_UNIT_MIN_SIZE);
@@ -1710,7 +1710,7 @@ heap_exit()
 
     /* Now we need to go back to the static struct to clean up */
     ASSERT(heapmgt != &temp_heapmgt);
-    memcpy(&temp_heapmgt, heapmgt, sizeof(temp_heapmgt));
+    dynamo_memcpy(&temp_heapmgt, heapmgt, sizeof(temp_heapmgt));
     temp = heapmgt;
     heapmgt = &temp_heapmgt;
     HEAP_TYPE_FREE(GLOBAL_DCONTEXT, temp, heap_management_t, ACCT_MEM_MGT, PROTECTED);
@@ -2211,7 +2211,7 @@ heap_mmap_ex(size_t reserve_size, size_t commit_size, uint prot, bool guarded,
                                       NULL, which _IF_DEBUG("heap_mmap"));
 #ifdef DEBUG_MEMORY
     if (TEST(MEMPROT_WRITE, prot))
-        memset(p, HEAP_ALLOCATED_BYTE, commit_size);
+        dynamo_memset(p, HEAP_ALLOCATED_BYTE, commit_size);
 #endif
     /* We rely on this for freeing _post_stack in absence of dcontext */
     ASSERT(!DYNAMO_OPTION(vm_reserve) ||
@@ -2248,7 +2248,7 @@ heap_mmap_extend_commitment(void *p, size_t commit_size, which_vmm_t which)
     STATS_SUB(mmap_reserved_only, commit_size);
     STATS_ADD_PEAK(mmap_capacity, commit_size);
 #ifdef DEBUG_MEMORY
-    memset(p, HEAP_ALLOCATED_BYTE, commit_size);
+    dynamo_memset(p, HEAP_ALLOCATED_BYTE, commit_size);
 #endif
 }
 
@@ -2381,7 +2381,7 @@ heap_mmap_reserve_post_stack(dcontext_t *dcontext,
     ASSERT((ptr_uint_t)p - GUARD_PAGE_ADJUSTMENT/2 !=
            ALIGN_BACKWARD(p, DYNAMO_OPTION(vmm_block_size)));
 #ifdef DEBUG_MEMORY
-    memset(p, HEAP_ALLOCATED_BYTE, commit_size);
+    dynamo_memset(p, HEAP_ALLOCATED_BYTE, commit_size);
 #endif
     LOG(GLOBAL, LOG_HEAP, 2, "heap_mmap w/ stack: %d bytes [/ %d] @ "PFX"\n",
         commit_size, reserve_size, p);
@@ -2488,7 +2488,7 @@ stack_alloc(size_t size, byte *min_addr)
     if (!DYNAMO_OPTION(guard_pages) && DYNAMO_OPTION(stack_guard_pages))
         p = (byte *)p + PAGE_SIZE;
 #ifdef DEBUG_MEMORY
-    memset(p, HEAP_ALLOCATED_BYTE, size);
+    dynamo_memset(p, HEAP_ALLOCATED_BYTE, size);
 #endif
 
     if (DYNAMO_OPTION(stack_guard_pages)) {
@@ -2832,7 +2832,7 @@ global_heap_realloc(void *ptr, size_t old_num, size_t new_num, size_t element_si
 {
     void *new_area = global_heap_alloc(new_num * element_size HEAPACCT(which));
     if (ptr) {
-        memcpy(new_area, ptr, (old_num < new_num ? old_num : new_num) * element_size);
+        dynamo_memcpy(new_area, ptr, (old_num < new_num ? old_num : new_num) * element_size);
         global_heap_free(ptr, old_num * element_size HEAPACCT(which));
     }
     return new_area;
@@ -2924,7 +2924,7 @@ heap_create_unit(thread_units_t *tu, size_t size, bool must_be_new)
 
 #ifdef DEBUG_MEMORY
     DOCHECK(CHKLVL_MEMFILL,
-            memset(u->start_pc, HEAP_UNALLOCATED_BYTE, u->end_pc - u->start_pc););
+            dynamo_memset(u->start_pc, HEAP_UNALLOCATED_BYTE, u->end_pc - u->start_pc););
 #endif
     return u;
 }
@@ -3061,7 +3061,7 @@ threadunits_init(dcontext_t *dcontext, thread_units_t *tu, size_t size)
     tu->dcontext = dcontext;
     tu->writable = true;
 #ifdef HEAP_ACCOUNTING
-    memset(&tu->acct, 0, sizeof(tu->acct));
+    dynamo_memset(&tu->acct, 0, sizeof(tu->acct));
 #endif
     for (i=0; i<BLOCK_TYPES; i++)
         tu->free_list[i] = NULL;
@@ -3368,7 +3368,7 @@ common_heap_extend_commitment(heap_pc cur_pc, heap_pc end_pc, heap_pc reserved_e
                end_pc + commit_size <= reserved_end_pc);
         extend_commitment(end_pc, commit_size, prot, false /* extension */, VMM_HEAP);
 #ifdef DEBUG_MEMORY
-        memset(end_pc, HEAP_UNALLOCATED_BYTE, commit_size);
+        dynamo_memset(end_pc, HEAP_UNALLOCATED_BYTE, commit_size);
 #endif
         /* caller should do end_pc += commit_size */
         RSTATS_ADD_PEAK(heap_capacity, commit_size);
@@ -3677,7 +3677,7 @@ common_heap_alloc(thread_units_t *tu, size_t size HEAPACCT(which_heap_t which))
             "\nalloc var "PFX"-"PFX" %d bytes, ret "PFX"-"PFX" %d bytes\n",
             p-HEADER_SIZE, p-HEADER_SIZE+alloc_size, alloc_size, p, p+size, size);
         /* there can only be extra padding if we took off of the free list */
-        DOCHECK(chklvl, memset(p+size, HEAP_PAD_BYTE, (alloc_size-HEADER_SIZE)-size););
+        DOCHECK(chklvl, dynamo_memset(p+size, HEAP_PAD_BYTE, (alloc_size-HEADER_SIZE)-size););
     } else {
         /* verify is unallocated memory, skip possible free list next pointer */
         DOCHECK(chklvl, {
@@ -3688,9 +3688,9 @@ common_heap_alloc(thread_units_t *tu, size_t size HEAPACCT(which_heap_t which))
         LOG(THREAD, LOG_HEAP, 6,
             "\nalloc fix or oversize "PFX"-"PFX" %d bytes, ret "PFX"-"PFX" %d bytes\n",
             p, p+alloc_size, alloc_size, p, p+size, size);
-        DOCHECK(chklvl, memset(p+size, HEAP_PAD_BYTE, alloc_size-size););
+        DOCHECK(chklvl, dynamo_memset(p+size, HEAP_PAD_BYTE, alloc_size-size););
     }
-    DOCHECK(chklvl, memset(p, HEAP_ALLOCATED_BYTE, size););
+    DOCHECK(chklvl, dynamo_memset(p, HEAP_ALLOCATED_BYTE, size););
 # ifdef HEAP_ACCOUNTING
     LOG(THREAD, LOG_HEAP, 6, "\t%s\n", whichheap_name[which]);
 # endif
@@ -3810,7 +3810,7 @@ common_heap_free(thread_units_t *tu, void *p_void, size_t size
             u->id, size/1024);
         /* go ahead and set unallocated, even though we are just going to free
          * the unit, is needed for an assert in heap_free_unit anyways */
-        DOCHECK(CHKLVL_MEMFILL, memset(p, HEAP_UNALLOCATED_BYTE, size););
+        DOCHECK(CHKLVL_MEMFILL, dynamo_memset(p, HEAP_UNALLOCATED_BYTE, size););
 #endif
         ASSERT(size <= UNITROOM(u));
         heap_free_unit(u, tu->dcontext);
@@ -3836,7 +3836,7 @@ common_heap_free(thread_units_t *tu, void *p_void, size_t size
             ASSERT(find_heap_unit(tu, p, alloc_size - HEADER_SIZE) != NULL);
         });
         /* set used and padding memory back to unallocated */
-        DOCHECK(CHKLVL_MEMFILL, memset(p, HEAP_UNALLOCATED_BYTE,
+        DOCHECK(CHKLVL_MEMFILL, dynamo_memset(p, HEAP_UNALLOCATED_BYTE,
                                        alloc_size-HEADER_SIZE););
 # endif
         STATS_SUB(heap_headers, HEADER_SIZE);
@@ -3852,7 +3852,7 @@ common_heap_free(thread_units_t *tu, void *p_void, size_t size
             ASSERT(find_heap_unit(tu, p, alloc_size) != NULL);
         });
         /* set used and padding memory back to unallocated */
-        DOCHECK(CHKLVL_MEMFILL, memset(p, HEAP_UNALLOCATED_BYTE, alloc_size););
+        DOCHECK(CHKLVL_MEMFILL, dynamo_memset(p, HEAP_UNALLOCATED_BYTE, alloc_size););
 # endif
         STATS_SUB(heap_bucket_pad, (alloc_size - aligned_size));
     }
@@ -3906,7 +3906,7 @@ protect_local_units_helper(heap_unit_t *u, bool writable)
      * adjacent units here
      */
     while (u != NULL) {
-        change_protection(UNIT_ALLOC_START(u), UNIT_COMMIT_SIZE(u), writable);
+        dynamo_dynamo_change_protection(UNIT_ALLOC_START(u), UNIT_COMMIT_SIZE(u), writable);
         u = u->next_local;
     }
 }
@@ -4249,7 +4249,7 @@ special_heap_create_unit(special_units_t *su, byte *pc, size_t size, bool unit_f
     /* Don't clobber already-allocated memory */
     DOCHECK(CHKLVL_MEMFILL, {
         if (pc == NULL)
-            memset(u->start_pc, HEAP_UNALLOCATED_BYTE, u->end_pc - u->start_pc);
+            dynamo_memset(u->start_pc, HEAP_UNALLOCATED_BYTE, u->end_pc - u->start_pc);
     });
 #endif
     return u;
@@ -4285,7 +4285,7 @@ special_heap_init_internal(uint block_size, uint block_alignment,
         (persistent ? global_heap_alloc(sizeof(special_units_t) HEAPACCT(ACCT_MEM_MGT)) :
          nonpersistent_heap_alloc(GLOBAL_DCONTEXT, sizeof(special_units_t)
                                   HEAPACCT(ACCT_MEM_MGT)));
-    memset(su, 0, sizeof(*su));
+    dynamo_memset(su, 0, sizeof(*su));
     ASSERT(block_size >= sizeof(heap_pc *) && "need room for free list ptrs");
     ASSERT(block_size >= sizeof(heap_pc *) + sizeof(uint) &&
            "need room for cfree list ptrs");
@@ -4314,7 +4314,7 @@ special_heap_init_internal(uint block_size, uint block_alignment,
     su->top_unit = special_heap_create_unit(su, heap_region, unit_size, unit_full);
     su->use_lock = use_lock;
 #ifdef HEAP_ACCOUNTING
-    memset(&su->acct, 0, sizeof(su->acct));
+    dynamo_memset(&su->acct, 0, sizeof(su->acct));
 #endif
     su->cur_unit = su->top_unit;
 
@@ -4623,7 +4623,7 @@ special_heap_calloc(void *special, uint num)
         mutex_unlock(&su->lock);
 
 #ifdef DEBUG_MEMORY
-    DOCHECK(CHKLVL_MEMFILL, memset(p, HEAP_ALLOCATED_BYTE, su->block_size*num););
+    DOCHECK(CHKLVL_MEMFILL, dynamo_memset(p, HEAP_ALLOCATED_BYTE, su->block_size*num););
 #endif
     ASSERT(p != NULL);
     return (void*)p;
@@ -4647,7 +4647,7 @@ special_heap_cfree(void *special, void *p, uint num)
         mutex_lock(&su->lock);
 #ifdef DEBUG_MEMORY
     /* FIXME: ensure that p is in allocated state */
-    DOCHECK(CHKLVL_MEMFILL, memset(p, HEAP_UNALLOCATED_BYTE, su->block_size*num););
+    DOCHECK(CHKLVL_MEMFILL, dynamo_memset(p, HEAP_UNALLOCATED_BYTE, su->block_size*num););
 #endif
     if (num == 1) {
         /* write next pointer */

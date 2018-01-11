@@ -866,7 +866,7 @@ emit_fragment_common(dcontext_t *dcontext, app_pc tag,
                (PAD_FRAGMENT_JMPS(flags) &&
                 !INTERNAL_OPTION(pad_jmps_return_excess_padding)));
         /* size is stored at the end, but included in copy_sz */
-        memcpy(copy_pc, tag, copy_sz - sizeof(uint));
+        dynamo_memcpy(copy_pc, tag, copy_sz - sizeof(uint));
         *((uint *)(copy_pc + copy_sz - sizeof(uint))) = copy_sz;
         /* count copy as part of fragment */
         pc = copy_pc + copy_sz;

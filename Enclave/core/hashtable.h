@@ -114,9 +114,9 @@
     ((hash_index) & (uint)(ftable->hash_mask >> ftable->hash_mask_offset))
 
 #ifdef HASHTABLE_STATISTICS
-/* Just a typechecking memset() wrapper */
+/* Just a typechecking dynamo_memset() wrapper */
 # define INIT_HASHTABLE_STATS(lookup_stats) do {                \
-        memset(&lookup_stats, 0, sizeof(hashtable_statistics_t));  \
+        dynamo_memset(&lookup_stats, 0, sizeof(hashtable_statistics_t));  \
         ASSERT(lookup_stats.hit_stat == 0);                     \
 } while (0)
 # define HTABLE_STAT_INC(ftable,event) ftable->drlookup_stats.event##_stat++

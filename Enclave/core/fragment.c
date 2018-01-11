@@ -522,7 +522,7 @@ print_size_results()
            HEAP_TYPE_ALLOC((dcontext), unprot_ht_statistics_t,                 \
                            FRAGTABLE_WHICH_HEAP((table)->table_flags),     \
                            UNPROTECTED);                                   \
-         memset((table)->unprot_stats, 0, sizeof(unprot_ht_statistics_t));     \
+         dynamo_memset((table)->unprot_stats, 0, sizeof(unprot_ht_statistics_t));     \
 } while (0)
 # define DEALLOC_UNPROT_STATS(dcontext, table)                             \
    HEAP_TYPE_FREE((dcontext), (table)->unprot_stats, unprot_ht_statistics_t,   \
@@ -1389,9 +1389,9 @@ fragment_reset_init(void)
     if (INTERNAL_OPTION(fragment_sharing_study)) {
         uint size = HASHTABLE_SIZE(SHARED_HASH_BITS) * sizeof(shared_entry_t*);
         shared_blocks = (shared_entry_t**) global_heap_alloc(size HEAPACCT(ACCT_OTHER));
-        memset(shared_blocks, 0, size);
+        dynamo_memset(shared_blocks, 0, size);
         shared_traces = (shared_entry_t**) global_heap_alloc(size HEAPACCT(ACCT_OTHER));
-        memset(shared_traces, 0, size);
+        dynamo_memset(shared_traces, 0, size);
     }
 #endif
 }
@@ -1433,7 +1433,7 @@ fragment_init()
     if (SHARED_IBT_TABLES_ENABLED()) {
         dead_lists =
             HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT,  dead_table_lists_t, ACCT_OTHER, PROTECTED);
-        memset(dead_lists, 0, sizeof(*dead_lists));
+        dynamo_memset(dead_lists, 0, sizeof(*dead_lists));
     }
 
     fragment_reset_init();
@@ -1923,7 +1923,7 @@ fragment_thread_reset_init(dcontext_t *dcontext)
             }
             else {
                 /* ensure table from last time (if we had a reset) not still there */
-                memset(&pt->trace_ibt[branch_type], 0,
+                dynamo_memset(&pt->trace_ibt[branch_type], 0,
                        sizeof(pt->trace_ibt[branch_type]));
                 update_private_ptr_to_shared_ibt_table(dcontext, branch_type,
                                                        true,  /* trace = yes */
@@ -1993,7 +1993,7 @@ fragment_thread_reset_init(dcontext_t *dcontext)
             }
             else {
                 /* ensure table from last time (if we had a reset) not still there */
-                memset(&pt->bb_ibt[branch_type], 0, sizeof(pt->bb_ibt[branch_type]));
+                dynamo_memset(&pt->bb_ibt[branch_type], 0, sizeof(pt->bb_ibt[branch_type]));
                 update_private_ptr_to_shared_ibt_table(dcontext, branch_type,
                                                        false, /* trace = no */
                                                        false, /* no adjust old
@@ -2122,7 +2122,7 @@ fragment_thread_reset_free(dcontext_t *dcontext)
                     DEALLOC_UNPROT_STATS(dcontext, &pt->trace_ibt[branch_type]);
                 }
 # endif
-                memset(&pt->trace_ibt[branch_type], 0,
+                dynamo_memset(&pt->trace_ibt[branch_type], 0,
                        sizeof(pt->trace_ibt[branch_type]));
             }
         }
@@ -2147,7 +2147,7 @@ fragment_thread_reset_free(dcontext_t *dcontext)
                     DEALLOC_UNPROT_STATS(dcontext, &pt->bb_ibt[branch_type]);
                 }
 # endif
-                memset(&pt->bb_ibt[branch_type], 0, sizeof(pt->bb_ibt[branch_type]));
+                dynamo_memset(&pt->bb_ibt[branch_type], 0, sizeof(pt->bb_ibt[branch_type]));
             }
         }
     }
@@ -2384,7 +2384,7 @@ fragment_create(dcontext_t *dcontext, app_pc tag, int body_size,
          * We could also use fragment_create() and free the resulting struct
          * somewhere and switch to a wrapper at that point.
          */
-        memset(&coarse_emit_fragment, 0, sizeof(coarse_emit_fragment));
+        dynamo_memset(&coarse_emit_fragment, 0, sizeof(coarse_emit_fragment));
         f = (fragment_t *) &coarse_emit_fragment;
         /* We do not mark as FRAG_FAKE since this is pretty much a real
          * fragment_t, and we do want to walk its linkstub_t structs, which
@@ -4015,7 +4015,7 @@ fragment_copy_data_fields(dcontext_t *dcontext, fragment_t *f_src, fragment_t *f
             t_dst->bbs =
                 nonpersistent_heap_alloc(dcontext, t_src->num_bbs*sizeof(trace_bb_info_t)
                                          HEAPACCT(ACCT_TRACE));
-            memcpy(t_dst->bbs, t_src->bbs, t_src->num_bbs*sizeof(trace_bb_info_t));
+            dynamo_memcpy(t_dst->bbs, t_src->bbs, t_src->num_bbs*sizeof(trace_bb_info_t));
             t_dst->num_bbs = t_src->num_bbs;
         }
 
@@ -7108,7 +7108,7 @@ output_trace_binary(dcontext_t *dcontext, per_thread_t *pt, fragment_t *f,
                  * try to re-relativize rip-rel instrs, which may fail
                  */
                 ASSERT(instr_get_raw_bits(inst) != NULL);
-                memcpy(p, instr_get_raw_bits(inst), instr_length(dcontext, inst));
+                dynamo_memcpy(p, instr_get_raw_bits(inst), instr_length(dcontext, inst));
                 p += instr_length(dcontext, inst);
             }
             /* free the instrlist_t elements */
@@ -7130,13 +7130,13 @@ output_trace_binary(dcontext_t *dcontext, per_thread_t *pt, fragment_t *f,
         ASSERT(DIRECT_EXIT_STUB_SIZE(f->flags) <= SEPARATE_STUB_MAX_SIZE);
 
         TRACEBUF_MAKE_ROOM(p, buf, STUB_DATA_FIXED_SIZE);
-        memcpy(p, &stub, STUB_DATA_FIXED_SIZE);
+        dynamo_memcpy(p, &stub, STUB_DATA_FIXED_SIZE);
         p += STUB_DATA_FIXED_SIZE;
 
         if (TEST(LINK_SEPARATE_STUB, l->flags) && stub_pc != NULL) {
             TRACEBUF_MAKE_ROOM(p, buf, DIRECT_EXIT_STUB_SIZE(f->flags));
             ASSERT(stub_pc < f->start_pc || stub_pc >= f->start_pc+f->size);
-            memcpy(p, stub_pc, DIRECT_EXIT_STUB_SIZE(f->flags));
+            dynamo_memcpy(p, stub_pc, DIRECT_EXIT_STUB_SIZE(f->flags));
             p += DIRECT_EXIT_STUB_SIZE(f->flags);
         } else { /* ensure client's method of identifying separate stubs works */
             ASSERT(stub_pc == NULL /* no stub at all */ ||
@@ -7151,7 +7151,7 @@ output_trace_binary(dcontext_t *dcontext, per_thread_t *pt, fragment_t *f,
     } else {
         /* single syscall for all but largest traces */
         TRACEBUF_MAKE_ROOM(p, buf, f->size);
-        memcpy(p, f->start_pc, f->size);
+        dynamo_memcpy(p, f->start_pc, f->size);
         p += f->size;
         os_write(pt->tracefile, buf, (p - buf));
         p = buf;
@@ -8132,7 +8132,7 @@ fragment_coarse_wrapper(fragment_t *wrapper, app_pc tag, cache_pc body_pc)
      * in that case.  We do need to set prefix_size, incoming_stubs, and
      * {next,prev}_vmarea to NULL, for sure.
      */
-    memset(wrapper, 0, sizeof(*wrapper));
+    dynamo_memset(wrapper, 0, sizeof(*wrapper));
     wrapper->tag = tag;
     wrapper->start_pc = body_pc;
     wrapper->flags = FRAGMENT_COARSE_WRAPPER_FLAGS;

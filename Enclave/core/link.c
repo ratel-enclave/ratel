@@ -311,8 +311,8 @@ link_thread_init(dcontext_t *dcontext)
     thread_link_data_t *ldata =
         HEAP_TYPE_ALLOC(dcontext, thread_link_data_t, ACCT_OTHER, PROTECTED);
     dcontext->link_field = (void *) ldata;
-    memset(&ldata->linkstub_deleted, 0, sizeof(ldata->linkstub_deleted));
-    memset(&ldata->linkstub_deleted_fragment, 0,
+    dynamo_memset(&ldata->linkstub_deleted, 0, sizeof(ldata->linkstub_deleted));
+    dynamo_memset(&ldata->linkstub_deleted_fragment, 0,
            sizeof(ldata->linkstub_deleted_fragment));
     ldata->linkstub_deleted_ordinal = -1;
     /* Mark as fake */
@@ -336,7 +336,7 @@ linkstubs_init(linkstub_t *first, int num_direct, int num_indirect, fragment_t *
      */
     uint size = linkstubs_heap_size(f->flags, num_direct, num_indirect);
     ASSERT(num_direct + num_indirect > 0);
-    memset(first, 0, size);
+    dynamo_memset(first, 0, size);
     /* place the offset to the fragment_t*, if necessary */
     if (linkstub_frag_offs_at_end(f->flags, num_direct, num_indirect)) {
         ushort offs;
@@ -3433,7 +3433,7 @@ coarse_lazy_link(dcontext_t *dcontext, fragment_t *targetf)
                  * head identification, which should happen at
                  * coarse-fragment-to-entrance-stub link time.
                  */
-                memset(&temp_sourcef, 0, sizeof(temp_sourcef));
+                dynamo_memset(&temp_sourcef, 0, sizeof(temp_sourcef));
                 temp_sourcef.tag = NULL; /* thus no trace head trigger */
                 DODEBUG({ temp_sourcef.start_pc = stub; });
                 temp_sourcef.flags = FRAG_SHARED | FRAG_COARSE_GRAIN |

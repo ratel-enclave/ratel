@@ -159,7 +159,7 @@ coarse_unit_create(app_pc base_pc, app_pc end_pc, module_digest_t *digest,
     coarse_info_t *info = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, coarse_info_t,
                                           /* FIXME: have separate heap acct? */
                                           ACCT_VMAREAS, PROTECTED);
-    memset(info, 0, sizeof(*info));
+    dynamo_memset(info, 0, sizeof(*info));
     ASSIGN_INIT_LOCK_FREE(info->lock, coarse_info_lock);
     ASSIGN_INIT_LOCK_FREE(info->incoming_lock, coarse_info_incoming_lock);
     info->base_pc = base_pc;
@@ -184,7 +184,7 @@ coarse_unit_create(app_pc base_pc, app_pc end_pc, module_digest_t *digest,
     if (for_execution)
         coarse_unit_mark_in_use(info);
     if (digest != NULL) {
-        memcpy(&info->module_md5, digest, sizeof(info->module_md5));
+        dynamo_memcpy(&info->module_md5, digest, sizeof(info->module_md5));
     } else if (TEST(PERSCACHE_MODULE_MD5_AT_LOAD,
                     DYNAMO_OPTION(persist_gen_validation))) {
         /* case 9735: calculate the module md5 at load time so we have a consistent
@@ -362,7 +362,7 @@ coarse_unit_reset_free_internal(dcontext_t *dcontext, coarse_info_t *info,
      * to a non-cache-consistency reason.  Thus we want to preserve the locks, vm
      * region, and md5, but clear everything else (case 10119).
      */
-    memset(info, 0, offsetof(coarse_info_t, lock));
+    dynamo_memset(info, 0, offsetof(coarse_info_t, lock));
     if (!have_locks) {
         if (need_info_lock)
             mutex_unlock(&info->lock);
@@ -635,7 +635,7 @@ coarse_replace_unit(dcontext_t *dcontext, coarse_info_t *dst, coarse_info_t *src
     temp_lock = dst->lock;
     temp_incoming_lock = dst->incoming_lock;
     DODEBUG({ modname = dst->module; });
-    memcpy(dst, src, sizeof(*dst));
+    dynamo_memcpy(dst, src, sizeof(*dst));
     dst->lock = temp_lock;
     dst->incoming_lock = temp_incoming_lock;
     dst->non_frozen = non_frozen;
@@ -714,7 +714,7 @@ coarse_unit_freeze(dcontext_t *dcontext, coarse_info_t *info, bool in_place)
     if (TEST(PERSCACHE_CODE_INVALID, info->flags)) /* paranoid */
         goto coarse_unit_freeze_exit;
 
-    memset(freeze_info, 0, sizeof(*freeze_info));
+    dynamo_memset(freeze_info, 0, sizeof(*freeze_info));
     freeze_info->src_info = info;
 
     /* Tasks:
@@ -922,7 +922,7 @@ transfer_coarse_stub(dcontext_t *dcontext, coarse_freeze_info_t *freeze_info,
         update_out = true;
     sz = exit_stub_size(dcontext, tgt, FRAG_COARSE_GRAIN)
         - (JMP_LONG_LENGTH - 1/*get opcode*/);
-    memcpy(pc, stub, sz);
+    dynamo_memcpy(pc, stub, sz);
     pc += sz;
     ASSERT(pc == entrance_stub_jmp(freeze_info->stubs_cur_pc) + 1/*skip opcode*/);
 #ifdef X86
@@ -1016,7 +1016,7 @@ push_pending_freeze(dcontext_t *dcontext, coarse_freeze_info_t *freeze_info,
     ASSERT(cti_len > 4);
     sz = cti_len - 4;
     pending->link_cti_opnd = freeze_info->cache_cur_pc + sz;
-    memcpy(freeze_info->cache_cur_pc, cti_pc, sz);
+    dynamo_memcpy(freeze_info->cache_cur_pc, cti_pc, sz);
     if (body_start_pc == cti_pc && !DYNAMO_OPTION(unsafe_freeze_elide_sole_ubr)) {
         /* case 9677: unsafe to elide entire-bb-ubr */
         pending->elide_ubr = false;
@@ -1091,7 +1091,7 @@ transfer_coarse_fragment(dcontext_t *dcontext, coarse_freeze_info_t *freeze_info
 
     /* copy body of fragment, up to start of cti */
     sz = pc - body;
-    memcpy(freeze_info->cache_cur_pc, body, sz);
+    dynamo_memcpy(freeze_info->cache_cur_pc, body, sz);
     freeze_info->cache_cur_pc += sz;
     DODEBUG({ freeze_info->app_code_size += sz; });
 
@@ -1112,7 +1112,7 @@ transfer_coarse_fragment(dcontext_t *dcontext, coarse_freeze_info_t *freeze_info
         /* elide the jmp to the stub */
         pc += JMP_LONG_LENGTH /*ubr to stub*/;
         sz = coarse_indirect_stub_size(freeze_info->src_info) - 4;
-        memcpy(freeze_info->cache_cur_pc, pc, sz);
+        dynamo_memcpy(freeze_info->cache_cur_pc, pc, sz);
         freeze_info->cache_cur_pc += sz;
         pc += sz;
         tgt = PC_RELATIVE_TARGET(pc);
@@ -1723,7 +1723,7 @@ coarse_merge_without_dups(dcontext_t *dcontext, coarse_freeze_info_t *freeze_inf
         if (dst_body == NULL) { /* not a dup */
             /* copy body of fragment, including cti (if not ending @ fall-through) */
             size_t sz = next_pc - src_body;
-            memcpy(freeze_info->cache_cur_pc, src_body, sz);
+            dynamo_memcpy(freeze_info->cache_cur_pc, src_body, sz);
             freeze_info->cache_cur_pc += sz;
         }
 
@@ -1970,9 +1970,9 @@ coarse_unit_merge(dcontext_t *dcontext, coarse_info_t *info1, coarse_info_t *inf
      * place.
      */
     cachelg_size = (src_lg == info2) ? cache2_size : cache1_size;
-    memcpy(merged->cache_start_pc, src_lg->cache_start_pc, cachelg_size);
+    dynamo_memcpy(merged->cache_start_pc, src_lg->cache_start_pc, cachelg_size);
 
-    memset(&freeze_info, 0, sizeof(freeze_info));
+    dynamo_memset(&freeze_info, 0, sizeof(freeze_info));
     freeze_info.dst_info = merged;
     freeze_info.stubs_start_pc = merged->stubs_start_pc;
     freeze_info.stubs_cur_pc = merged->stubs_start_pc;
@@ -2033,8 +2033,8 @@ coarse_unit_merge(dcontext_t *dcontext, coarse_info_t *info1, coarse_info_t *inf
             SZFMT" @"PFX" "PFX" "SZFMT" "SZFMT"\n",
             merged->mmap_size, merged->cache_start_pc, merged->fcache_return_prefix,
             newsz, newmap, newmap + cachesz_aligned, cache_shift, stubs_shift);
-        memcpy(newmap, merged->cache_start_pc, cachesz);
-        memcpy(newmap + cachesz_aligned, merged->fcache_return_prefix, stubsz);
+        dynamo_memcpy(newmap, merged->cache_start_pc, cachesz);
+        dynamo_memcpy(newmap + cachesz_aligned, merged->fcache_return_prefix, stubsz);
         heap_munmap(merged->cache_start_pc, merged->mmap_size, VMM_CACHE);
         coarse_stubs_delete(merged);
         merged->mmap_size = newsz;
@@ -2887,7 +2887,7 @@ coarse_unit_merge_persist_info(dcontext_t *dcontext, coarse_info_t *dst,
             dst->hotp_ppoint_vec =
                 HEAP_ARRAY_ALLOC(dcontext, app_rva_t, dst->hotp_ppoint_vec_num,
                                  ACCT_HOT_PATCHING, PROTECTED);
-            memcpy(dst->hotp_ppoint_vec, info2->hotp_ppoint_vec,
+            dynamo_memcpy(dst->hotp_ppoint_vec, info2->hotp_ppoint_vec,
                    dst->hotp_ppoint_vec_num*sizeof(app_rva_t));
         }
     } else {
@@ -2985,7 +2985,7 @@ coarse_unit_set_persist_data(dcontext_t *dcontext, coarse_info_t *info,
         DOLOG(1, LOG_CACHE, {
             print_module_digest(THREAD, &info->module_md5, "using md5 from load time: ");
         });
-        memcpy(&pers->modinfo.module_md5, &info->module_md5,
+        dynamo_memcpy(&pers->modinfo.module_md5, &info->module_md5,
                sizeof(pers->modinfo.module_md5));
     } else {
         persist_calculate_module_digest(&pers->modinfo.module_md5, modbase,
@@ -3317,7 +3317,7 @@ coarse_unit_persist(dcontext_t *dcontext, coarse_info_t *info)
                                                  BUFFER_SIZE_ELEMENTS(option_buf),
                                                  option_level);
     /* get_persist_filename() fills in pers.modinfo */
-    memset(&pers, 0, sizeof(pers));
+    dynamo_memset(&pers, 0, sizeof(pers));
     if (!get_persist_filename(filename, BUFFER_SIZE_ELEMENTS(filename), modbase,
                               true/*write*/, &pers.modinfo, option_string)) {
         LOG(THREAD, LOG_CACHE, 1, "  error calculating filename (or excluded)\n");
@@ -3558,7 +3558,7 @@ coarse_unit_persist(dcontext_t *dcontext, coarse_info_t *info)
             unmap_file(map, sz);
         }
     } else {
-        memset(&footer, 0, sizeof(footer));
+        dynamo_memset(&footer, 0, sizeof(footer));
     }
     footer.magic = PERSISTENT_CACHE_MAGIC;
     if (!write_persist_file(dcontext, fd, &footer, sizeof(footer)))
@@ -3745,7 +3745,7 @@ persist_get_name_and_open(dcontext_t *dcontext, app_pc modbase,
     do {
         *option_string = persist_get_relevant_options(dcontext, option_buf,
                                                       option_buf_sz, *option_level);
-        memset(modinfo, 0, sizeof(*modinfo));
+        dynamo_memset(modinfo, 0, sizeof(*modinfo));
         if (!get_persist_filename(filename, filename_sz, modbase,
                                   false/*read*/, modinfo, *option_string)) {
             LOG(THREAD, LOG_CACHE, 1,

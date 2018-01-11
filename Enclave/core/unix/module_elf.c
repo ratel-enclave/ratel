@@ -82,7 +82,7 @@ typedef uint32_t Elf_Symndx;
 bool
 safe_read(const void *base, size_t size, void *out_buf)
 {
-    memcpy(out_buf, base, size);
+    dynamo_memcpy(out_buf, base, size);
     return true;
 }
 
@@ -1149,7 +1149,7 @@ get_shared_lib_name(app_pc map)
     ptr_int_t load_delta;
     char *soname = NULL;
     os_module_data_t os_data;
-    memset(&os_data, 0, sizeof(os_data));
+    dynamo_memset(&os_data, 0, sizeof(os_data));
     module_read_os_data(map, true/*doesn't matter for soname*/,
                         &load_delta, NULL, &soname);
     return soname;
@@ -1487,7 +1487,7 @@ symbol_iterator_start(module_handle_t handle)
     iter = global_heap_alloc(sizeof(*iter)HEAPACCT(ACCT_CLIENT));
     if (iter == NULL)
         return NULL;
-    memset(iter, 0, sizeof(*iter));
+    dynamo_memset(iter, 0, sizeof(*iter));
 
     os_get_module_info_lock();
     ma = module_pc_lookup((byte *)handle);
@@ -1641,7 +1641,7 @@ dr_symbol_export_iterator_next(dr_symbol_export_iterator_t *dr_iter)
     sym = symbol_iterator_cur_symbol(iter);
     CLIENT_ASSERT(sym != NULL, "no next");
 
-    memset(&iter->symbol_export, 0, sizeof(iter->symbol_export));
+    dynamo_memset(&iter->symbol_export, 0, sizeof(iter->symbol_export));
     iter->symbol_export.name = iter->dynstr + sym->st_name;
     iter->symbol_export.is_indirect_code = (ELF_ST_TYPE(sym->st_info) == STT_GNU_IFUNC);
     iter->symbol_export.is_code = (ELF_ST_TYPE(sym->st_info) == STT_FUNC);
@@ -1813,7 +1813,7 @@ module_relocate_symbol(ELF_REL_TYPE *rel,
         break;
     case ELF_R_COPY:
         if (sym != NULL)
-            memcpy(r_addr, res, sym->st_size);
+            dynamo_memcpy(r_addr, res, sym->st_size);
         break;
 #ifdef X86
     case ELF_R_PC32:
@@ -1915,7 +1915,7 @@ os_read_until(file_t fd, void *buf, size_t toread)
 bool
 elf_loader_init(elf_loader_t *elf, const char *filename)
 {
-    memset(elf, 0, sizeof(*elf));
+    dynamo_memset(elf, 0, sizeof(*elf));
     elf->filename = filename;
     elf->fd = os_open(filename, OS_OPEN_READ);
     return elf->fd != INVALID_FILE;
@@ -1930,7 +1930,7 @@ elf_loader_destroy(elf_loader_t *elf)
     if (elf->file_map != NULL) {
         os_unmap_file(elf->file_map, elf->file_size);
     }
-    memset(elf, 0, sizeof(*elf));
+    dynamo_memset(elf, 0, sizeof(*elf));
 }
 
 ELF_HEADER_TYPE *
@@ -2138,7 +2138,7 @@ elf_loader_map_phdrs(elf_loader_t *elf, bool fixed, map_fn_t map_func,
                     file_end = (app_pc)prog_hdr->p_vaddr + prog_hdr->p_filesz;
                     if (seg_end > file_end + delta) {
 #ifndef NOT_DYNAMORIO_CORE_PROPER
-                        memset(file_end + delta, 0, seg_end - (file_end + delta));
+                        dynamo_memset(file_end + delta, 0, seg_end - (file_end + delta));
 #else
                         /* FIXME i#37: use a remote memset to zero out this gap or fix
                          * it up in the child.  There is typically one RW PT_LOAD

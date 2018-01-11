@@ -478,20 +478,20 @@ GLOBAL_LABEL(get_stack_ptr:)
 
 /* Private memcpy.
  */
-        DECLARE_FUNC(memcpy)
-GLOBAL_LABEL(memcpy:)
+        DECLARE_FUNC(dynamo_memcpy)
+GLOBAL_LABEL(dynamo_memcpy:)
         ARGS_TO_XDI_XSI_XDX()           /* dst=xdi, src=xsi, n=xdx */
         mov    REG_XAX, REG_XDI         /* Save dst for return. */
         /* Copy xdx bytes, align on src. */
-        REP_STRING_OP(memcpy, REG_XSI, movs)
+        REP_STRING_OP(dynamo_memcpy, REG_XSI, movs)
         RESTORE_XDI_XSI()
         ret                             /* Return original dst. */
-        END_FUNC(memcpy)
+        END_FUNC(dynamo_memcpy)
 
 /* Private memset.
  */
-        DECLARE_FUNC(memset)
-GLOBAL_LABEL(memset:)
+        DECLARE_FUNC(dynamo_memset)
+GLOBAL_LABEL(dynamo_memset:)
         ARGS_TO_XDI_XSI_XDX()           /* dst=xdi, val=xsi, n=xdx */
         push    REG_XDI                 /* Save dst for return. */
         test    esi, esi                /* Usually val is zero. */
@@ -499,7 +499,7 @@ GLOBAL_LABEL(memset:)
         xor     eax, eax
 do_memset:
         /* Set xdx bytes, align on dst. */
-        REP_STRING_OP(memset, REG_XDI, stos)
+        REP_STRING_OP(dynamo_memset, REG_XDI, stos)
         pop     REG_XAX                 /* Return original dst. */
         RESTORE_XDI_XSI()
         ret
@@ -515,7 +515,7 @@ make_val_word_size:
         /* Use two-operand imul to avoid clobbering XDX. */
         imul    REG_XAX, REG_XSI
         jmp     do_memset
-        END_FUNC(memset)
+        END_FUNC(dynamo_memset)
 
 
 # ifndef MACOS /* XXX: attribute alias issue, plus using nasm */
@@ -526,11 +526,11 @@ make_val_word_size:
  */
 .global __memcpy_chk
 .hidden __memcpy_chk
-.set __memcpy_chk,memcpy
+.set __memcpy_chk,dynamo_memcpy
 
 .global __memset_chk
 .hidden __memset_chk
-.set __memset_chk,memset
+.set __memset_chk,dynamo_memset
 # endif
 #endif /* UNIX */
 

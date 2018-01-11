@@ -352,7 +352,7 @@ monitor_thread_init(dcontext_t *dcontext)
     md = (monitor_data_t *) heap_alloc(dcontext, sizeof(monitor_data_t)
                                        HEAPACCT(ACCT_TRACE));
     dcontext->monitor_field = (void *) md;
-    memset(md, 0, sizeof(monitor_data_t));
+    dynamo_memset(md, 0, sizeof(monitor_data_t));
     reset_trace_state(dcontext, false /* link lock not needed */);
 
     /* case 7966: don't initialize un-needed things for hotp_only & thin_client
@@ -1029,7 +1029,7 @@ make_room_in_trace_buffer(dcontext_t *dcontext, uint add_size, fragment_t *f)
         if (md->trace_buf != NULL) {
             /* copy entire thing, just in case */
             IF_X64(ASSERT_NOT_REACHED()); /* can't copy w/o re-relativizing! */
-            memcpy(new_tbuf, md->trace_buf, md->trace_buf_size);
+            dynamo_memcpy(new_tbuf, md->trace_buf, md->trace_buf_size);
             heap_free(dcontext, md->trace_buf, md->trace_buf_size HEAPACCT(ACCT_TRACE));
             realloc_shift = new_tbuf - md->trace_buf;
             /* need to walk through trace instr_t list and update addresses */
@@ -1061,11 +1061,11 @@ make_room_in_trace_buffer(dcontext_t *dcontext, uint add_size, fragment_t *f)
         new_buf = (trace_bb_build_t *)
             HEAP_ARRAY_ALLOC(dcontext, trace_bb_build_t, new_len, ACCT_TRACE, true);
         /* PR 306761 relies on being zeroed, as does reset_trace_state to free vmlists */
-        memset(new_buf, 0, sizeof(trace_bb_build_t)*new_len);
+        dynamo_memset(new_buf, 0, sizeof(trace_bb_build_t)*new_len);
         LOG(THREAD, LOG_MONITOR, 3, "\nRe-allocating trace blks from %d to %d\n",
             md->blk_info_length, new_len);
         if (md->blk_info != NULL) {
-            memcpy(new_buf, md->blk_info, md->blk_info_length*sizeof(trace_bb_build_t));
+            dynamo_memcpy(new_buf, md->blk_info, md->blk_info_length*sizeof(trace_bb_build_t));
             HEAP_ARRAY_FREE(dcontext, md->blk_info, trace_bb_build_t, md->blk_info_length,
                             ACCT_TRACE, true);
         }

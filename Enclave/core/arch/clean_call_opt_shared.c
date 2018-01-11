@@ -68,7 +68,7 @@ static void
 callee_info_init(callee_info_t *ci)
 {
     uint i;
-    memset(ci, 0, sizeof(*ci));
+    dynamo_memset(ci, 0, sizeof(*ci));
     ci->bailout = true;
     /* to be conservative */
     ci->has_locals  = true;
@@ -659,7 +659,7 @@ analyze_clean_call_inline(dcontext_t *dcontext, clean_call_info_t *cci)
                 ", save all regs in priv_mcontext_t layout.\n",
                 info->start);
             cci->num_regs_skip = 0;
-            memset(cci->reg_skip, 0, sizeof(bool) * NUM_GP_REGS);
+            dynamo_memset(cci->reg_skip, 0, sizeof(bool) * NUM_GP_REGS);
             cci->should_align = true;
         } else {
             uint i;

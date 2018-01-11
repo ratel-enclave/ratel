@@ -524,9 +524,9 @@ config_reread(void)
          * datasec_not_prot.
          */
         tmp_config = config_reread_info;
-        memcpy(config_reread_info, &config, sizeof(*config_reread_info));
+        dynamo_memcpy(config_reread_info, &config, sizeof(*config_reread_info));
         ASSERT(config_reread_info->u.v == &myvals);
-        memcpy(config_reread_vals, &myvals, sizeof(*config_reread_vals));
+        dynamo_memcpy(config_reread_vals, &myvals, sizeof(*config_reread_vals));
         config_reread_info->u.v = config_reread_vals;
     } else {
         SELF_UNPROTECT_DATASEC(DATASEC_RARELY_PROT);
@@ -567,7 +567,7 @@ config_reread(void)
          * same.
          */
         SELF_UNPROTECT_DATASEC(DATASEC_RARELY_PROT);
-        memcpy(&myvals, config_reread_vals, sizeof(myvals));
+        dynamo_memcpy(&myvals, config_reread_vals, sizeof(myvals));
         SELF_PROTECT_DATASEC(DATASEC_RARELY_PROT);
     } else {
         SELF_PROTECT_DATASEC(DATASEC_RARELY_PROT);
@@ -592,7 +592,7 @@ get_config_val_other(const char *appname, process_id_t pid, const char *sfx,
      * uses another 1.2K.
      */
     config_info_t info;
-    memset(&info, 0, sizeof(info));
+    dynamo_memset(&info, 0, sizeof(info));
     info.query = var;
     config_read(&info, appname, pid, sfx);
     if (info.u.q.have_answer) {
@@ -696,7 +696,7 @@ config_exit(void)
 {
 #if !defined(NOT_DYNAMORIO_CORE) && !defined(NOT_DYNAMORIO_CORE_PROPER)
     if (doing_detach)
-        memset(&config, 0, sizeof config); /* for possible re-attach */
+        dynamo_memset(&config, 0, sizeof config); /* for possible re-attach */
 #endif
     /* nothing -- so not called on fast exit (is called on detach) */
 }

@@ -1606,7 +1606,7 @@ bitmap_find_set_block_sequence(bitmap_t b, uint bitmap_size, uint requested)
 void
 bitmap_initialize_free(bitmap_t b, uint bitmap_size)
 {
-    memset(b, 0xff, BITMAP_INDEX(bitmap_size) * sizeof(bitmap_element_t));
+    dynamo_memset(b, 0xff, BITMAP_INDEX(bitmap_size) * sizeof(bitmap_element_t));
 }
 
 uint
@@ -2516,7 +2516,7 @@ safe_write_try_except(void *base, size_t size, const void *in_buf, size_t *bytes
     if (dcontext != NULL) {
         TRY_EXCEPT(dcontext, {
             /* We abort on the 1st fault, just like safe_read */
-            memcpy(base, in_buf, size);
+            dynamo_memcpy(base, in_buf, size);
             res = true;
         } , { /* EXCEPT */
             /* nothing: res is already false */
@@ -2542,7 +2542,7 @@ safe_write_try_except(void *base, size_t size, const void *in_buf, size_t *bytes
             return false;
         }
         /* ok, checks passed do the copy, FIXME - because of races this isn't safe! */
-        memcpy(base, in_buf, size);
+        dynamo_memcpy(base, in_buf, size);
         res = true;
     }
 
@@ -3137,7 +3137,7 @@ stats_thread_init(dcontext_t *dcontext)
     LOG(THREAD, LOG_STATS, 2, "thread_stats="PFX" size=%d\n", new_thread_stats,
         sizeof(thread_local_statistics_t));
     /* initialize any thread stats bookkeeping fields before assigning to dcontext */
-    memset(new_thread_stats, 0x0, sizeof(thread_local_statistics_t));
+    dynamo_memset(new_thread_stats, 0x0, sizeof(thread_local_statistics_t));
     new_thread_stats->thread_id = get_thread_id();
     ASSIGN_INIT_LOCK_FREE(new_thread_stats->thread_stats_lock, thread_stats_lock);
     dcontext->thread_stats = new_thread_stats;
@@ -3855,7 +3855,7 @@ MD5Update(struct MD5Context *ctx, const unsigned char *input, size_t len)
 
     if (len >= need) {
         if (have != 0) {
-            memcpy(ctx->buffer + have, input, need);
+            dynamo_memcpy(ctx->buffer + have, input, need);
             MD5Transform(ctx->state, ctx->buffer);
             input += need;
             len -= need;
@@ -3872,7 +3872,7 @@ MD5Update(struct MD5Context *ctx, const unsigned char *input, size_t len)
 
     /* Handle any remaining bytes of data. */
     if (len != 0)
-        memcpy(ctx->buffer + have, input, len);
+        dynamo_memcpy(ctx->buffer + have, input, len);
 }
 
 /*
@@ -3910,7 +3910,7 @@ MD5Final(unsigned char digest[MD5_RAW_BYTES], struct MD5Context *ctx)
         for (i = 0; i < 4; i++)
             PUT_32BIT_LE(digest + i * 4, ctx->state[i]);
     }
-    memset(ctx, 0, sizeof(*ctx));   /* in case it's sensitive */
+    dynamo_memset(ctx, 0, sizeof(*ctx));   /* in case it's sensitive */
 }
 
 
@@ -4367,7 +4367,7 @@ profile_callers()
         return;
     ASSERT(DYNAMO_OPTION(prof_caller) <= MAX_CALL_PROFILE_DEPTH);
     GET_FRAME_PTR(our_ebp);
-    memset(caller, 0, sizeof(caller));
+    dynamo_memset(caller, 0, sizeof(caller));
     pc = (uint *) our_ebp;
     /* FIXME: mutex_collect_callstack() assumes caller addresses are in
      * DR and thus are safe to read, but checks for dstack, etc.
@@ -4400,7 +4400,7 @@ profile_callers()
     }
     if (entry == NULL) {
         entry = global_heap_alloc(sizeof(profile_callers_t) HEAPACCT(ACCT_OTHER));
-        memcpy(entry->caller, caller, sizeof(caller));
+        dynamo_memcpy(entry->caller, caller, sizeof(caller));
         entry->count = 1;
         mutex_lock(&profile_callers_lock);
         entry->next = profcalls;
@@ -4616,7 +4616,7 @@ dr_wstrdup(const wchar_t *str HEAPACCT(which_heap_t which))
             /* Xref i#347, though we shouldn't get here b/c utf16_to_utf8_size uses
              * the same code.  We fall back on filling with '?'.
              */
-            memset(dup + strlen(dup), '?', str_len - 1 - strlen(dup));
+            dynamo_memset(dup + strlen(dup), '?', str_len - 1 - strlen(dup));
         }
     }
     dup[str_len - 1] = '\0';        /* Being on the safe side. */
@@ -4687,7 +4687,7 @@ array_merge(dcontext_t *dcontext, bool intersect /* else union */,
     if (num > 0) {
         vec = HEAP_ARRAY_ALLOC(dcontext, void *, num, which, PROTECTED);
         if (!intersect)
-            memcpy(vec, src1, sizeof(void *) * src1_num);
+            dynamo_memcpy(vec, src1, sizeof(void *) * src1_num);
         DODEBUG(res = num;);
         num = intersect ? 0 : src1_num;
         for (i = 0; i < src2_num; i++) {

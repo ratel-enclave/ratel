@@ -131,11 +131,11 @@ pcprofile_thread_init(dcontext_t *dcontext, bool shared_itimer, void *parent_inf
     /* we use global heap so we can share with child threads */
     info = global_heap_alloc(sizeof(thread_pc_info_t) HEAPACCT(ACCT_OTHER));
     dcontext->pcprofile_field = (void *) info;
-    memset(info, 0, sizeof(thread_pc_info_t));
+    dynamo_memset(info, 0, sizeof(thread_pc_info_t));
     info->thread_shared = shared_itimer;
 
     info->htable = (pc_profile_entry_t**) global_heap_alloc(size HEAPACCT(ACCT_OTHER));
-    memset(info->htable, 0, size);
+    dynamo_memset(info->htable, 0, size);
 #if USE_SYMTAB
     valid_symtab = symtab_init();
 #endif

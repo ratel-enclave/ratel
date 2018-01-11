@@ -334,7 +334,7 @@ set_default_signal_action(int sig)
     kernel_sigset_t set;
     kernel_sigaction_t act;
     int rc;
-    memset(&act, 0, sizeof(act));
+    dynamo_memset(&act, 0, sizeof(act));
     act.handler = (handler_t) SIG_DFL;
     /* arm the signal */
     rc = sigaction_syscall(sig, &act, NULL);
@@ -353,7 +353,7 @@ set_ignore_signal_action(int sig)
 {
     kernel_sigaction_t act;
     int rc;
-    memset(&act, 0, sizeof(act));
+    dynamo_memset(&act, 0, sizeof(act));
     act.handler = (handler_t) SIG_IGN;
     /* arm the signal */
     rc = sigaction_syscall(sig, &act, NULL);
@@ -494,7 +494,7 @@ signal_thread_init(dcontext_t *dcontext)
     IF_LINUX(IF_X86(ASSERT(ALIGNED(pend_unit_size, AVX_ALIGNMENT))));
 
     /* all fields want to be initialized to 0 */
-    memset(info, 0, sizeof(thread_sig_info_t));
+    dynamo_memset(info, 0, sizeof(thread_sig_info_t));
     dcontext->signal_field = (void *) info;
 
     /* our special heap to avoid reentrancy problems
@@ -766,11 +766,11 @@ signal_info_init_sigaction(dcontext_t *dcontext, thread_sig_info_t *info)
 {
     info->app_sigaction = (kernel_sigaction_t **)
         handler_alloc(dcontext, SIGARRAY_SIZE * sizeof(kernel_sigaction_t *));
-    memset(info->app_sigaction, 0, SIGARRAY_SIZE * sizeof(kernel_sigaction_t *));
-    memset(&info->restorer_valid, -1, SIGARRAY_SIZE * sizeof(info->restorer_valid[0]));
+    dynamo_memset(info->app_sigaction, 0, SIGARRAY_SIZE * sizeof(kernel_sigaction_t *));
+    dynamo_memset(&info->restorer_valid, -1, SIGARRAY_SIZE * sizeof(info->restorer_valid[0]));
     info->we_intercept = (bool *)
         handler_alloc(dcontext, SIGARRAY_SIZE * sizeof(bool));
-    memset(info->we_intercept, 0, SIGARRAY_SIZE * sizeof(bool));
+    dynamo_memset(info->we_intercept, 0, SIGARRAY_SIZE * sizeof(bool));
 }
 
 /* Cleans up info's app_sigaction and we_intercept entries */
@@ -780,7 +780,7 @@ signal_info_exit_sigaction(dcontext_t *dcontext, thread_sig_info_t *info,
 {
     int i;
     kernel_sigaction_t act;
-    memset(&act, 0, sizeof(act));
+    dynamo_memset(&act, 0, sizeof(act));
     act.handler = (handler_t) SIG_DFL;
     kernel_sigemptyset(&act.mask); /* does mask matter for SIG_DFL? */
     for (i = 1; i <= MAX_SIGNUM; i++) {
@@ -875,13 +875,13 @@ signal_thread_inherit(dcontext_t *dcontext, void *clone_record)
             LOG(THREAD, LOG_ASYNCH, 2, "inheriting signal handlers from parent\n");
             info->app_sigaction = (kernel_sigaction_t **)
                 handler_alloc(dcontext, SIGARRAY_SIZE * sizeof(kernel_sigaction_t *));
-            memset(info->app_sigaction, 0, SIGARRAY_SIZE * sizeof(kernel_sigaction_t *));
+            dynamo_memset(info->app_sigaction, 0, SIGARRAY_SIZE * sizeof(kernel_sigaction_t *));
             for (i = 1; i <= MAX_SIGNUM; i++) {
                 info->restorer_valid[i] = -1;  /* clear cache */
                 if (record->info.app_sigaction[i] != NULL) {
                     info->app_sigaction[i] = (kernel_sigaction_t *)
                         handler_alloc(dcontext, sizeof(kernel_sigaction_t));
-                    memcpy(info->app_sigaction[i], record->info.app_sigaction[i],
+                    dynamo_memcpy(info->app_sigaction[i], record->info.app_sigaction[i],
                            sizeof(kernel_sigaction_t));
                     LOG(THREAD, LOG_ASYNCH, 2, "\thandler for signal %d is "PFX"\n",
                         i, info->app_sigaction[i]->handler);
@@ -889,7 +889,7 @@ signal_thread_inherit(dcontext_t *dcontext, void *clone_record)
             }
             info->we_intercept = (bool *)
                 handler_alloc(dcontext, SIGARRAY_SIZE * sizeof(bool));
-            memcpy(info->we_intercept, record->info.we_intercept,
+            dynamo_memcpy(info->we_intercept, record->info.we_intercept,
                    SIGARRAY_SIZE * sizeof(bool));
             mutex_lock(&record->info.child_lock);
             record->info.num_unstarted_children--;
@@ -922,7 +922,7 @@ signal_thread_inherit(dcontext_t *dcontext, void *clone_record)
             /* parent was under our control, so the real sigstack we see is just
              * the parent's being inherited -- clear it now
              */
-            memset(&info->app_sigstack, 0, sizeof(stack_t));
+            dynamo_memset(&info->app_sigstack, 0, sizeof(stack_t));
             info->app_sigstack.ss_flags |= SS_DISABLE;
         }
 
@@ -1381,7 +1381,7 @@ set_handler_and_record_app(dcontext_t *dcontext, thread_sig_info_t *info, int si
         }
         info->app_sigaction[sig] = (kernel_sigaction_t *)
             handler_alloc(dcontext, sizeof(kernel_sigaction_t));
-        memcpy(info->app_sigaction[sig], &oldact, sizeof(kernel_sigaction_t));
+        dynamo_memcpy(info->app_sigaction[sig], &oldact, sizeof(kernel_sigaction_t));
         /* clear cache */
         info->restorer_valid[sig] = -1;
         if (info->shared_app_sigaction)
@@ -1419,7 +1419,7 @@ intercept_signal_ignore_initially(dcontext_t *dcontext, thread_sig_info_t *info,
 {
     kernel_sigaction_t act;
     ASSERT(sig <= MAX_SIGNUM);
-    memset(&act, 0, sizeof(act));
+    dynamo_memset(&act, 0, sizeof(act));
     act.handler = (handler_t) SIG_IGN;
     set_handler_and_record_app(dcontext, info, sig, &act);
 }
@@ -1448,7 +1448,7 @@ signal_remove_handlers(dcontext_t *dcontext)
     thread_sig_info_t *info = (thread_sig_info_t *) dcontext->signal_field;
     int i;
     kernel_sigaction_t act;
-    memset(&act, 0, sizeof(act));
+    dynamo_memset(&act, 0, sizeof(act));
     act.handler = (handler_t) SIG_DFL;
     kernel_sigemptyset(&act.mask);
     for (i = 1; i <= MAX_SIGNUM; i++) {
@@ -1657,13 +1657,13 @@ handle_sigaction(dcontext_t *dcontext, int sig, const kernel_sigaction_t *act,
         if (info->app_sigaction[sig] == NULL) {
             if (info->we_intercept[sig]) {
                 /* need to pretend there is no handler */
-                memset(&info->prior_app_sigaction, 0, sizeof(info->prior_app_sigaction));
+                dynamo_memset(&info->prior_app_sigaction, 0, sizeof(info->prior_app_sigaction));
                 info->prior_app_sigaction.handler = (handler_t) SIG_DFL;
             } else {
                 info->use_kernel_prior_sigaction = true;
             }
         } else {
-            memcpy(&info->prior_app_sigaction, info->app_sigaction[sig],
+            dynamo_memcpy(&info->prior_app_sigaction, info->app_sigaction[sig],
                    sizeof(info->prior_app_sigaction));
         }
     }
@@ -1693,7 +1693,7 @@ handle_sigaction(dcontext_t *dcontext, int sig, const kernel_sigaction_t *act,
 
         /* save app's entire sigaction struct */
         save = (kernel_sigaction_t *) handler_alloc(dcontext, sizeof(kernel_sigaction_t));
-        memcpy(save, &local_act, sizeof(kernel_sigaction_t));
+        dynamo_memcpy(save, &local_act, sizeof(kernel_sigaction_t));
         /* Remove the unblockable sigs */
         kernel_sigdelset(&save->mask, SIGKILL);
         kernel_sigdelset(&save->mask, SIGSTOP);
@@ -2247,7 +2247,7 @@ sigcontext_to_mcontext(priv_mcontext_t *mc, sig_full_cxt_t *sc_full,
     }
 #elif defined(AARCH64)
     if (TEST(DR_MC_INTEGER, flags))
-        memcpy(&mc->r0, &sc->SC_FIELD(regs[0]), sizeof(mc->r0) * 31);
+        dynamo_memcpy(&mc->r0, &sc->SC_FIELD(regs[0]), sizeof(mc->r0) * 31);
     if (TEST(DR_MC_CONTROL, flags)) {
         /* XXX i#2710: the link register should be under DR_MC_CONTROL */
         mc->sp = sc->SC_FIELD(sp);
@@ -2333,7 +2333,7 @@ mcontext_to_sigcontext(sig_full_cxt_t *sc_full, priv_mcontext_t *mc,
     }
 #elif defined(AARCH64)
     if (TEST(DR_MC_INTEGER, flags)) {
-        memcpy(&sc->SC_FIELD(regs[0]), &mc->r0, sizeof(mc->r0) * 31);
+        dynamo_memcpy(&sc->SC_FIELD(regs[0]), &mc->r0, sizeof(mc->r0) * 31);
     }
     if (TEST(DR_MC_CONTROL, flags)) {
         /* XXX i#2710: the link register should be under DR_MC_CONTROL */
@@ -2520,7 +2520,7 @@ thread_set_self_context(void *cxt)
 #ifdef VMX86_SERVER
     ASSERT_NOT_IMPLEMENTED(false); /* PR 405694: can't use regular sigreturn! */
 #endif
-    memset(&frame, 0, sizeof(frame));
+    dynamo_memset(&frame, 0, sizeof(frame));
 #ifdef LINUX
 # ifdef X86
     byte *xstate = get_xstate_buffer(dcontext);
@@ -2829,23 +2829,23 @@ convert_frame_to_nonrt(dcontext_t *dcontext, int sig, sigframe_rt_t *f_old,
     sigcontext_t *sc_old = get_sigcontext_from_rt_frame(f_old);
     f_new->pretcode = f_old->pretcode;
     f_new->sig = f_old->sig;
-    memcpy(&f_new->sc, get_sigcontext_from_rt_frame(f_old), sizeof(sigcontext_t));
+    dynamo_memcpy(&f_new->sc, get_sigcontext_from_rt_frame(f_old), sizeof(sigcontext_t));
     if (sc_old->fpstate != NULL) {
         /* up to caller to include enough space for fpstate at end */
         byte *new_fpstate = (byte *)
             ALIGN_FORWARD(((byte *)f_new) + sizeof(*f_new), XSTATE_ALIGNMENT);
-        memcpy(new_fpstate, sc_old->fpstate, signal_frame_extra_size(false));
+        dynamo_memcpy(new_fpstate, sc_old->fpstate, signal_frame_extra_size(false));
         f_new->sc.fpstate = (kernel_fpstate_t *) new_fpstate;
     }
     f_new->sc.oldmask = f_old->uc.uc_sigmask.sig[0];
-    memcpy(&f_new->extramask, &f_old->uc.uc_sigmask.sig[1],
+    dynamo_memcpy(&f_new->extramask, &f_old->uc.uc_sigmask.sig[1],
            (_NSIG_WORDS-1) * sizeof(uint));
-    memcpy(&f_new->retcode, &f_old->retcode, RETCODE_SIZE);
+    dynamo_memcpy(&f_new->retcode, &f_old->retcode, RETCODE_SIZE);
     /* now fill in our extra field */
     f_new->sig_noclobber = f_new->sig;
 # elif defined(ARM)
-    memcpy(&f_new->uc, &f_old->uc, sizeof(f_new->uc));
-    memcpy(f_new->retcode, f_old->retcode, sizeof(f_new->retcode));
+    dynamo_memcpy(&f_new->uc, &f_old->uc, sizeof(f_new->uc));
+    dynamo_memcpy(f_new->retcode, f_old->retcode, sizeof(f_new->retcode));
     /* now fill in our extra field */
     f_new->sig_noclobber = f_old->info.si_signo;
 # endif /* X86 */
@@ -2866,7 +2866,7 @@ convert_frame_to_nonrt_partial(dcontext_t *dcontext, int sig, sigframe_rt_t *f_o
     sigframe_plain_t *f_plain = (sigframe_plain_t *) frame_and_xstate;
     ASSERT_NOT_TESTED(); /* XXX: we have no test of this for change to heap_alloc */
     convert_frame_to_nonrt(dcontext, sig, f_old, f_plain);
-    memcpy(f_new, f_plain, size);
+    dynamo_memcpy(f_new, f_plain, size);
     heap_free(dcontext, frame_and_xstate, sizeof(sigframe_plain_t) +
               signal_frame_extra_size(true) HEAPACCT(ACCT_OTHER));
 # elif defined(ARM)
@@ -2934,15 +2934,15 @@ fixup_rtframe_pointers(dcontext_t *dcontext, int sig,
         byte *frame_end = ((byte *)f_new) + frame_size;
         byte *tgt = (byte *) ALIGN_FORWARD(frame_end, XSTATE_ALIGNMENT);
         ASSERT(tgt - frame_end <= signal_frame_extra_size(true));
-        memcpy(tgt, f_old->uc.uc_mcontext.fpstate, sizeof(kernel_fpstate_t));
+        dynamo_memcpy(tgt, f_old->uc.uc_mcontext.fpstate, sizeof(kernel_fpstate_t));
         f_new->uc.uc_mcontext.fpstate = (kernel_fpstate_t *) tgt;
         if (YMM_ENABLED()) {
             kernel_xstate_t *xstate_new = (kernel_xstate_t *) tgt;
             kernel_xstate_t *xstate_old =
                 (kernel_xstate_t *) f_old->uc.uc_mcontext.fpstate;
-            memcpy(&xstate_new->xstate_hdr, &xstate_old->xstate_hdr,
+            dynamo_memcpy(&xstate_new->xstate_hdr, &xstate_old->xstate_hdr,
                    sizeof(xstate_new->xstate_hdr));
-            memcpy(&xstate_new->ymmh, &xstate_old->ymmh, sizeof(xstate_new->ymmh));
+            dynamo_memcpy(&xstate_new->ymmh, &xstate_old->ymmh, sizeof(xstate_new->ymmh));
         }
         LOG(THREAD, LOG_ASYNCH, level+1, "\tfpstate old="PFX" new="PFX"\n",
             f_old->uc.uc_mcontext.fpstate, f_new->uc.uc_mcontext.fpstate);
@@ -2985,13 +2985,13 @@ memcpy_rt_frame(sigframe_rt_t *frame, byte *dst, bool from_pending)
          * variable mid-struct padding.
          */
         sigcontext_t *sc = SIGCXT_FROM_UCXT(frame->puc);
-        memcpy(dst, frame, offsetof(sigframe_rt_t, puc) + sizeof(frame->puc));
-        memcpy(&((sigframe_rt_t*)dst)->mc, sc,
+        dynamo_memcpy(dst, frame, offsetof(sigframe_rt_t, puc) + sizeof(frame->puc));
+        dynamo_memcpy(&((sigframe_rt_t*)dst)->mc, sc,
                sizeof(sigframe_rt_t) - offsetof(sigframe_rt_t, mc));
         return;
     }
 #endif
-    memcpy(dst, frame, sizeof(sigframe_rt_t));
+    dynamo_memcpy(dst, frame, sizeof(sigframe_rt_t));
 }
 
 /* Copies frame to sp.
@@ -3044,7 +3044,7 @@ copy_frame_to_stack(dcontext_t *dcontext, int sig, sigframe_rt_t *frame, byte *s
                     check_pc);
                 /* copy what we can */
                 if (rtframe)
-                    memcpy(sp, frame, rest);
+                    dynamo_memcpy(sp, frame, rest);
 #if defined(LINUX) && !defined(X64)
                 else {
                     convert_frame_to_nonrt_partial(dcontext, sig, frame,
@@ -3162,7 +3162,7 @@ copy_frame_to_pending(dcontext_t *dcontext, int sig, sigframe_rt_t *frame
      * copy now in case our own retrieval somehow misses some fields
      */
     if (frame->uc.uc_mcontext.fpstate != NULL) {
-        memcpy(&info->sigpending[sig]->xstate, frame->uc.uc_mcontext.fpstate,
+        dynamo_memcpy(&info->sigpending[sig]->xstate, frame->uc.uc_mcontext.fpstate,
                /* XXX: assuming full xstate if avx is enabled */
                signal_frame_extra_size(false));
     }
@@ -5836,7 +5836,7 @@ handle_sigreturn(dcontext_t *dcontext, void *ucxt_param, int style)
 # else
         prevset.sig[0] = frame->IF_X86_ELSE(sc.oldmask, uc.uc_mcontext.oldmask);
         if (_NSIG_WORDS > 1) {
-            memcpy(&prevset.sig[1], &frame->IF_X86_ELSE(extramask, uc.sigset_ex),
+            dynamo_memcpy(&prevset.sig[1], &frame->IF_X86_ELSE(extramask, uc.sigset_ex),
                    sizeof(prevset.sig[1]));
         }
 #  ifdef ARM
@@ -6044,7 +6044,7 @@ os_forge_exception(app_pc target_pc, dr_exception_type_t type)
     /* since we always delay delivery, we always want an rt frame.  we'll convert
      * to a plain frame on delivery.
      */
-    memset(frame, 0, sizeof(*frame));
+    dynamo_memset(frame, 0, sizeof(*frame));
     frame->info.si_signo = sig;
 #ifdef X86_32
     frame->sig = sig;
@@ -6254,7 +6254,7 @@ init_itimer(dcontext_t *dcontext, bool first)
         info->itimer = (thread_itimer_info_t (*)[NUM_ITIMERS])
             heap_alloc(dcontext, sizeof(*info->itimer) HEAPACCT(ACCT_OTHER));
     }
-    memset(info->itimer, 0, sizeof(*info->itimer));
+    dynamo_memset(info->itimer, 0, sizeof(*info->itimer));
     if (first) {
         /* see if app has set up an itimer before we were loaded */
         struct itimerval prev;
@@ -6288,7 +6288,7 @@ set_actual_itimer(dcontext_t *dcontext, int which, thread_sig_info_t *info,
             (*info->itimer)[which].actual.interval, (*info->itimer)[which].actual.value);
     } else {
         LOG(THREAD, LOG_ASYNCH, 2, "disabling itimer %d\n", which);
-        memset(&val, 0, sizeof(val));
+        dynamo_memset(&val, 0, sizeof(val));
         (*info->itimer)[which].actual.value = 0;
         (*info->itimer)[which].actual.interval = 0;
     }

@@ -271,7 +271,7 @@ annotation_init()
 #if !(defined(WINDOWS) && defined(X64))
     vg_handlers = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, vg_handlers_t,
                                   ACCT_OTHER, UNPROTECTED);
-    memset(vg_handlers, 0, sizeof(vg_handlers_t));
+    dynamo_memset(vg_handlers, 0, sizeof(vg_handlers_t));
 
     vg_router.type = DR_ANNOTATION_HANDLER_CALL;
     /* The Valgrind client request object is passed in %xax. */
@@ -509,7 +509,7 @@ dr_annotation_register_call(const char *annotation_name, void *callee, bool save
     if (handler == NULL) { /* make a new handler if never registered yet */
         handler = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, dr_annotation_handler_t,
                                   ACCT_OTHER, UNPROTECTED);
-        memset(handler, 0, sizeof(dr_annotation_handler_t));
+        dynamo_memset(handler, 0, sizeof(dr_annotation_handler_t));
         handler->type = DR_ANNOTATION_HANDLER_CALL;
         handler->symbol_name = dr_strdup(annotation_name HEAPACCT(ACCT_OTHER));
         handler->num_args = num_args;
@@ -559,7 +559,7 @@ dr_annotation_register_valgrind(dr_valgrind_request_id_t request_id,
     if (handler == NULL) { /* make a new handler if never registered yet */
         handler = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, dr_annotation_handler_t,
                                   ACCT_OTHER, UNPROTECTED);
-        memset(handler, 0, sizeof(dr_annotation_handler_t));
+        dynamo_memset(handler, 0, sizeof(dr_annotation_handler_t));
         handler->type = DR_ANNOTATION_HANDLER_VALGRIND;
 
         vg_handlers->handlers[request_id] = handler;
@@ -591,7 +591,7 @@ dr_annotation_register_return(const char *annotation_name, void *return_value)
     if (handler == NULL) { /* make a new handler if never registered yet */
         handler = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, dr_annotation_handler_t,
                                   ACCT_OTHER, UNPROTECTED);
-        memset(handler, 0, sizeof(dr_annotation_handler_t));
+        dynamo_memset(handler, 0, sizeof(dr_annotation_handler_t));
         handler->type = DR_ANNOTATION_HANDLER_RETURN_VALUE;
         handler->symbol_name = dr_strdup(annotation_name HEAPACCT(ACCT_OTHER));
         strhash_hash_add(GLOBAL_DCONTEXT, handlers, handler->symbol_name, handler);

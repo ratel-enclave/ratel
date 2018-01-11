@@ -451,7 +451,7 @@ HTNAME(hashtable_,NAME_KEY,_init_internal)
             table->lookuptable, lookup_table_allocation);
 
         /* set all to null_fragment {tag : 0, start_pc : 0} */
-        memset(table->lookuptable, 0, table->capacity*sizeof(AUX_ENTRY_TYPE));
+        dynamo_memset(table->lookuptable, 0, table->capacity*sizeof(AUX_ENTRY_TYPE));
         ASSERT(AUX_ENTRY_IS_EMPTY(table->lookuptable[0]));
         /* set last to sentinel_fragment {tag : 0, start_pc : 1} */
         AUX_ENTRY_SET_TO_SENTINEL(table->lookuptable[sentinel_index]);
@@ -517,7 +517,7 @@ HTNAME(hashtable_,NAME_KEY,_init_internal)
 #  else
                 ((byte*)table->entry_stats - (byte*)table->table);
 #  endif
-            memset(table->entry_stats, 0, table->capacity*sizeof(fragment_stat_entry_t));
+            dynamo_memset(table->entry_stats, 0, table->capacity*sizeof(fragment_stat_entry_t));
         }
     }
 # endif
@@ -1468,14 +1468,14 @@ HTNAME(hashtable_,NAME_KEY,_clear)(dcontext_t *dcontext,
         table->table[i] = ENTRY_EMPTY;
     }
 #ifdef HASHTABLE_USE_LOOKUPTABLE
-    memset(table->lookuptable, 0, table->capacity*sizeof(AUX_ENTRY_TYPE));
+    dynamo_memset(table->lookuptable, 0, table->capacity*sizeof(AUX_ENTRY_TYPE));
 #endif
 #ifdef HASHTABLE_STATISTICS
 # ifdef HASHTABLE_ENTRY_STATS
     table->added_since_dumped = 0;
     if (INTERNAL_OPTION(hashtable_ibl_entry_stats) && table->entry_stats != NULL) {
         if (TEST(HASHTABLE_USE_ENTRY_STATS, table->table_flags)) {
-            memset(table->entry_stats, 0, table->capacity*sizeof(fragment_stat_entry_t));
+            dynamo_memset(table->entry_stats, 0, table->capacity*sizeof(fragment_stat_entry_t));
         }
     }
 # endif
@@ -2202,10 +2202,10 @@ HTNAME(hashtable_,NAME_KEY,_copy)(dcontext_t *dcontext,
     dst->entries = src->entries;
     dst->unlinked_entries = src->unlinked_entries;
     if (dst->table != NULL)
-        memcpy(dst->table, src->table, dst->capacity*sizeof(ENTRY_TYPE));
+        dynamo_memcpy(dst->table, src->table, dst->capacity*sizeof(ENTRY_TYPE));
 #ifdef HASHTABLE_USE_LOOKUPTABLE
     if (dst->lookuptable != NULL)
-        memcpy(dst->lookuptable, src->lookuptable, dst->capacity*sizeof(AUX_ENTRY_TYPE));
+        dynamo_memcpy(dst->lookuptable, src->lookuptable, dst->capacity*sizeof(AUX_ENTRY_TYPE));
 #endif
     return dst;
 }
@@ -2231,7 +2231,7 @@ HTNAME(hashtable_,NAME_KEY,_resurrect)(dcontext_t *dcontext, byte *mapped_table
      * !HASHTABLE_STATISTICS if we supported calculating where the table lies
      * in all the htable routines, and set HASHTABLE_READ_ONLY when persisting
      */
-    memcpy(htable, mapped_table, sizeof(*htable));
+    dynamo_memcpy(htable, mapped_table, sizeof(*htable));
     htable->table_flags |= HASHTABLE_READ_ONLY;
     htable->table = (ENTRY_TYPE *) (mapped_table + sizeof(*htable));
     htable->table_unaligned = NULL;

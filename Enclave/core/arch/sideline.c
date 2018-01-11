@@ -229,7 +229,7 @@ sideline_init()
     ASSIGN_INIT_LOCK_FREE(table.lock, sideline_table_lock);
     table.table = (sample_entry_t**)
         global_heap_alloc(table.capacity*sizeof(sample_entry_t*) HEAPACCT(ACCT_SIDELINE));
-    memset(table.table, 0, table.capacity*sizeof(sample_entry_t*));
+    dynamo_memset(table.table, 0, table.capacity*sizeof(sample_entry_t*));
     fragment_now_optimizing = NULL;
 
     remember = NULL;

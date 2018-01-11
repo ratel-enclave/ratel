@@ -63,8 +63,8 @@ analyze_callee_regs_usage(dcontext_t *dcontext, callee_info_t *ci)
     uint i, num_regparm;
 
     ci->num_simd_used = 0;
-    memset(ci->simd_used, 0, sizeof(bool) * NUM_SIMD_REGS);
-    memset(ci->reg_used, 0, sizeof(bool) * NUM_GP_REGS);
+    dynamo_memset(ci->simd_used, 0, sizeof(bool) * NUM_SIMD_REGS);
+    dynamo_memset(ci->reg_used, 0, sizeof(bool) * NUM_GP_REGS);
     ci->write_flags = false;
     for (instr  = instrlist_first(ilist);
          instr != NULL;

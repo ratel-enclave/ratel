@@ -1450,9 +1450,9 @@ decode_init(void);
     (FRAG_IS_32(flags) ? STUB_COARSE_DIRECT_SIZE32 : STUB_COARSE_DIRECT_SIZE64)
 
 /* writes nops into the address range */
-# define SET_TO_NOPS(isa_mode, addr, size) memset(addr, 0x90, size)
+# define SET_TO_NOPS(isa_mode, addr, size) dynamo_memset(addr, 0x90, size)
 /* writes debugbreaks into the address range */
-# define SET_TO_DEBUG(addr, size) memset(addr, 0xcc, size)
+# define SET_TO_DEBUG(addr, size) dynamo_memset(addr, 0xcc, size)
 /* check if region is SET_TO_NOP */
 # define IS_SET_TO_NOP(addr, size) is_region_memset_to_char(addr, size, 0x90)
 /* check if region is SET_TO_DEBUG */
@@ -2161,8 +2161,8 @@ app_pc safe_read_resume_pc(void);
 # ifdef memset
 #  undef memset
 # endif
-void *memcpy(void *dst, const void *src, size_t n);
-void *memset(void *dst, int val, size_t n);
+void *dynamo_memcpy(void *dst, const void *src, size_t n);
+void *dynamo_memset(void *dst, int val, size_t n);
 #endif /* UNIX */
 
 #ifdef UNIX

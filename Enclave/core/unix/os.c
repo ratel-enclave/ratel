@@ -1956,7 +1956,7 @@ os_tls_init(void)
     ASSERT(!is_thread_tls_initialized());
 
     /* MUST zero out dcontext slot so uninit access gets NULL */
-    memset(segment, 0, PAGE_SIZE);
+    dynamo_memset(segment, 0, PAGE_SIZE);
     /* store key data in the tls itself */
     os_tls->self = os_tls;
     os_tls->tid = get_sys_thread_id();
@@ -1988,7 +1988,7 @@ os_tls_init(void)
 #else
     tls_table = (tls_slot_t *)
         global_heap_alloc(MAX_THREADS*sizeof(tls_slot_t) HEAPACCT(ACCT_OTHER));
-    memset(tls_table, 0, MAX_THREADS*sizeof(tls_slot_t));
+    dynamo_memset(tls_table, 0, MAX_THREADS*sizeof(tls_slot_t));
 #endif
     if (!first_thread_tls_initialized) {
         first_thread_tls_initialized = true;
@@ -2189,7 +2189,7 @@ os_thread_init(dcontext_t *dcontext)
     /* make sure stack fields, etc. are 0 now so they can be initialized on demand
      * (don't have app esp register handy here to init now)
      */
-    memset(ostd, 0, sizeof(*ostd));
+    dynamo_memset(ostd, 0, sizeof(*ostd));
 
     ksynch_init_var(&ostd->suspended);
     ksynch_init_var(&ostd->wakeup);
@@ -2226,7 +2226,7 @@ os_thread_init(dcontext_t *dcontext)
         ostd->app_thread_areas =
             heap_alloc(dcontext, sizeof(our_modify_ldt_t) * GDT_NUM_TLS_SLOTS
                        HEAPACCT(ACCT_OTHER));
-        memcpy(ostd->app_thread_areas,
+        dynamo_memcpy(ostd->app_thread_areas,
                os_tls->os_seg_info.app_thread_areas,
                sizeof(our_modify_ldt_t) * GDT_NUM_TLS_SLOTS);
     }
@@ -2447,7 +2447,7 @@ os_swap_dr_tls(dcontext_t *dcontext, bool to_app)
          * invalidating prior to copying.
          */
         cur_tls->magic = TLS_MAGIC_INVALID;
-        memcpy(ostd->clone_tls, cur_tls, sizeof(*ostd->clone_tls));
+        dynamo_memcpy(ostd->clone_tls, cur_tls, sizeof(*ostd->clone_tls));
         cur_tls->magic = TLS_MAGIC_VALID;
         ostd->clone_tls->self = ostd->clone_tls;
         os_set_dr_tls_base(dcontext, NULL, (byte *)ostd->clone_tls);
@@ -4631,7 +4631,7 @@ safe_read_via_query(const void *base, size_t size, void *out_buf, size_t *bytes_
     else
         res = is_readable_without_exception_query_os((void *)base, size);
     if (res) {
-        memcpy(out_buf, base, size);
+        dynamo_memcpy(out_buf, base, size);
         num_read = size;
     }
     if (bytes_read != NULL)
@@ -4659,7 +4659,7 @@ bool
 safe_read_if_fast(const void *base, size_t size, void *out_buf)
 {
     if (!fault_handling_initialized) {
-        memcpy(out_buf, base, size);
+        dynamo_memcpy(out_buf, base, size);
         return true;
     } else {
         return safe_read_ex(base, size, out_buf, NULL);
@@ -4804,7 +4804,7 @@ set_protection(byte *pc, size_t length, uint prot/*MEMPROT_*/)
 
 /* change protections on memory region starting at pc of length length */
 bool
-change_protection(byte *pc, size_t length, bool writable)
+dynamo_dynamo_change_protection(byte *pc, size_t length, bool writable)
 {
     uint flags = (writable) ? (MEMPROT_READ|MEMPROT_WRITE) : (MEMPROT_READ);
     return set_protection(pc, length, flags);
@@ -5672,7 +5672,7 @@ add_dr_env_vars(dcontext_t *dcontext, char *inject_library_path, const char *app
     new_envp = heap_alloc(dcontext, sizeof(char*)*(num_old+num_new)
                           HEAPACCT(ACCT_OTHER));
     /* copy old envp */
-    memcpy(new_envp, envp, sizeof(char*)*num_old);
+    dynamo_memcpy(new_envp, envp, sizeof(char*)*num_old);
     /* change/add preload and ldpath if necessary */
     if (!DYNAMO_OPTION(early_inject) && !preload_us) {
         int idx_preload;
@@ -6352,7 +6352,7 @@ os_set_app_thread_area(dcontext_t *dcontext, our_modify_ldt_t *user_desc)
         }
         if (i < GDT_NUM_TLS_SLOTS) {
             user_desc->entry_number = GDT_SELECTOR(i + tls_min_index());
-            memcpy(&desc[i], user_desc, sizeof(*user_desc));
+            dynamo_memcpy(&desc[i], user_desc, sizeof(*user_desc));
         } else
             return false;
     } else {
@@ -6384,7 +6384,7 @@ os_set_app_thread_area(dcontext_t *dcontext, our_modify_ldt_t *user_desc)
             "%s: change selector 0x%x base from "PFX" to "PFX"\n",
             __FUNCTION__, GDT_SELECTOR(user_desc->entry_number),
             desc[i].base_addr, user_desc->base_addr);
-        memcpy(&desc[i], user_desc, sizeof(*user_desc));
+        dynamo_memcpy(&desc[i], user_desc, sizeof(*user_desc));
     }
     /* if not conflict with dr's tls, perform the syscall */
     if (IF_CLIENT_INTERFACE_ELSE(!INTERNAL_OPTION(private_loader), true) &&
@@ -9767,7 +9767,7 @@ os_list_threads(dcontext_t *dcontext, uint *num_threads_out)
             /* realloc, essentially.  Less expensive than counting first. */
             new_tids = HEAP_ARRAY_ALLOC(dcontext, thread_id_t, tids_alloced * 2,
                                         ACCT_THREAD_MGT, PROTECTED);
-            memcpy(new_tids, tids, sizeof(thread_id_t) * tids_alloced);
+            dynamo_memcpy(new_tids, tids, sizeof(thread_id_t) * tids_alloced);
             HEAP_ARRAY_FREE(dcontext, tids, thread_id_t, tids_alloced,
                             ACCT_THREAD_MGT, PROTECTED);
             tids = new_tids;
@@ -9781,7 +9781,7 @@ os_list_threads(dcontext_t *dcontext, uint *num_threads_out)
     /* realloc back down to num_threads for caller simplicity. */
     new_tids = HEAP_ARRAY_ALLOC(dcontext, thread_id_t, num_threads,
                                 ACCT_THREAD_MGT, PROTECTED);
-    memcpy(new_tids, tids, sizeof(thread_id_t) * num_threads);
+    dynamo_memcpy(new_tids, tids, sizeof(thread_id_t) * num_threads);
     HEAP_ARRAY_FREE(dcontext, tids, thread_id_t, tids_alloced,
                     ACCT_THREAD_MGT, PROTECTED);
     tids = new_tids;

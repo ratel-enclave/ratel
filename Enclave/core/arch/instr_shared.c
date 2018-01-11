@@ -90,7 +90,7 @@ instr_create(dcontext_t *dcontext)
     instr_t *instr = (instr_t*) heap_alloc(dcontext, sizeof(instr_t) HEAPACCT(ACCT_IR));
     /* everything initializes to 0, even flags, to indicate
      * an uninitialized instruction */
-    memset((void *)instr, 0, sizeof(instr_t));
+    dynamo_memset((void *)instr, 0, sizeof(instr_t));
 #if defined(X86) && defined(X64)
     instr_set_isa_mode(instr, X64_CACHE_MODE_DC(dcontext) ? DR_ISA_AMD64 : DR_ISA_IA32);
 #elif defined(ARM)
@@ -114,7 +114,7 @@ instr_t *
 instr_clone(dcontext_t *dcontext, instr_t *orig)
 {
     instr_t *instr = (instr_t*) heap_alloc(dcontext, sizeof(instr_t) HEAPACCT(ACCT_IR));
-    memcpy((void *)instr, (void *)orig, sizeof(instr_t));
+    dynamo_memcpy((void *)instr, (void *)orig, sizeof(instr_t));
     instr->next = NULL;
     instr->prev = NULL;
 
@@ -128,7 +128,7 @@ instr_clone(dcontext_t *dcontext, instr_t *orig)
         /* instr length already set from memcpy */
         instr->bytes = (byte *) heap_alloc(dcontext, instr->length
                                            HEAPACCT(ACCT_IR));
-        memcpy((void *)instr->bytes, (void *)orig->bytes, instr->length);
+        dynamo_memcpy((void *)instr->bytes, (void *)orig->bytes, instr->length);
     }
 #ifdef CUSTOM_EXIT_STUBS
     if ((orig->flags & INSTR_HAS_CUSTOM_STUB) != 0) {
@@ -142,20 +142,20 @@ instr_clone(dcontext_t *dcontext, instr_t *orig)
     if (orig->num_dsts > 0) { /* checking num_dsts, not dsts, b/c of label data */
         instr->dsts = (opnd_t *) heap_alloc(dcontext, instr->num_dsts*sizeof(opnd_t)
                                           HEAPACCT(ACCT_IR));
-        memcpy((void *)instr->dsts, (void *)orig->dsts,
+        dynamo_memcpy((void *)instr->dsts, (void *)orig->dsts,
                instr->num_dsts*sizeof(opnd_t));
     }
     if (orig->num_srcs > 1) { /* checking num_src, not srcs, b/c of label data */
         instr->srcs = (opnd_t *) heap_alloc(dcontext,
                                           (instr->num_srcs-1)*sizeof(opnd_t)
                                           HEAPACCT(ACCT_IR));
-        memcpy((void *)instr->srcs, (void *)orig->srcs,
+        dynamo_memcpy((void *)instr->srcs, (void *)orig->srcs,
                (instr->num_srcs-1)*sizeof(opnd_t));
     }
     /* copy note (we make no guarantee, and have no way, to do a deep clone) */
     instr->note = orig->note;
     if (instr_is_label(orig))
-        memcpy(&instr->label_data, &orig->label_data, sizeof(instr->label_data));
+        dynamo_memcpy(&instr->label_data, &orig->label_data, sizeof(instr->label_data));
     return instr;
 }
 
@@ -165,7 +165,7 @@ instr_init(dcontext_t *dcontext, instr_t *instr)
 {
     /* everything initializes to 0, even flags, to indicate
      * an uninitialized instruction */
-    memset((void *)instr, 0, sizeof(instr_t));
+    dynamo_memset((void *)instr, 0, sizeof(instr_t));
     instr_set_isa_mode(instr, dr_get_isa_mode(dcontext));
 }
 
@@ -592,9 +592,9 @@ instr_remove_srcs(dcontext_t *dcontext, instr_t *instr, uint start, uint end)
             (dcontext, (instr->num_srcs - 1 - (end-start))*sizeof(opnd_t)
              HEAPACCT(ACCT_IR));
         if (start > 1)
-            memcpy(new_srcs, instr->srcs, (start-1)*sizeof(opnd_t));
+            dynamo_memcpy(new_srcs, instr->srcs, (start-1)*sizeof(opnd_t));
         if ((byte)end < instr->num_srcs - 1) {
-            memcpy(new_srcs + (start == 0 ? 0 : (start-1)), instr->srcs + end,
+            dynamo_memcpy(new_srcs + (start == 0 ? 0 : (start-1)), instr->srcs + end,
                    (instr->num_srcs - 1 - end)*sizeof(opnd_t));
         }
     } else
@@ -620,9 +620,9 @@ instr_remove_dsts(dcontext_t *dcontext, instr_t *instr, uint start, uint end)
         new_dsts = (opnd_t *) heap_alloc
             (dcontext, (instr->num_dsts - (end-start))*sizeof(opnd_t) HEAPACCT(ACCT_IR));
         if (start > 0)
-            memcpy(new_dsts, instr->dsts, start*sizeof(opnd_t));
+            dynamo_memcpy(new_dsts, instr->dsts, start*sizeof(opnd_t));
         if (end < instr->num_dsts) {
-            memcpy(new_dsts + start, instr->dsts + end,
+            dynamo_memcpy(new_dsts + start, instr->dsts + end,
                    (instr->num_dsts - end)*sizeof(opnd_t));
         }
     } else
@@ -1099,7 +1099,7 @@ instr_allocate_raw_bits(dcontext_t *dcontext, instr_t *instr, uint num_bytes)
             /* copy original bits into modified bits so can just modify
              * a few and still have all info in one place
              */
-            memcpy(new_bits, original_bits,
+            dynamo_memcpy(new_bits, original_bits,
                    (num_bytes < instr->length) ? num_bytes : instr->length);
         }
         if ((instr->flags & INSTR_RAW_BITS_ALLOCATED) != 0)
@@ -1202,7 +1202,7 @@ instr_set_raw_bytes(instr_t *instr, byte *start, uint num_bytes)
                   "instr_set_raw_bytes: no raw bits");
     CLIENT_ASSERT(num_bytes <= instr->length && instr->bytes != NULL,
                   "instr_set_raw_bytes: ordinal invalid, or no raw bits");
-    memcpy(instr->bytes, start, num_bytes);
+    dynamo_memcpy(instr->bytes, start, num_bytes);
 #ifdef X86_64
     instr_set_rip_rel_valid(instr, false); /* relies on original raw bits */
 #endif

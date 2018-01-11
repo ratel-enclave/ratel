@@ -1946,7 +1946,7 @@ hotp_compute_hash(app_pc base, hotp_patch_point_hash_t *hash)
         copy = HEAP_ARRAY_ALLOC(GLOBAL_DCONTEXT, char, copy_size,
                                 ACCT_HOT_PATCHING, PROTECTED);
         hash_buf = copy + HOTP_PATCH_REGION_SIZE;
-        memcpy(hash_buf, hash_start, hash->len);
+        dynamo_memcpy(hash_buf, hash_start, hash->len);
 
         /* Now, for each vmarea that overlaps, copy the original image bytes
          * into the buffer.
@@ -2028,7 +2028,7 @@ hotp_compute_hash(app_pc base, hotp_patch_point_hash_t *hash)
                  * trampoline contain the original app code; so any changes
                  * should be kept in sync.
                  */
-                memcpy(dst, src, HOTP_PATCH_REGION_SIZE);
+                dynamo_memcpy(dst, src, HOTP_PATCH_REGION_SIZE);
             }
             /* FIXME: if the iterator guaranteed order, we can break out after
              *  the first non-match - optimization.
@@ -4322,7 +4322,7 @@ hotp_only_remove_patch(dcontext_t *dcontext, const hotp_module_t *module,
      */
     ASSERT(HOTP_PATCH_REGION_SIZE == HOTP_ONLY_PATCH_REGION_SIZE);
     DODEBUG({
-        memcpy(ppoint_content, cur_ppoint->trampoline,
+        dynamo_memcpy(ppoint_content, cur_ppoint->trampoline,
                HOTP_PATCH_REGION_SIZE);
     });
     unhook_text(cur_ppoint->trampoline, addr_to_unhook);
@@ -5015,7 +5015,7 @@ Question for reviewer: for hotp_only, when control comes to the gateway, should
      * and pass the copy to the hot patch.
      * Note: nothing is done for partial memory writes.  TODO: how to fix this?
      */
-    memcpy(&local_cxt, hotp_cxt, sizeof(hotp_context_t));
+    dynamo_memcpy(&local_cxt, hotp_cxt, sizeof(hotp_context_t));
     dcontext->whereami = WHERE_HOTPATCH;
 
     if (DR_SETJMP(&dcontext->hotp_excpt_state) == 0) {  /* TRY block */
@@ -5037,7 +5037,7 @@ Question for reviewer: for hotp_only, when control comes to the gateway, should
              * changes enforced by the hot patch.  Note: this is applicable
              * only for registers not memory
              */
-            memcpy(hotp_cxt, &local_cxt, sizeof(hotp_context_t));
+            dynamo_memcpy(hotp_cxt, &local_cxt, sizeof(hotp_context_t));
         }
 
         if ((TEST(HOTP_EXEC_DETECTOR_ERROR, exec_status_only) ||
@@ -5265,7 +5265,7 @@ hotp_spill_before_notify(dcontext_t *dcontext,
      */
     mc = get_mcontext(dcontext);
     ASSERT(mc != NULL);
-    memcpy(cxt_spill, mc, sizeof(*cxt_spill));
+    dynamo_memcpy(cxt_spill, mc, sizeof(*cxt_spill));
     if (cxt_type == CXT_TYPE_HOT_PATCH) {
         hotp_context_t *new = (hotp_context_t *) new_cxt;
         *mc = *new;
@@ -5296,7 +5296,7 @@ hotp_restore_after_notify(dcontext_t *dcontext, const fragment_t *old_frag,
 
     mc = get_mcontext(dcontext);
     ASSERT(mc != NULL);
-    memcpy(mc, old_cxt, sizeof(*old_cxt));
+    dynamo_memcpy(mc, old_cxt, sizeof(*old_cxt));
 }
 
 #if defined(DEBUG) && defined(INTERNAL)
@@ -5738,7 +5738,7 @@ hotp_only_read_gbop_policy_defs(hotp_vul_t *tab, uint *num_vuls)
         vul->sets = set;
         vul->info = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, hotp_vul_info_t,
                                     ACCT_HOT_PATCHING, PROTECTED);
-        memset(vul->info, 0, sizeof(hotp_vul_info_t));  /* Initialize stats. */
+        dynamo_memset(vul->info, 0, sizeof(hotp_vul_info_t));  /* Initialize stats. */
 
         vul->hotp_dll_base = dr_base;
         vul->type = HOTP_TYPE_GBOP_HOOK;
@@ -6143,7 +6143,7 @@ dr_register_probes(
 
         vul = &tab[valid_probes];
         /* memset vul to 0 here because parse errors can leave freed pointers */
-        memset(vul, 0, sizeof(hotp_vul_t));
+        dynamo_memset(vul, 0, sizeof(hotp_vul_t));
 
         /* TODO: remove this once support is added for exported functions
          * (PR 225654) & raw addresses (PR 225658); for now just prevent
@@ -6280,7 +6280,7 @@ dr_register_probes(
         if (valid_probes > 0) {
             tab = HEAP_ARRAY_ALLOC(GLOBAL_DCONTEXT, hotp_vul_t, valid_probes,
                                    ACCT_HOT_PATCHING, PROTECTED);
-            memcpy(tab, old_tab, sizeof(hotp_vul_t) * valid_probes);
+            dynamo_memcpy(tab, old_tab, sizeof(hotp_vul_t) * valid_probes);
         } else {
             tab = NULL;
         }

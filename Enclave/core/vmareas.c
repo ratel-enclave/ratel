@@ -1431,7 +1431,7 @@ remove_vm_area(vm_area_vector_t *v, app_pc start, app_pc end, bool restore_prot)
         for (i = overlap_start; i < v->length-diff; i++)
             v->buf[i] = v->buf[i+diff];
 #ifdef DEBUG
-        memset(v->buf + v->length - diff, 0, diff * sizeof(vm_area_t));
+        dynamo_memset(v->buf + v->length - diff, 0, diff * sizeof(vm_area_t));
 #endif
         v->length -= diff;
     }
@@ -1558,7 +1558,7 @@ vm_area_overlap(vm_area_vector_t *v, app_pc start, app_pc end)
 void
 vm_areas_reset_init(void)
 {
-    memset(shared_data, 0, sizeof(*shared_data));
+    dynamo_memset(shared_data, 0, sizeof(*shared_data));
     VMVECTOR_INITIALIZE_VECTOR(&shared_data->areas,
                                VECTOR_SHARED | VECTOR_FRAGMENT_LIST, shared_vm_areas);
 }
@@ -1611,7 +1611,7 @@ vm_areas_init()
 
     todelete = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, deletion_lists_t, ACCT_VMAREAS,
                                PROTECTED);
-    memset(todelete, 0, sizeof(*todelete));
+    dynamo_memset(todelete, 0, sizeof(*todelete));
 
     coarse_to_delete = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, coarse_info_t *,
                                        ACCT_VMAREAS, PROTECTED);
@@ -1620,7 +1620,7 @@ vm_areas_init()
     if (DYNAMO_OPTION(unloaded_target_exception)) {
         last_deallocated = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, last_deallocated_t,
                                            ACCT_VMAREAS, PROTECTED);
-        memset(last_deallocated, 0, sizeof(*last_deallocated));
+        dynamo_memset(last_deallocated, 0, sizeof(*last_deallocated));
     } else
         ASSERT(last_deallocated == NULL);
 
@@ -1811,7 +1811,7 @@ void
 vm_areas_thread_reset_init(dcontext_t *dcontext)
 {
     thread_data_t *data = (thread_data_t *) dcontext->vm_areas_field;
-    memset(dcontext->vm_areas_field, 0, sizeof(thread_data_t));
+    dynamo_memset(dcontext->vm_areas_field, 0, sizeof(thread_data_t));
     VMVECTOR_INITIALIZE_VECTOR(&data->areas, VECTOR_FRAGMENT_LIST, thread_vm_areas);
     /* data->areas.lock is never used, but we may want to grab it one day,
        e.g. to print other thread areas */
@@ -2069,7 +2069,7 @@ vmvector_modify_data(vm_area_vector_t *v, app_pc start, app_pc end, void *data)
 void
 vmvector_init_vector(vm_area_vector_t *v, uint flags)
 {
-    memset(v, 0, sizeof(*v));
+    dynamo_memset(v, 0, sizeof(*v));
     v->flags = flags;
 }
 
@@ -2334,7 +2334,7 @@ add_written_area(vm_area_vector_t *v, app_pc tag, app_pc start,
              * ensure no cache line is crossed.
              */
             ASSERT(ALIGNED(ro2s, sizeof(uint)));
-            memset(ro2s, 0, sizeof(*ro2s));
+            dynamo_memset(ro2s, 0, sizeof(*ro2s));
             a->custom.client = (void *) ro2s;
         }
     } else {
@@ -5730,7 +5730,7 @@ simulate_attack(dcontext_t *dcontext, app_pc pc)
                 esp, esp + overflow_size-1);
 
             /* wipe out a good portion of the app stack */
-            memset((void*)esp, 0xbf, overflow_size); /* LOOK for 0xbf in the log */
+            dynamo_memset((void*)esp, 0xbf, overflow_size); /* LOOK for 0xbf in the log */
             LOG(THREAD_GET, LOG_VMAREAS, 1, "simulate_attack: wiped stack "PFX"-"PFX"\n",
                 esp, esp + overflow_size-1);
 
@@ -9647,7 +9647,7 @@ vm_area_check_shared_pending(dcontext_t *dcontext, fragment_t *was_I_flushed)
                             "\tfilling F%d "PFX"-"PFX" with 0x%x\n",
                             entry->id, entry->start_pc, entry->start_pc+entry->size,
                             DEBUGGER_INTERRUPT_BYTE);
-                        memset(entry->start_pc, DEBUGGER_INTERRUPT_BYTE, entry->size);
+                        dynamo_memset(entry->start_pc, DEBUGGER_INTERRUPT_BYTE, entry->size);
                     }
                 }
             });

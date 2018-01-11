@@ -3243,7 +3243,7 @@ mangle_annotation_helper(dcontext_t *dcontext, instr_t *label, instrlist_t *ilis
         if (handler->num_args != 0) {
             args = HEAP_ARRAY_ALLOC(dcontext, opnd_t, handler->num_args,
                                     ACCT_CLEANCALL, UNPROTECTED);
-            memcpy(args, handler->args, sizeof(opnd_t) * handler->num_args);
+            dynamo_memcpy(args, handler->args, sizeof(opnd_t) * handler->num_args);
         }
         dr_insert_clean_call_ex_varg(dcontext, ilist, label,
                                      receiver->instrumentation.callback,

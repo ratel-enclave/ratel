@@ -229,7 +229,7 @@ Enclave/dynamorio_t.c: $(SGX_EDGER8R) Enclave/dynamorio.edl
 	@echo "GEN  =>  $@"
 
 Enclave/dynamorio_t.o: Enclave/dynamorio_t.c
-	@$(CC) $(SGX_Enclave_C_Flags) $(SGX_SDK_ELV_INCLUDE) -c $< -o $@
+	@$(CC) $(SGX_Enclave_C_Flags) $(SGX_SDK_ELV_INCLUDE) -I$(SGX_SDK)/include/tlibc -c $< -o $@
 	@echo "CC   <=  $<"
 
 export DYNAMORIO_T_OBJ	:= dynamorio_t.o

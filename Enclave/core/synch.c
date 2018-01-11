@@ -703,10 +703,10 @@ check_wait_at_safe_spot(dcontext_t *dcontext, thread_synch_permission_t cur_stat
         ASSERT(sizeof(cxt) >= sizeof(priv_mcontext_t));
         if (tsd->set_mcontext != NULL) {
             set_mcontext = true;
-            memcpy(cxt, tsd->set_mcontext, sizeof(*tsd->set_mcontext));
+            dynamo_memcpy(cxt, tsd->set_mcontext, sizeof(*tsd->set_mcontext));
         } else {
             set_context = true;
-            memcpy(cxt, tsd->set_context, tsd->set_context_size);
+            dynamo_memcpy(cxt, tsd->set_context, tsd->set_context_size);
         }
         synch_thread_free_setcontext(tsd); /* sets to NULL for us */
     }

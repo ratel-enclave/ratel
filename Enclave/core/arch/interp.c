@@ -251,7 +251,7 @@ init_build_bb(build_bb_t *bb, app_pc start_pc, bool app_interp, bool for_cache,
               bool mangle_ilist, bool record_translation, file_t outf, uint known_flags,
               overlap_info_t *overlap_info)
 {
-    memset(bb, 0, sizeof(*bb));
+    dynamo_memset(bb, 0, sizeof(*bb));
 #if defined(LINUX) && defined(X86_32)
     /* With SA_RESTART (i#2659) we end up interpreting the int 0x80 in vsyscall,
      * whose fall-through hits our hook.  We avoid interpreting our own hook
@@ -7264,7 +7264,7 @@ decode_fragment(dcontext_t *dcontext, fragment_t *f, byte *buf, /*IN/OUT*/uint *
                      * find any we want one giant piece anyway
                      */
                     ASSERT(cur_buf + num_bytes < buf + *bufsz);
-                    memcpy(cur_buf, raw_start_pc, num_bytes);
+                    dynamo_memcpy(cur_buf, raw_start_pc, num_bytes);
                     top_buf = cur_buf + num_bytes;
                     LOG(THREAD, LOG_MONITOR, DF_LOGLEVEL(dcontext),
                         "decode_fragment: copied "PFX"-"PFX" to "PFX"-"PFX"\n",
@@ -7636,7 +7636,7 @@ decode_fragment(dcontext_t *dcontext, fragment_t *f, byte *buf, /*IN/OUT*/uint *
                     IF_X64(ASSERT(CHECK_TRUNCATE_TYPE_uint((cur_buf - top_buf))));
                     num_bytes = (uint) (cur_buf - top_buf);
                     ASSERT(cur_buf + num_bytes < buf + *bufsz);
-                    memcpy(cur_buf, raw_start_pc, num_bytes);
+                    dynamo_memcpy(cur_buf, raw_start_pc, num_bytes);
                     top_buf = cur_buf + num_bytes;
                     LOG(THREAD, LOG_MONITOR, DF_LOGLEVEL(dcontext),
                         "decode_fragment: copied "PFX"-"PFX" to "PFX"-"PFX"\n",
@@ -7906,7 +7906,7 @@ copy_fragment(dcontext_t *dcontext, fragment_t *f, bool replace)
         IF_X64(ASSERT(CHECK_TRUNCATE_TYPE_uint((EXIT_CTI_PC(f, l) - start_pc))));
         num_bytes = (uint) (EXIT_CTI_PC(f, l) - start_pc);
         if (num_bytes > 0) {
-            memcpy(p, (byte *)start_pc, num_bytes);
+            dynamo_memcpy(p, (byte *)start_pc, num_bytes);
             trace_buf_top += num_bytes;
             start_pc += num_bytes;
 

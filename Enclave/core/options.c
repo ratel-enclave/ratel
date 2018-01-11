@@ -242,7 +242,8 @@ set_dynamo_options_defaults(options_t *options)
 {
     ASSERT_OWN_OPTIONS_LOCK(options==&dynamo_options || options==&temp_options,
                             &options_lock);
-    *options = default_options;
+    //*options = default_options;
+    dynamo_memcpy(options, &default_options, sizeof(default_options));
     adjust_defaults_for_page_size(options);
 }
 #undef OPTION_COMMAND_INTERNAL
@@ -858,7 +859,7 @@ options_enable_code_api_dependences(options_t *options)
      * own -native_exec_list.
      * However the .pexe section thing on Vista is too dangerous so we
      * leave that on. */
-    memset(options->native_exec_default_list, 0,
+    dynamo_memset(options->native_exec_default_list, 0,
            sizeof(options->native_exec_default_list));
     options->native_exec_managed_code = false;
 

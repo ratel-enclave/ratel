@@ -494,7 +494,7 @@ test_call_switch_stack(dcontext_t *dc)
     byte* stack_ptr = test_stack + TEST_STACK_SIZE;
     static_dc = dc;
     print_file(STDERR, "testing asm call_switch_stack\n");
-    memset(test_stack, CONST_BYTE, sizeof(test_stack));
+    dynamo_memset(test_stack, CONST_BYTE, sizeof(test_stack));
     call_switch_stack(dc, stack_ptr, (void(*)(void*))test_func,
                       NULL, true /* should return */);
 }

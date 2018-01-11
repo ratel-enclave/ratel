@@ -131,7 +131,7 @@ bool is_vmm_reserved_address(byte *pc, size_t size);
 bool rel32_reachable_from_vmcode(byte *target);
 
 /* heap management */
-void heap_init(void);
+void dynamo_heap_init(void);
 void heap_exit(void);
 void heap_post_exit(void); /* post exit to support reattach */
 void heap_reset_init(void);
@@ -242,7 +242,7 @@ void global_unprotected_heap_free(void *p, size_t size HEAPACCT(which_heap_t whi
 #define HEAP_TYPE_ALLOC(dc, type, which, protected) \
     HEAP_ARRAY_ALLOC(dc, type, 1, which, protected)
 #define HEAP_ARRAY_ALLOC_MEMSET(dc, type, num, which, protected, val)   \
-    memset(HEAP_ARRAY_ALLOC(dc, type, num, which, protected), (val),    \
+    dynamo_memset(HEAP_ARRAY_ALLOC(dc, type, num, which, protected), (val),    \
            sizeof(type)*(num));
 
 #define HEAP_ARRAY_FREE(dc, p, type, num, which, protected) \

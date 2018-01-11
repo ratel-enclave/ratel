@@ -519,7 +519,7 @@ shared_gencode_init(IF_X86_64_ELSE(gencode_mode_t gencode_mode, void))
 #else
     shared_code = gencode;
 #endif
-    memset(gencode, 0, sizeof(*gencode));
+    dynamo_memset(gencode, 0, sizeof(*gencode));
 
     gencode->thread_shared = true;
     IF_X86_64(gencode->gencode_mode = gencode_mode);
@@ -1186,7 +1186,7 @@ arch_thread_init(dcontext_t *dcontext)
     /* FIXME case 6493: if we split private from shared, remove this
      * memset since we will no longer have a bunch of fields we don't use
      */
-    memset(code, 0, sizeof(*code));
+    dynamo_memset(code, 0, sizeof(*code));
     code->thread_shared = false;
     /* Generated code immediately follows struct */
     code->gen_start_pc = ((byte *)code) + sizeof(*code);
@@ -1435,7 +1435,7 @@ void
 protect_generated_code(generated_code_t *code_in, bool writable)
 {
     /* i#936: prevent cl v16 (VS2010) from combining the two code->writable
-     * stores into one prior to the change_protection() call and from
+     * stores into one prior to the dynamo_dynamo_change_protection() call and from
      * changing the conditionally-executed stores into always-executed
      * stores of conditionally-determined values.
      */
@@ -1448,7 +1448,7 @@ protect_generated_code(generated_code_t *code_in, bool writable)
             code->writable = writable;
         }
         STATS_INC(gencode_prot_changes);
-        change_protection(genstart, code->commit_end_pc - genstart,
+        dynamo_dynamo_change_protection(genstart, code->commit_end_pc - genstart,
                           writable);
         if (writable) {
             ASSERT(!code->writable);
@@ -2950,7 +2950,7 @@ hook_vsyscall(dcontext_t *dcontext, bool method_changing)
     ASSERT(pc + 1/*nop*/ - vsyscall_sysenter_return_pc == JMP_LONG_LENGTH);
     if (num_nops >= VSYS_DISPLACED_LEN) {
         CHECK(num_nops >= pc - vsyscall_sysenter_return_pc);
-        memcpy(vsyscall_syscall_end_pc, vsyscall_sysenter_return_pc,
+        dynamo_memcpy(vsyscall_syscall_end_pc, vsyscall_sysenter_return_pc,
                /* we don't copy the 5th byte to preserve nop for nice disassembly */
                pc - vsyscall_sysenter_return_pc);
         vsyscall_sysenter_displaced_pc = vsyscall_syscall_end_pc;
@@ -2966,7 +2966,7 @@ hook_vsyscall(dcontext_t *dcontext, bool method_changing)
          */
         pc += 1; /* skip 5th byte of to-be-inserted jmp */
         CHECK(PAGE_START(pc) == PAGE_START(pc + VSYS_DISPLACED_LEN));
-        memcpy(pc, vsyscall_sysenter_return_pc, VSYS_DISPLACED_LEN);
+        dynamo_memcpy(pc, vsyscall_sysenter_return_pc, VSYS_DISPLACED_LEN);
         vsyscall_sysenter_displaced_pc = pc;
     }
     insert_relative_jump(vsyscall_sysenter_return_pc,
@@ -3013,10 +3013,10 @@ unhook_vsyscall(void)
         if (!res)
             return false;
     }
-    memcpy(vsyscall_sysenter_return_pc, vsyscall_sysenter_displaced_pc, len);
+    dynamo_memcpy(vsyscall_sysenter_return_pc, vsyscall_sysenter_displaced_pc, len);
     /* we do not restore the 5th (junk/nop) byte (we never copied it) */
     if (vsyscall_sysenter_displaced_pc == vsyscall_syscall_end_pc) /* <4.4.8 */
-        memset(vsyscall_syscall_end_pc, RAW_OPCODE_nop, len);
+        dynamo_memset(vsyscall_syscall_end_pc, RAW_OPCODE_nop, len);
     if (!TEST(MEMPROT_WRITE, prot)) {
         res = set_protection(vsyscall_page_start, PAGE_SIZE, prot);
         ASSERT(res);
@@ -3299,7 +3299,7 @@ dr_mcontext_to_priv_mcontext(priv_mcontext_t *dst, dr_mcontext_t *src)
              * restore it later so we can use one memcpy for DR_MC_INTEGER.
              */
             reg_t save_xsp = dst->xsp;
-            memcpy(&MCXT_FIRST_REG_FIELD(dst), &MCXT_FIRST_REG_FIELD(src),
+            dynamo_memcpy(&MCXT_FIRST_REG_FIELD(dst), &MCXT_FIRST_REG_FIELD(src),
                    /* end of the mcxt integer gpr */
                    offsetof(priv_mcontext_t, IF_X86_ELSE(xflags, pc)));
             dst->xsp = save_xsp;
@@ -3312,7 +3312,7 @@ dr_mcontext_to_priv_mcontext(priv_mcontext_t *dst, dr_mcontext_t *src)
         }
         if (TEST(DR_MC_MULTIMEDIA, src->flags)) {
             IF_X86_ELSE({
-                memcpy(&dst->ymm, &src->ymm, sizeof(dst->ymm));
+                dynamo_memcpy(&dst->ymm, &src->ymm, sizeof(dst->ymm));
             }, {
                 /* FIXME i#1551: NYI on ARM */
                 ASSERT_NOT_IMPLEMENTED(false);
@@ -3339,7 +3339,7 @@ priv_mcontext_to_dr_mcontext(dr_mcontext_t *dst, priv_mcontext_t *src)
              * restore it later so we can use one memcpy for DR_MC_INTEGER.
              */
             reg_t save_xsp = dst->xsp;
-            memcpy(&MCXT_FIRST_REG_FIELD(dst), &MCXT_FIRST_REG_FIELD(src),
+            dynamo_memcpy(&MCXT_FIRST_REG_FIELD(dst), &MCXT_FIRST_REG_FIELD(src),
                    /* end of the mcxt integer gpr */
                    offsetof(priv_mcontext_t, IF_X86_ELSE(xflags, pc)));
             dst->xsp = save_xsp;
@@ -3351,7 +3351,7 @@ priv_mcontext_to_dr_mcontext(dr_mcontext_t *dst, priv_mcontext_t *src)
         }
         if (TEST(DR_MC_MULTIMEDIA, dst->flags)) {
             IF_X86_ELSE({
-                memcpy(&dst->ymm, &src->ymm, sizeof(dst->ymm));
+                dynamo_memcpy(&dst->ymm, &src->ymm, sizeof(dst->ymm));
             }, {
                 /* FIXME i#1551: NYI on ARM */
                 ASSERT_NOT_IMPLEMENTED(false);

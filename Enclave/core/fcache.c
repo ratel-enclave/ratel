@@ -928,7 +928,7 @@ static void
 fcache_really_free_unit(fcache_unit_t *u, bool on_dead_list, bool dealloc_unit)
 {
     if (TEST(SELFPROT_CACHE, dynamo_options.protect_mask) && !u->writable) {
-        change_protection((void*)u->start_pc, u->size, WRITABLE);
+        dynamo_dynamo_change_protection((void*)u->start_pc, u->size, WRITABLE);
     }
 #ifdef WINDOWS_PC_SAMPLE
     if (u->profile != NULL) {
@@ -1216,7 +1216,7 @@ fcache_change_fragment_protection(dcontext_t *dcontext, fragment_t *f, bool writ
         ASSERT(u != NULL);
         if (u->writable == writable)
             return;
-        change_protection((void*)u->start_pc, u->size, writable);
+        dynamo_dynamo_change_protection((void*)u->start_pc, u->size, writable);
         u->writable = writable;
     } else {
         /* else, do entire fcache
@@ -1231,7 +1231,7 @@ fcache_change_fragment_protection(dcontext_t *dcontext, fragment_t *f, bool writ
         u = allunits->units;
         while (u != NULL) {
             if (u->writable != writable) {
-                change_protection((void*)u->start_pc, u->size, writable);
+                dynamo_dynamo_change_protection((void*)u->start_pc, u->size, writable);
                 u->writable = writable;
             }
             u = u->next_global;
@@ -1537,16 +1537,16 @@ fcache_cache_init(dcontext_t *dcontext, uint flags, bool initial_unit)
     cache->wset_check = 0;
     cache->record_wset = false;
     if (cache->is_shared) { /* else won't use free list */
-        memset(cache->free_list, 0, sizeof(cache->free_list));
+        dynamo_memset(cache->free_list, 0, sizeof(cache->free_list));
         DODEBUG({
-            memset(cache->free_stats_freed, 0, sizeof(cache->free_stats_freed));
-            memset(cache->free_stats_reused, 0, sizeof(cache->free_stats_reused));
-            memset(cache->free_stats_coalesced, 0, sizeof(cache->free_stats_coalesced));
-            memset(cache->free_stats_charge, 0, sizeof(cache->free_stats_charge));
-            memset(cache->free_stats_split, 0, sizeof(cache->free_stats_split));
-            memset(cache->request_size_histogram, 0,
+            dynamo_memset(cache->free_stats_freed, 0, sizeof(cache->free_stats_freed));
+            dynamo_memset(cache->free_stats_reused, 0, sizeof(cache->free_stats_reused));
+            dynamo_memset(cache->free_stats_coalesced, 0, sizeof(cache->free_stats_coalesced));
+            dynamo_memset(cache->free_stats_charge, 0, sizeof(cache->free_stats_charge));
+            dynamo_memset(cache->free_stats_split, 0, sizeof(cache->free_stats_split));
+            dynamo_memset(cache->request_size_histogram, 0,
                    sizeof(cache->request_size_histogram));
-            memset(cache->free_size_histogram, 0,
+            dynamo_memset(cache->free_size_histogram, 0,
                    sizeof(cache->free_size_histogram));
         });
     }
@@ -1998,7 +1998,7 @@ fcache_increase_size(dcontext_t *dcontext, fcache_t *cache, fcache_unit_t *unit,
     ASSERT(unit == cache->units && unit->next_local == NULL);
 
     /* copy old data over to new memory */
-    memcpy(new_memory, unit->start_pc, unit->size);
+    dynamo_memcpy(new_memory, unit->start_pc, unit->size);
 
     /* update pc-relative into-cache or out-of-cache pointers
      * also update stored addresses like start pc
@@ -2050,7 +2050,7 @@ fcache_increase_size(dcontext_t *dcontext, fcache_t *cache, fcache_unit_t *unit,
                                            NULL);
             stop_profile(old_prof);
             ASSERT(unit->profile->buffer_size >= old_prof->buffer_size);
-            memcpy(unit->profile->buffer, old_prof->buffer,
+            dynamo_memcpy(unit->profile->buffer, old_prof->buffer,
                    old_prof->buffer_size);
             free_profile(old_prof);
             start_profile(unit->profile);
@@ -3661,7 +3661,7 @@ fcache_remove_fragment(dcontext_t *dcontext, fragment_t *f)
      * FIXME: put in the rest of the patterns and checks to make this
      * parallel to heap DEBUG_MEMORY (==case 5657)
      */
-    memset(f->start_pc, DEBUGGER_INTERRUPT_BYTE, f->size);
+    dynamo_memset(f->start_pc, DEBUGGER_INTERRUPT_BYTE, f->size);
 #endif
 
     /* if the entire unit is being freed, do not place individual fragments in

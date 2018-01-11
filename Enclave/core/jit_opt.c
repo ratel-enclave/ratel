@@ -76,13 +76,13 @@ fragment_tree_create()
 {
     fragment_tree_t *tree = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, fragment_tree_t,
                                             ACCT_OTHER, UNPROTECTED);
-    memset(tree, 0, sizeof(fragment_tree_t));
+    dynamo_memset(tree, 0, sizeof(fragment_tree_t));
     tree->node_heap = special_heap_init(sizeof(bb_node_t), true /* lock */,
                                         false /* -x */, true /* persistent */);
     tree->trace_heap = special_heap_init(sizeof(bb_node_t), true /* lock */,
                                          false /* -x */, true /* persistent */);
     tree->nil = special_heap_alloc(tree->node_heap);
-    memset(tree->nil, 0, sizeof(bb_node_t));
+    dynamo_memset(tree->nil, 0, sizeof(bb_node_t));
     tree->root = tree->nil;
     return tree;
 }
@@ -305,7 +305,7 @@ fragment_tree_node_create(fragment_tree_t *tree, app_pc start, app_pc end)
 
     ASSERT(start < end);
 
-    memset(new_node, 0, sizeof(bb_node_t));
+    dynamo_memset(new_node, 0, sizeof(bb_node_t));
     new_node->left = new_node->right = tree->nil;
     new_node->red = true;
     new_node->start = start;
@@ -489,7 +489,7 @@ fragment_tree_delete(fragment_tree_t *tree, bb_node_t *node)
         bb_node_t *restore = deletion;
         trace_list_t *trace_swap = restore->traces;
 
-        memcpy(restore, node, sizeof(bb_node_t));
+        dynamo_memcpy(restore, node, sizeof(bb_node_t));
         if (node == tree->root)
             tree->root = restore;
         else if (node == restore->parent->left)

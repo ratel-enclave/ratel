@@ -1455,7 +1455,7 @@ insert_profile_call(cache_pc start_pc)
 {
     if (profile_call_length == 0)
         build_profile_call_buffer();
-    memcpy((void *)start_pc, profile_call_buf, profile_call_length);
+    dynamo_memcpy((void *)start_pc, profile_call_buf, profile_call_length);
     /* if thread-private, we change to proper dcontext when finalizing */
 }
 

@@ -101,7 +101,7 @@ static void
 translate_walk_init(translate_walk_t *walk, byte *start_cache, byte *end_cache,
                     priv_mcontext_t *mc)
 {
-    memset(walk, 0, sizeof(*walk));
+    dynamo_memset(walk, 0, sizeof(*walk));
     walk->mc = mc;
     walk->start_cache = start_cache;
     walk->end_cache = end_cache;
@@ -1258,7 +1258,7 @@ recreate_app_pc(dcontext_t *tdcontext, cache_pc pc, fragment_t *f)
     LOG(THREAD_GET, LOG_INTERP, 2,
         "recreate_app_pc -- translating from pc="PFX"\n", pc);
 
-    memset(&mc, 0, sizeof(mc)); /* ensures esp is NULL */
+    dynamo_memset(&mc, 0, sizeof(mc)); /* ensures esp is NULL */
     mc.pc = pc;
 
     res = recreate_app_state_internal(tdcontext, &mc, true, f, false);
@@ -1597,7 +1597,7 @@ record_translation_info(dcontext_t *dcontext, fragment_t *f, instrlist_t *existi
 
     /* now copy into right-sized array */
     info = translation_info_alloc(dcontext, i);
-    memcpy(info->translation, entries, sizeof(translation_entry_t) * i);
+    dynamo_memcpy(info->translation, entries, sizeof(translation_entry_t) * i);
     HEAP_ARRAY_FREE(GLOBAL_DCONTEXT, entries, translation_entry_t,
                     num_entries, ACCT_OTHER, PROTECTED);
 

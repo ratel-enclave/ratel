@@ -1315,7 +1315,7 @@ encoding_possible(decode_info_t *di, instr_t *in, const instr_info_t * ii)
 void
 decode_info_init_for_instr(decode_info_t *di, instr_t *instr)
 {
-    memset(di, 0, sizeof(*di));
+    dynamo_memset(di, 0, sizeof(*di));
     IF_X64(di->x86_mode = instr_get_x86_mode(instr));
 }
 
@@ -2256,7 +2256,7 @@ copy_and_re_relativize_raw_instr(dcontext_t *dcontext, instr_t *instr,
         CLIENT_ASSERT(opnd_is_pc(instr_get_target(instr)),
                       "cti_short_rewrite: must have pc target");
         target = opnd_get_pc(instr_get_target(instr));
-        memcpy(dst_pc, instr->bytes, instr->length - 4);
+        dynamo_memcpy(dst_pc, instr->bytes, instr->length - 4);
         dst_pc += instr->length - 4;
         if (!REL32_REACHABLE(final_pc + instr->length, target)) {
             CLIENT_ASSERT(false, "mangled jecxz/loop*: target out of 32-bit reach");
@@ -2302,17 +2302,17 @@ copy_and_re_relativize_raw_instr(dcontext_t *dcontext, instr_t *instr,
                           "address whose target is unreachable");
             return NULL;
         }
-        memcpy(dst_pc, instr->bytes, rip_rel_pos);
+        dynamo_memcpy(dst_pc, instr->bytes, rip_rel_pos);
         dst_pc += rip_rel_pos;
         *((int *)dst_pc) = (int) new_offs;
         if (rip_rel_pos + 4U < instr->length) {
             /* suffix byte */
-            memcpy(dst_pc + 4, instr->bytes + rip_rel_pos + 4,
+            dynamo_memcpy(dst_pc + 4, instr->bytes + rip_rel_pos + 4,
                    instr->length - (rip_rel_pos + 4));
         }
     } else
 #endif
-        memcpy(dst_pc, instr->bytes, instr->length);
+        dynamo_memcpy(dst_pc, instr->bytes, instr->length);
     return orig_dst_pc + instr->length;
 }
 
@@ -2380,7 +2380,7 @@ instr_encode_arch(dcontext_t *dcontext, instr_t *instr, byte *copy_pc, byte *fin
      */
     DOLOG(ENC_LEVEL, LOG_EMIT, { loginst(dcontext, 1, instr, "\n--- encoding"); });
 
-    memset(&di, 0, sizeof(decode_info_t));
+    dynamo_memset(&di, 0, sizeof(decode_info_t));
     di.opcode = opc;
     IF_X64(di.x86_mode = instr_get_x86_mode(instr));
     /* while only PREFIX_SIGNIFICANT should be set by the user, internally

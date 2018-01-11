@@ -893,7 +893,7 @@ get_private_library_address(app_pc modbase, const char *name)
         ptr_int_t delta;
         char *soname;
         os_module_data_t os_data;
-        memset(&os_data, 0, sizeof(os_data));
+        dynamo_memset(&os_data, 0, sizeof(os_data));
         if (!module_read_os_data(mod->base,
                                  false /* .dynamic not relocated (i#1589) */,
                                  &delta, &os_data, &soname)) {
@@ -1167,7 +1167,7 @@ privload_create_os_privmod_data(privmod_t *privmod, bool dyn_reloc)
                           ACCT_OTHER, PROTECTED);
     privmod->os_privmod_data = opd;
 
-    memset(opd, 0, sizeof(*opd));
+    dynamo_memset(opd, 0, sizeof(*opd));
 
     /* walk the module's program header to get privmod information */
     module_walk_program_headers(privmod->base, privmod->size,
@@ -1306,7 +1306,7 @@ void *
 redirect___gnu_Unwind_Find_exidx(void *pc, int *count)
 {
     unwind_callback_data_t ucd;
-    memset(&ucd, 0, sizeof(ucd));
+    dynamo_memset(&ucd, 0, sizeof(ucd));
     ucd.pc = pc;
     if (redirect_dl_iterate_phdr(exidx_lookup_callback, &ucd) <= 0)
         return NULL;
@@ -1349,8 +1349,8 @@ static const redirect_import_t redirect_imports[] = {
     {"strchr", (app_pc)strchr},
     {"strrchr", (app_pc)strrchr},
     {"strncpy", (app_pc)strncpy},
-    {"memcpy", (app_pc)memcpy},
-    {"memset", (app_pc)memset},
+    {"memcpy", (app_pc)dynamo_memcpy},
+    {"memset", (app_pc)dynamo_memset},
     {"memmove", (app_pc)memmove},
     {"strncat", (app_pc)strncat},
     {"strcmp", (app_pc)strcmp},
@@ -1359,8 +1359,8 @@ static const redirect_import_t redirect_imports[] = {
     {"strstr", (app_pc)strstr},
     {"strcasecmp", (app_pc)strcasecmp},
     /* Also redirect the _chk versions (i#1747, i#46) */
-    {"memcpy_chk", (app_pc)memcpy},
-    {"memset_chk", (app_pc)memset},
+    {"memcpy_chk", (app_pc)dynamo_memcpy},
+    {"memset_chk", (app_pc)dynamo_memset},
     {"memmove_chk", (app_pc)memmove},
     {"strncpy_chk", (app_pc)strncpy},
 };
@@ -1760,7 +1760,7 @@ reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
     ASSERT(is_elf_so_header(dr_map, 0));
 
     /* Relocate it */
-    memset(&opd, 0, sizeof(opd));
+    dynamo_memset(&opd, 0, sizeof(opd));
     module_get_os_privmod_data(dr_map, dr_size, false/*!relocated*/, &opd);
     /* XXX: we assume libdynamorio has no tls block b/c we're not calling
      * privload_relocate_mod().
@@ -1998,7 +1998,7 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
 #  endif
     }
 
-    memset(&mc, 0, sizeof(mc));
+    dynamo_memset(&mc, 0, sizeof(mc));
     mc.xsp = (reg_t) sp;
     mc.pc = entry;
     dynamo_start(&mc);

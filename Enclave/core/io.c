@@ -842,7 +842,7 @@ test_sscanf_all_specs(void)
     EXPECT(signed_int, 1);
 
     /* Test width specifications on strings. */
-    memset(str, '*', sizeof(str));  /* Fill string with garbage. */
+    dynamo_memset(str, '*', sizeof(str));  /* Fill string with garbage. */
     res = our_sscanf("abcdefghijklmnopqrstuvwxyz",
                      "%13s", str);
     EXPECT(res, 1);
@@ -910,7 +910,7 @@ test_sscanf_all_specs(void)
 }
 
 /*****************************************************************************
- * memcpy() and memset() tests
+ * dynamo_memcpy() and dynamo_memset() tests
  */
 
 # ifdef UNIX
@@ -937,7 +937,7 @@ test_memcpy_offset_size(size_t src_offset, size_t dst_offset, size_t size)
     }
     EXPECT(src_offset + size <= sizeof(src), 1);
     EXPECT(dst_offset + size <= sizeof(dst), 1);
-    memcpy(dst + dst_offset, src + src_offset, size);
+    dynamo_memcpy(dst + dst_offset, src + src_offset, size);
     EXPECT(memcmp(dst + dst_offset, src + src_offset, size), 0);
     /* Check the bytes just out of bounds, which should still be zero. */
     if (dst_offset > 0)
@@ -965,7 +965,7 @@ test_our_memcpy(void)
         }
     }
     /* Check that memcpy returns dst. */
-    ret = memcpy(&i, &j, sizeof(i));
+    ret = dynamo_memcpy(&i, &j, sizeof(i));
     EXPECT(ret == &i, 1);
 }
 
@@ -978,7 +978,7 @@ test_memset_offset_size(int val, int start_offs, int end_offs)
     /* Zero without memset. */
     for (i = 0; i < sizeof(buf); i++)
         buf[i] = 0;
-    memset(buf + start_offs, val, end);
+    dynamo_memset(buf + start_offs, val, end);
     EXPECT(is_region_memset_to_char(buf + start_offs, end, val), 1);
     if (start_offs > 0)
         EXPECT(buf[start_offs-1], 0);
@@ -1001,7 +1001,7 @@ test_our_memset(void)
         }
     }
     /* Check that memset returns dst. */
-    ret = memset(&i, -1, sizeof(i));
+    ret = dynamo_memset(&i, -1, sizeof(i));
     EXPECT(ret == &i, 1);
 }
 
@@ -1019,12 +1019,12 @@ our_memcpy_vs_libc(void)
     memcpy_t glibc_memcpy = (memcpy_t) dlsym(RTLD_NEXT, "memcpy");
     uint64 our_memcpy_start, our_memcpy_end, our_memcpy_time;
     uint64 libc_memcpy_start, libc_memcpy_end, libc_memcpy_time;
-    memset(src, -1, alloc_size);
-    memset(dst, 0, alloc_size);
+    dynamo_memset(src, -1, alloc_size);
+    dynamo_memset(dst, 0, alloc_size);
 
     our_memcpy_start = query_time_millis();
     for (i = 0; i < loop_count; i++) {
-        memcpy(src, dst, alloc_size);
+        dynamo_memcpy(src, dst, alloc_size);
     }
     our_memcpy_end = query_time_millis();
 

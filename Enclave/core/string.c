@@ -144,7 +144,7 @@ memmove(void *dst, const void *src, size_t n)
     byte *dst_b = (byte *) dst;
     const byte *src_b = (const byte *) src;
     if (dst < src)
-        return memcpy(dst, src, n);
+        return dynamo_memcpy(dst, src, n);
     /* FIXME: Could use reverse DF and rep movs. */
     for (i = n - 1; i >= 0; i--) {
         dst_b[i] = src_b[i];

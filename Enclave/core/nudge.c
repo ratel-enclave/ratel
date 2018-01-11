@@ -484,7 +484,7 @@ nudge_internal(process_id_t pid, uint nudge_action_mask,
     dcontext_t *dcontext = get_thread_private_dcontext();
 #endif
     nudge_arg_t nudge_arg;
-    memset(&nudge_arg, 0, sizeof(nudge_arg));
+    dynamo_memset(&nudge_arg, 0, sizeof(nudge_arg));
 
     nudge_arg.version = NUDGE_ARG_CURRENT_VERSION;
     nudge_arg.nudge_action_mask = nudge_action_mask;

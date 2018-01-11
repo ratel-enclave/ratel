@@ -159,7 +159,7 @@ typedef struct _callback_list_t {
         }                                                                      \
         else if (num <= FAST_COPY_SIZE) {                                      \
             callback_t tmp[FAST_COPY_SIZE];                                    \
-            memcpy(tmp, (vec).callbacks, num * sizeof(callback_t));            \
+            dynamo_memcpy(tmp, (vec).callbacks, num * sizeof(callback_t));            \
             read_unlock(&callback_registration_lock);                          \
             for (idx=0; idx<num; idx++) {                                      \
                 ret retop (((type)tmp[num-idx-1])(__VA_ARGS__)) postop;        \
@@ -168,7 +168,7 @@ typedef struct _callback_list_t {
         else {                                                                 \
             callback_t *tmp = HEAP_ARRAY_ALLOC(GLOBAL_DCONTEXT, callback_t,    \
                                                num, ACCT_OTHER, UNPROTECTED);  \
-            memcpy(tmp, (vec).callbacks, num * sizeof(callback_t));            \
+            dynamo_memcpy(tmp, (vec).callbacks, num * sizeof(callback_t));            \
             read_unlock(&callback_registration_lock);                          \
             for (idx=0; idx<num; idx++) {                                      \
                 ret retop (((type)tmp[num-idx-1])(__VA_ARGS__)) postop;        \
@@ -395,7 +395,7 @@ add_callback(callback_list_t *vec, void (*func)(void), bool unprotect)
         }
 
         if (vec->callbacks != NULL) {
-            memcpy(tmp, vec->callbacks, vec->num * sizeof(callback_t));
+            dynamo_memcpy(tmp, vec->callbacks, vec->num * sizeof(callback_t));
             HEAP_ARRAY_FREE(GLOBAL_DCONTEXT, vec->callbacks, callback_t, vec->size,
                         ACCT_OTHER, UNPROTECTED);
         }
@@ -1254,7 +1254,7 @@ instrument_client_thread_init(dcontext_t *dcontext, bool client_thread)
     if (dcontext->client_data == NULL) {
         dcontext->client_data = HEAP_TYPE_ALLOC(dcontext, client_data_t,
                                                 ACCT_OTHER, UNPROTECTED);
-        memset(dcontext->client_data, 0x0, sizeof(client_data_t));
+        dynamo_memset(dcontext->client_data, 0x0, sizeof(client_data_t));
 
 #ifdef CLIENT_SIDELINE
         ASSIGN_INIT_LOCK_FREE(dcontext->client_data->sideline_mutex, sideline_mutex);
@@ -1774,7 +1774,7 @@ create_and_initialize_module_data(app_pc start, app_pc end, app_pc entry_point,
 #endif
     module_data_t *copy = (module_data_t *)
         HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, module_data_t, ACCT_CLIENT, UNPROTECTED);
-    memset(copy, 0, sizeof(module_data_t));
+    dynamo_memset(copy, 0, sizeof(module_data_t));
 
     copy->start = start;
     copy->end = end;
@@ -1814,13 +1814,13 @@ create_and_initialize_module_data(app_pc start, app_pc end, app_pc entry_point,
     } else {
         ASSERT(segments != NULL);
         if (segments != NULL)
-            memcpy(copy->segments, segments, num_segments*sizeof(module_segment_data_t));
+            dynamo_memcpy(copy->segments, segments, num_segments*sizeof(module_segment_data_t));
     }
     copy->timestamp = timestamp;
 # ifdef MACOS
     copy->current_version = current_version;
     copy->compatibility_version = compatibility_version;
-    memcpy(copy->uuid, uuid, sizeof(copy->uuid));
+    dynamo_memcpy(copy->uuid, uuid, sizeof(copy->uuid));
 # endif
 #endif
     return copy;
@@ -3822,7 +3822,7 @@ dr_module_iterator_start(void)
         HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, client_mod_iterator_t, ACCT_CLIENT, UNPROTECTED);
     module_iterator_t *dr_iterator = module_iterator_start();
 
-    memset(client_iterator, 0, sizeof(*client_iterator));
+    dynamo_memset(client_iterator, 0, sizeof(*client_iterator));
     while (module_iterator_hasnext(dr_iterator)) {
         module_area_t *area = module_iterator_next(dr_iterator);
         client_mod_iterator_list_t *list = (client_mod_iterator_list_t *)
@@ -6993,7 +6993,7 @@ dr_delay_flush_region(app_pc start, size_t size, uint flush_id,
 
     flush = HEAP_TYPE_ALLOC(GLOBAL_DCONTEXT, client_flush_req_t, ACCT_CLIENT,
                             UNPROTECTED);
-    memset(flush, 0x0, sizeof(client_flush_req_t));
+    dynamo_memset(flush, 0x0, sizeof(client_flush_req_t));
     flush->start = (app_pc)start;
     flush->size = size;
     flush->flush_id = flush_id;

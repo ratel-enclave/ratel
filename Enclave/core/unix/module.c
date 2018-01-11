@@ -212,12 +212,12 @@ free_module_names(module_names_t *mod_names HEAPACCT(which_heap_t which))
 void
 module_copy_os_data(os_module_data_t *dst, os_module_data_t *src)
 {
-    memcpy(dst, src, sizeof(*dst));
+    dynamo_memcpy(dst, src, sizeof(*dst));
     if (src->segments != NULL) {
         dst->segments = (module_segment_t *)
             HEAP_ARRAY_ALLOC(GLOBAL_DCONTEXT, module_segment_t,
                              src->alloc_segments, ACCT_OTHER, PROTECTED);
-        memcpy(dst->segments, src->segments, src->num_segments*sizeof(module_segment_t));
+        dynamo_memcpy(dst->segments, src->segments, src->num_segments*sizeof(module_segment_t));
     }
 }
 
@@ -494,7 +494,7 @@ module_add_segment_data(OUT os_module_data_t *out_data,
             HEAP_ARRAY_ALLOC(GLOBAL_DCONTEXT, module_segment_t,
                              newsz, ACCT_OTHER, PROTECTED);
         if (out_data->alloc_segments > 0) {
-            memcpy(newmem, out_data->segments,
+            dynamo_memcpy(newmem, out_data->segments,
                    out_data->alloc_segments * sizeof(*out_data->segments));
             HEAP_ARRAY_FREE(GLOBAL_DCONTEXT, out_data->segments, module_segment_t,
                             out_data->alloc_segments, ACCT_OTHER, PROTECTED);
@@ -627,7 +627,7 @@ redirect_realloc(void *mem, size_t size)
         if (buf != NULL && mem != NULL) {
             size_t old_size = *((size_t *)(mem - sizeof(size_t)));
             size_t min_size = MIN(old_size, size);
-            memcpy(buf, mem, min_size);
+            dynamo_memcpy(buf, mem, min_size);
         }
     }
     redirect_free(mem);
@@ -645,7 +645,7 @@ redirect_calloc(size_t nmemb, size_t size)
 
     buf = redirect_malloc(size);
     if (buf != NULL)
-        memset(buf, 0, size);
+        dynamo_memset(buf, 0, size);
     return buf;
 }
 

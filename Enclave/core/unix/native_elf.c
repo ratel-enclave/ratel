@@ -312,7 +312,7 @@ create_plt_stub(app_pc plt_target)
     if (DYNAMO_OPTION(native_exec_opt) && create_opt_plt_stub(plt_target, stub_pc))
         return stub_pc;
 
-    memcpy(stub_pc, plt_stub_template, plt_stub_size);
+    dynamo_memcpy(stub_pc, plt_stub_template, plt_stub_size);
     tgt_immed = (app_pc *) (stub_pc + plt_stub_immed_offset);
     jmp_tgt = stub_pc + plt_stub_jmp_tgt_offset;
     *tgt_immed = plt_target;
@@ -427,7 +427,7 @@ module_change_hooks(module_area_t *ma, bool add_hooks, bool at_map)
     if (add_hooks && at_map)
         return;
 
-    memset(&opd, 0, sizeof(opd));
+    dynamo_memset(&opd, 0, sizeof(opd));
     module_get_os_privmod_data(ma->start, ma->end - ma->start,
                                !at_map/*relocated*/, &opd);
     pltgot = (app_pc *) opd.pltgot;
