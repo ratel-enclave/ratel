@@ -294,8 +294,8 @@ static void handle_restartable_region_syscall_post(dcontext_t *dcontext, bool su
 /* full path to our own library, used for execve */
 static char app_library_path[MAXIMUM_PATH]; /* just dir */
 static char app_library_filepath[MAXIMUM_PATH];
-static char enclave_library_path[MAXIMUM_PATH]; /* just dir */
-static char enclave_library_filepath[MAXIMUM_PATH];
+static char dynamorio_library_path[MAXIMUM_PATH]; /* just dir */
+static char dynamorio_library_filepath[MAXIMUM_PATH];
 /* Issue 20: path to other architecture */
 static char app_alt_arch_path[MAXIMUM_PATH];
 static char app_alt_arch_filepath[MAXIMUM_PATH]; /* just dir */
@@ -8778,16 +8778,16 @@ get_app_library_path(void)
 }
 
 char*
-get_enclave_library_path(void)
+get_dynamorio_library_path(void)
 {
-    if (!enclave_library_filepath[0]) { /* not cached */
-        const char *enclave_libname;
-        enclave_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,ENCLAVE_LIBRARY_NAME);
-        snprintf(enclave_library_filepath, BUFFER_SIZE_ELEMENTS(enclave_library_filepath),
-                "%s%s", enclave_library_path, enclave_libname);
-        NULL_TERMINATE_BUFFER(enclave_library_filepath);
+    if (!dynamorio_library_filepath[0]) { /* not cached */
+        const char *libname;
+        libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,DYNAMORIO_LIBRARY_NAME);
+        snprintf(dynamorio_library_filepath, BUFFER_SIZE_ELEMENTS(dynamorio_library_filepath),
+                "%s%s", dynamorio_library_path, libname);
+        NULL_TERMINATE_BUFFER(dynamorio_library_filepath);
     }
-    return enclave_library_filepath;
+    return dynamorio_library_filepath;
 }
 
 #ifdef LINUX

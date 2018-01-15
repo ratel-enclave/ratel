@@ -1160,8 +1160,8 @@ GLOBAL_LABEL(client_int_syscall:)
  * If we reload ourselves (i#1227) we'll set xdi and xsi to the base and size
  * of the old library that needs to be unmapped.
  */
-        DECLARE_EXPORTED_FUNC(dynamorio_start)
-GLOBAL_LABEL(dynamorio_start:)
+        DECLARE_EXPORTED_FUNC(_start)
+GLOBAL_LABEL(_start:)
         /* i#1676, i#1708: relocate dynamorio if it is not loaded to preferred address.
          * We call this here to ensure it's safe to access globals once in C code
          * (xref i#1865).
@@ -1190,7 +1190,7 @@ reloaded_xfer:
 # endif
         CALLC0(GLOBAL_REF(privload_early_inject))
         jmp     GLOBAL_REF(unexpected_return)
-        END_FUNC(dynamorio_start)
+        END_FUNC(_start)
 #endif /* !STANDALONE_UNIT_TEST && !STATIC_LIBRARY */
 
 

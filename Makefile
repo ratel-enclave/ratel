@@ -142,14 +142,14 @@ SGX_Enclave_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,--no-undefined -nostdlib -nod
 	-Wl,--whole-archive -l$(Trts_Library_Name) -Wl,--no-whole-archive \
 	-Wl,--start-group -lsgx_tstdc -lsgx_tcxx -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group \
 	-Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
-	-Wl,-pie,-eenclave_entry -Wl,--export-dynamic  \
+	-Wl,-eenclave_entry -Wl,--export-dynamic  \
 	-Wl,--defsym,__ImageBase=0 -Wl,--gc-sections   \
-	-Wl,--version-script=Enclave.lds
+	-Wl,--version-script=dynamorio.lds
 
 
 Enclave_Name := libdynamorio.so
 Signed_Enclave_Name := libdynamorio.signed.so
-Enclave_Config_File := Enclave/libdynamorio.config.xml
+Enclave_Config_File := Enclave/dynamorio.config.xml
 
 export SGX_Enclave_C_Flags SGX_Enclave_Cpp_Flags SGX_Enclave_Link_Flags Enclave_Name
 
@@ -237,7 +237,8 @@ $(Enclave_Name): Enclave/dynamorio_t.o Enclave/Makefile
 	cd Enclave/ && make -f Makefile	all
 
 $(Signed_Enclave_Name): $(Enclave_Name)
-	@$(SGX_ENCLAVE_SIGNER) sign -key Enclave/Enclave_private.pem -enclave $(Enclave_Name) -out $@ -config $(Enclave_Config_File)
+	@mv Enclave/$(Enclave_Name) ./
+	@echo $(SGX_ENCLAVE_SIGNER) sign -key Enclave/dynamorio_private.pem -enclave $(Enclave_Name) -out $@ -config $(Enclave_Config_File)
 	@echo "SIGN =>  $@"
 
 .PHONY: clean

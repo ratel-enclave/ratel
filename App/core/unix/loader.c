@@ -37,6 +37,7 @@
  */
 
 #include "../../dynamorio_u.h"
+#include "../sgx_edge.h"
 #include "../globals.h"
 #include "../module_shared.h"
 #include "os_private.h"
@@ -1519,48 +1520,38 @@ relocate_dynamorio(byte *dr_map, size_t dr_size, byte *sp)
  * Does not return.
  */
 static void
-create_dynamo_enclave(void **init_sp, app_pc conflict_start, app_pc conflict_end)
+create_dynamo_enclave(void **init_sp, app_pc exe_start, app_pc exe_end)
 {
+    app_pc cur_dr_map = (app_pc)get_appso_start();
+    app_pc cur_dr_end = (app_pc)get_appso_end();
+
+    const char* dynamo_path = get_dynamorio_library_path();
     elf_loader_t dr_ld;
-    os_privmod_data_t opd;
-    byte *dr_map;
-    /* We expect at most vvar+vdso+stack+vsyscall => 5 different mappings
-     * even if they were all in the conflict area.
-     */
-#define MAX_TEMP_MAPS 16
-    app_pc entry;
-    byte *cur_dr_map = get_appso_start();
-    byte *cur_dr_end = get_appso_end();
-    size_t dr_size = cur_dr_end - cur_dr_map;
-    IF_DEBUG(bool success = )
-        elf_loader_read_headers(&dr_ld, get_enclave_library_path());
+    app_pc dr_map, dr_end;
+
+    IF_DEBUG(bool success = ) elf_loader_read_headers(&dr_ld, dynamo_path);
     ASSERT(success);
 
-    /* Now load the libenclave.so */
-    dr_map = elf_loader_map_phdrs(&dr_ld, false /*!fixed*/, os_map_file,
-                                  os_unmap_file, os_set_protection, 0/*!reachable*/);
-    ASSERT(dr_map != NULL);
-    ASSERT(is_elf_so_header(dr_map, 0));
+    /* Find range of libdynamorio.so */
+    dr_map = module_vaddr_from_prog_header((app_pc)dr_ld.phdrs, dr_ld.ehdr->e_phnum, NULL, &dr_end);
 
-    /* Relocate it */
-    memset(&opd, 0, sizeof(opd));
-    module_get_os_privmod_data(dr_map, dr_size, false/*!relocated*/, &opd);
-    /* XXX: we assume libdynamorio has no tls block b/c we're not calling
-     * privload_relocate_mod().
-     */
-    ASSERT(opd.tls_block_size == 0);
-    privload_relocate_os_privmod_data(&opd, dr_map);
+    /* Make sure the desired address-spacees is ordered as app.so > libdynamorio.so > exe */
+    if (!(cur_dr_end > cur_dr_map && cur_dr_map > dr_end && dr_end > dr_map))
+        print_file(STDERR, "Unexpected address-space\n");
 
+    if (!(dr_end > dr_map && dr_map > exe_end && exe_end > exe_start))
+        print_file(STDERR, "Unexpected address-space\n");
 
-    entry = (app_pc)dr_ld.ehdr->e_entry + dr_ld.load_delta;
     elf_loader_destroy(&dr_ld);
 
-    dynamorio_start((sgx_enclave_id_t)0);
     /* Now we transfer control unconditionally to the new DR's _start, after
      * first restoring init_sp.  We pass along the current (old) DR's bounds
      * for removal.
      */
-    xfer_to_new_libdr(entry, init_sp, 0, dr_size);
+    if(_create_dynamo_enclave(dynamo_path) != SGX_SUCCESS)
+        print_file(STDERR, "Load Enclave Failure\n");
+
+    dynamorio_start(dynamo_eid, init_sp);
 
     ASSERT_NOT_REACHED();
 }
@@ -1601,8 +1592,7 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
     if (exe_path == NULL) {
         /* i#1677: avoid assert in get_application_name_helper() */
         set_executable_path("UNKNOWN");
-        apicheck(exe_path != NULL, DYNAMORIO_VAR_EXE_PATH" env var is not set.  "
-                 "Are you re-launching within gdb?");
+        apicheck(exe_path != NULL, DYNAMORIO_VAR_EXE_PATH" env var is not set.  " "Are you re-launching within gdb?");
     }
 
     /* i#907: We can't rely on /proc/self/exe for the executable path, so we
@@ -1611,14 +1601,14 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
     set_executable_path(exe_path);
 
     success = elf_loader_read_headers(&exe_ld, exe_path);
-    apicheck(success, "Failed to read app ELF headers.  Check path and "
-             "architecture.");
+    apicheck(success, "Failed to read app ELF headers.  Check path and " "architecture.");
 
     /* Find range of app */
-    exe_map = module_vaddr_from_prog_header((app_pc)exe_ld.phdrs,
-            exe_ld.ehdr->e_phnum, NULL, &exe_end);
+    exe_map = module_vaddr_from_prog_header((app_pc)exe_ld.phdrs, exe_ld.ehdr->e_phnum, NULL, &exe_end);
+
     /* i#1227: on a conflict with the app (+ room for the brk): reload ourselves */
     create_dynamo_enclave(sp, exe_map, exe_end+APP_BRK_GAP);
+
     ASSERT_NOT_REACHED();
 }
 # endif /* !defined(STANDALONE_UNIT_TEST) && !defined(STATIC_LIBRARY) */

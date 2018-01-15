@@ -1287,7 +1287,7 @@ typedef char liststring_t[MAX_LIST_OPTION_LENGTH];
 
 /* for processview, etc */
 #  define APP_LIBRARY_NAME "app.dll"
-#  define ENCLAVE_LIBRARY_NAME "enclave.dll"
+#  define ENCLAVE_LIBRARY_NAME "dynamorio.dll"
 #  define DLLPATH_RELEASE    "\\lib\\release\\" APP_LIBRARY_NAME
 #  define DLLPATH_DEBUG      "\\lib\\debug\\" APP_LIBRARY_NAME
 #  define DLLPATH_PROFILE    "\\lib\\profile\\" APP_LIBRARY_NAME

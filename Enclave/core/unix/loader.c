@@ -2003,6 +2003,15 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
     mc.pc = entry;
     dynamo_start(&mc);
 }
+
+void dynamorio_start(void **sp)
+{
+    //restore the stack
+    //innner_overwrite_stack
+
+    //Jump to the entry of original dynamorio version, .i.e. _start
+}
+
 # endif /* !defined(STANDALONE_UNIT_TEST) && !defined(STATIC_LIBRARY) */
 #else
 /* XXX i#1285: implement MacOS private loader */

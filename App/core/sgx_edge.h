@@ -52,11 +52,12 @@
 # define TOKEN_FILENAME   "dynamorio.token"
 # define ENCLAVE_FILENAME "libdynamorio.signed.so"
 
-extern sgx_enclave_id_t global_eid;    /* global enclave id */
+extern sgx_enclave_id_t dynamo_eid;    /* global enclave id */
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
+    uint32_t _create_dynamo_enclave(const char* dynamo_path);
 
     void ecall_dynamorio_start(void);
 

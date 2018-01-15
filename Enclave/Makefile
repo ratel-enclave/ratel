@@ -21,6 +21,7 @@ SGX_SDK_ELV_INCLUDE		?=
 SGX_Enclave_CC_Flags	?= -m64 -O0 -g -ggdb3
 SGX_Enclave_Cpp_Flags	?=
 SGX_Enclave_Link_Flags	?=
+DYNAMORIO_T_OBJ			?= dynamorio_t.o
 
 #export SGX_ARCH SGX_DEBUG SGX_SDK_INCLUDE
 #export SGX_Enclave_CC_Flags SGX_Enclave_Cpp_Flags SGX_Enclave_Link_Flags Enclave_Name
@@ -43,43 +44,18 @@ else
 endif
 
 
-#Built target drhelper
-DRHELPER_AS_SRC	:= core/arch/asm_shared.asm core/arch/x86/x86_shared.asm
-DRHELPER_AS_OBJ	:= $(patsubst %,$(BLD_DIR)/%.o,$(DRHELPER_AS_SRC))
-DRHELPER_AS_FLAGS := $(BASIC_AS_FLAGS)
-DRHELPER_CC_SRC := core/lib/dr_helper.c
-DRHELPER_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRHELPER_CC_SRC))
-DRHELPER_CC_FLAGS := $(BASIC_CC_FLAGS) -fPIC
-
-$(DRHELPER_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
-	${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
-	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
-	$(AS) $(DRHELPER_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
-
-$(DRHELPER_CC_OBJ): $(BLD_DIR)/%.o: %.c
-	$(CC) $(INCLUDES) $(DRHELPER_CC_FLAGS) -c $< -o $@
-
-$(BLD_DIR)/libdrhelper.a: $(DRHELPER_AS_OBJ) $(DRHELPER_CC_OBJ)
-	$(AR) qc $@ $^
-	$(RANDLIB) $@
-
-DRLIBS_		:= libdrhelper.a
-DRLIBS      := $(addprefix $(BLD_DIR)/,$(DRLIBS_))
-
-
-
 #Built target libdynamorio.so
-DYNAMORIO_AS_SRC	:= core/arch/x86/x86.asm
+DYNAMORIO_AS_SRC	:= core/arch/asm_shared.asm core/arch/x86/x86_shared.asm core/arch/x86/x86.asm 
 DYNAMORIO_AS_OBJ	:= $(patsubst %,$(BLD_DIR)/%.o,$(DYNAMORIO_AS_SRC))
 DYNAMORIO_AS_FLAGS := $(BASIC_AS_FLAGS)
 
 DYNAMORIO_SRC_DIR	:= $(MODULES)
 DYNAMORIO_CC_SRC	:= $(foreach sdir,$(DYNAMORIO_SRC_DIR),$(wildcard $(sdir)/*.c))
-DYNAMORIO_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DYNAMORIO_CC_SRC))
+DYNAMORIO_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DYNAMORIO_CC_SRC)) $()
 DYNAMORIO_CC_FLAGS	:= $(BASIC_CC_FLAGS) -Ddynamorio_EXPORTS -fPIC
 DYNAMORIO_LDSCRIPT	:= core/dynamorio.ldscript
-DYNAMORIO_LD_FLAGS	:= $(BASIC_CC_FLAGS) -Xlinker -z -Xlinker now -Xlinker -Bsymbolic -nostdlib -Wl,--entry,dynamorio_start -Wl,-dT,$(DYNAMORIO_LDSCRIPT) -Wl,--hash-style=both -shared -Wl,-soname,libdynamorio.so
-DYNAMORIO_LD_FLAGS	+= $(SGX_Enclave_Link_Flags)
+DYNAMORIO_LD_FLAGS	:= $(SGX_Enclave_Link_Flags) -Xlinker -z -Xlinker now -Xlinker -Bsymbolic -nostdlib -Wl,-dT,$(DYNAMORIO_LDSCRIPT) -Wl,--hash-style=both -shared -Wl,-soname,libdynamorio.so
+
 
 $(DYNAMORIO_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
 	${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
@@ -100,8 +76,8 @@ $(foreach bdir,$(BUILD_DIR),$(eval $(call make-goal,$(bdir))))
 .PHONY: all checkdirs $(Enclave_Name) clean
 
 
-$(Enclave_Name): $(DRLIBS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(DYNAMORIO_T_OBJ)
-	$(LD)  $(DYNAMORIO_LD_FLAGS) -o $@ $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(DRLIBS) $(DYNAMORIO_T_OBJ)
+$(Enclave_Name): $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(DYNAMORIO_T_OBJ)
+	$(LD)  $(DYNAMORIO_LD_FLAGS) -o $@ $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(DYNAMORIO_T_OBJ)
 	#$(CP) $@ $@.full
 	#$(OBJCOPY) --only-keep-debug $@ $@.debug
 	#$(OBJCOPY) --add-gnu-debuglink=$@.debug $@
@@ -118,4 +94,3 @@ $(BUILD_DIR):
 clean:
 	@rm	-rf $(BUILD_DIR)
 	@rm	-rf $(BLD_DIR)
-	@rm	libdynamorio.so*

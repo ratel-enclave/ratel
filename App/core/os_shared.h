@@ -427,7 +427,7 @@ shared_library_bounds(IN shlib_handle_t lib, IN byte *addr,
                       OUT byte **start, OUT byte **end);
 #endif
 char *get_app_library_path(void);
-char *get_enclave_library_path(void);
+char *get_dynamorio_library_path(void);
 
 /* DR_API EXPORT TOFILE dr_tools.h */
 /* DR_API EXPORT BEGIN */

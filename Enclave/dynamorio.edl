@@ -42,7 +42,7 @@ enclave {
          */
         
         //public void dynamorio_start([in, out] int *val);
-        public void dynamorio_start(void);
+        public void dynamorio_start([in] void **sp);
 	};
     
     untrusted {
