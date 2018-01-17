@@ -1,42 +1,48 @@
-#!/bin/make
+#
+# Copyright (C) 2011-2017 Intel Corporation. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in
+#     the documentation and/or other materials provided with the
+#     distribution.
+#   * Neither the name of Intel Corporation nor the names of its
+#     contributors may be used to endorse or promote products derived
+#     from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#
 
-App_Name			?= libapp.so
-
-all: checkdirs $(App_Name)
-
-CC	:= /usr/bin/cc
-CPP	:= /usr/bin/cpp
-LD	:= /usr/bin/cc
-AS	:= /usr/bin/as
-AR	:= /usr/bin/ar
-CMAKE	:= /usr/bin/cmake
-RANDLIB := /usr/bin/ranlib
-CP	:= /bin/cp
-OBJCOPY	:= /usr/bin/objcopy
-STRIP	:= /usr/bin/strip
-
-#export SGX_ARCH SGX_DEBUG SGX_SDK_INC_DIR
-#export SGX_App_CC_Flags SGX_App_Cpp_Flags SGX_App_Link_Flags App_Name
-#export DYNAMORIO_U_OBJ	:= dynamorio_u.o
-
-SGX_ARCH ?= x64
-SGX_DEBUG ?= 1
-SGX_SDK_APP_INCLUDE	?=
-SGX_App_CC_Flags	?= -m64 -O0 -g -ggdb3
-SGX_App_Cpp_Flags	?=
-SGX_App_Link_Flags	?=
-DYNAMORIO_U_OBJ		?=
-
-BLD_DIR	?= build
-INC_DIR	:= core/arch/x86 core/unix core/arch core/lib extra extra/include/annotations
-INCLUDES	:= $(addprefix -I./,$(INC_DIR))
-INCLUDES	+= $(SGX_SDK_APP_INCLUDE)
-MODULES := core core/unix core/lib core/arch core/arch/x86 third_party/libgcc
-BUILD_DIR   := $(addprefix $(BLD_DIR)/,$(MODULES))
+include ../buildenv.mk
 
 
-BASIC_CC_FLAGS	:= $(SGX_App_CC_Flags) -fno-strict-aliasing -fno-stack-protector -fvisibility=internal  -std=gnu99 -fno-omit-frame-pointer -fno-builtin-strcmp -Wall -Werror -Wwrite-strings -Wno-unused-but-set-variable
+ifeq ($(SGX_ARCH), x86)
+	SGX_LIBRARY_PATH := $(SGX_SDK)/lib
+	SGX_ENCLAVE_SIGNER := $(SGX_SDK)/bin/x86/sgx_sign
+	SGX_EDGER8R := $(SGX_SDK)/bin/x86/sgx_edger8r
+else
+	SGX_LIBRARY_PATH := $(SGX_SDK)/lib64
+	SGX_ENCLAVE_SIGNER := $(SGX_SDK)/bin/x64/sgx_sign
+	SGX_EDGER8R := $(SGX_SDK)/bin/x64/sgx_edger8r
+endif
 
+######## App Settings ########
 
 ifeq ($(SGX_ARCH), x86)
 	BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --32 --noexecstack -g
@@ -44,80 +50,85 @@ else
 	BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --64 --noexecstack -g
 endif
 
+ifneq ($(SGX_MODE), HW)
+	Urts_Library_Name := sgx_urts_sim
+else
+	Urts_Library_Name := sgx_urts
+endif
 
-#Built target drhelper
-DRHELPER_AS_SRC	:= core/arch/asm_shared.asm core/arch/x86/x86_shared.asm
-DRHELPER_AS_OBJ	:= $(patsubst %,$(BLD_DIR)/%.o,$(DRHELPER_AS_SRC))
-DRHELPER_AS_FLAGS := $(BASIC_AS_FLAGS)
-DRHELPER_CC_SRC := core/lib/dr_helper.c
-DRHELPER_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRHELPER_CC_SRC))
-DRHELPER_CC_FLAGS := $(BASIC_CC_FLAGS) -fPIC
+APP_INC_DIRS := -I./ -I$(SGX_SDK)/include
 
-$(DRHELPER_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
-	${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
-	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
-	$(AS) $(DRHELPER_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
+APP_CC_FLAGS := $(PLATFORM_DEBUG_FLAGS) -fPIC -Wno-attributes $(APP_INC_DIRS)
 
-$(DRHELPER_CC_OBJ): $(BLD_DIR)/%.o: %.c
-	$(CC) $(INCLUDES) $(DRHELPER_CC_FLAGS) -c $< -o $@
+# Three configuration modes - Debug, prerelease, release
+#   Debug - Macro DEBUG enabled.
+#   Prerelease - Macro NDEBUG and EDEBUG enabled.
+#   Release - Macro NDEBUG enabled.
+ifeq ($(SGX_DEBUG), 1)
+        APP_CC_FLAGS += -DDEBUG -UNDEBUG -UEDEBUG
+else ifeq ($(SGX_PRERELEASE), 1)
+        APP_CC_FLAGS += -DNDEBUG -DEDEBUG -UDEBUG
+else
+        APP_CC_FLAGS += -DNDEBUG -UEDEBUG -UDEBUG
+endif
 
-$(BLD_DIR)/libdrhelper.a: $(DRHELPER_AS_OBJ) $(DRHELPER_CC_OBJ)
-	$(AR) qc $@ $^
-	$(RANDLIB) $@
-
-DRLIBS_		:= libdrhelper.a
-DRLIBS      := $(addprefix $(BLD_DIR)/,$(DRLIBS_))
-
-
-
-#Built target libapp.so
-DYNAMORIO_AS_SRC	:= core/arch/x86/x86.asm
-DYNAMORIO_AS_OBJ	:= $(patsubst %,$(BLD_DIR)/%.o,$(DYNAMORIO_AS_SRC))
-DYNAMORIO_AS_FLAGS := $(BASIC_AS_FLAGS)
-
-DYNAMORIO_SRC_DIR	:= $(MODULES)
-DYNAMORIO_CC_SRC	:= $(foreach sdir,$(DYNAMORIO_SRC_DIR),$(wildcard $(sdir)/*.c))
-DYNAMORIO_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DYNAMORIO_CC_SRC))
-DYNAMORIO_CC_FLAGS	:= $(BASIC_CC_FLAGS) -Ddynamorio_EXPORTS -fPIC
-DYNAMORIO_LDSCRIPT	:= core/app.ldscript
-DYNAMORIO_LD_FLAGS	:= $(BASIC_CC_FLAGS) -Xlinker -z -Xlinker now -Xlinker -Bsymbolic -nostdlib -Wl,--entry,_start -Wl,-dT,$(DYNAMORIO_LDSCRIPT) -Wl,--hash-style=both -shared -Wl,-soname,libapp.so
-DYNAMORIO_LD_FLAGS	+= $(SGX_App_Link_Flags)
-
-$(DYNAMORIO_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
-	${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
-	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
-	$(AS) $(DYNAMORIO_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
-
-vpath %.c $(DYNAMORIO_SRC_DIR)
+APP_CPP_FLAGS := $(APP_CC_FLAGS) -std=c++11
 
 
-define make-goal
-$1/%.o: %.c
-	$(CC) $(INCLUDES) $(DYNAMORIO_CC_FLAGS) -c $$< -o $$@
-endef
+APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -Wl,-eapp_start -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
 
-$(foreach bdir,$(BUILD_DIR),$(eval $(call make-goal,$(bdir))))
-
-
-.PHONY: all checkdirs $(App_Name) clean
+ifneq ($(SGX_MODE), HW)
+	APP_LINK_FLAGS += -lsgx_uae_service_sim
+else
+	APP_LINK_FLAGS += -lsgx_uae_service
+endif
 
 
-$(App_Name): $(DRLIBS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(DYNAMORIO_U_OBJ)
-	$(LD)  $(DYNAMORIO_LD_FLAGS) -o $@ $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(DRLIBS) $(DYNAMORIO_U_OBJ)
-	#$(CP) $@ $@.full
-	#$(OBJCOPY) --only-keep-debug $@ $@.debug
-	#$(OBJCOPY) --add-gnu-debuglink=$@.debug $@
-	#$(STRIP) -g -x $@
+.PHONY: all run clean
 
 
-checkdirs: $(BUILD_DIR)
+APP_AS_SRCS	:= startup/x86.asm
+APP_AS_ASMS	:= $(patsubst %,%.s,$(APP_AS_SRCS))
+APP_AS_OBJS	:= $(patsubst %,%.o,$(APP_AS_SRCS))
+APP_AS_FALG	:= $(BASIC_AS_FLAGS)
 
 
-$(BUILD_DIR):
-	@mkdir -p $@
+APP_CPP_SRCS 	:= App.cpp $(wildcard Edger8rSyntax/*.cpp) $(wildcard TrustedLibrary/*.cpp)
+APP_CPP_OBJS 	:= $(APP_CPP_SRCS:.cpp=.o)
+APP_NAME		:= app
 
+
+all: $(APP_NAME)
+
+run: all
+ifneq ($(Build_Mode), HW_RELEASE)
+	@$(CURDIR)/$(APP_NAME)
+	@echo "RUN  =>  $(APP_NAME) [$(SGX_MODE)|$(SGX_ARCH), OK]"
+endif
+
+######## App Objects ########
+
+%.asm:
+$(APP_AS_OBJS): %.asm.o: %.asm
+	@${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $<.s
+	@${CMAKE} -Dfile=$<.s -P "CMake_asm.cmake"
+	@$(AS) $(APP_AS_FALG) -c $<.s -o $@
+
+dynamorio_u.c: $(SGX_EDGER8R) ../Enclave/dynamorio.edl
+	$(SGX_EDGER8R) --untrusted ../Enclave/dynamorio.edl --search-path ../Enclave --search-path $(SGX_SDK)/include
+	@echo "GEN  =>  $@"
+
+dynamorio_u.o: dynamorio_u.c
+	@$(CC) $(APP_CC_FLAGS) -c $< -o $@
+	@echo "CC   <=  $<"
+
+%.o: %.cpp
+	@$(CXX) $(APP_CPP_FLAGS) -c $< -o $@
+	@echo "CXX  <=  $<"
+
+$(APP_NAME): dynamorio_u.o $(APP_CPP_OBJS) $(APP_AS_OBJS)
+	@$(CXX) $^ -o $@ $(APP_LINK_FLAGS)
+	@echo "LINK =>  $@"
 
 clean:
-	@rm	-rf $(BUILD_DIR)
-	@rm	-rf $(BLD_DIR)
-	@rm	libapp.so*
+	@rm -f .config_* $(APP_NAME) $(APP_CPP_OBJS) $(APP_AS_ASMS) $(APP_AS_OBJS) dynamorio_u.*
