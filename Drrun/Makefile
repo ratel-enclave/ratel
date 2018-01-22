@@ -103,9 +103,9 @@ $(BLD_DIR)/libdrconfiglib.a: $(DRCONFIGLIB_CC_OBJ)
 DRRUN_CC_SRC	:= tools/drrun.c
 DRRUN_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRRUN_CC_SRC))
 DRRUN_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DRC_IS_drrun -DDRRUN
-DRRUN_LD_FLAGS	:= $(BASIC_CC_FLAGS) -Wl,--hash-style=both 
+DRRUN_LD_FLAGS	:= $(BASIC_CC_FLAGS) -Wl,--hash-style=both
 DRRUN_EXTRA_LD_FLAGS		:= -Wl,--section-start=.text=0x8048000
-DRLIBS_A	:= libdrconfiglib.a libdrfrontendlib.a libdrinjectlib.a libdrdecode.a libdrhelper.a   
+DRLIBS_A	:= libdrconfiglib.a libdrfrontendlib.a libdrinjectlib.a libdrdecode.a libdrhelper.a
 DRLIBS		:= $(addprefix $(BLD_DIR)/,$(DRLIBS_A))
 
 $(DRRUN_CC_OBJ): $(BLD_DIR)/%.o: %.c
@@ -117,10 +117,10 @@ $(DRRUN_CC_OBJ): $(BLD_DIR)/%.o: %.c
 
 drrun: $(DRRUN_CC_OBJ) $(DRLIBS)
 	$(LD)  $(DRRUN_LD_FLAGS) $(DRRUN_CC_OBJ) -o $@ -rdynamic $(DRLIBS) $(DRRUN_EXTRA_LD_FLAGS)
-	$(CP) drrun drrun.full
-	$(OBJCOPY) --only-keep-debug drrun drrun.debug
-	$(OBJCOPY) --add-gnu-debuglink=drrun.debug drrun
-	$(STRIP) -g -x drrun
+	#$(CP) drrun drrun.full
+	#$(OBJCOPY) --only-keep-debug drrun drrun.debug
+	#$(OBJCOPY) --add-gnu-debuglink=drrun.debug drrun
+	#$(STRIP) -g -x drrun
 
 
 checkdirs: $(BUILD_DIR)

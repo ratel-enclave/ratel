@@ -48,6 +48,14 @@ DECL_EXTERN(unexpected_return)
 DECL_EXTERN(log_syscall_ready)
 DECL_EXTERN(log_app_syscall)
 DECL_EXTERN(ocall_all_syscalls)
+DECL_EXTERN(simulate_syscall_inst)
+DECL_EXTERN(simulate_syscall_inst_0)
+DECL_EXTERN(simulate_syscall_inst_1)
+DECL_EXTERN(simulate_syscall_inst_2)
+DECL_EXTERN(simulate_syscall_inst_3)
+DECL_EXTERN(simulate_syscall_inst_4)
+DECL_EXTERN(simulate_syscall_inst_5)
+DECL_EXTERN(simulate_syscall_inst_6)
 
 /* we share dynamorio_syscall w/ preload */
 #ifdef UNIX
@@ -71,31 +79,41 @@ GLOBAL_LABEL(dynamorio_syscall:)
         or       rax, 0x2000000
 #  endif
         cmp      REG_XBX, 0
-        je       syscall_ready
+        CALLC1(GLOBAL_REF(simulate_syscall_inst_0), rax)
+        je       syscall_ready_tail
         mov      ARG1, ARG3
         cmp      REG_XBX, 1
-        je       syscall_ready
+        CALLC2(GLOBAL_REF(simulate_syscall_inst_1), rax, ARG1)
+        je       syscall_ready_tail
         mov      ARG2, ARG4
         cmp      REG_XBX, 2
-        je       syscall_ready
+        CALLC3(GLOBAL_REF(simulate_syscall_inst_2), rax, ARG1, ARG2)
+        je       syscall_ready_tail
         mov      ARG3, ARG5
         cmp      REG_XBX, 3
-        je       syscall_ready
+        CALLC4(GLOBAL_REF(simulate_syscall_inst_3), rax, ARG1, ARG2, ARG3)
+        je       syscall_ready_tail
         mov      ARG4, ARG6
         cmp      REG_XBX, 4
-        je       syscall_ready
+        CALLC5(GLOBAL_REF(simulate_syscall_inst_4), rax, ARG1, ARG2, ARG3, ARG4)
+        je       syscall_ready_tail
         mov      ARG5, [2*ARG_SZ + REG_XSP] /* arg7: above xbx and retaddr */
         cmp      REG_XBX, 5
-        je       syscall_ready
+        CALLC6(GLOBAL_REF(simulate_syscall_inst_5), rax, ARG1, ARG2, ARG3, ARG4, ARG5)
+        je       syscall_ready_tail
         mov      ARG6, [3*ARG_SZ + REG_XSP] /* arg8: above arg7, xbx, retaddr */
+        CALLC7(GLOBAL_REF(simulate_syscall_inst_6), rax, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)
+        je       syscall_ready_tail
 syscall_ready:
-        mov      r10, rcx
+        mov      r10, rcx //what's the purpose?
 #ifdef DEBUG
-        PUSHGPR
+        //PUSHGPR
         //call log_syscall_ready
-        POPGPR
+        //POPGPR
 #endif
-        syscall
+        //syscall
+
+syscall_ready_tail:
 # else
         push     REG_XBP
         push     REG_XSI

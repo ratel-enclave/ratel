@@ -29,42 +29,25 @@
 #
 #
 
+include buildenv.mk
 
-#.PHONY: all app enclave
-.PHONY: drrun app enclave clean
+.PHONY: all drrun app enclave clean
 
-ifeq ($(Build_Mode), HW_RELEASE)
-all: .config_$(Build_Mode)_$(SGX_ARCH) $(App_Name) $(Enclave_Name)
-	@echo "The project has been built in release hardware mode."
-	@echo "Please sign the $(Enclave_Name) first with your signing key before you run the $(App_Name) to launch and access the libdynamorio."
-	@echo "To sign the enclave use the command:"
-	@echo "   $(SGX_ENCLAVE_SIGNER) sign -key <your key> -enclave $(Enclave_Name) -out <$(Signed_Enclave_Name)> -config $(Enclave_Config_File)"
-	@echo "You can also sign the enclave using an external signing tool."
-	@echo "To build the project in simulation mode set SGX_MODE=SIM. To build the project in prerelease mode set SGX_PRERELEASE=1 and SGX_MODE=HW."
-else
-all: .config_$(Build_Mode)_$(SGX_ARCH) $(App_Name) $(Enclave_Name) $(Signed_Enclave_Name)
-ifeq ($(Build_Mode), HW_DEBUG)
-	@echo "The project has been built in debug hardware mode."
-else ifeq ($(Build_Mode), SIM_DEBUG)
-	@echo "The project has been built in debug simulation mode."
-else ifeq ($(Build_Mode), HW_PRERELEASE)
-	@echo "The project has been built in pre-release hardware mode."
-else ifeq ($(Build_Mode), SIM_PRERELEASE)
-	@echo "The project has been built in pre-release simulation mode."
-else
-	@echo "The project has been built in release simulation mode."
-endif
-endif
 
 run: all
-ifneq ($(Build_Mode), HW_RELEASE)
+ifneq ($(BUILD_MODE), HW_RELEASE)
 	@$(CURDIR)/$(App_Name)
 	@echo "RUN  =>  $(App_Name) [$(SGX_MODE)|$(SGX_ARCH), OK]"
 endif
 
+all: drrun app enclave
+	@cp Drrun/drrun .
+	@cp App/libapp.so .
+	@cp Enclave/libdynamorio.signed.so .
+
 
 drrun:
-	make -C drrun all
+	make -C Drrun all
 
 
 app:
@@ -76,6 +59,7 @@ enclave:
 
 
 clean:
-	make -C drrun clean
+	make -C Drrun clean
 	make -C App clean
 	make -C Enclave clean
+	@rm drrun libapp.so libdynamorio.signed.so

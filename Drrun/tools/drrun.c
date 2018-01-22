@@ -814,7 +814,7 @@ _tmain(int argc, TCHAR *targv[])
     c = buf + strlen(buf) - 1;
     while (*c != '\\' && *c != '/' && c > buf)
         c--;
-    _snprintf(c+1, BUFFER_SIZE_ELEMENTS(buf) - (c+1-buf), "..");
+    _snprintf(c+1, BUFFER_SIZE_ELEMENTS(buf) - (c+1-buf), ".");
     NULL_TERMINATE_BUFFER(buf);
     get_absolute_path(buf, default_root, BUFFER_SIZE_ELEMENTS(default_root));
     NULL_TERMINATE_BUFFER(default_root);

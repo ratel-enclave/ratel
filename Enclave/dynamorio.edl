@@ -37,16 +37,20 @@ enclave {
 	        /*
          * [in, out]:
          *      buffer with the same size will be allocated inside the enclave,
-         *      the content pointed by 'val' will be copied either. After return, 
+         *      the content pointed by 'val' will be copied either. After return,
          *      the buffer inside the enclave will by copied into outside 'val' again.
          */
-        
-        //public void dynamorio_start([in, out] int *val);
-        public void dynamorio_start([in] void **sp);
+
+        //public void dynamorio_enclave_entry([in, out] int *val);
+        public void dynamorio_enclave_entry(int argc, [in] char** argv, [in]char **env);
+        //public void dynamorio_enclave_entry(unsigned long sp);
 	};
-    
+
     untrusted {
+        void ocall_print_str([in, string] const char *str);
+        void ocall_print_int(long sysno);
 
         void ocall_all_syscalls([in, string] const char *str);
+        long ocall_syscall_0(long sysno);
     };
 };

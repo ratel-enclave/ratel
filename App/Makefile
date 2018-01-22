@@ -75,7 +75,8 @@ endif
 APP_CPP_FLAGS := $(APP_CC_FLAGS) -std=c++11
 
 
-APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -Wl,-eapp_start -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
+#APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -Wl,-eapp_start -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
+APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
 
 ifneq ($(SGX_MODE), HW)
 	APP_LINK_FLAGS += -lsgx_uae_service_sim
@@ -84,7 +85,7 @@ else
 endif
 
 
-.PHONY: all run clean
+.PHONY: all clean
 
 
 APP_AS_SRCS	:= startup/x86.asm
@@ -95,16 +96,11 @@ APP_AS_FALG	:= $(BASIC_AS_FLAGS)
 
 APP_CPP_SRCS 	:= App.cpp $(wildcard Edger8rSyntax/*.cpp) $(wildcard TrustedLibrary/*.cpp)
 APP_CPP_OBJS 	:= $(APP_CPP_SRCS:.cpp=.o)
-APP_NAME		:= app
+APP_NAME		:= libapp.so
 
 
 all: $(APP_NAME)
 
-run: all
-ifneq ($(Build_Mode), HW_RELEASE)
-	@$(CURDIR)/$(APP_NAME)
-	@echo "RUN  =>  $(APP_NAME) [$(SGX_MODE)|$(SGX_ARCH), OK]"
-endif
 
 ######## App Objects ########
 

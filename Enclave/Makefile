@@ -62,14 +62,13 @@ SGX_ENCLAVE_LD_FLAGS := -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfile
 ######## Enclave Objects ########
 
 dynamorio_t.c: $(SGX_EDGER8R) dynamorio.edl
-	@cd Enclave && $(SGX_EDGER8R) --trusted dynamorio.edl --search-path . --search-path $(SGX_SDK)/include
+	@$(SGX_EDGER8R) --trusted dynamorio.edl --search-path . --search-path $(SGX_SDK)/include
 	@echo "GEN  =>  $@"
 
 
 dynamorio_t.o: dynamorio_t.c
 	@$(CC) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_CC_FLAGS) -c $< -o $@
 	@echo "CC   <=  $<"
-
 
 
 ######## Dynamorio Settings ########
@@ -121,6 +120,16 @@ endef
 
 $(foreach bdir,$(BUILD_DIR),$(eval $(call make-goal,$(bdir))))
 
+######## sgx_edge Objects ########
+
+EDGE_DIR	:= sgx_edge
+EDGE_SRCS	:= $(wildcard $(EDGE_DIR)/*.c)
+EDGE_OBJS	:= $(patsubst %c,%o,$(EDGE_SRCS))
+DYNAMORIO_DEFINES	:= -DINTERNAL -DDEBUG -DDRSTATS_DEMO -DX86 -DX64 -DLINUX -DUNIX -DCLIENT_INTERFACE -DAPP_EXPORTS -DKSTATS -DHAVE_FVISIBILITY -
+
+$(EDGE_OBJS): %.o: %.c
+	$(CC) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_CC_FLAGS) $(DYNAMORIO_CC_FLAGS) -fPIC  -c $< -o $@
+
 ######## building libdynamorio ########
 
 ENCLAVE_NAME 	:= libdynamorio.so
@@ -129,10 +138,10 @@ ENCLAVE_CONFIG_FILE := dynamorio.config.xml
 
 .PHONY: all checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME) clean
 
-all: checkdirs $(SIGNED_ENCLAVE_NAME)
+all: checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME)
 
-$(ENCLAVE_NAME): $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o
-	$(LD) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_LD_FLAGS) $(DYNAMORIO_LD_FLAGS) $(SGX_DYNAMORIO_LD_FLAGS) -o $@ $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o
+$(ENCLAVE_NAME): dynamorio_t.o $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(EDGE_OBJS)
+	$(LD) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_LD_FLAGS) $(DYNAMORIO_LD_FLAGS) $(SGX_DYNAMORIO_LD_FLAGS) -o $@ $(EDGE_OBJS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o
 	#$(CP) $@ $@.full
 	#$(OBJCOPY) --only-keep-debug $@ $@.debug
 	#$(OBJCOPY) --add-gnu-debuglink=$@.debug $@
@@ -140,7 +149,7 @@ $(ENCLAVE_NAME): $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o
 
 
 $(SIGNED_ENCLAVE_NAME): $(ENCLAVE_NAME)
-	@echo $(SGX_ENCLAVE_SIGNER) sign -key dynamorio_private.pem -enclave $(ENCLAVE_NAME) -out $@ -config $(ENCLAVE_CONFIG_FILE)
+	$(SGX_ENCLAVE_SIGNER) sign -key dynamorio_private.pem -enclave $(ENCLAVE_NAME) -out $@ -config $(ENCLAVE_CONFIG_FILE)
 	@echo "SIGN =>  $@"
 
 

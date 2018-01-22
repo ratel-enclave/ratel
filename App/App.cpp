@@ -43,7 +43,7 @@
 #include "dynamorio_u.h"
 
 /* Global EID shared by multiple threads */
-sgx_enclave_id_t global_eid = 0;
+sgx_enclave_id_t dynamo_eid = 0;
 
 typedef struct _sgx_errlist_t {
     sgx_status_t err;
@@ -194,7 +194,7 @@ int initialize_enclave(void)
     }
     /* Step 2: call sgx_create_enclave to initialize an enclave instance */
     /* Debug Support: set 2nd parameter to 1 */
-    ret = sgx_create_enclave(ENCLAVE_FILENAME, SGX_DEBUG_FLAG, &token, &updated, &global_eid, NULL);
+    ret = sgx_create_enclave(ENCLAVE_FILENAME, SGX_DEBUG_FLAG, &token, &updated, &dynamo_eid, NULL);
     if (ret != SGX_SUCCESS) {
         print_error_message(ret);
         if (fp != NULL) fclose(fp);
@@ -218,22 +218,13 @@ int initialize_enclave(void)
     return 0;
 }
 
-/* OCall functions */
-void ocall_print_string(const char *str)
-{
-    /* Proxy/Bridge will check the length and null-terminate
-     * the input string to prevent buffer overflow.
-     */
-    printf("%s", str);
-}
-
 
 /* Application entry */
-int SGX_CDECL main(int argc, char *argv[])
+int SGX_CDECL main(int argc, char *argv[], char* envp[])
 {
     (void)(argc);
     (void)(argv);
-
+    (void)(envp);
 
     /* Initialize the enclave */
     if(initialize_enclave() < 0){
@@ -242,8 +233,12 @@ int SGX_CDECL main(int argc, char *argv[])
         return -1;
     }
 
+    //ulong sp = (unsigned long)argv - sizeof(unsigned long);
+    //dynamorio_enclave_entry(dynamo_eid, sp);
+    dynamorio_enclave_entry(dynamo_eid, argc, argv, envp);
+
     /* Destroy the enclave */
-    sgx_destroy_enclave(global_eid);
+    sgx_destroy_enclave(dynamo_eid);
 
     printf("Info: SampleEnclave successfully returned.\n");
 
@@ -252,12 +247,40 @@ int SGX_CDECL main(int argc, char *argv[])
     return 0;
 }
 
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/syscall.h>
+
+/* OCall functions */
+void ocall_print_str(const char *str)
+{
+    /* Proxy/Bridge will check the length and null-terminate
+     * the input string to prevent buffer overflow.
+     */
+    printf("%s\n", str);
+}
+
+void ocall_print_int(long sysno)
+{
+    printf("syscall No. is: %d\n", (int)sysno);
+}
+
 void _syscall_exit(void)
 {
     /* Destroy the enclave */
     //sgx_destroy_enclave(dynamo_eid);
 }
 
+long ocall_syscall_0(long sysno)
+{
+	return syscall(sysno);
+}
+
+/*void ocall_getpid(long *ret)
+{
+    *ret = (long)getpid();
+}*/
 
 /* OCall functions */
 void ocall_all_syscalls(const char *str)
