@@ -32,9 +32,9 @@
 /* Enclave.edl - Top EDL file. */
 
 enclave {
-	trusted {
+    trusted {
 
-	        /*
+        /*
          * [in, out]:
          *      buffer with the same size will be allocated inside the enclave,
          *      the content pointed by 'val' will be copied either. After return,
@@ -44,13 +44,40 @@ enclave {
         //public void dynamorio_enclave_entry([in, out] int *val);
         public void dynamorio_enclave_entry(int argc, [in] char** argv, [in]char **env);
         //public void dynamorio_enclave_entry(unsigned long sp);
-	};
+    };
 
     untrusted {
+        /* These two functions are used for debuging */
         void ocall_print_str([in, string] const char *str);
-        void ocall_print_int(long sysno);
+        void ocall_print_syscallname(long sysno);
 
-        void ocall_all_syscalls([in, string] const char *str);
+
+        /* system call */
+        //void ocall_all_syscalls([in, string] const char *str);
+
         long ocall_syscall_0(long sysno);
+
+
+        long ocall_syscall_1_str(long sysno, [in, string] char *str);
+        /*long ocall_syscall_1_pint(long sysno, [in, out] long* pval);*/
+        /*long ocall_syscall_1_int(long sysno, long val);*/
+        /*long ocall_syscall_1_not(long sysno, long unimplemented);*/
+        /*long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);*/
+        //long ocall_syscall_1_uname(long sysno, struct old_utsname* uname);
+        //long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info);
+        //long ocall_syscall_1_timex(long sysno,, struct timex* time);
+
+        /*syscalls with 2 paramters*/
+        //long ocall_syscall_2_V0N(long sysno, [user_check] void *V, long N);
+        long ocall_syscall_2_NN(long sysno, long N1, long N2);
+        long ocall_syscall_2_V1N(long sysno, [in, size=len] void *V, int len, long N);
+
+        /*V0: just a void* pointer*/
+        /*V1: IN void* pointer*/
+        /*V2: OUT void* pointer*/
+        /*V3: INOUT void* pointer*/
+        /*syscalls with 3 paramters*/
+        long ocall_syscall_3_NV2N(long sysno, long N1, [out, size=N2] void *V, long N2);
+
     };
 };

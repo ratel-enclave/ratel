@@ -45,17 +45,7 @@
 START_FILE
 
 DECL_EXTERN(unexpected_return)
-DECL_EXTERN(log_syscall_ready)
-DECL_EXTERN(log_app_syscall)
-DECL_EXTERN(ocall_all_syscalls)
 DECL_EXTERN(simulate_syscall_inst)
-DECL_EXTERN(simulate_syscall_inst_0)
-DECL_EXTERN(simulate_syscall_inst_1)
-DECL_EXTERN(simulate_syscall_inst_2)
-DECL_EXTERN(simulate_syscall_inst_3)
-DECL_EXTERN(simulate_syscall_inst_4)
-DECL_EXTERN(simulate_syscall_inst_5)
-DECL_EXTERN(simulate_syscall_inst_6)
 
 /* we share dynamorio_syscall w/ preload */
 #ifdef UNIX
@@ -79,41 +69,27 @@ GLOBAL_LABEL(dynamorio_syscall:)
         or       rax, 0x2000000
 #  endif
         cmp      REG_XBX, 0
-        CALLC1(GLOBAL_REF(simulate_syscall_inst_0), rax)
-        je       syscall_ready_tail
+        je       syscall_ready
         mov      ARG1, ARG3
         cmp      REG_XBX, 1
-        CALLC2(GLOBAL_REF(simulate_syscall_inst_1), rax, ARG1)
-        je       syscall_ready_tail
+        je       syscall_ready
         mov      ARG2, ARG4
         cmp      REG_XBX, 2
-        CALLC3(GLOBAL_REF(simulate_syscall_inst_2), rax, ARG1, ARG2)
-        je       syscall_ready_tail
+        je       syscall_ready
         mov      ARG3, ARG5
         cmp      REG_XBX, 3
-        CALLC4(GLOBAL_REF(simulate_syscall_inst_3), rax, ARG1, ARG2, ARG3)
-        je       syscall_ready_tail
+        je       syscall_ready
         mov      ARG4, ARG6
         cmp      REG_XBX, 4
-        CALLC5(GLOBAL_REF(simulate_syscall_inst_4), rax, ARG1, ARG2, ARG3, ARG4)
-        je       syscall_ready_tail
+        je       syscall_ready
         mov      ARG5, [2*ARG_SZ + REG_XSP] /* arg7: above xbx and retaddr */
         cmp      REG_XBX, 5
-        CALLC6(GLOBAL_REF(simulate_syscall_inst_5), rax, ARG1, ARG2, ARG3, ARG4, ARG5)
-        je       syscall_ready_tail
+        je       syscall_ready
         mov      ARG6, [3*ARG_SZ + REG_XSP] /* arg8: above arg7, xbx, retaddr */
-        CALLC7(GLOBAL_REF(simulate_syscall_inst_6), rax, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)
-        je       syscall_ready_tail
 syscall_ready:
-        mov      r10, rcx //what's the purpose?
-#ifdef DEBUG
-        //PUSHGPR
-        //call log_syscall_ready
-        //POPGPR
-#endif
-        //syscall
+        mov      r10, rcx
+        call     simulate_syscall_inst
 
-syscall_ready_tail:
 # else
         push     REG_XBP
         push     REG_XSI
@@ -216,15 +192,15 @@ syscall_success:
         END_FUNC(dynamorio_syscall)
 
 
-        DECLARE_FUNC(sgx_syscall)
-GLOBAL_LABEL(sgx_syscall:)
-        PUSHGPR
+        DECLARE_FUNC(dynamorio_syscall_inst)
+GLOBAL_LABEL(dynamorio_syscall_inst:)
+        //PUSHGPR
         //call log_app_syscall
-        POPGPR
+        //POPGPR
         //syscall
-        call ocall_all_syscalls
+        call simulate_syscall_inst
         ret
-        END_FUNC(sgx_syscall)
+        END_FUNC(dynamorio_syscall_inst)
 
 # ifdef MACOS
 /* Mach dep syscall invocation.

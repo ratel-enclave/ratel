@@ -72,7 +72,7 @@ else
         APP_CC_FLAGS += -DNDEBUG -UEDEBUG -UDEBUG
 endif
 
-APP_CPP_FLAGS := $(APP_CC_FLAGS) -std=c++11
+APP_CXX_FLAGS := $(APP_CC_FLAGS)
 
 
 #APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -Wl,-eapp_start -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
@@ -94,8 +94,8 @@ APP_AS_OBJS	:= $(patsubst %,%.o,$(APP_AS_SRCS))
 APP_AS_FALG	:= $(BASIC_AS_FLAGS)
 
 
-APP_CPP_SRCS 	:= App.cpp $(wildcard Edger8rSyntax/*.cpp) $(wildcard TrustedLibrary/*.cpp)
-APP_CPP_OBJS 	:= $(APP_CPP_SRCS:.cpp=.o)
+APP_CXX_SRCS 	:= App.c syscall.c
+APP_CXX_OBJS 	:= $(APP_CXX_SRCS:.c=.o)
 APP_NAME		:= libapp.so
 
 
@@ -118,13 +118,13 @@ dynamorio_u.o: dynamorio_u.c
 	@$(CC) $(APP_CC_FLAGS) -c $< -o $@
 	@echo "CC   <=  $<"
 
-%.o: %.cpp
-	@$(CXX) $(APP_CPP_FLAGS) -c $< -o $@
+%.o: %.c
+	@$(CXX) $(APP_CXX_FLAGS) -c $< -o $@
 	@echo "CXX  <=  $<"
 
-$(APP_NAME): dynamorio_u.o $(APP_CPP_OBJS) $(APP_AS_OBJS)
+$(APP_NAME): dynamorio_u.o $(APP_CXX_OBJS) $(APP_AS_OBJS)
 	@$(CXX) $^ -o $@ $(APP_LINK_FLAGS)
 	@echo "LINK =>  $@"
 
 clean:
-	@rm -f .config_* $(APP_NAME) $(APP_CPP_OBJS) $(APP_AS_ASMS) $(APP_AS_OBJS) dynamorio_u.*
+	@rm -f .config_* $(APP_NAME) $(APP_CXX_OBJS) $(APP_AS_ASMS) $(APP_AS_OBJS) dynamorio_u.*

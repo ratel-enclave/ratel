@@ -59,15 +59,27 @@ SGX_ENCLAVE_LD_FLAGS := -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfile
 	-Wl,--version-script=dynamorio.lds
 
 
-######## Enclave Objects ########
+
+######## final target is libdynamorio ########
+
+ENCLAVE_NAME 	:= libdynamorio.so
+SIGNED_ENCLAVE_NAME	:= libdynamorio.signed.so
+ENCLAVE_CONFIG_FILE := dynamorio.config.xml
+
+.PHONY: all checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME) clean
+
+all: checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME)
+
+
+######## SGX_wrapper Objects ########
 
 dynamorio_t.c: $(SGX_EDGER8R) dynamorio.edl
-	@$(SGX_EDGER8R) --trusted dynamorio.edl --search-path . --search-path $(SGX_SDK)/include
+	$(SGX_EDGER8R) --trusted dynamorio.edl --search-path . --search-path $(SGX_SDK)/include
 	@echo "GEN  =>  $@"
 
 
 dynamorio_t.o: dynamorio_t.c
-	@$(CC) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_CC_FLAGS) -c $< -o $@
+	$(CC) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_CC_FLAGS) -c $< -o $@
 	@echo "CC   <=  $<"
 
 
@@ -130,16 +142,8 @@ DYNAMORIO_DEFINES	:= -DINTERNAL -DDEBUG -DDRSTATS_DEMO -DX86 -DX64 -DLINUX -DUNI
 $(EDGE_OBJS): %.o: %.c
 	$(CC) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_CC_FLAGS) $(DYNAMORIO_CC_FLAGS) -fPIC  -c $< -o $@
 
+
 ######## building libdynamorio ########
-
-ENCLAVE_NAME 	:= libdynamorio.so
-SIGNED_ENCLAVE_NAME	:= libdynamorio.signed.so
-ENCLAVE_CONFIG_FILE := dynamorio.config.xml
-
-.PHONY: all checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME) clean
-
-all: checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME)
-
 $(ENCLAVE_NAME): dynamorio_t.o $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(EDGE_OBJS)
 	$(LD) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_LD_FLAGS) $(DYNAMORIO_LD_FLAGS) $(SGX_DYNAMORIO_LD_FLAGS) -o $@ $(EDGE_OBJS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o
 	#$(CP) $@ $@.full

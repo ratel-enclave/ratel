@@ -4637,7 +4637,7 @@ emit_do_syscall_common(dcontext_t *dcontext, generated_code_t *code,
 #endif
 
     /* system call itself -- using same method we've observed OS using */
-    instr_t *o_call = INSTR_CREATE_call(dcontext, opnd_create_pc((app_pc)sgx_syscall));
+    instr_t *o_call = INSTR_CREATE_call(dcontext, opnd_create_pc((app_pc)dynamorio_syscall_inst));
     APP(&ilist, o_call);
 
     *syscall_offs += instr_length(dcontext, o_call) - instr_length(dcontext, syscall);

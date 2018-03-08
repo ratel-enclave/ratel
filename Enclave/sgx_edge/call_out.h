@@ -8,7 +8,7 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx);
 long simulate_syscall_inst_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10);
 long simulate_syscall_inst_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8);
 long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
-long simulate_syscall_inst(long sysno, int nargs, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
+__attribute((sysv_abi)) long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
 
 #ifndef HAVE_TYPELIMITS_CONTROL
 #define  HAVE_TYPELIMITS_CONTROL
