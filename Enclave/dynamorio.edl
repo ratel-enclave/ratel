@@ -42,8 +42,8 @@ enclave {
          */
 
         //public void dynamorio_enclave_entry([in, out] int *val);
-        public void dynamorio_enclave_entry(int argc, [in] char** argv, [in]char **env);
-        //public void dynamorio_enclave_entry(unsigned long sp);
+        public void dyn_enclave_entry(int argc, [in] char** argv, [in]char **env);
+        //public void dyn_enclave_entry(unsigned long sp);
     };
 
     untrusted {

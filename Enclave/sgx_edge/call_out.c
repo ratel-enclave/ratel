@@ -130,7 +130,7 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
     long ret = 0;
 
     if (sysno == SYS_open) {
-        ocall_print_str((char*)_rdi);
+        //ocall_print_str((char*)_rdi);
         int len = strlen((char*)_rdi) + 1;
 
         ocall_syscall_2_V1N(&ret, sysno, (void*)_rdi, len, _rsi);

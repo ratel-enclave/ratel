@@ -28,7 +28,7 @@ extern void *dynamo_memcpy(void *dest, const void *src, size_t n);
 
 //unsigned long global_sp;
 //void dynamorio_enclave_entry(unsigned long execve_sp)
-void dynamorio_enclave_entry(int argc, char* argv[], char*envp[])
+void dyn_enclave_entry(int argc, char* argv[], char*envp[])
 {
     //unsigned long newsp, sz;
     //int argc;
@@ -53,7 +53,10 @@ void dynamorio_enclave_entry(int argc, char* argv[], char*envp[])
     //asm volatile (
     //        "jmp *%0 \n\t"
     //        ::"r"(_start),"rm"(newsp));
-    _start(argc, argv, envp);
+    //_start(argc, argv, envp);
     //unexpected_return();
+    ocall_print_str("I am in dyn_enclave_entry.");
+
+    return;
 }
 
