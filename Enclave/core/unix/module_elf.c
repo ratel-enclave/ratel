@@ -302,6 +302,7 @@ module_is_partial_map(app_pc base, size_t size, uint memprot)
 #ifndef NOT_DYNAMORIO_CORE_PROPER
 
 /* Returns absolute address of the ELF dynamic array DT_ target */
+extern app_pc dynamo_dll_start;
 static app_pc
 elf_dt_abs_addr(ELF_DYNAMIC_ENTRY_TYPE *dyn, app_pc base, size_t size,
                 size_t view_size, ptr_int_t load_delta, bool at_map, bool dyn_reloc)
@@ -324,7 +325,11 @@ elf_dt_abs_addr(ELF_DYNAMIC_ENTRY_TYPE *dyn, app_pc base, size_t size,
      * either at this point, as they're done after import processing.
      */
     app_pc tgt = (app_pc) dyn->d_un.d_ptr;
-    if (at_map || !dyn_reloc || tgt < base || tgt > base + size) {
+    if (base == dynamo_dll_start) {
+        if ((at_map || !dyn_reloc) && (tgt < base || tgt > base + size))
+            tgt = (app_pc) dyn->d_un.d_ptr + load_delta;
+    }
+    else if (at_map || !dyn_reloc || tgt < base || tgt > base + size) {
         /* not relocated, adjust by load_delta */
         tgt = (app_pc) dyn->d_un.d_ptr + load_delta;
     }

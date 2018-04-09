@@ -42,7 +42,10 @@ enclave {
          */
 
         //public void dynamorio_enclave_entry([in, out] int *val);
-        public void dyn_enclave_entry(int argc, [in] char** argv, [in]char **env);
+        /*public void dyn_enclave_entry(int argc, [in] char *(*p_argv)[], [in] char *(*p_env)[]);*/
+        public void dyn_enclave_entry(int argc, [in] char ***p_argv, [in] char ***p_env);
+
+
         //public void dyn_enclave_entry(unsigned long sp);
     };
 
@@ -78,6 +81,6 @@ enclave {
         /*V3: INOUT void* pointer*/
         /*syscalls with 3 paramters*/
         long ocall_syscall_3_NV2N(long sysno, long N1, [out, size=N2] void *V, long N2);
-
+        long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
     };
 };

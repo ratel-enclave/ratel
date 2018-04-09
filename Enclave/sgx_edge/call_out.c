@@ -129,13 +129,6 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
 {
     long ret = 0;
 
-    if (sysno == SYS_open) {
-        //ocall_print_str((char*)_rdi);
-        int len = strlen((char*)_rdi) + 1;
-
-        ocall_syscall_2_V1N(&ret, sysno, (void*)_rdi, len, _rsi);
-    }
-
     if (sysno == SYS_munmap) {
         //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
         ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
@@ -143,10 +136,29 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
     return ret;
 }
 
+        #include "sgx_trts.h"
+#include "string.h"
 //All syscalls with 3 parameters
 long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
 {
     long ret = 0;
+
+    if (sysno == SYS_open) {
+        char *S = (char*)_rdi;
+        char *t = NULL;
+        int len = strlen(S);
+
+        if (!sgx_is_within_enclave(S, len)) {
+            t = malloc(len);
+            strncpy(t, S, len);
+            S = t;
+        }
+
+        ocall_syscall_3_SNN(&ret, sysno, S, _rsi, _rdx);
+
+        if (t != NULL)
+            free(t);
+    }
 
     if (sysno == SYS_read) {
         ocall_syscall_3_NV2N(&ret, sysno, _rdi, (void*)_rsi, _rdx);
@@ -193,7 +205,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
 
     //Two paramters
     if (sysno == SYS_open) {
-        return simulate_syscall_inst_2(sysno, _rdi, _rsi);
+        return simulate_syscall_inst_3(sysno, _rdi, _rsi, _rdx);
     }
 
     //Three paramters

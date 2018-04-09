@@ -302,8 +302,8 @@ static char dynamorio_alt_arch_filepath[MAXIMUM_PATH]; /* just dir */
 #define DR_LIBDIR_X64 STRINGIFY(LIBDIR_X64)
 
 /* pc values delimiting dynamo dll image */
-static app_pc dynamo_dll_start = NULL;
-static app_pc dynamo_dll_end = NULL; /* open-ended */
+app_pc dynamo_dll_start = NULL;
+app_pc dynamo_dll_end = NULL; /* open-ended */
 
 static app_pc executable_start = NULL;
 static app_pc executable_end = NULL;
@@ -8720,10 +8720,28 @@ get_dynamo_library_bounds(void)
     check_start = dynamo_dll_start;
     dynamorio_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,DYNAMORIO_LIBRARY_NAME);
 #endif /* STATIC_LIBRARY */
-    res = memquery_library_bounds(dynamorio_libname,
-                                  &check_start, &check_end,
-                                  dynamorio_library_path,
-                                  BUFFER_SIZE_ELEMENTS(dynamorio_library_path));
+    /*res = memquery_library_bounds(dynamorio_libname,*/
+                                  /*&check_start, &check_end,*/
+                                  /*dynamorio_library_path,*/
+                                  /*BUFFER_SIZE_ELEMENTS(dynamorio_library_path));*/
+    long dr_size = dynamo_dll_end - dynamo_dll_start;
+    int nPages = dr_size / PAGE_SIZE;
+    res = 0;
+
+    asm ("\tcall local\n" \
+            "local: pop %0" \
+            :"=rm"(check_start));
+    check_start = (app_pc) ALIGN_FORWARD(check_start, PAGE_SIZE);
+    while (nPages > 0 && *(uint32*)check_start != 0x464c457f) {
+        check_start -= PAGE_SIZE;
+        nPages --;
+        res++;
+    }
+    check_end = check_start + dr_size;
+    /*strcpy(dynamorio_library_path, "/home/sgx/project/dynamorio/lib64/debug/");*/
+    strcpy(dynamorio_library_path, "/home/sgx/project/sgx/sgx-dbi/");
+
+
     LOG(GLOBAL, LOG_VMAREAS, 1, PRODUCT_NAME" library path: %s\n",
         dynamorio_library_path);
     snprintf(dynamorio_library_filepath, BUFFER_SIZE_ELEMENTS(dynamorio_library_filepath),

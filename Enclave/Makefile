@@ -55,7 +55,7 @@ SGX_ENCLAVE_LD_FLAGS := -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfile
 	-Wl,--start-group -lsgx_tstdc -lsgx_tcxx -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group \
 	-Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
 	-Wl,--export-dynamic  \
-	-Wl,--defsym,__ImageBase=0 -Wl,--gc-sections   \
+	-Wl,--defsym,__ImageBase=0x0 -Wl,--gc-sections   \
 	-Wl,--version-script=dynamorio.lds
 
 
@@ -68,7 +68,7 @@ ENCLAVE_CONFIG_FILE := dynamorio.config.xml
 
 .PHONY: all checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME) clean
 
-all: checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME)
+all: checkdirs $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME) Makefile
 
 
 ######## SGX_wrapper Objects ########
@@ -122,6 +122,11 @@ $(DYNAMORIO_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
 	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
 	$(AS) $(DYNAMORIO_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
 
+
+${DYNAMORIO_LDSCRIPT}: make/ldscript.cmake
+	${CMAKE} -D outfile=$@ -DCMAKE_LINKER=/usr/bin/ld -DCMAKE_COMPILER_IS_GNUCC=TRUE -DLD_FLAGS=-melf_x86_64 -Dset_preferred=1 -Dreplace_maxpagesize= -Dpreferred_base=0x0 -Dadd_bounds_vars=ON -P $<
+
+
 vpath %.c $(DYNAMORIO_SRC_DIR)
 
 
@@ -144,12 +149,13 @@ $(EDGE_OBJS): %.o: %.c
 
 
 ######## building libdynamorio ########
-$(ENCLAVE_NAME): dynamorio_t.o $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(EDGE_OBJS)
+$(ENCLAVE_NAME): dynamorio_t.o $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(EDGE_OBJS) ${DYNAMORIO_LDSCRIPT}
 	$(LD) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_LD_FLAGS) $(DYNAMORIO_LD_FLAGS) $(SGX_DYNAMORIO_LD_FLAGS) -o $@ $(EDGE_OBJS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o
 	#$(CP) $@ $@.full
 	#$(OBJCOPY) --only-keep-debug $@ $@.debug
 	#$(OBJCOPY) --add-gnu-debuglink=$@.debug $@
 	#$(STRIP) -g -x $@
+
 
 
 $(SIGNED_ENCLAVE_NAME): $(ENCLAVE_NAME)

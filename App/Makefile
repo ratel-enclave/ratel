@@ -87,7 +87,11 @@ endif
 
 .PHONY: all clean
 
+APP_NAME		:= libapp.so
+all: $(APP_NAME)
 
+
+######## App Objects ########
 APP_AS_SRCS	:= startup/x86.asm
 APP_AS_ASMS	:= $(patsubst %,%.s,$(APP_AS_SRCS))
 APP_AS_OBJS	:= $(patsubst %,%.o,$(APP_AS_SRCS))
@@ -96,34 +100,28 @@ APP_AS_FALG	:= $(BASIC_AS_FLAGS)
 
 APP_CXX_SRCS 	:= App.c syscall.c
 APP_CXX_OBJS 	:= $(APP_CXX_SRCS:.c=.o)
-APP_NAME		:= libapp.so
-
-
-all: $(APP_NAME)
-
-
-######## App Objects ########
 
 %.asm:
 $(APP_AS_OBJS): %.asm.o: %.asm
 	@${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $<.s
 	@${CMAKE} -Dfile=$<.s -P "CMake_asm.cmake"
-	@$(AS) $(APP_AS_FALG) -c $<.s -o $@
+	$(AS) $(APP_AS_FALG) -c $<.s -o $@
 
-dynamorio_u.c: $(SGX_EDGER8R) ../Enclave/dynamorio.edl
+dynamorio_u.c dynamorio_u.h: $(SGX_EDGER8R) ../Enclave/dynamorio.edl
 	$(SGX_EDGER8R) --untrusted ../Enclave/dynamorio.edl --search-path ../Enclave --search-path $(SGX_SDK)/include
 	@echo "GEN  =>  $@"
 
-dynamorio_u.o: dynamorio_u.c
+dynamorio_u.o: dynamorio_u.c dynamorio_u.h
 	@$(CC) $(APP_CC_FLAGS) -c $< -o $@
 	@echo "CC   <=  $<"
 
 %.o: %.c
-	@$(CXX) $(APP_CXX_FLAGS) -c $< -o $@
+	$(CXX) $(APP_CXX_FLAGS) -c $< -o $@
 	@echo "CXX  <=  $<"
 
+APP_LDSCRIPT    := app.ldscript
 $(APP_NAME): dynamorio_u.o $(APP_CXX_OBJS) $(APP_AS_OBJS)
-	@$(CXX) $^ -o $@ $(APP_LINK_FLAGS)
+	$(CXX) $^ -Wl,-dT,$(APP_LDSCRIPT) -o $@ $(APP_LINK_FLAGS)
 	@echo "LINK =>  $@"
 
 clean:
