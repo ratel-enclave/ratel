@@ -56,14 +56,21 @@ enclave {
 
 
         /* system call */
+        /*P represents pointer and T represents a data structure */
+        /*V0: just a void* pointer, can be treated as a integer value*/
+        /*V1: IN void* pointer, pointing to a buffer, see SYS_write*/
+        /*V2: OUT void* pointer, pointing to a buffer, see SYS_read*/
+        /*V3: INOUT void* pointer, pointing to a buffer*/
+        /*The same rules applied on T0, T1, T2, T3*/
+
         //void ocall_all_syscalls([in, string] const char *str);
 
         long ocall_syscall_0(long sysno);
 
 
-        long ocall_syscall_1_str(long sysno, [in, string] char *str);
+        long ocall_syscall_1_S(long sysno, [in, string] char *S);
         /*long ocall_syscall_1_pint(long sysno, [in, out] long* pval);*/
-        /*long ocall_syscall_1_int(long sysno, long val);*/
+        long ocall_syscall_1_N(long sysno, long N1);
         /*long ocall_syscall_1_not(long sysno, long unimplemented);*/
         /*long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);*/
         //long ocall_syscall_1_uname(long sysno, struct old_utsname* uname);
@@ -74,13 +81,22 @@ enclave {
         //long ocall_syscall_2_V0N(long sysno, [user_check] void *V, long N);
         long ocall_syscall_2_NN(long sysno, long N1, long N2);
         long ocall_syscall_2_V1N(long sysno, [in, size=len] void *V, int len, long N);
+        long ocall_syscall_2_V2N(long sysno, [out, size=len] void *V, int len, long N);
 
-        /*V0: just a void* pointer*/
-        /*V1: IN void* pointer*/
-        /*V2: OUT void* pointer*/
-        /*V3: INOUT void* pointer*/
+
         /*syscalls with 3 paramters*/
+        long ocall_syscall_3_V0NN(long sysno, long V, long N1, long N2);
+        long ocall_syscall_3_NV1N(long sysno, long N1, [out, size=N2] void *V, long N2);
+        long ocall_syscall_3_NT2N(long sysno, long N1, [in, size=l] void *T, long l, long N2);
         long ocall_syscall_3_NV2N(long sysno, long N1, [out, size=N2] void *V, long N2);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
+
+        /*syscalls with 5 paramters*/
+        long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5);
+
+        /*syscalls with 6 paramters*/
+        long ocall_syscall_6_V0NNNNN(long sysno, long V0, long N1, long N2, long N3, long N4, long N5);
+
+
     };
 };

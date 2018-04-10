@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 # include <unistd.h>
 # include <pwd.h>
@@ -342,6 +343,15 @@ void ocall_print_syscallname(long sysno)
         printf("%s, %d\n", syscall_name[sysno], (int)sysno);
 }
 
+/* system calls */
+void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
+{
+    if (implemented)
+        printf("%s: return 0x%lx\n", fname, ret);
+    else
+        printf("sysno: %-4d not implemented!\n", (int)sysno);
+}
+
 
 //void _syscall_exit(void)
 //{
@@ -352,15 +362,32 @@ void ocall_print_syscallname(long sysno)
 //all syscalls without parameters
 long ocall_syscall_0(long sysno)
 {
-    printf("%s\n", __FUNCTION__);
-    return syscall(sysno);
+    long ret;
+
+    if (sysno == SYS_getpid) {
+        ret = syscall(sysno);
+        printf("%s: return 0x%lx\n", __FUNCTION__, ret);
+    }
+    else
+        printf("Not implemented for sysno: %ld !\n", sysno);
+
+
+    return ret;
 }
 
 
-long ocall_syscall_1_str(long sysno, char *str)
+long ocall_syscall_1_S(long sysno, char *S)
 {
-    printf("%s\n", __FUNCTION__);
-    return syscall(sysno, str);
+    long ret;
+
+    if (sysno == SYS_unlink) {
+        ret = syscall(sysno, S);
+        printf("%s: return 0x%lx\n", __FUNCTION__, ret);
+    }
+    else
+        printf("Not implemented for sysno: %ld !\n", sysno);
+
+    return ret;
 }
 
 
@@ -370,10 +397,24 @@ long ocall_syscall_1_str(long sysno, char *str)
 /*}*/
 
 
-/*long ocall_syscall_1_int(long sysno, long val)*/
-/*{*/
-/*return syscall(sysno, val);*/
-/*}*/
+long ocall_syscall_1_N(long sysno, long N1)
+{
+    long ret;
+    bool b = false;
+
+    switch (sysno) {
+        case SYS_close:
+        case SYS_exit_group:
+        case SYS_exit:
+            ret = syscall(sysno, N1);
+            b = true;
+            break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 
 /*long ocall_syscall_1_not(long sysno, long unimplemented)*/
 /*{*/
@@ -414,36 +455,91 @@ long ocall_syscall_1_str(long sysno, char *str)
 long ocall_syscall_2_NN(long sysno, long N1, long N2)
 {
     long ret = 0;
+    bool b = false;
 
     if (sysno == SYS_munmap) {
         ret = syscall(sysno, N1, N2);
+        b = true;
     }
 
-    printf("%s\n", __FUNCTION__);
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
     return ret;
 }
 
 long ocall_syscall_2_V1N(long sysno, void *V, int len, long N)
 {
     long ret = 0;
+    bool b = false;
 
     if (sysno == SYS_open) {
         ret = syscall(sysno, (char*)V, N);
+        b = true;
     }
 
-    printf("%s\n", __FUNCTION__);
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
     return ret;
+}
+
+long ocall_syscall_2_V2N(long sysno, void *V, int len, long N)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_gettimeofday) {
+        ret = syscall(sysno, V, N);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_V0NN(long sysno, long V, long N1, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_mprotect) {
+        ret = syscall(sysno, V, N1, N2);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+
 }
 
 long ocall_syscall_3_NV2N(long sysno, long N1, void *V, long N2)
 {
     long ret = 0;
+    bool b = false;
 
     if (sysno == SYS_read) {
         ret = syscall(sysno, N1, V, N2);
+        b = true;
     }
 
-    printf("%s\n", __FUNCTION__);
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_NT2N(long sysno, long N1, void *T, long l, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_getdents) {
+            ret = syscall(sysno, N1, T, N2);
+            b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
     return ret;
 
 }
@@ -451,13 +547,62 @@ long ocall_syscall_3_NV2N(long sysno, long N1, void *V, long N2)
 long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
 {
     long ret = 0;
+    bool b = false;
 
     if (sysno == SYS_open) {
         ret = syscall(sysno, S, N1, N2);
+        b = true;
     }
 
-    printf("%s\n", __FUNCTION__);
-    return ret;
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
 
+    return ret;
 }
 
+long ocall_syscall_3_NV1N(long sysno, long N1, void *V, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_write) {
+        ret = syscall(sysno, N1, V, N2);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+/*syscalls with 5 paramters*/
+long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_prctl) {
+        ret = syscall(sysno, N1, N2, N3, N4, N5);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+long ocall_syscall_6_V0NNNNN(long sysno, long V0, long N1, long N2, long N3, long N4, long N5)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_mmap) {
+        ret = syscall(sysno, V0, N1, N2, N3, N4, N5);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}

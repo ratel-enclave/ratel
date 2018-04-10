@@ -1614,7 +1614,7 @@ privload_mem_is_elf_so_header(byte *mem)
 /* Returns false if the text-data gap is not empty.  Else, fills the gap with
  * no-access mappings and returns true.
  */
-static bool
+bool
 dynamorio_lib_gap_empty(void)
 {
     /* XXX: get_dynamorio_dll_start() is already calling
@@ -1885,10 +1885,11 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
      * under the assumption that it's rare and we're not paying this cost
      * very often.
      */
-    if (!dynamorio_lib_gap_empty()) {
-        reload_dynamorio(sp, get_dynamorio_dll_start(), get_dynamorio_dll_end());
-        ASSERT_NOT_REACHED();
-    }
+    /*No need to do this check!*/
+    /*if (!dynamorio_lib_gap_empty()) {*/
+        /*reload_dynamorio(sp, get_dynamorio_dll_start(), get_dynamorio_dll_end());*/
+        /*ASSERT_NOT_REACHED();*/
+    /*}*/
 
     exe_map = elf_loader_map_phdrs(&exe_ld,
                                    /* fixed at preferred address,

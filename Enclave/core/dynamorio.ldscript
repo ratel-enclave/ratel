@@ -218,5 +218,5 @@ SECTIONS
   .debug_macro    0 : { *(.debug_macro) }
   .gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
   /DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) }
-  PROVIDE(dynamorio_so_start = 0x7ffff3000000); PROVIDE(dynamorio_so_end = 0x7ffff365beb0);
+  PROVIDE(dynamorio_so_start = __executable_start); PROVIDE(dynamorio_so_end = end);
 }

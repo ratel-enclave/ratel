@@ -111,7 +111,7 @@ dynamorio_u.c dynamorio_u.h: $(SGX_EDGER8R) ../Enclave/dynamorio.edl
 	$(SGX_EDGER8R) --untrusted ../Enclave/dynamorio.edl --search-path ../Enclave --search-path $(SGX_SDK)/include
 	@echo "GEN  =>  $@"
 
-dynamorio_u.o: dynamorio_u.c dynamorio_u.h
+dynamorio_u.o: dynamorio_u.c dynamorio_u.h syscall.c
 	@$(CC) $(APP_CC_FLAGS) -c $< -o $@
 	@echo "CC   <=  $<"
 
