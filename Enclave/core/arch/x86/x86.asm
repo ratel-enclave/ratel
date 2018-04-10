@@ -1920,8 +1920,8 @@ GLOBAL_LABEL(cpuid_supported:)
  * Executes cpuid instr, which is hard for x64 inline asm b/c clobbers rbx and can't
  * push in middle of func.
  */
-        DECLARE_FUNC(our_cpuid)
-GLOBAL_LABEL(our_cpuid:)
+        DECLARE_FUNC(org_our_cpuid)
+GLOBAL_LABEL(org_our_cpuid:)
         mov      REG_XAX, ARG1
         mov      REG_XDX, ARG2
         mov      REG_XCX, ARG3
@@ -1938,7 +1938,7 @@ GLOBAL_LABEL(our_cpuid:)
         pop      REG_XDI /* callee-saved */
         pop      REG_XBX /* callee-saved */
         ret
-        END_FUNC(our_cpuid)
+        END_FUNC(org_our_cpuid)
 
 /* We could use inline asm on Linux but it's cleaner to share the same code: */
 /* void dr_stmxcsr(uint *val) */

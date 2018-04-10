@@ -54,6 +54,9 @@ enclave {
         void ocall_print_str([in, string] const char *str);
         void ocall_print_syscallname(long sysno);
 
+        /* CPUID */
+        void ocall_cpuid_3_T2NN([out, size=l] void *T, int l, int eax, int ecx);
+
 
         /* system call */
         /*P represents pointer and T represents a data structure */
@@ -82,6 +85,8 @@ enclave {
         long ocall_syscall_2_NN(long sysno, long N1, long N2);
         long ocall_syscall_2_V1N(long sysno, [in, size=len] void *V, int len, long N);
         long ocall_syscall_2_V2N(long sysno, [out, size=len] void *V, int len, long N);
+        long ocall_syscall_2_NT1(long sysno, long N, [in, size=len] void *V, int len);
+        long ocall_syscall_2_NT2(long sysno, long N, [out, size=len] void *V, int len);
 
 
         /*syscalls with 3 paramters*/

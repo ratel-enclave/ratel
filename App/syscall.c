@@ -14,6 +14,29 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
+
+//Please make me beautiful
+void ocall_cpuid_3_T2NN(void *T, int l, int eax, int ecx)
+{
+    int a, b, c,d;
+
+    asm volatile (
+            "\tmov %4, %%eax\n" \
+            "\tmov %5, %%ecx\n" \
+            "\tcpuid\n" \
+            "\tmov %%eax, %0\n" \
+            "\tmov %%ebx, %1\n" \
+            "\tmov %%ecx, %2\n" \
+            "\tmov %%edx, %3\n" \
+            :"=m"(a), "=m"(b),"=m"(c),"=m"(d): "rm"(eax), "rm"(ecx));
+    ((int*)T)[0] = a;
+    ((int*)T)[1] = b;
+    ((int*)T)[2] = c;
+    ((int*)T)[3] = d;
+    printf("%s\n", __FUNCTION__);
+}
+
+
 char *syscall_name[] = {
     "read",
     "write",
@@ -497,6 +520,36 @@ long ocall_syscall_2_V2N(long sysno, void *V, int len, long N)
     return ret;
 }
 
+long ocall_syscall_2_NT1(long sysno, long N, void *V, int len)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_setrlimit) {
+        ret = syscall(sysno, N, V);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_2_NT2(long sysno, long N, void *V, int len)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_getrlimit) {
+        ret = syscall(sysno, N, V);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_3_V0NN(long sysno, long V, long N1, long N2)
 {
     long ret = 0;
@@ -518,9 +571,12 @@ long ocall_syscall_3_NV2N(long sysno, long N1, void *V, long N2)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_read) {
-        ret = syscall(sysno, N1, V, N2);
-        b = true;
+    switch (sysno) {
+        case SYS_read:
+        case SYS_getdents:
+            ret = syscall(sysno, N1, V, N2);
+            b = true;
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -533,9 +589,9 @@ long ocall_syscall_3_NT2N(long sysno, long N1, void *T, long l, long N2)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_getdents) {
-            ret = syscall(sysno, N1, T, N2);
-            b = true;
+    if (false) {
+        ret = syscall(sysno, N1, T, N2);
+        b = true;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);

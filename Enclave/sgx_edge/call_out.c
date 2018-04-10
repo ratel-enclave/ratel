@@ -21,6 +21,11 @@ void* gen_enclave_copy(void *org, int len)
     }
 }
 
+/*CPUID*/
+void our_cpuid(int res[4], int eax, int ecx)
+{
+    ocall_cpuid_3_T2NN(res, sizeof(int)*4, eax, ecx);
+}
 
 //__attribute__((stdcall)) long simulate_syscall_inst(int sysno)
 //rdi, rsi, rdx, r10, r8, r9
@@ -147,14 +152,26 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
 {
     long ret = 0;
 
-    if (sysno == SYS_munmap) {
+    switch (sysno) {
+        case SYS_munmap:
         //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
         ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
-    }
-    else if (sysno == SYS_gettimeofday) {
+        break;
+
+        case SYS_gettimeofday:
         //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
         ocall_syscall_2_V2N(&ret, sysno, (void*)_rdi, 16,  _rsi);
+        break;
+
+        case SYS_getrlimit:
+        ocall_syscall_2_NT2(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
+        break;
+
+        case SYS_setrlimit:
+        ocall_syscall_2_NT1(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
+        break;
     }
+
     return ret;
 }
 
@@ -188,7 +205,8 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_getdents:
-            ocall_syscall_3_NT2N(&ret, sysno, _rdi, (void*)_rsi, len_linux_dirent, _rdx);
+            /*ocall_syscall_3_NT2N(&ret, sysno, _rdi, (void*)_rsi, len_linux_dirent, _rdx);*/
+            ocall_syscall_3_NV2N(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
     }
 
@@ -256,6 +274,8 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
             //Two paramters
         case SYS_munmap:
         case SYS_gettimeofday:
+        case SYS_getrlimit:
+        case SYS_setrlimit:
             return simulate_syscall_inst_2(sysno, _rdi, _rsi);
             break;
 
