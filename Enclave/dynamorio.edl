@@ -77,6 +77,7 @@ enclave {
         /*long ocall_syscall_1_not(long sysno, long unimplemented);*/
         /*long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);*/
         //long ocall_syscall_1_uname(long sysno, struct old_utsname* uname);
+        long ocall_syscall_1_T2(long sysno, [out, size=l] void *T, int l);
         //long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info);
         //long ocall_syscall_1_timex(long sysno,, struct timex* time);
 
@@ -90,18 +91,22 @@ enclave {
 
 
         /*syscalls with 3 paramters*/
+        long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
         long ocall_syscall_3_V0NN(long sysno, long V, long N1, long N2);
         long ocall_syscall_3_NV1N(long sysno, long N1, [out, size=N2] void *V, long N2);
+        long ocall_syscall_3_NT1T3(long sysno, long N1, [in, size=l1] void *T1, long l1, [in, out, size=l2] void *T2, long l2);
         long ocall_syscall_3_NT2N(long sysno, long N1, [in, size=l] void *T, long l, long N2);
         long ocall_syscall_3_NV2N(long sysno, long N1, [out, size=N2] void *V, long N2);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
+
+        /*syscalls with 4 paramters*/
+        long ocall_syscall_4_NT1T3N(long sysno, long N1, [in, size=l1] void *T1, long l1, [in, out, size=l2] void *T2, long l2, long N2);
 
         /*syscalls with 5 paramters*/
         long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5);
 
         /*syscalls with 6 paramters*/
         long ocall_syscall_6_V0NNNNN(long sysno, long V0, long N1, long N2, long N3, long N4, long N5);
-
-
+        long ocall_syscall_6_V2NNT1V2N(long sysno, [out] int* V1, long N1, long N2, [in, size=l] void *T, long l, [out] int *V2, long N3);
     };
 };

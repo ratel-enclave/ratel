@@ -127,7 +127,7 @@ long simulate_syscall_inst_1(long sysno, long _rdi)
             break;
 
         case SYS_uname:
-            //ocall_syscall_1_uname(&ret, sysno, (struct old_utsname*)_rdi);
+            ocall_syscall_1_T2(&ret, sysno, (void*)_rdi, len_utsname);
             break;
 
         case SYS_sysinfo:
@@ -192,6 +192,10 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             break;
 
+        case SYS_tgkill:
+            ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
+            break;
+
         case SYS_read:
             ocall_syscall_3_NV2N(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
@@ -205,9 +209,9 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_getdents:
-            /*ocall_syscall_3_NT2N(&ret, sysno, _rdi, (void*)_rsi, len_linux_dirent, _rdx);*/
             ocall_syscall_3_NV2N(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
+
     }
 
     return ret;
@@ -216,6 +220,18 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
 long simulate_syscall_inst_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 {
     long ret = 0;
+
+    switch(sysno) {
+        case SYS_rt_sigaction:
+            ocall_syscall_4_NT1T3N(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
+            break;
+
+        case SYS_rt_sigprocmask:
+            ocall_syscall_4_NT1T3N(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
+            break;
+
+    }
+
     return ret;
 }
 
@@ -234,8 +250,14 @@ long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _
 {
     long ret = 0;
 
-    if (sysno == SYS_mmap) {
+    switch (sysno) {
+        case SYS_mmap:
         ocall_syscall_6_V0NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
+        break;
+
+        case SYS_futex:
+        ocall_syscall_6_V2NNT1V2N(&ret, sysno, (int*)_rdi, _rsi, _rdx, (void*)_r10, len_timespec, (int*) _r8, _r9);
+        break;
     }
 
     return ret;
@@ -258,6 +280,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
 
         //No parameters
         case SYS_getpid:
+        case SYS_gettid:
             return simulate_syscall_inst_0(sysno);
             break;
 
@@ -267,6 +290,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_unlink:
         case SYS_exit:
         case SYS_exit_group:
+        case SYS_uname:
             return simulate_syscall_inst_1(sysno, _rdi);
             break;
 
@@ -281,12 +305,20 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
 
 
             //Three paramters
+        case SYS_tgkill:
         case SYS_open:
         case SYS_read:
         case SYS_write:
         case SYS_mprotect:
         case SYS_getdents:
             return simulate_syscall_inst_3(sysno, _rdi, _rsi, _rdx);
+            break;
+
+
+            //Four parameters
+        case SYS_rt_sigaction:
+        case SYS_rt_sigprocmask:
+            return simulate_syscall_inst_4(sysno, _rdi, _rsi, _rdx, _r10);
             break;
 
 
@@ -297,6 +329,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
 
             //Six parameters
         case SYS_mmap:
+        case SYS_futex:
             return simulate_syscall_inst_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
             break;
     }

@@ -42,7 +42,7 @@
 #define len_off_t 8
 #define len_pid_t 4
 #define len_siginfo_t 128
-#define len_sigset_t 8
+#define len_kernel_sigset 8
 #define len_size_t 8
 #define len_stack_t 24
 #define len_epoll_event 16
@@ -61,7 +61,7 @@
 #define len_msgbuf 16
 #define len_msghdr 88
 #define len_msqid_ds 104
-#define len_old_utsname 325
+#define len_utsname 390
 #define len_perf_event_attr 112
 #define len_pollfd 8
 #define len_pollfd 8
@@ -73,7 +73,8 @@
 #define len_sched_param 4
 #define len_sembuf 6
 #define len_shmid_ds 88
-#define len_sigaction 32
+#define len_kernel_sigaction 32
+#define len_sigaction 152
 #define len_sigevent 64
 #define len_siginfo 128
 #define len_sockaddr 16
