@@ -185,7 +185,7 @@ privload_mod_tls_init(privmod_t *mod);
 DYNAMORIO_EXPORT void
 dr_gdb_add_symbol_file(const char *filename, app_pc textaddr)
 {
-    /* Do nothing.  If gdb is attached with libenclave.so-gdb.py loaded, it
+    /* Do nothing.  If gdb is attached with libdynamorio.so-gdb.py loaded, it
      * will stop here and lift the argument values.
      */
     /* FIXME: This only passes the text section offset.  gdb can accept
@@ -243,7 +243,7 @@ os_loader_init_prologue(void)
 
     privload_init_search_paths();
 #ifndef STATIC_LIBRARY
-    /* insert libenclave.so */
+    /* insert libdynamorio.so */
     mod = privload_insert(NULL,
                           get_dynamorio_dll_start(),
                           get_dynamorio_dll_end() - get_dynamorio_dll_start(),
@@ -863,7 +863,7 @@ get_private_library_address(app_pc modbase, const char *name)
         ASSERT(!DYNAMO_OPTION(early_inject));
         return dlsym(modbase, name);
 #else
-        /* Only libenclave.so is externally_loaded and we should not be querying
+        /* Only libdynamorio.so is externally_loaded and we should not be querying
          * for it.  Unknown libs shouldn't be queried here: get_proc_address should
          * be used instead.
          */
@@ -1554,7 +1554,7 @@ privload_get_os_privmod_data(app_pc base, OUT os_privmod_data_t *opd)
     /* At this point one could consider returning false if the load_delta
      * is zero. However, this optimisation was found to give only a small
      * benefit, and is not safe if RELA relocations are in use. In particular,
-     * it did not work on AArch64 when libenclave.so was built with the BFD
+     * it did not work on AArch64 when libdynamorio.so was built with the BFD
      * linker from Debian's binutils 2.26-8.
      */
 
@@ -1753,7 +1753,7 @@ reload_dynamorio(void **init_sp, app_pc conflict_start, app_pc conflict_end)
         }
     }
 
-    /* Now load the 2nd libenclave.so */
+    /* Now load the 2nd libdynamorio.so */
     dr_map = elf_loader_map_phdrs(&dr_ld, false /*!fixed*/, os_map_file,
                                   os_unmap_file, os_set_protection, 0/*!reachable*/);
     ASSERT(dr_map != NULL);

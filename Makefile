@@ -31,13 +31,14 @@
 
 include buildenv.mk
 
+
 .PHONY: all drrun app enclave clean
 
 
 all: drrun app enclave
 	@cp Drrun/drrun .
 	@cp App/libapp.so .
-	@cp Enclave/libdynamorio.signed.so .
+	@cp Enclave/libdynamorio.signed.so libdynamorio.so
 
 
 drrun:
@@ -56,11 +57,4 @@ clean:
 	make -C Drrun clean
 	make -C App clean
 	make -C Enclave clean
-	@rm drrun libapp.so libdynamorio.signed.so
-
-run: all
-ifneq ($(BUILD_MODE), HW_RELEASE)
-	@$(CURDIR)/$(App_Name)
-	@echo "RUN  =>  $(App_Name) [$(SGX_MODE)|$(SGX_ARCH), OK]"
-endif
-
+	@rm -rf drrun libapp.so libdynamorio.so

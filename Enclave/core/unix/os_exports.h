@@ -55,7 +55,7 @@
 # define DYNAMORIO_LIBRARY_NAME "libenclave.dylib"
 # define DYNAMORIO_PRELOAD_NAME "libdrpreload.dylib"
 #else
-# define DYNAMORIO_LIBRARY_NAME "libenclave.so"
+# define DYNAMORIO_LIBRARY_NAME "libdynamorio.so"
 # define DYNAMORIO_PRELOAD_NAME "libdrpreload.so"
 #endif
 

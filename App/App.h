@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "sgx_error.h"       /* sgx_status_t */
+#include "sgx_error.h"   /* sgx_status_t */
 #include "sgx_eid.h"     /* sgx_enclave_id_t */
 
 #ifndef TRUE
@@ -50,7 +50,7 @@
 #endif
 
 # define TOKEN_FILENAME   "dynamorio.token"
-# define ENCLAVE_FILENAME "libdynamorio.signed.so"
+# define ENCLAVE_FILENAME "libdynamorio.so"
 
 extern sgx_enclave_id_t global_eid;    /* global enclave id */
 

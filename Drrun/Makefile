@@ -133,4 +133,4 @@ $(BUILD_DIR):
 clean:
 	@rm	-rf $(BUILD_DIR)
 	@rm	-rf $(BLD_DIR)
-	@rm	drrun*
+	@rm	-rf drrun
