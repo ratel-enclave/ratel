@@ -24,7 +24,7 @@ void* gen_enclave_copy(void *org, int len)
 /*CPUID*/
 void our_cpuid(int res[4], int eax, int ecx)
 {
-    ocall_cpuid_3_T2NN(res, sizeof(int)*4, eax, ecx);
+    ocall_cpuid_3_ToNN(res, sizeof(int)*4, eax, ecx);
 }
 
 //__attribute__((stdcall)) long simulate_syscall_inst(int sysno)
@@ -127,7 +127,7 @@ long simulate_syscall_inst_1(long sysno, long _rdi)
             break;
 
         case SYS_uname:
-            ocall_syscall_1_T2(&ret, sysno, (void*)_rdi, len_utsname);
+            ocall_syscall_1_To(&ret, sysno, (void*)_rdi, len_utsname);
             break;
 
         case SYS_sysinfo:
@@ -153,23 +153,27 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
     long ret = 0;
 
     switch (sysno) {
+        case SYS_fstat:
+            ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_stat);
+            break;
+
         case SYS_munmap:
-        //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
-        ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
-        break;
+            //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
+            ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
+            break;
 
         case SYS_gettimeofday:
-        //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
-        ocall_syscall_2_V2N(&ret, sysno, (void*)_rdi, 16,  _rsi);
-        break;
+            //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
+            ocall_syscall_2_ToN(&ret, sysno, (void*)_rdi, 16,  _rsi);
+            break;
 
         case SYS_getrlimit:
-        ocall_syscall_2_NT2(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
-        break;
+            ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
+            break;
 
         case SYS_setrlimit:
-        ocall_syscall_2_NT1(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
-        break;
+            ocall_syscall_2_NTi(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
+            break;
     }
 
     return ret;
@@ -197,11 +201,11 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_read:
-            ocall_syscall_3_NV2N(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
 
         case SYS_write:
-            ocall_syscall_3_NV1N(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
 
         case SYS_mprotect:
@@ -209,7 +213,7 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_getdents:
-            ocall_syscall_3_NV2N(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
 
     }
@@ -222,12 +226,13 @@ long simulate_syscall_inst_4(long sysno, long _rdi, long _rsi, long _rdx, long _
     long ret = 0;
 
     switch(sysno) {
+
         case SYS_rt_sigaction:
-            ocall_syscall_4_NT1T3N(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
+            ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
             break;
 
         case SYS_rt_sigprocmask:
-            ocall_syscall_4_NT1T3N(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
+            ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
             break;
 
     }
@@ -252,12 +257,12 @@ long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _
 
     switch (sysno) {
         case SYS_mmap:
-        ocall_syscall_6_V0NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
-        break;
+            ocall_syscall_6_V0NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
+            break;
 
         case SYS_futex:
-        ocall_syscall_6_V2NNT1V2N(&ret, sysno, (int*)_rdi, _rsi, _rdx, (void*)_r10, len_timespec, (int*) _r8, _r9);
-        break;
+            ocall_syscall_6_PoNNTiPoN(&ret, sysno, (int*)_rdi, _rsi, _rdx, (void*)_r10, len_timespec, (int*) _r8, _r9);
+            break;
     }
 
     return ret;
@@ -296,6 +301,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
 
 
             //Two paramters
+        case SYS_fstat:
         case SYS_munmap:
         case SYS_gettimeofday:
         case SYS_getrlimit:

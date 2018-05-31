@@ -27,9 +27,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- */
+*/
 
 /* Enclave.edl - Top EDL file. */
+
+
+
+//  int gettimeofday(struct timeval *tv, struct timezone *tz);
+//  int settimeofday(const struct timeval *tv, const struct timezone *tz);
+
 
 enclave {
     trusted {
@@ -42,7 +48,7 @@ enclave {
          */
 
         //public void dynamorio_enclave_entry([in, out] int *val);
-        /*public void dyn_enclave_entry(int argc, [in] char *(*p_argv)[], [in] char *(*p_env)[]);*/
+        /********public void dyn_enclave_entry(int argc, [in] char *(*p_argv)[], [in] char *(*p_env)[]);********/
         public void dyn_enclave_entry(int argc, [in] char ***p_argv, [in] char ***p_env);
 
 
@@ -50,21 +56,21 @@ enclave {
     };
 
     untrusted {
-        /* These two functions are used for debuging */
+        /******** These two functions are used for debuging ********/
         void ocall_print_str([in, string] const char *str);
         void ocall_print_syscallname(long sysno);
 
-        /* CPUID */
-        void ocall_cpuid_3_T2NN([out, size=l] void *T, int l, int eax, int ecx);
+        /******** CPUID ********/
+        void ocall_cpuid_3_ToNN([out, size=l] void *T, int l, int eax, int ecx);
 
 
-        /* system call */
-        /*P represents pointer and T represents a data structure */
-        /*V0: just a void* pointer, can be treated as a integer value*/
-        /*V1: IN void* pointer, pointing to a buffer, see SYS_write*/
-        /*V2: OUT void* pointer, pointing to a buffer, see SYS_read*/
-        /*V3: INOUT void* pointer, pointing to a buffer*/
-        /*The same rules applied on T0, T1, T2, T3*/
+        /******** system call ********/
+        /********P represents a pointer and T represents a data structure ********/
+        /********V0: just a void* pointer, can be treated as a integer value********/
+        /********V1: IN void* pointer, pointing to a buffer, see SYS_write********/
+        /********To: OUT void* pointer, pointing to a buffer, see SYS_read********/
+        /********V3: INOUT void* pointer, pointing to a buffer********/
+        /********The same rules are applied on T0, Ti, To, T3********/
 
         //void ocall_all_syscalls([in, string] const char *str);
 
@@ -72,41 +78,52 @@ enclave {
 
 
         long ocall_syscall_1_S(long sysno, [in, string] char *S);
-        /*long ocall_syscall_1_pint(long sysno, [in, out] long* pval);*/
+        /********long ocall_syscall_1_pint(long sysno, [in, out] long* pval);********/
         long ocall_syscall_1_N(long sysno, long N1);
-        /*long ocall_syscall_1_not(long sysno, long unimplemented);*/
-        /*long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);*/
+        /********long ocall_syscall_1_not(long sysno, long unimplemented);********/
+        /********long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);********/
         //long ocall_syscall_1_uname(long sysno, struct old_utsname* uname);
-        long ocall_syscall_1_T2(long sysno, [out, size=l] void *T, int l);
+        long ocall_syscall_1_To(long sysno, [out, size=l] void *T, int l);  //uname(struct utsname *buf);
         //long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info);
         //long ocall_syscall_1_timex(long sysno,, struct timex* time);
 
-        /*syscalls with 2 paramters*/
+        /********syscalls with 2 paramters********/
         //long ocall_syscall_2_V0N(long sysno, [user_check] void *V, long N);
+        //SYS_munmap(void *addr, size_t length)
         long ocall_syscall_2_NN(long sysno, long N1, long N2);
-        long ocall_syscall_2_V1N(long sysno, [in, size=len] void *V, int len, long N);
-        long ocall_syscall_2_V2N(long sysno, [out, size=len] void *V, int len, long N);
-        long ocall_syscall_2_NT1(long sysno, long N, [in, size=len] void *V, int len);
-        long ocall_syscall_2_NT2(long sysno, long N, [out, size=len] void *V, int len);
+
+        long ocall_syscall_2_TiN(long sysno, [in, size=len] void *V, int len, long N);
+        //int gettimeofday(struct timeval *tv, struct timezone *tz=NULL);
+        long ocall_syscall_2_ToN(long sysno, [out, size=len] void *T, int len, long N);
+        //int fstat(int fd, struct stat *buf);
+        //int setrlimit(int resource, const struct rlimit *rlim);
+        long ocall_syscall_2_NTi(long sysno, long N, [in, size=len] void *V, int len);
+        //int getrlimit(int resource, struct rlimit *rlim);
+        long ocall_syscall_2_NTo(long sysno, long N, [out, size=len] void *V, int len);
 
 
-        /*syscalls with 3 paramters*/
+        /********syscalls with 3 paramters********/
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
         long ocall_syscall_3_V0NN(long sysno, long V, long N1, long N2);
-        long ocall_syscall_3_NV1N(long sysno, long N1, [out, size=N2] void *V, long N2);
-        long ocall_syscall_3_NT1T3(long sysno, long N1, [in, size=l1] void *T1, long l1, [in, out, size=l2] void *T2, long l2);
-        long ocall_syscall_3_NT2N(long sysno, long N1, [in, size=l] void *T, long l, long N2);
-        long ocall_syscall_3_NV2N(long sysno, long N1, [out, size=N2] void *V, long N2);
+        //long ocall_syscall_3_NTiT3(long sysno, long N1, [in, size=l1] void *T1, long l1, [in, out, size=l2] void *T2, long l2);
+        long ocall_syscall_3_NTiN(long sysno, long N1, [in, size=N2] void *T, long N2);
+        //ssize_t read(int fd, void *buf, size_t count);
+        //int getdents(unsigned int fd, struct linux_dirent *dirp, unsigned int count);
+        long ocall_syscall_3_NToN(long sysno, long N1, [out, size=N2] void *T, long N2);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
 
-        /*syscalls with 4 paramters*/
-        long ocall_syscall_4_NT1T3N(long sysno, long N1, [in, size=l1] void *T1, long l1, [in, out, size=l2] void *T2, long l2, long N2);
+        /********syscalls with 4 paramters********/
+        // int rt_sigaction(int signum, const struct sigaction *act, struct sigaction *oact, size_t sigsetsize)
+        long ocall_syscall_4_NTiToN(long sysno, long N1, [in, size=l1] void *T1, long l1, [out, size=l2] void *To, long l2, long N2);
 
-        /*syscalls with 5 paramters*/
+        /********syscalls with 5 paramters********/
         long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5);
 
-        /*syscalls with 6 paramters*/
+        /********syscalls with 6 paramters********/
+        //void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
         long ocall_syscall_6_V0NNNNN(long sysno, long V0, long N1, long N2, long N3, long N4, long N5);
-        long ocall_syscall_6_V2NNT1V2N(long sysno, [out] int* V1, long N1, long N2, [in, size=l] void *T, long l, [out] int *V2, long N3);
+
+        //int futex(int *uaddr, int futex_op, int val, const struct timespec *timeout, int *uaddr2, int val3);
+        long ocall_syscall_6_PoNNTiPoN(long sysno, [out] int* V1, long N1, long N2, [in, size=l] void *T, long l, [out] int *V2, long N3);
     };
 };
