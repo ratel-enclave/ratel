@@ -436,6 +436,24 @@ long ocall_syscall_1_N(long sysno, long N1)
     return ret;
 }
 
+long ocall_syscall_1_Ti(long sysno, void *T, int l)
+{
+    long ret;
+    bool b = false;
+
+    switch (sysno) {
+        case SYS_uname:
+        case SYS_set_thread_area:
+            ret = syscall(sysno, T);
+            b = true;
+            break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_1_To(long sysno, void *T, int l)
 {
     long ret;
@@ -443,6 +461,7 @@ long ocall_syscall_1_To(long sysno, void *T, int l)
 
     switch (sysno) {
         case SYS_uname:
+        case SYS_get_thread_area:
             ret = syscall(sysno, T);
             b = true;
             break;
@@ -494,39 +513,12 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_munmap) {
-        ret = syscall(sysno, N1, N2);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_TiN(long sysno, void *V, int len, long N)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_open) {
-        ret = syscall(sysno, (char*)V, N);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_ToN(long sysno, void *V, int len, long N)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_gettimeofday) {
-        ret = syscall(sysno, V, N);
-        b = true;
+    switch (sysno) {
+        case SYS_munmap:
+        case SYS_arch_prctl:
+            ret = syscall(sysno, N1, N2);
+            b = true;
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -557,9 +549,40 @@ long ocall_syscall_2_NTo(long sysno, long N, void *V, int len)
     switch (sysno) {
         case SYS_getrlimit:
         case SYS_fstat:
+        case SYS_arch_prctl:
             ret = syscall(sysno, N, V);
             b = true;
             break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_2_TiN(long sysno, void *V, int len, long N)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_open) {
+        ret = syscall(sysno, (char*)V, N);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_2_ToN(long sysno, void *V, int len, long N)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_gettimeofday) {
+        ret = syscall(sysno, V, N);
+        b = true;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);

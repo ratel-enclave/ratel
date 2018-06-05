@@ -104,6 +104,16 @@ long simulate_syscall_inst_1(long sysno, long _rdi)
             ocall_syscall_1_N(&ret, sysno, _rdi);
             break;
 
+        case SYS_get_thread_area:
+            /*int get_thread_area(struct user_desc *u_info);*/
+            ocall_syscall_1_To(&ret, sysno, (void*)_rdi, 16);
+            break;
+
+        case SYS_set_thread_area:
+            /*int set_thread_area(struct user_desc *u_info);*/
+            ocall_syscall_1_Ti(&ret, sysno, (void*)_rdi, 16);
+            break;
+
         case SYS_afs_syscall:
         case SYS_epoll_ctl_old:
         case SYS_epoll_wait_old:
@@ -114,8 +124,6 @@ long simulate_syscall_inst_1(long sysno, long _rdi)
         case SYS_tuxcall:
         case SYS_uselib:
         case SYS_vserver:
-        case SYS_get_thread_area:
-        case SYS_set_thread_area:
         case SYS_create_module:
         case SYS_get_kernel_syms:
         case SYS_query_module:
@@ -173,6 +181,18 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
 
         case SYS_setrlimit:
             ocall_syscall_2_NTi(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
+            break;
+
+        case SYS_arch_prctl:
+            /*int arch_prctl(int code, unsigned long addr);*/
+            /*int arch_prctl(int code, unsigned long *addr);*/
+            /*if (code == ARCH_SET_FS || code == ARCH_SET_GS)*/
+            if ((int)_rdi == 0x1002 || (int)_rdi == 0x1001)
+                ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
+            /*else if (code == ARCH_GET_FS || code == ARCH_GET_GS) */
+            else if ((int)_rdi == 0x1003 || (int)_rdi == 0x1004)
+                ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, sizeof(long));
+
             break;
     }
 
@@ -279,6 +299,9 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
     __asm("mov %%rax, %0": "=rm"(sysno):: );
     ocall_print_syscallname(sysno);
 
+    if (sysno == SYS_get_thread_area)
+    ocall_print_syscallname(sysno);
+
 
     /*fixing-up them with a sysno-to-function table*/
     switch (sysno) {
@@ -296,6 +319,8 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_exit:
         case SYS_exit_group:
         case SYS_uname:
+        case SYS_set_thread_area:
+        case SYS_get_thread_area:
             return simulate_syscall_inst_1(sysno, _rdi);
             break;
 
@@ -306,6 +331,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_gettimeofday:
         case SYS_getrlimit:
         case SYS_setrlimit:
+        case SYS_arch_prctl:
             return simulate_syscall_inst_2(sysno, _rdi, _rsi);
             break;
 

@@ -83,6 +83,7 @@ enclave {
         /********long ocall_syscall_1_not(long sysno, long unimplemented);********/
         /********long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);********/
         //long ocall_syscall_1_uname(long sysno, struct old_utsname* uname);
+        long ocall_syscall_1_Ti(long sysno, [in, size=l] void *T, int l);  //uname(struct utsname *buf);
         long ocall_syscall_1_To(long sysno, [out, size=l] void *T, int l);  //uname(struct utsname *buf);
         //long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info);
         //long ocall_syscall_1_timex(long sysno,, struct timex* time);
