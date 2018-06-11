@@ -3132,7 +3132,7 @@ os_heap_reserve(void *preferred, size_t size, heap_error_code_t *error_code,
                 bool executable)
 {
     void *p;
-    uint prot = PROT_NONE;
+    //uint prot = PROT_NONE;
 #ifdef VMX86_SERVER
     /* PR 365331: we need to be in the mmap_text region for code cache and
      * gencode (PROT_EXEC).
@@ -3161,10 +3161,11 @@ os_heap_reserve(void *preferred, size_t size, heap_error_code_t *error_code,
     /* FIXME: note that this memory is in fact still committed - see man mmap */
     /* FIXME: case 2347 on Linux or -vm_reserve should be set to false */
     /* FIXME: Need to actually get a mmap-ing with |MAP_NORESERVE */
-    p = mmap_syscall(preferred, size, prot, MAP_PRIVATE|MAP_ANONYMOUS
-                     IF_X64(| (DYNAMO_OPTION(heap_in_lower_4GB) ?
-                               MAP_32BIT : 0)),
-                     -1, 0);
+    // p = mmap_syscall(preferred, size, prot, MAP_PRIVATE|MAP_ANONYMOUS
+    //                  IF_X64(| (DYNAMO_OPTION(heap_in_lower_4GB) ?
+    //                            MAP_32BIT : 0)),
+    //                  -1, 0);
+    p = preferred;
     if (!mmap_syscall_succeeded(p)) {
         *error_code = -(heap_error_code_t)(ptr_int_t)p;
         LOG(GLOBAL, LOG_HEAP, 4,
