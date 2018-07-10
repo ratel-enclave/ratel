@@ -198,7 +198,8 @@ typedef struct _dr_pthread_t {
  * more work.  The comment above should be updated as well, as we do not use
  * the app's libc inside DR.
  */
-# define APP_LIBC_TLS_SIZE 0x400
+//# define APP_LIBC_TLS_SIZE 0x400
+# define APP_LIBC_TLS_SIZE 0x00
 #elif defined(AARCHXX)
 /* FIXME i#1551, i#1569: investigate the difference between ARM and X86 on TLS.
  * On ARM, it seems that TLS variables are not put before the thread pointer
@@ -262,11 +263,12 @@ privload_tls_init(void *app_tp)
     tcb_head_t *dr_tcb;
     uint i;
     size_t tls_bytes_read;
+    byte *seg;
 
     /* FIXME: These should be a thread logs, but dcontext is not ready yet. */
     LOG(GLOBAL, LOG_LOADER, 2, "%s: app TLS segment base is "PFX"\n",
         __FUNCTION__, app_tp);
-    dr_tp = heap_mmap(client_tls_alloc_size, VMM_SPECIAL_MMAP);
+    seg = dr_tp = heap_mmap(client_tls_alloc_size, VMM_SPECIAL_MMAP);
     ASSERT(APP_LIBC_TLS_SIZE + TLS_PRE_TCB_SIZE + tcb_size <= client_tls_alloc_size);
 #ifdef AARCHXX
     /* GDB reads some pthread members (e.g., pid, tid), so we must make sure
@@ -290,6 +292,7 @@ privload_tls_init(void *app_tp)
      * This copy can be avoided if we remove the DR's dependency on
      * libc.
      */
+
     if (app_tp != NULL &&
         !safe_read_ex(app_tp - APP_LIBC_TLS_SIZE - TLS_PRE_TCB_SIZE,
                       APP_LIBC_TLS_SIZE + TLS_PRE_TCB_SIZE + tcb_size,
@@ -337,7 +340,11 @@ privload_tls_init(void *app_tp)
         dynamo_memset(dest + opd->tls_image_size, 0,
                opd->tls_block_size - opd->tls_image_size);
     }
-    return dr_tp;
+    if (app_tp != NULL) {
+      init_slave_thread_data((thread_data_t *)seg);
+    }
+    //return dr_tp;
+    return seg;
 }
 
 void

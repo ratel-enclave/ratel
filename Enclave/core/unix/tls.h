@@ -269,6 +269,18 @@ get_dr_tls_base_addr(void);
 #endif
 
 #ifdef X86
+
+
+typedef struct thread_data_t thread_data_t;
+extern void init_slave_thread_data(thread_data_t *td);
+extern void update_fsbase(unsigned long base);
+extern void update_gsbase(unsigned long base);
+
+unsigned long read_fsbase(void);
+unsigned long read_gsbase(void);
+
+
+
 /* Assumes it's passed either SEG_FS or SEG_GS.
  * Returns POINTER_MAX on failure.
  */

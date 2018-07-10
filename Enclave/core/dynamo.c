@@ -2314,7 +2314,7 @@ dynamo_thread_init(byte *dstack_in, priv_mcontext_t *mc
     heap_thread_init(dcontext);
     DOSTATS({ stats_thread_init(dcontext); });
 #ifdef KSTATS
-    kstat_thread_init(dcontext);
+    //kstat_thread_init(dcontext);
 #endif
     os_thread_init(dcontext);
     arch_thread_init(dcontext);

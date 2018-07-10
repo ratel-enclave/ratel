@@ -106,6 +106,8 @@
 # endif /* INTERNAL */
 # define ASSERT_NOT_TESTED() SYSLOG_INTERNAL_WARNING_ONCE("Not tested @%s:%d", \
                                                           __FILE__, __LINE__)
+#define YPHASSERT(x) ASSERT(x)
+
 #else
 # define ASSERT(x)         ((void) 0)
 # define ASSERT_MESSAGE(level, msg, x) ASSERT(x)

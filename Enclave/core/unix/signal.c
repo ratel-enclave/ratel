@@ -324,7 +324,7 @@ unblock_all_signals(kernel_sigset_t *oset)
 {
     kernel_sigset_t set;
     kernel_sigemptyset(&set);
-    sigprocmask_syscall(SIG_SETMASK, &set, oset, sizeof(set));
+    //igprocmask_syscall(SIG_SETMASK, &set, oset, sizeof(set));
 }
 
 /* exported for stackdump.c */
@@ -469,7 +469,8 @@ signal_exit()
 #endif
 }
 
-#ifdef HAVE_SIGALTSTACK
+//#ifdef HAVE_SIGALTSTACK
+#if 0
 /* Separated out to run from the dstack (i#2016: see below). */
 static void
 set_our_alt_stack(void *arg)
@@ -512,7 +513,8 @@ signal_thread_init(dcontext_t *dcontext)
                                   true /* persistent */,
                                   pend_unit_size * DYNAMO_OPTION(max_pending_signals));
 
-#ifdef HAVE_SIGALTSTACK
+//#ifdef HAVE_SIGALTSTACK
+#if 0
     /* set up alternate stack
      * i#552 we may terminate the process without freeing the stack, so we
      * stack_alloc it to exempt from the memory leak check.

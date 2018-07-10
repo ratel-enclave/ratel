@@ -132,6 +132,19 @@ typedef struct _ibl_entry_pc_t {
 } ibl_entry_pc_t;
 #endif
 
+#ifdef X86
+
+typedef struct _sgxsdk_thread_data_t
+{
+    unsigned long  self_addr;
+    unsigned long  ul1[19];
+    void *tcs;                          /* Point to the TCS of current enclave thread */
+    struct _dr_thread_data_t *fsbase;   /* Store the latest value of fsbase and gsbase */
+    struct _dr_thread_data_t *gsbase;   /* Load them when EENTER */
+    unsigned long  ul2;
+} sgxsdk_thread_data_t;
+#endif
+
 /* All spill slots are grouped in a separate struct because with
  * -no_ibl_table_in_tls, only these slots are mapped to TLS (and the
  * table address/mask pairs are not).
@@ -163,10 +176,16 @@ typedef struct _spill_state_t {
 } spill_state_t;
 
 typedef struct _local_state_t {
+#ifdef X86
+    sgxsdk_thread_data_t td_space;
+#endif
     spill_state_t spill_space;
 } local_state_t;
 
 typedef struct _local_state_extended_t {
+#ifdef X86
+    sgxsdk_thread_data_t td_space;
+#endif
     spill_state_t spill_space;
     table_stat_state_t table_space;
 } local_state_extended_t;

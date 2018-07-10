@@ -549,7 +549,7 @@ long ocall_syscall_2_NTo(long sysno, long N, void *V, int len)
     switch (sysno) {
         case SYS_getrlimit:
         case SYS_fstat:
-        case SYS_arch_prctl:
+        case SYS_getitimer:
             ret = syscall(sysno, N, V);
             b = true;
             break;

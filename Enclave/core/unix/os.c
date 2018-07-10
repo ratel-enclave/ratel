@@ -1888,11 +1888,11 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
     /* If we're a non-initial thread, tls will be set to the parent's value,
      * or to &uninit_tls (i#2089), both of which will be is_dynamo_address().
      */
-    os_tls->app_lib_tls_base =
-        is_dynamo_address(app_lib_tls_base) ? NULL : app_lib_tls_base;
-    os_tls->app_alt_tls_base =
-        is_dynamo_address(app_alt_tls_base) ? NULL : app_alt_tls_base;
+    os_tls->app_lib_tls_base = is_dynamo_address(app_lib_tls_base) ? NULL : app_lib_tls_base;
+    os_tls->app_alt_tls_base = is_dynamo_address(app_alt_tls_base) ? NULL : app_alt_tls_base;
 
+    YPHASSERT(os_tls->app_lib_tls_base != NULL);
+    YPHASSERT(os_tls->app_alt_tls_base != NULL);
 #ifdef X86
     /* get all TLS thread area value */
     /* XXX: is get_thread_area supported in 64-bit kernel?
@@ -1914,8 +1914,7 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
     /* now allocate the tls segment for client libraries */
     if (IF_CLIENT_INTERFACE_ELSE(INTERNAL_OPTION(private_loader), false)) {
         os_tls->os_seg_info.priv_lib_tls_base =
-            IF_UNIT_TEST_ELSE(os_tls->app_lib_tls_base,
-                              privload_tls_init(os_tls->app_lib_tls_base));
+            IF_UNIT_TEST_ELSE(os_tls->app_lib_tls_base, privload_tls_init(os_tls->app_lib_tls_base));
     }
 
 #ifdef X86
@@ -1934,6 +1933,7 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
         os_tls->os_seg_info.priv_alt_tls_base,
         os_tls->os_seg_info.dr_tls_base);
 }
+
 
 void
 os_tls_init(void)
@@ -1957,6 +1957,9 @@ os_tls_init(void)
 
     /* MUST zero out dcontext slot so uninit access gets NULL */
     dynamo_memset(segment, 0, PAGE_SIZE);
+    #ifdef X86
+    init_slave_thread_data((thread_data_t*)segment);
+    #endif
     /* store key data in the tls itself */
     os_tls->self = os_tls;
     os_tls->tid = get_sys_thread_id();
@@ -1964,6 +1967,7 @@ os_tls_init(void)
 #ifdef X86
     os_tls->magic = TLS_MAGIC_VALID;
 #endif
+    ASSERT(os_tls->magic == TLS_MAGIC_VALID);
     /* We save DR's TLS segment base here so that os_get_dr_tls_base() will work
      * even when -no_mangle_app_seg is set.  If -mangle_app_seg is set, this
      * will be overwritten in os_tls_app_seg_init().
@@ -1978,6 +1982,11 @@ os_tls_init(void)
         os_tls_app_seg_init(os_tls, segment);
 
     tls_thread_init(os_tls, segment);
+    ASSERT((byte*)get_segment_base(SEG_TLS) == segment);
+    ASSERT(os_tls->os_seg_info.dr_tls_base == segment);
+    ASSERT(os_tls->magic == TLS_MAGIC_VALID);
+
+
     ASSERT(os_tls->tls_type != TLS_TYPE_NONE);
     /* store type in global var for convenience: should be same for all threads */
     tls_global_type = os_tls->tls_type;
@@ -2539,8 +2548,8 @@ os_swap_context(dcontext_t *dcontext, bool to_app, dr_state_flags_t flags)
 {
     if (os_should_swap_state())
         os_switch_seg_to_context(dcontext, LIB_SEG_TLS, to_app);
-    if (TEST(DR_STATE_DR_TLS, flags))
-        os_swap_dr_tls(dcontext, to_app);
+    //if (TEST(DR_STATE_DR_TLS, flags))
+    //    os_swap_dr_tls(dcontext, to_app);
 }
 
 void
@@ -9176,6 +9185,7 @@ find_executable_vm_areas(void)
             app_memory_allocation(NULL, iter.vm_start, (iter.vm_end - iter.vm_start),
                                   iter.prot, image _IF_DEBUG(map_type))) {
             count++;
+          break;
         }
 
     }

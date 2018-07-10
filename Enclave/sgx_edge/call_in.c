@@ -91,8 +91,7 @@ void call_libstart(int argc, char**argv, char** envp, void *libstart)
     /*"jmp *%3   \n\t"*/
     /*::"rm"(envp), "rm"(argv), "rm"((long)argc), "rm"(libstart));*/
 
-    asm volatile ("\n\t"
-            "mov %%rsp, %0   \n\t"
+    asm volatile ("mov %%rsp, %0   \n\t"
             "mov %1, %%rsp   \n\t"
             /*"xor %%rdi,%%rdi  \n\t"*/
             "jmp *%2   \n\t"

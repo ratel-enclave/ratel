@@ -679,8 +679,8 @@ arch_init(void)
      * This isn't self-descriptive, though, so it's not being used right now
      * (xref case 7097).
      */
-    ASSERT(offsetof(local_state_extended_t, spill_space) == 0);
-    ASSERT(offsetof(local_state_extended_t, table_space) == sizeof(spill_state_t));
+    ASSERT(offsetof(local_state_extended_t, spill_space) == sizeof(sgxsdk_thread_data_t));
+    ASSERT(offsetof(local_state_extended_t, table_space) == sizeof(sgxsdk_thread_data_t) + sizeof(spill_state_t));
 #ifdef WINDOWS
     /* syscalls_init() should have already set the syscall_method so go ahead
      * and create the globlal_do_syscall now */
