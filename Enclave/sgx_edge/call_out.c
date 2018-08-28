@@ -218,6 +218,9 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
         case SYS_getitimer:
             ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_itimerval);
             break;
+
+        case SYS_stat:
+            ocall_syscall_2_STo(&ret, sysno, (char*)_rdi, (void*)_rsi, len_stat);
     }
 
     return ret;
@@ -253,7 +256,7 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_mprotect:
-            ocall_syscall_3_V0NN(&ret, sysno, _rdi, _rsi, _rdx);
+            ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
             break;
 
         case SYS_getdents:
@@ -301,7 +304,7 @@ long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _
 
     switch (sysno) {
         case SYS_mmap:
-            ocall_syscall_6_V0NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
+            ocall_syscall_6_NNNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
             break;
 
         case SYS_futex:
@@ -313,7 +316,6 @@ long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _
 }
 
 
-//All syscalls with 1 parameters
     __attribute ((sysv_abi))
 long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
@@ -354,6 +356,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_setrlimit:
         case SYS_arch_prctl:
         case SYS_getitimer:
+        case SYS_stat:
             return simulate_syscall_inst_2(sysno, _rdi, _rsi);
             break;
 

@@ -590,37 +590,41 @@ long ocall_syscall_2_ToN(long sysno, void *V, int len, long N)
     return ret;
 }
 
+
+long ocall_syscall_2_STo(long sysno, const char *S, void *T, int l)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_stat) {
+        ret = syscall(sysno, S, T);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
 long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_tgkill) {
-        ret = syscall(sysno, N1, N2, N3);
-        b = true;
+    switch (sysno) {
+        case SYS_tgkill:
+        case SYS_mprotect:
+            ret = syscall(sysno, N1, N2, N3);
+            b = true;
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
-
 }
 
-long ocall_syscall_3_V0NN(long sysno, long V, long N1, long N2)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_mprotect) {
-        ret = syscall(sysno, V, N1, N2);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-
-}
 
 long ocall_syscall_3_NToN(long sysno, long N1, void *V, long N2)
 {
@@ -728,13 +732,13 @@ long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long 
 }
 
 
-long ocall_syscall_6_V0NNNNN(long sysno, long V, long N1, long N2, long N3, long N4, long N5)
+long ocall_syscall_6_NNNNNN(long sysno, long N1, long N2, long N3, long N4, long N5, long N6)
 {
     long ret = 0;
     bool b = false;
 
     if (sysno == SYS_mmap) {
-        ret = syscall(sysno, V, N1, N2, N3, N4, N5);
+        ret = syscall(sysno, N1, N2, N3, N4, N5, N6);
         b = true;
     }
 
