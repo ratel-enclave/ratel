@@ -1191,6 +1191,12 @@ bool bitmap_check_consistency(bitmap_t b, uint bitmap_size, uint expect_free);
 void print_log(file_t logfile, uint mask, uint level, const char *fmt, ...);
 void print_file(file_t f, const char *fmt, ...);
 
+#if defined(DEBUG)
+#define YPHPRINT(FMT, ...) LOG(GLOBAL, LOG_ALL, 0, "thread_%d:%s:%d:%s:" #FMT "\n", dynamorio_syscall(186, 0), __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#else
+#define YPHPRINT(...)
+#endif
+
 /* For repeated appending to a buffer.  The "sofar" var should be set
  * to 0 by the caller before the first call to print_to_buffer.
  */
