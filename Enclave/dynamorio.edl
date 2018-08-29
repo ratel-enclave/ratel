@@ -97,6 +97,7 @@ enclave {
         //SYS_munmap(void *addr, size_t length)
         long ocall_syscall_2_NN(long sysno, long N1, long N2);
 
+
         long ocall_syscall_2_TiN(long sysno, [in, size=l] void *T, int l, long N);
 
         //int gettimeofday(struct timeval *tv, struct timezone *tz=NULL);
@@ -108,6 +109,9 @@ enclave {
 
         //int getrlimit(int resource, struct rlimit *rlim);
         long ocall_syscall_2_NTo(long sysno, long N, [out, size=l] void *T, int l);
+
+        //int mkdir(const char *pathname, mode_t mode);
+        long ocall_syscall_2_SN(long sysno, [in, string] const char *S, long N1);
 
         //int stat(const char *pathname, struct stat *buf);
         long ocall_syscall_2_STo(long sysno, [in, string] const char *S, [out, size=l] void *T, int l);

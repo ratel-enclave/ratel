@@ -430,7 +430,7 @@ dynamorio_app_init(void)
         /* decision: nullcalls WILL create a dynamorio.log file and
          * fill it with perfctr stats!
          */
-        if (stats->loglevel > 0) {
+        if (stats->loglevel >= 0) {
             main_logfile = open_log_file(main_logfile_name(), NULL, 0);
             LOG(GLOBAL, LOG_TOP, 1, "global log file fd=%d\n", main_logfile);
         } else {
@@ -547,6 +547,7 @@ dynamorio_app_init(void)
          * FIXME i#338: this must be before arch_init() for Windows, but Linux
          * wants it later.
          */
+        YPHPRINT("->loader_init()");
         loader_init();
         arch_init();
         synch_init();

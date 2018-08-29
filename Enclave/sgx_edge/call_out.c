@@ -6,8 +6,8 @@
 #include "string.h"
 #include "../dynamorio_t.h"
 
-
 #include "x86intrin.h"
+
 
 void sgx_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
 {
@@ -34,6 +34,7 @@ void sgx_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
     /*}*/
     /**ret = 0;*/
 }
+
 
 //Generate a copy within the enclave.
 void* gen_enclave_copy(void *org, int len)
@@ -221,6 +222,11 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
 
         case SYS_stat:
             ocall_syscall_2_STo(&ret, sysno, (char*)_rdi, (void*)_rsi, len_stat);
+            break;
+
+        case SYS_mkdir:
+            ocall_syscall_2_SN(&ret, sysno, (char*)_rdi, _rsi);
+            break;
     }
 
     return ret;
@@ -316,6 +322,22 @@ long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _
 }
 
 
+long sgx_fcntl(long cmd, long _rsi, long _rdx, long _r10)
+{
+#define F_DUPFD 0
+
+    long ret = 0;
+
+    switch (cmd) {
+        case F_DUPFD:
+            ocall_syscall_2_NN(&ret, SYS_fcntl, cmd, _rsi);
+            break;
+    }
+
+    return ret;
+}
+
+
     __attribute ((sysv_abi))
 long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
@@ -332,6 +354,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         //No parameters
         case SYS_getpid:
         case SYS_gettid:
+        case SYS_sync:
             return simulate_syscall_inst_0(sysno);
             break;
 
@@ -357,6 +380,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_arch_prctl:
         case SYS_getitimer:
         case SYS_stat:
+        case SYS_mkdir:
             return simulate_syscall_inst_2(sysno, _rdi, _rsi);
             break;
 
@@ -388,6 +412,11 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_mmap:
         case SYS_futex:
             return simulate_syscall_inst_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
+            break;
+
+            //variable parameters
+        case SYS_fcntl:
+            return sgx_fcntl(_rdi, _rsi, _rdx, _r10);
             break;
     }
 
