@@ -1,5 +1,5 @@
 /* **********************************************************
- * Copyright (c) 2010-2017 Google, Inc.  All rights reserved.
+ * Copyright (c) 2010-2018 Google, Inc.  All rights reserved.
  * Copyright (c) 2003-2010 VMware, Inc.  All rights reserved.
  * **********************************************************/
 
@@ -76,6 +76,8 @@ void detach_finalize_cleanup(void);
 
 void os_heap_init(void);
 void os_heap_exit(void);
+
+void sgx_mm_init(void);
 
 /* os provided heap routines */
 /* caller is required to handle thread synchronization and to update dynamo vm areas.
@@ -761,7 +763,9 @@ app_pc get_dynamorio_dll_start(void);
 app_pc get_dynamorio_dll_preferred_base(void);
 
 bool is_in_dynamo_dll(app_pc pc);
+/* Returns the number of separate regions added to the dynamo vm areas list. */
 int find_dynamo_library_vm_areas(void);
+/* Returns the number of executable regions found in the address space. */
 int find_executable_vm_areas(void);
 
 /* all_memory_areas is !HAVE_MEMINFO-only: nop elsewhere */

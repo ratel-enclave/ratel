@@ -325,11 +325,7 @@ elf_dt_abs_addr(ELF_DYNAMIC_ENTRY_TYPE *dyn, app_pc base, size_t size,
      * either at this point, as they're done after import processing.
      */
     app_pc tgt = (app_pc) dyn->d_un.d_ptr;
-    if (base == dynamo_dll_start) {
-        if ((at_map || !dyn_reloc) && (tgt < base || tgt > base + size))
-            tgt = (app_pc) dyn->d_un.d_ptr + load_delta;
-    }
-    else if (at_map || !dyn_reloc || tgt < base || tgt > base + size) {
+    if (at_map || !dyn_reloc || tgt < base || tgt > base + size) {
         /* not relocated, adjust by load_delta */
         tgt = (app_pc) dyn->d_un.d_ptr + load_delta;
     }
@@ -480,11 +476,11 @@ module_fill_os_data(ELF_PROGRAM_HEADER_TYPE *prog_hdr, /* PT_DYNAMIC entry */
              */
             module_hashtab_init(out_data);
         }
-    } , { /* EXCEPT */
-        ASSERT_CURIOSITY(false && "crashed while walking dynamic header");
-        *soname = NULL;
-        res = false;
-    });
+     } , { /* EXCEPT */
+         ASSERT_CURIOSITY(false && "crashed while walking dynamic header");
+         *soname = NULL;
+         res = false;
+     });
     if (res && out_data != NULL)
         out_data->have_dynamic_info = true;
     return res;

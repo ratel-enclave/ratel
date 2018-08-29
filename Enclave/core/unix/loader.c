@@ -1824,6 +1824,7 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
         takeover_ptrace((ptrace_stack_args_t *) sp);
     }
 
+    sgx_mm_init();
     /* i#1227: if we reloaded ourselves, unload the old libdynamorio */
     /*if (old_libdr_base != NULL) {*/
     if (false) {
@@ -1876,6 +1877,7 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
     /* i#1227: on a conflict with the app (+ room for the brk): reload ourselves */
     if (get_dynamorio_dll_start() < exe_end+APP_BRK_GAP &&
         get_dynamorio_dll_end() > exe_map) {
+        YPHASSERT(false);   //We make sure no reloading
         reload_dynamorio(sp, exe_map, exe_end+APP_BRK_GAP);
         ASSERT_NOT_REACHED();
     }
@@ -1885,12 +1887,11 @@ privload_early_inject(void **sp, byte *old_libdr_base, size_t old_libdr_size)
      * under the assumption that it's rare and we're not paying this cost
      * very often.
      */
-    /*No need to do this check!*/
-    /*if (!dynamorio_lib_gap_empty()) {*/
-        /*reload_dynamorio(sp, get_dynamorio_dll_start(), get_dynamorio_dll_end());*/
-        /*ASSERT_NOT_REACHED();*/
-    /*}*/
-
+    if (!dynamorio_lib_gap_empty()) {
+        YPHASSERT(false);   //We make sure no reloading
+        reload_dynamorio(sp, get_dynamorio_dll_start(), get_dynamorio_dll_end());
+        ASSERT_NOT_REACHED();
+    }
     exe_map = elf_loader_map_phdrs(&exe_ld,
                                    /* fixed at preferred address,
                                     * will be overridden if preferred base is 0

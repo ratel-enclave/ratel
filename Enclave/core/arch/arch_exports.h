@@ -137,7 +137,11 @@ typedef struct _ibl_entry_pc_t {
 typedef struct _sgxsdk_thread_data_t
 {
     unsigned long  self_addr;
-    unsigned long  ul1[19];
+    unsigned long  last_sp;
+    unsigned long  stack_base_addr;    /* set by urts, relative to TCS */
+    unsigned long  stack_limit_addr;   /* set by urts, relative to TCS */
+    unsigned long  first_ssa_gpr;      /* set by urts, relative to TCS */
+    unsigned long  ul1[15];
     void *tcs;                          /* Point to the TCS of current enclave thread */
     struct _dr_thread_data_t *fsbase;   /* Store the latest value of fsbase and gsbase */
     struct _dr_thread_data_t *gsbase;   /* Load them when EENTER */

@@ -88,28 +88,22 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 
 
 /* The memroy layout when Dynamorio is executed */
-#define DR_CODE_SZ      0x3c1000
+#define DR_CODE1_SZ     0x3bb000
 #define DR_HOLE1_SZ     0x1000
-#define DR_HOLE2_SZ     0x7000
-#define DR_HOLE3_SZ     0x21000
-#define DR_HOLE4_SZ     0x1ff000
-#define DR_RDDATA_SZ    0x24000
-#define DR_RWDATA_SZ    0x60000
+#define DR_CODE2_SZ     0x28000
+#define DR_SEGGAP_SZ    0x200000
+#define DR_DATA_SZ      0x84000
 
-#define DR_CODE_START   (byte*)0x600000000000
-#define DR_CODE_END     (DR_CODE_START + DR_CODE_SZ)
-#define DR_HOLE1_START  (DR_CODE_END)
+#define DR_CODE1_START  (byte*)0x600000000000
+#define DR_CODE1_END    (DR_CODE1_START + DR_CODE1_SZ)
+#define DR_HOLE1_START  (DR_CODE1_END)
 #define DR_HOLE1_END    (DR_HOLE1_START + DR_HOLE1_SZ)
-#define DR_HOLE2_START  (DR_HOLE1_END)
-#define DR_HOLE2_END    (DR_HOLE2_START + DR_HOLE2_SZ)
-#define DR_HOLE3_START  (DR_HOLE2_END)
-#define DR_HOLE3_END    (DR_HOLE3_START + DR_HOLE3_SZ)
-#define DR_HOLE4_START  (DR_HOLE3_END)
-#define DR_HOLE4_END    (DR_HOLE4_START + DR_HOLE4_SZ)
-#define DR_RDDATA_START (DR_HOLE4_END)
-#define DR_RDDATA_END   (DR_RDDATA_START + DR_RDDATA_SZ)
-#define DR_RWDATA_START (DR_RDDATA_END)
-#define DR_RWDATA_END   (DR_RWDATA_START + DR_RWDATA_SZ)
+#define DR_CODE2_START  (DR_HOLE1_END)
+#define DR_CODE2_END    (DR_CODE2_START + DR_CODE2_SZ)
+#define DR_SEGGAP_START (DR_CODE2_END)
+#define DR_SEGGAP_END   (DR_SEGGAP_START + DR_SEGGAP_SZ)
+#define DR_DATA_START   (DR_SEGGAP_END)
+#define DR_DATA_END     (DR_DATA_START + DR_DATA_SZ)
 
 // thread context
 #define GUARD_PG_SZ     (16 * SGX_PAGE_SIZE)
@@ -123,7 +117,7 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 #define XTA_TDCXT_SZ    0x3f95b000
 
 #define AFTER_HEAP_FLAG 0x800000000000
-#define HEAP_MIN_START  (DR_RWDATA_END)
+#define HEAP_MIN_START  (DR_DATA_END)
 #define HEAP_MIN_END    (HEAP_MIN_START + HEAP_MIN_SZ)
 #define HEAP_INIT_START (HEAP_MIN_END)
 #define HEAP_INIT_END   (HEAP_INIT_START + HEAP_INIT_SZ)
@@ -153,19 +147,18 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 /* -dr-codecache-sgxbuffer-threadcontext- */
 // Start address of external memory region needing to be mapped into enclave
 #define EXTN_MEM_REGION (byte*)0x7ffff0000000
-#define SGX_BUFFER_BASE (DR_CODE_START + 17 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
+#define DR_CODE_CACHE_BASE (DR_CODE1_START + 1 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
+#define SGX_BUFFER_BASE (DR_CODE1_START + 17 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
 #define SGX_BUFFER_SIZE 0x000010000000
 
 
 sgx_vm_area_t memlayout_init_encalve[] = {
-    {DR_CODE_START,     DR_CODE_END,     DR_CODE_START,   PROT_READ|PROT_EXEC,   0,  0,  0,  0x0000000,    {NULL,  NULL},  DR_PATH},
-    {DR_HOLE1_START,    DR_HOLE1_END,    DR_HOLE1_START,   PROT_READ, 0,  0,  0,  0x03c1000,    {NULL,  NULL},  DR_PATH},
-    {DR_HOLE2_START,    DR_HOLE2_END,    DR_HOLE2_START,   PROT_READ, 0,  0,  0,  0x03c2000,    {NULL,  NULL},  DR_PATH},
-    {DR_HOLE3_START,    DR_HOLE3_END,    DR_HOLE3_START,   PROT_READ|PROT_EXEC,   0,  0,  0,  0x03c9000,    {NULL,  NULL},  DR_PATH},
-    {DR_HOLE4_START,    DR_HOLE4_END,    DR_HOLE4_START,   PROT_NONE, 0,  0,  0,  0x03ea000,    {NULL,  NULL},  DR_PATH},
-    {DR_RDDATA_START,   DR_RDDATA_END,   DR_RDDATA_START,   PROT_READ, 0,  0,  0,  0x05e9000,    {NULL,  NULL},  DR_PATH},
-    {DR_RWDATA_START,   DR_RWDATA_END,   DR_RWDATA_START,   PROT_READ|PROT_WRITE,  0,  0,  0,  0x060d000,    {NULL,  NULL},  "[.bss?]"},  // .bss
-    {HEAP_MIN_START,    HEAP_MIN_END,    HEAP_MIN_START,   PROT_READ|PROT_WRITE,  0,  0,  0,  0x066d000,    {NULL,  NULL},  "[heap min]"},
+    {DR_CODE1_START,    DR_CODE1_END,    DR_CODE1_START,   PROT_READ|PROT_EXEC,   0,  0,  0,  0x0000000,    {NULL,  NULL},  DR_PATH},
+    {DR_HOLE1_START,    DR_HOLE1_END,    DR_HOLE1_START,   PROT_READ|PROT_WRITE|PROT_EXEC, 0,  0,  0,  DR_HOLE1_START-DR_CODE1_START,    {NULL,  NULL},  DR_PATH},
+    {DR_CODE2_START,    DR_CODE2_END,    DR_CODE2_START,   PROT_READ|PROT_EXEC,   0,  0,  0,  DR_CODE2_START-DR_CODE1_START,    {NULL,  NULL},  DR_PATH},
+    {DR_SEGGAP_START,   DR_SEGGAP_END,   DR_SEGGAP_START,  PROT_READ, 0,  0,  0,  DR_SEGGAP_START-DR_CODE1_START,    {NULL,  NULL},  ""},
+    {DR_DATA_START,     DR_DATA_END,     DR_DATA_START,    PROT_READ|PROT_WRITE, 0,  0,  0,  DR_DATA_START-DR_CODE1_START,    {NULL,  NULL},  DR_PATH},
+    {HEAP_MIN_START,    HEAP_MIN_END,    HEAP_MIN_START,    PROT_READ|PROT_WRITE,  0,  0,  0,  0x066d000,    {NULL,  NULL},  "[heap min]"},
     {HEAP_INIT_START,   HEAP_INIT_END,   HEAP_INIT_START,   PROT_READ|PROT_WRITE,  0,  0,  0,  0x066e000,    {NULL,  NULL},  "[heap init]"},
     {GUARD_PG1_START,   GUARD_PG1_END,   GUARD_PG1_START,   PROT_NONE, 0,  0,  0,  0x4066d000,    {NULL,  NULL},  "[guard]"},
     {STACK_MAX_START,   STACK_MAX_END,   STACK_MAX_START,   PROT_READ|PROT_WRITE,  0,  0,  0,  0x4067d000,    {NULL,  NULL},  "[stack max]"},
@@ -178,8 +171,6 @@ sgx_vm_area_t memlayout_init_encalve[] = {
     {XTA_TDCXT_START,   XTA_TDCXT_END,   XTA_TDCXT_START,  PROT_NONE, 0,  0,  0,  0x406a5000,    {NULL,  NULL},  "[XTA_TDCXT]"},
     {(byte*)NULL,   (byte*)NULL,    NULL,   PROT_NONE, 0,  0,  0,  0,   {NULL,  NULL},  ""}
 };
-
-
 
 
 byte* sgx_vm_base = NULL;

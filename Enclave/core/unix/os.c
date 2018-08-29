@@ -1,5 +1,5 @@
 /* *******************************************************************************
- * Copyright (c) 2010-2017 Google, Inc.  All rights reserved.
+ * Copyright (c) 2010-2018 Google, Inc.  All rights reserved.
  * Copyright (c) 2011 Massachusetts Institute of Technology  All rights reserved.
  * Copyright (c) 2000-2010 VMware, Inc.  All rights reserved.
  * *******************************************************************************/
@@ -195,6 +195,8 @@ char **our_environ;
 #ifdef CLIENT_INTERFACE
 # include "instrument.h"
 #endif
+
+#include "sgx_vma.h"
 
 /* Cross arch syscall nums for use with struct stat64. */
 #ifdef X64
@@ -1913,7 +1915,7 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
 
     /* now allocate the tls segment for client libraries */
     if (IF_CLIENT_INTERFACE_ELSE(INTERNAL_OPTION(private_loader), false)) {
-        os_tls->os_seg_info.priv_lib_tls_base =
+        os_tls->os_seg_info.priv_lib_tls_base = //os_tls->app_lib_tls_base;
             IF_UNIT_TEST_ELSE(os_tls->app_lib_tls_base, privload_tls_init(os_tls->app_lib_tls_base));
     }
 
@@ -1933,7 +1935,6 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
         os_tls->os_seg_info.priv_alt_tls_base,
         os_tls->os_seg_info.dr_tls_base);
 }
-
 
 void
 os_tls_init(void)
@@ -2548,8 +2549,8 @@ os_swap_context(dcontext_t *dcontext, bool to_app, dr_state_flags_t flags)
 {
     if (os_should_swap_state())
         os_switch_seg_to_context(dcontext, LIB_SEG_TLS, to_app);
-    //if (TEST(DR_STATE_DR_TLS, flags))
-    //    os_swap_dr_tls(dcontext, to_app);
+    if (TEST(DR_STATE_DR_TLS, flags))
+        os_swap_dr_tls(dcontext, to_app);
 }
 
 void
@@ -2897,7 +2898,15 @@ osprot_replace_memprot(uint old_osprot, uint memprot)
 static inline long
 mprotect_syscall(byte *p, size_t size, uint prot)
 {
-    return dynamorio_syscall(SYS_mprotect, 3, p, size, prot);
+    long ret;
+
+    p = sgx_mm_itn2ext(p);
+    ret = dynamorio_syscall(SYS_mprotect, 3, p, size, prot);
+    if (ret == 0) {
+        sgx_mm_mprotect(p, size, prot);
+    }
+
+    return ret;
 }
 
 bool
@@ -2927,22 +2936,38 @@ mmap_syscall_succeeded(byte *retval)
 static inline byte *
 mmap_syscall(byte *addr, size_t len, ulong prot, ulong flags, ulong fd, ulong offs)
 {
+    byte* ret;
+
+    addr = sgx_mm_itn2ext(addr);
 #if defined(MACOS) && !defined(X64)
-    return (byte *)(ptr_int_t)
+    ret = return (byte *)(ptr_int_t)
         dynamorio_syscall(SYS_mmap, 7, addr, len, prot, flags, fd,
-                          /* represent 64-bit arg as 2 32-bit args */
-                          offs, 0);
+                /* represent 64-bit arg as 2 32-bit args */
+                offs, 0);
 #else
-    return (byte *)(ptr_int_t)
+    ret = (byte *)(ptr_int_t)
         dynamorio_syscall(IF_MACOS_ELSE(SYS_mmap, IF_X64_ELSE(SYS_mmap, SYS_mmap2)), 6,
-                          addr, len, prot, flags, fd, offs);
+                addr, len, prot, flags, fd, offs);
 #endif
+    if (ret != (byte*)-1) {
+        /* return internal address */
+        ret = sgx_mm_mmap(ret, len, prot, flags, (int)fd, offs);
+    }
+
+    return ret;
 }
 
 static inline long
 munmap_syscall(byte *addr, size_t len)
 {
-    return dynamorio_syscall(SYS_munmap, 2, addr, len);
+    long ret;
+
+    /* free external block */
+    addr = sgx_mm_itn2ext(addr);
+    sgx_mm_munmap(addr, len);
+    ret = dynamorio_syscall(SYS_munmap, 2, addr, len);
+
+    return ret;
 }
 
 #ifndef NOT_DYNAMORIO_CORE_PROPER
@@ -4077,12 +4102,18 @@ int
 open_syscall(const char *file, int flags, int mode)
 {
     ASSERT(file != NULL);
+    int res;
+
 #ifdef SYS_open
-    return dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_open), 3, file, flags, mode);
+    res = dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_open), 3, file, flags, mode);
 #else
-    return dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_openat), 4,
+    res = dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_openat), 4,
                              AT_FDCWD, file, flags, mode);
 #endif
+    if (res != -1)
+        sgx_vma_set_cmt(res, file);
+
+    return res;
 }
 
 int
@@ -5080,6 +5111,7 @@ ignorable_system_call_normalized(int num)
 #ifdef MACOS
     case SYS_close_nocancel:
 #endif
+    case SYS_open:  /* hook open procmaps file event */
     case SYS_close:
 #ifdef SYS_dup2
     case SYS_dup2:
@@ -6793,6 +6825,12 @@ pre_system_call(dcontext_t *dcontext)
         dcontext->sys_param1 = len;
         dcontext->sys_param2 = prot;
         dcontext->sys_param3 = flags;
+
+        /* change internal address to external address for invoking mmap */
+        addr = sgx_mm_itn2ext(addr);
+        *sys_param_addr(dcontext, 0) = (reg_t) addr;
+        // Update sys_param0 although post_system_call doeen't use it
+        dcontext->sys_param0 = (reg_t) addr;
         break;
     }
     /* must flush stale fragments when we see munmap/mremap */
@@ -6849,6 +6887,9 @@ pre_system_call(dcontext_t *dcontext)
         memcache_remove(addr, addr + len);
         memcache_unlock();
 #endif
+        addr = sgx_mm_itn2ext(addr);
+        *sys_param_addr(dcontext, 0) = (reg_t) addr;
+        dcontext->sys_param0 = (reg_t) addr;
         break;
     }
 #ifdef LINUX
@@ -6943,6 +6984,10 @@ pre_system_call(dcontext_t *dcontext)
             /* FIXME Store state for undo if the syscall fails. */
             IF_NO_MEMQUERY(memcache_update_locked(addr, addr + len, new_memprot,
                                                   -1/*type unchanged*/, exists));
+
+            addr = sgx_mm_itn2ext(addr);
+            *sys_param_addr(dcontext, 0) = (reg_t) addr;
+            dcontext->sys_param0 = (reg_t) addr;
         }
         break;
     }
@@ -7630,17 +7675,17 @@ pre_system_call(dcontext_t *dcontext)
     /* FIXME i#58: handle i386_{get,set}_ldt and thread_fast_set_cthread_self64 */
 #endif
 
-#ifdef DEBUG
-# ifdef MACOS
-    case SYS_open_nocancel:
-# endif
-# ifdef SYS_open
+// #ifdef DEBUG
+// # ifdef MACOS
+//     case SYS_open_nocancel:
+// # endif
+// # ifdef SYS_open
     case SYS_open: {
         dcontext->sys_param0 = sys_param(dcontext, 0);
         break;
     }
-# endif
-#endif
+// # endif
+// #endif
 
     default: {
 #ifdef LINUX
@@ -8140,11 +8185,11 @@ post_system_call(dcontext_t *dcontext)
     /****************************************************************************/
     /* MEMORY REGIONS */
 
-#ifdef DEBUG
-# ifdef MACOS
-    case SYS_open_nocancel:
-# endif
-# ifdef SYS_open
+// #ifdef DEBUG
+// # ifdef MACOS
+//     case SYS_open_nocancel:
+// # endif
+// # ifdef SYS_open
     case SYS_open: {
         if (success) {
             /* useful for figuring out what module was loaded that then triggers
@@ -8152,11 +8197,14 @@ post_system_call(dcontext_t *dcontext)
              */
             LOG(THREAD, LOG_SYSCALLS, 2, "SYS_open %s => %d\n",
                 dcontext->sys_param0, (int)result);
+
+            //dr_printf("%s: %s => %d\n", __FUNCTION__, (const char*)dcontext->sys_param0, (int)result);
+            sgx_vma_set_cmt(result, (const char*)dcontext->sys_param0);
         }
         break;
     }
-# endif
-#endif
+// # endif
+// #endif
 
 #if defined(LINUX) && !defined(X64) && !defined(ARM)
     case SYS_mmap:
@@ -8201,6 +8249,14 @@ post_system_call(dcontext_t *dcontext)
 #if defined(LINUX) && !defined(X64) && !defined(ARM)
         }
 #endif
+        if (success) {
+            ulong ufd = sys_param(dcontext, 4);
+            ulong offs = sys_param(dcontext, 5);
+
+            base = sgx_mm_mmap(base, size, prot, flags, ufd, offs);
+            set_success_return_val(dcontext, (reg_t)base);
+        }
+
         process_mmap(dcontext, base, size, prot, flags _IF_DEBUG(map_type));
         break;
     }
@@ -8240,6 +8296,9 @@ post_system_call(dcontext_t *dcontext)
                                                                         PAGE_SIZE),
                                                   info.prot,
                                                   info.type, false/*add back*/));
+        }
+        if (success) {
+            sgx_mm_munmap(addr, len);
         }
         break;
     }
@@ -8330,6 +8389,9 @@ post_system_call(dcontext_t *dcontext)
                                                       memprot, -1/*type unchanged*/,
                                                       true/*exists*/));
             }
+        }
+        if (success) {
+            sgx_mm_mprotect(base, size, prot);
         }
         break;
     }
@@ -8730,26 +8792,26 @@ get_dynamo_library_bounds(void)
     check_start = dynamo_dll_start;
     dynamorio_libname = IF_UNIT_TEST_ELSE(UNIT_TEST_EXE_NAME,DYNAMORIO_LIBRARY_NAME);
 #endif /* STATIC_LIBRARY */
-    /*res = memquery_library_bounds(dynamorio_libname,*/
-                                  /*&check_start, &check_end,*/
-                                  /*dynamorio_library_path,*/
-                                  /*BUFFER_SIZE_ELEMENTS(dynamorio_library_path));*/
-    long dr_size = dynamo_dll_end - dynamo_dll_start;
-    int nPages = dr_size / PAGE_SIZE;
-    res = 0;
+    res = memquery_library_bounds(dynamorio_libname,
+                                  &check_start, &check_end,
+                                  dynamorio_library_path,
+                                  BUFFER_SIZE_ELEMENTS(dynamorio_library_path));
+    // long dr_size = dynamo_dll_end - dynamo_dll_start;
+    // int nPages = dr_size / PAGE_SIZE;
+    // res = 0;
 
-    asm ("\tcall local\n" \
-            "local: pop %0" \
-            :"=rm"(check_start));
-    check_start = (app_pc) ALIGN_FORWARD(check_start, PAGE_SIZE);
-    while (nPages > 0 && *(uint32*)check_start != 0x464c457f) {
-        check_start -= PAGE_SIZE;
-        nPages --;
-        res++;
-    }
-    check_end = check_start + dr_size;
-    /*strcpy(dynamorio_library_path, "/home/sgx/project/dynamorio/lib64/debug/");*/
-    strcpy(dynamorio_library_path, "/home/sgx/project/sgx/sgx-dbi/");
+    // asm ("\tcall local\n"
+    //         "local: pop %0"
+    //         :"=rm"(check_start));
+    // check_start = (app_pc) ALIGN_FORWARD(check_start, PAGE_SIZE);
+    // while (nPages > 0 && *(uint32*)check_start != 0x464c457f) {
+    //     check_start -= PAGE_SIZE;
+    //     nPages --;
+    //     res++;
+    // }
+    // check_end = check_start + dr_size;
+    // /*strcpy(dynamorio_library_path, "/home/sgx/project/dynamorio/lib64/debug/");*/
+    // strcpy(dynamorio_library_path, "/home/sgx/project/sgx/sgx-dbi/");
 
 
     LOG(GLOBAL, LOG_VMAREAS, 1, PRODUCT_NAME" library path: %s\n",

@@ -324,7 +324,7 @@ unblock_all_signals(kernel_sigset_t *oset)
 {
     kernel_sigset_t set;
     kernel_sigemptyset(&set);
-    //igprocmask_syscall(SIG_SETMASK, &set, oset, sizeof(set));
+    sigprocmask_syscall(SIG_SETMASK, &set, oset, sizeof(set));
 }
 
 /* exported for stackdump.c */
