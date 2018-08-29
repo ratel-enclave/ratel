@@ -200,7 +200,7 @@ int sgx_procmaps_read_start(void)
             end = vma->vm_end;
         }
         nwrite = snprintf(pcnt, nleft, MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
-        /*dr_printf(MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);*/
+        dr_printf(MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
 
         sgx_procmaps.cnt_len += nwrite;
     }

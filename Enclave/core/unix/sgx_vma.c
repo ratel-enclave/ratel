@@ -88,10 +88,10 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 
 
 /* The memroy layout when Dynamorio is executed */
-#define DR_CODE1_SZ     0x3bb000
+#define DR_CODE1_SZ     0x3bc000
 #define DR_HOLE1_SZ     0x1000
 #define DR_CODE2_SZ     0x28000
-#define DR_SEGGAP_SZ    0x200000
+#define DR_SEGGAP_SZ    0x1ff000
 #define DR_DATA_SZ      0x84000
 
 #define DR_CODE1_START  (byte*)0x600000000000
