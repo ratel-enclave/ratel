@@ -740,7 +740,7 @@ vmm_heap_unit_init(vm_heap_t *vmh, size_t size)
     /* -heap_in_lower_4GB takes top priority and has already set heap_allowable_region_*.
      * Next comes -vm_base_near_app.
      */
-    if (DYNAMO_OPTION(vm_base_near_app)) {
+    if (false && DYNAMO_OPTION(vm_base_near_app)) {
         /* Required for STATIC_LIBRARY: must be near app b/c clients are there.
          * Non-static: still a good idea for fewer rip-rel manglings.
          * Asking for app base means we'll prefer before the app, which
@@ -786,7 +786,7 @@ vmm_heap_unit_init(vm_heap_t *vmh, size_t size)
         //              + get_random_offset(DYNAMO_OPTION(vm_max_offset) /
         //                                  DYNAMO_OPTION(vmm_block_size)) *
         //              DYNAMO_OPTION(vmm_block_size));
-        preferred = 0x7fff00000000 + 0x20000000;
+        preferred = 0x600000000000 + 4096 * 4096;
         preferred = ALIGN_FORWARD(preferred, DYNAMO_OPTION(vmm_block_size));
         /* overflow check: w/ vm_base shouldn't happen so debug-only check */
         ASSERT(!POINTER_OVERFLOW_ON_ADD(preferred, size));
