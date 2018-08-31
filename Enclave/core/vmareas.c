@@ -1577,6 +1577,7 @@ dynamo_vm_areas_init()
 int
 vm_areas_init()
 {
+    YPHPRINT("Begin");
     int areas;
 
     /* Case 7957: we allocate all vm vectors on the heap for self-prot reasons.
@@ -1648,6 +1649,7 @@ vm_areas_init()
             "------------------------------------------------------------------------\n");
     });
 
+    YPHPRINT("End");
     return areas;
 }
 
