@@ -124,6 +124,9 @@ struct procmaps_t {
 } sgx_procmaps;
 
 
+// extern byte* sgx_vm_base;
+extern byte* heap_init_end;
+
 /* print the vma list to a buffer */
 int sgx_procmaps_read_start(void)
 {
@@ -145,7 +148,6 @@ int sgx_procmaps_read_start(void)
 
 #define MAPS_LINE_FORMAT  "%08lx-%08lx %s %08lx %-8d %-8d %8s\n"
 #define AFTER_HEAP_FLAG   (byte*)0x800000000000
-#define SGX_VM_HEAPBASE   (byte*)0x60000066e000
 #define SGX_BUFFER_SIZE   0x000010000000
 
     for (ll = sgxmm.in.next; ll != &sgxmm.in; ll = ll->next) {
@@ -153,7 +155,12 @@ int sgx_procmaps_read_start(void)
 
         /* Please don't expose the sgx-mm-buffer itself */
         // if (vma->vm_start >= sgx_vm_base && vma->vm_end <= sgx_vm_base + SGX_BUFFER_SIZE)
-        if (vma->vm_start >= SGX_VM_HEAPBASE && vma->vm_end <= (SGX_VM_HEAPBASE + SGX_BUFFER_SIZE))
+        // if (vma->vm_start >= SGX_VM_HEAPBASE && vma->vm_end <= (SGX_VM_HEAPBASE + SGX_BUFFER_SIZE))
+        if (vma->vm_end == heap_init_end)
+            continue;
+
+        /* TCS is not accessile to Application, making it non-visible such that would not be emulated */
+        if (strncmp(vma->comment, "[TCS]", 80) == 0)
             continue;
 
         /* perm to string */
