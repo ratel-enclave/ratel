@@ -90,20 +90,27 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 /* The memroy layout when Dynamorio is executed */
 #define DR_CODE1_SZ     0x3bc000
 #define DR_HOLE1_SZ     0x1000
-#define DR_CODE2_SZ     0x28000
-#define DR_SEGGAP_SZ    0x1ff000
-#define DR_DATA_SZ      0x84000
+#define DR_HOLE2_SZ     0x7000
+#define DR_CODE2_SZ     0x20000
+#define DR_SEGGAP_SZ    0x200000
+#define DR_RDDATA_SZ    0x24000
+#define DR_RWDATA_SZ    0x60000
 
-#define DR_CODE1_START  (byte*)0x600000000000
+#define DR_START        (byte*)0x600000000000
+#define DR_CODE1_START  (DR_START)
 #define DR_CODE1_END    (DR_CODE1_START + DR_CODE1_SZ)
 #define DR_HOLE1_START  (DR_CODE1_END)
 #define DR_HOLE1_END    (DR_HOLE1_START + DR_HOLE1_SZ)
-#define DR_CODE2_START  (DR_HOLE1_END)
+#define DR_HOLE2_START  (DR_HOLE1_END)
+#define DR_HOLE2_END    (DR_HOLE2_START + DR_HOLE2_SZ)
+#define DR_CODE2_START  (DR_HOLE2_END)
 #define DR_CODE2_END    (DR_CODE2_START + DR_CODE2_SZ)
 #define DR_SEGGAP_START (DR_CODE2_END)
 #define DR_SEGGAP_END   (DR_SEGGAP_START + DR_SEGGAP_SZ)
-#define DR_DATA_START   (DR_SEGGAP_END)
-#define DR_DATA_END     (DR_DATA_START + DR_DATA_SZ)
+#define DR_RDDATA_START (DR_SEGGAP_END)
+#define DR_RDDATA_END   (DR_RDDATA_START + DR_RDDATA_SZ)
+#define DR_RWDATA_START (DR_RDDATA_END)
+#define DR_RWDATA_END   (DR_RWDATA_START + DR_RWDATA_SZ)
 
 // thread context
 #define GUARD_PG_SZ     (16 * SGX_PAGE_SIZE)
@@ -117,7 +124,7 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 #define XTA_TDCXT_SZ    0x3f95b000
 
 #define AFTER_HEAP_FLAG 0x800000000000
-#define HEAP_MIN_START  (DR_DATA_END)
+#define HEAP_MIN_START  (DR_RWDATA_END)
 #define HEAP_MIN_END    (HEAP_MIN_START + HEAP_MIN_SZ)
 #define HEAP_INIT_START (HEAP_MIN_END)
 #define HEAP_INIT_END   (HEAP_INIT_START + HEAP_INIT_SZ)
@@ -146,18 +153,20 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 /* simulate the task_struct::mm */
 /* -dr-codecache-sgxbuffer-threadcontext- */
 // Start address of external memory region needing to be mapped into enclave
-#define EXTN_MEM_REGION (byte*)0x7ffff0000000
-#define DR_CODE_CACHE_BASE (DR_CODE1_START + 1 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
-#define SGX_BUFFER_BASE (DR_CODE1_START + 17 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
-#define SGX_BUFFER_SIZE 0x000010000000
+#define EXTN_MEM_REGION     (byte*)0x7ffff0000000
+#define DR_CODE_CACHE_BASE  (DR_START + 1 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
+#define SGX_BUFFER_BASE     (DR_START + 17 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
+#define SGX_BUFFER_SIZE     0x000010000000
 
 
 sgx_vm_area_t memlayout_init_encalve[] = {
     {DR_CODE1_START,    DR_CODE1_END,    DR_CODE1_START,   PROT_READ|PROT_EXEC,   0,  0,  0,  0x0000000,    {NULL,  NULL},  DR_PATH},
-    {DR_HOLE1_START,    DR_HOLE1_END,    DR_HOLE1_START,   PROT_READ|PROT_WRITE|PROT_EXEC, 0,  0,  0,  DR_HOLE1_START-DR_CODE1_START,    {NULL,  NULL},  DR_PATH},
-    {DR_CODE2_START,    DR_CODE2_END,    DR_CODE2_START,   PROT_READ|PROT_EXEC,   0,  0,  0,  DR_CODE2_START-DR_CODE1_START,    {NULL,  NULL},  DR_PATH},
-    {DR_SEGGAP_START,   DR_SEGGAP_END,   DR_SEGGAP_START,  PROT_NONE, 0,  0,  0,  DR_SEGGAP_START-DR_CODE1_START,    {NULL,  NULL},  ""},
-    {DR_DATA_START,     DR_DATA_END,     DR_DATA_START,    PROT_READ|PROT_WRITE, 0,  0,  0,  DR_DATA_START-DR_CODE1_START,    {NULL,  NULL},  DR_PATH},
+    {DR_HOLE1_START,    DR_HOLE1_END,    DR_HOLE1_START,   PROT_READ, 0,  0,  0,  DR_HOLE1_START-DR_START,    {NULL,  NULL},  DR_PATH},
+    {DR_HOLE2_START,    DR_HOLE2_END,    DR_HOLE2_START,   PROT_READ, 0,  0,  0,  DR_HOLE2_START-DR_START,    {NULL,  NULL},  DR_PATH},
+    {DR_CODE2_START,    DR_CODE2_END,    DR_CODE2_START,   PROT_READ|PROT_EXEC,   0,  0,  0,  DR_CODE2_START-DR_START,    {NULL,  NULL},  DR_PATH},
+    {DR_SEGGAP_START,   DR_SEGGAP_END,   DR_SEGGAP_START,  PROT_NONE, 0,  0,  0,  DR_SEGGAP_START-DR_START,    {NULL,  NULL},  ""},
+    {DR_RDDATA_START,   DR_RDDATA_END,   DR_RDDATA_START,  PROT_READ, 0,  0,  0,  DR_RDDATA_START-DR_START,    {NULL,  NULL},  DR_PATH},
+    {DR_RWDATA_START,   DR_RWDATA_END,   DR_RWDATA_START,  PROT_READ|PROT_WRITE, 0,  0,  0,  DR_RWDATA_START-DR_START,    {NULL,  NULL},  DR_PATH},
     {HEAP_MIN_START,    HEAP_MIN_END,    HEAP_MIN_START,    PROT_READ|PROT_WRITE,  0,  0,  0,  0x066d000,    {NULL,  NULL},  "[heap min]"},
     {HEAP_INIT_START,   HEAP_INIT_END,   HEAP_INIT_START,   PROT_READ|PROT_WRITE,  0,  0,  0,  0x066e000,    {NULL,  NULL},  "[heap init]"},
     {GUARD_PG1_START,   GUARD_PG1_END,   GUARD_PG1_START,   PROT_NONE, 0,  0,  0,  0x4066d000,    {NULL,  NULL},  "[guard]"},
@@ -234,7 +243,7 @@ sgx_vm_area_t* _sgx_vma_alloc(list_t* llp, list_t* lln);
 void _sgx_vma_free(sgx_vm_area_t* vma);
 static void _sgx_vma_fill(sgx_vm_area_t* vma, byte* ext_addr, size_t len, ulong prot, int fd, ulong offs);
 
-void sgx_mm_init(void)
+void sgx_mm_init_static(void)
 {
     sgx_vm_area_t *vma = NULL;
     sgx_vm_area_t *add = NULL;
@@ -290,6 +299,125 @@ void sgx_mm_init(void)
     }
 }
 
+
+int _sgx_mm_init_byreffing_procmaps(void)
+{
+    const char *fn = "/proc/self/maps";
+    int fd = dynamorio_syscall(SYS_open, 2, fn, O_RDONLY);
+    if (fd == -1)
+        return -1;
+
+#define BUF_SZ 4096
+#define HEPA_SZ 0x3ffff000
+#define MAPS_LINE_FORMAT4 "%08x-%08x %s %08x %*s %llu %4096s"
+#define MAPS_LINE_FORMAT8 "%016llx-%016llx %s %016llx %*s %llu %4096s"
+    char buf[BUF_SZ];
+    ssize_t nread;
+    nread = dynamorio_syscall(SYS_read, 3, fd, buf, BUF_SZ);
+    if (nread == -1)
+        return -1;
+
+    char *line = buf;
+    char *r;
+    int nRgn = 0;
+    bool after_heap = false;
+
+    buf[BUF_SZ-1] = '\0';
+    do {
+        unsigned long nStart, nEnd, nProt, nOfft, nNode;
+        char szProt[8];
+        char szCmt[80];
+        byte* vm_start;
+        sgx_vm_area_t *add;
+
+        r = strchr(line, '\n');
+        if (r == NULL)
+            break;
+
+        *r = '\0';
+        szCmt[0] = '\0';
+        sscanf(line,
+                sizeof(void*) == 4 ? MAPS_LINE_FORMAT4 : MAPS_LINE_FORMAT8,
+                (unsigned long*)&nStart, (unsigned long*)&nEnd,
+                szProt, (unsigned long*)&nOfft, &nNode, szCmt);
+        line = r+1;
+
+        if (strncmp("/dev/isgx", szCmt, 80) != 0)
+            continue;
+        else
+            nRgn ++;
+
+        nProt = 0;
+        if (szProt[0] == 'r') nProt += 1;
+        if (szProt[1] == 'w') nProt += 2;
+        if (szProt[2] == 'x') nProt += 4;
+
+        if (!after_heap) {
+            vm_start = (byte*)nStart;
+            if (nEnd - nStart == HEPA_SZ && add != NULL) {
+                after_heap = true;
+                add->comment[0] = '\0';
+            }
+        }
+        else {
+            vm_start = (byte*)(AFTER_HEAP_FLAG + nStart);
+        }
+
+        // YPHPRINT("%lx-%lx %x %lx %d %d %s\n", nStart, nEnd, nProt, nOfft, nDev, nNode, szCmt);
+        add = _sgx_vma_alloc(sgxmm.in.prev, &sgxmm.in);
+        _sgx_vma_fill(add, vm_start, nEnd - nStart, nProt, -1, nOfft);
+        add->vm_sgx = (byte*)nStart;
+        add->dev = 8;
+        add->inode = nNode;
+        add->size = nEnd - nStart;
+        if (!after_heap)
+            strncpy(add->comment, DR_PATH, 80);
+        else
+            add->comment[0] = '\0';
+    }while(r != NULL);
+
+    dynamorio_syscall(SYS_close, 1, fd);
+
+    YPHASSERT(nRgn == 18);
+    return 0;
+}
+
+
+void sgx_mm_init(void)
+{
+    sgx_vm_area_t *vma = NULL;
+    list_t *ll = NULL;
+    int idx;
+
+    YPHASSERT(SGX_VMA_MAX_CNT > 2);
+    /* Initialize sgxmm */
+    for (idx = 0, vma = sgxmm.slots; idx < SGX_VMA_MAX_CNT; idx++, vma++) {
+        ll = &vma->ll;
+        ll->prev = NULL;    /* set prev to NULL if not used */
+        if(idx == SGX_VMA_MAX_CNT - 1) {
+            ll->next = NULL;
+        }
+        else {
+            ll->next = &(sgxmm.slots[idx+1].ll);
+        }
+    }
+    sgxmm.un = &(sgxmm.slots[0].ll);
+    sgxmm.in.prev = &sgxmm.in;
+    sgxmm.in.next = &sgxmm.in;
+
+    sgxmm.nin = 0;
+    sgxmm.nun = SGX_VMA_MAX_CNT;
+
+    /* Allocate a big buffer for loading target program into SGX*/
+    sgx_vm_base = SGX_BUFFER_BASE;
+    ext_vm_base = EXTN_MEM_REGION;
+
+    YPHASSERT(sgx_vm_base == SGX_BUFFER_BASE);
+    sgxmm.vm_base = sgx_vm_base;
+    sgxmm.vm_size = SGX_BUFFER_SIZE;
+
+    _sgx_mm_init_byreffing_procmaps();
+}
 
 /* exported for debugging */
 sgx_mm_t* sgx_mm_getmm(void)
@@ -904,332 +1032,4 @@ int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
     _sgx_mm_mprotect(ext_addr, len, prot);
 
     return 0;
-}
-
-
-/* allocate vma for the first segment, it's usually .text */
-sgx_vm_area_t* ___sgx_vma_alloc_text(uint npgs)
-{
-    sgx_vm_area_t *vma;
-    sgx_vm_area_t *add;
-    list_t *llp;
-
-    add = list_entry(sgxmm.un, sgx_vm_area_t, ll);
-    sgxmm.un = sgxmm.un->next;
-
-    llp = sgxmm.in.prev;
-    if (llp == &sgxmm.in) {
-        YPHASSERT(sgxmm.vm_size/SGX_PAGE_SIZE >= npgs);
-        add->vm_sgx = 0;
-        /*//add->npgs = npgs;*/
-
-        sgxmm.in.next = &add->ll;
-        sgxmm.in.prev = &add->ll;
-        add->ll.prev = &sgxmm.in;
-        add->ll.next = &sgxmm.in;
-
-        return add;
-    }
-    else {
-        vma = list_entry(llp, sgx_vm_area_t, ll);
-
-        /*add->vm_sgx = vma->vm_sgx + vma->npgs;*/
-        //add->npgs = npgs;
-
-        list_add(llp, &sgxmm.in, &add->ll);
-        return add;
-    }
-}
-
-sgx_vm_area_t* ___sgx_vma_alloc_data(uint npgs)
-{
-    YPHASSERT(sgxmm.in.next != &sgxmm.in);
-    return ___sgx_vma_alloc_text(npgs);
-}
-
-sgx_vm_area_t* ___sgx_vma_alloc_bss(uint npgs)
-{
-    return ___sgx_vma_alloc_data(npgs);
-}
-
-
-
-sgx_vm_area_t* ___sgx_vma_alloc_anon(uint npgs)
-{
-    sgx_vm_area_t *prev;
-    sgx_vm_area_t *next;
-    sgx_vm_area_t *add;
-    list_t *llp;
-    list_t *lln;
-
-    llp = sgxmm.in.next;
-    lln = llp->next;
-
-    add = list_entry(sgxmm.un, sgx_vm_area_t, ll);
-    sgxmm.un = sgxmm.un->next;
-
-    if (llp == &sgxmm.in) {
-        YPHASSERT(sgxmm.vm_size/SGX_PAGE_SIZE >= npgs);
-        add->vm_sgx = 0;
-        //add->npgs = npgs;
-
-        sgxmm.in.next = &add->ll;
-        sgxmm.in.prev = &add->ll;
-        add->ll.prev = &sgxmm.in;
-        add->ll.next = &sgxmm.in;
-
-        return add;
-    }
-    else if (lln == &sgxmm.in) {
-        prev = list_entry(llp, sgx_vm_area_t, ll);
-        if (false) {//prev->vm_sgx >= npgs) {
-            add->vm_sgx = 0;
-            //add->npgs = npgs;
-
-            list_add(&sgxmm.in, llp, &add->ll);
-        }
-        else {
-            /*YPHASSERT(sgxmm.vm_size/SGX_PAGE_SIZE > prev->vm_sgx + prev->npgs);*/
-            //add->vm_sgx = prev->vm_sgx + prev->npgs;
-            //add->npgs = npgs;
-
-            list_add(llp, &sgxmm.in, &add->ll);
-        }
-        return add;
-    }
-    else {
-        while (lln != &sgxmm.in) {
-            uint gap = 0;
-
-            prev = list_entry(llp, sgx_vm_area_t, ll);
-            next = list_entry(lln, sgx_vm_area_t, ll);
-
-            /* adjcent? */
-            /*gap = next->vm_sgx - (prev->vm_sgx + prev->npgs);*/
-            if (gap >= npgs) {
-                //add->vm_sgx = prev->vm_sgx + prev->npgs;
-                //add->npgs = npgs;
-
-                list_add(llp, lln, &add->ll);
-                return add;
-            }
-            else {
-                llp = lln;
-                lln = lln->next;
-            }
-        }
-        if (lln == &sgxmm.in) {
-            prev = list_entry(llp, sgx_vm_area_t, ll);
-            /*YPHASSERT(sgxmm.vm_size/SGX_PAGE_SIZE > prev->vm_sgx + prev->npgs);*/
-            //add->vm_sgx = prev->vm_sgx + prev->npgs;
-            //add->npgs = npgs;
-
-            list_add(llp, &sgxmm.in, &add->ll);
-            return add;
-        }
-    }
-
-    /* Failed: free add and return NULL */
-    add->ll.next = sgxmm.un;
-    sgxmm.un = &add->ll;
-
-    return NULL;
-}
-
-
-sgx_vm_area_t* __sgx_vma_alloc(sgx_vma_type t, uint npgs)
-{
-    switch(t) {
-        case SGX_VMA_TEXT:
-            return ___sgx_vma_alloc_text(npgs);
-        case SGX_VMA_DATA:
-            return ___sgx_vma_alloc_data(npgs);
-        case SGX_VMA_BSS:
-            return ___sgx_vma_alloc_bss(npgs);
-        case SGX_VMA_ANON:
-            return ___sgx_vma_alloc_anon(npgs);
-            //return ___sgx_vma_alloc_bss(npgs);
-        default:
-            return NULL;
-    }
-}
-
-
-void* __sgx_vma_free(uint first_page, uint npgs)
-{
-    sgx_vm_area_t *vma = NULL;
-    list_t *llp = NULL;
-    list_t *ll = NULL;
-    void * ext_addr = NULL;
-
-    llp = sgxmm.in.next;
-    if (llp == &sgxmm.in)
-        return NULL;
-
-    if (llp->next == &sgxmm.in) {
-        vma = list_entry(llp, sgx_vm_area_t, ll);
-
-        // if (vma->vm_sgx == first_page && vma->npgs == npgs) {
-        //     ext_addr = vma->vm_start;
-
-        //     sgxmm.in.next = &sgxmm.in;
-        //     sgxmm.in.prev = &sgxmm.in;
-
-        //     llp->next = sgxmm.un;
-        //     sgxmm.un = llp;
-        // }
-
-        return ext_addr;
-    }
-
-    for (ll = llp->next; ll != &sgxmm.in; ll = ll->next) {
-        vma = list_entry(ll, sgx_vm_area_t, ll);
-
-        /*if (vma->vm_sgx == first_page && vma->npgs == npgs) {*/
-            /*ext_addr = vma->vm_start;*/
-            /*list_del(ll);*/
-
-            /*ll->next = sgxmm.un;*/
-            /*sgxmm.un = ll;*/
-            /*break;*/
-        /*}*/
-    }
-    return ext_addr;
-}
-
-
-// byte* _sgx_mm_mmap(byte *exp_addr, byte *ext_addr, size_t len, ulong prot, ulong flags, ulong fd, ulong offs)
-// {
-//     sgx_vm_area_t* vma;
-//     sgx_vma_type t;
-//     uint npgs;
-
-//     npgs = (len + SGX_PAGE_SIZE - 1) / SGX_PAGE_SIZE;
-//     if (exp_addr == NULL) {
-//         if (fd == (ulong)-1)
-//             t = SGX_VMA_ANON;
-//         else
-//             t = SGX_VMA_TEXT;
-//     }
-//     else {
-//         YPHASSERT(ext_addr != NULL);
-//         if (fd == (ulong)-1)
-//             t = SGX_VMA_BSS;
-//         else
-//             t = SGX_VMA_DATA;
-//     }
-//     vma = __sgx_vma_alloc(t, npgs);
-//     if (vma == NULL)
-//         return NULL;
-
-//     switch (t) {
-//         case SGX_VMA_ANON:
-//             vma->vm_start = NULL;
-//             break;
-
-//         case SGX_VMA_TEXT:
-//             vma->vm_start = ext_addr;
-//             break;
-
-//         case SGX_VMA_DATA:
-//             vma->vm_start = ext_addr;
-//             break;
-
-//         case SGX_VMA_BSS:
-//             vma->vm_start = NULL;
-//             break;
-
-//         default:
-//             return NULL;
-//     }
-
-//     /* fill in other content */
-//     vma->perm = prot;
-//     vma->offset = offs;
-//     /* anonymous mmap ? */
-//     if (fd == (ulong)-1)
-//         vma->inode = 0;
-//     else
-//         vma->inode = 0; /* fourcely set it to 0 */
-
-//     sgx_vma_get_cmt(fd, vma->comment);
-
-//     return (sgxmm.vm_base + vma->vm_sgx * SGX_PAGE_SIZE);
-// }
-
-// void* _sgx_mm_munmap(byte* itn_addr, size_t len)
-// {
-//     void *ext_addr;
-//     uint pgidx;
-//     uint npgs;
-
-//     YPHASSERT(itn_addr > sgxmm.vm_base);
-//     pgidx = (itn_addr - sgxmm.vm_base) / SGX_PAGE_SIZE;
-//     npgs = (len + SGX_PAGE_SIZE - 1) / SGX_PAGE_SIZE;
-//     ext_addr = __sgx_vma_free(pgidx, npgs);
-
-//     YPHASSERT(ext_addr != NULL);
-
-//     return ext_addr;
-// }
-
-
-// void _sgx_mm_mprotect(byte* start, byte* end)
-// {
-
-// }
-
-byte* sgx_mm_databss_itn2ext(byte* itn_addr, ulong fd)
-{
-    //uint pgidx = (itn_addr - sgxmm.vm_base) / SGX_PAGE_SIZE;
-    sgx_vm_area_t *vma = NULL;
-    list_t *ll = NULL;
-
-    for (ll = sgxmm.in.next; ll != &sgxmm.in; ll = ll->next) {
-        YPHASSERT(ll != &sgxmm.in);
-        vma = list_entry(ll, sgx_vm_area_t, ll);
-
-        //if (vma->vm_sgx + vma->npgs == pgidx) {
-            //YPHASSERT(vma->fd == fd);
-            /*return vma->vm_start + vma->npgs * SGX_PAGE_SIZE;*/
-        {}
-    }
-    return NULL;
-}
-
-
-sgx_vm_area_t* sgx_procmaps_mmap(byte* addr)
-{
-    // sgx_vm_area_t *vma;
-    // sgx_vm_area_t *add;
-    // list_t *llp;
-
-    // int npgs;
-    // add = list_entry(sgxmm.un, sgx_vm_area_t, ll);
-    // sgxmm.un = sgxmm.un->next;
-
-    // llp = sgxmm.in.prev;
-    // if (llp == &sgxmm.in) {
-    //     YPHASSERT(sgxmm.vm_size/SGX_PAGE_SIZE >= npgs);
-    //     add->vm_sgx = 0;
-    //     //add->npgs = npgs;
-
-    //     sgxmm.in.next = &add->ll;
-    //     sgxmm.in.prev = &add->ll;
-    //     add->ll.prev = &sgxmm.in;
-    //     add->ll.next = &sgxmm.in;
-
-    //     return add;
-    // }
-    // else {
-    //     vma = list_entry(llp, sgx_vm_area_t, ll);
-    //     YPHASSERT(sgxmm.vm_size/SGX_PAGE_SIZE > vma->vm_sgx + vma->npgs + npgs);
-
-    //     add->vm_sgx = vma->vm_sgx + vma->npgs;
-    //     //add->npgs = npgs;
-
-    //     list_add(llp, &sgxmm.in, &add->ll);
-    //     return add;
-    return NULL;
-
 }
