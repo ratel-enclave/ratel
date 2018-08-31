@@ -184,6 +184,7 @@ sgx_vm_area_t memlayout_init_encalve[] = {
 
 byte* sgx_vm_base = NULL;
 byte* ext_vm_base = NULL;
+byte* heap_init_end = NULL;
 sgx_mm_t sgxmm;
 
 
@@ -302,13 +303,26 @@ void sgx_mm_init_static(void)
 
 int _sgx_mm_init_byreffing_procmaps(void)
 {
-    const char *fn = "/proc/self/maps";
-    int fd = dynamorio_syscall(SYS_open, 2, fn, O_RDONLY);
+    static const char* AFTER_HEAP_SEG[] = {"[heap min]",
+        "[heap init]",
+        "[guard]",
+        "[stack max]",
+        "[stack min]",
+        "[guard]",
+        "[TCS]",
+        "[SSA]",
+        "[guard]",
+        "[FIRST_TD]",
+        "[XTA_TDCXT]",
+    };
+    static const char *PROCMAPS = "/proc/self/maps";
+
+    int fd = dynamorio_syscall(SYS_open, 2, PROCMAPS, O_RDONLY);
     if (fd == -1)
         return -1;
 
 #define BUF_SZ 4096
-#define HEPA_SZ 0x3ffff000
+#define HEPA_INIT_SZ 0x3ffff000
 #define MAPS_LINE_FORMAT4 "%08x-%08x %s %08x %*s %llu %4096s"
 #define MAPS_LINE_FORMAT8 "%016llx-%016llx %s %016llx %*s %llu %4096s"
     char buf[BUF_SZ];
@@ -321,6 +335,7 @@ int _sgx_mm_init_byreffing_procmaps(void)
     char *r;
     int nRgn = 0;
     bool after_heap = false;
+    int nAfter = 0;
 
     buf[BUF_SZ-1] = '\0';
     do {
@@ -354,10 +369,14 @@ int _sgx_mm_init_byreffing_procmaps(void)
 
         if (!after_heap) {
             vm_start = (byte*)nStart;
-            if (nEnd - nStart == HEPA_SZ && add != NULL) {
+            if (nEnd - nStart == HEPA_INIT_SZ && add != NULL) {
+                add->dev = 0;                                   //Not associated with dev
+                add->inode = 0;                                 //Not associated with inode
+                strncpy(add->comment, AFTER_HEAP_SEG[0], 80);   //comment vma heap_min
+                heap_init_end = (byte*)nEnd;
                 after_heap = true;
-                add->comment[0] = '\0';
             }
+            nAfter = 1;
         }
         else {
             vm_start = (byte*)(AFTER_HEAP_FLAG + nStart);
@@ -367,13 +386,19 @@ int _sgx_mm_init_byreffing_procmaps(void)
         add = _sgx_vma_alloc(sgxmm.in.prev, &sgxmm.in);
         _sgx_vma_fill(add, vm_start, nEnd - nStart, nProt, -1, nOfft);
         add->vm_sgx = (byte*)nStart;
-        add->dev = 8;
-        add->inode = nNode;
-        add->size = nEnd - nStart;
-        if (!after_heap)
+
+        if (!after_heap) {
+            add->dev = 8;
+            add->inode = nNode;
+            add->size = nEnd - nStart;
             strncpy(add->comment, DR_PATH, 80);
-        else
-            add->comment[0] = '\0';
+        }
+        else {
+            add->dev = 0;       //Not associated with dev
+            add->inode = 0;     //Not associated with inode
+            add->size = 0;
+            strncpy(add->comment, AFTER_HEAP_SEG[nAfter++], 80);
+        }
     }while(r != NULL);
 
     dynamorio_syscall(SYS_close, 1, fd);
