@@ -2783,15 +2783,15 @@ void mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr,
 void mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr, instr_t *next_instr)
 {
     /* replace rdtsc with a help function */
-            dr_insert_clean_call(dcontext, ilist, instr,
-                    (void*)sgx_helper_cpuid,
-                    false,  // don't save float regs
-                    1,      // 1 args
-                    OPND_CREATE_INTPTR(dcontext));
+    dr_insert_clean_call(dcontext, ilist, instr,
+            (void*)sgx_helper_cpuid,
+            false,  // don't save float regs
+            1,      // 1 args
+            OPND_CREATE_INTPTR(dcontext));
 
-            /* destroy the rdtsc instruction */
-            instrlist_remove(ilist, instr);
-            instr_destroy(dcontext, instr);
+    /* destroy the rdtsc instruction */
+    instrlist_remove(ilist, instr);
+    instr_destroy(dcontext, instr);
 }
 
 #endif /* FOOL_CPUID */
@@ -2799,16 +2799,16 @@ void mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr, inst
 
 void mangle_rdtsc(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr, instr_t *next_instr)
 {
-/* replace rdtsc with a help function */
-            dr_insert_clean_call(dcontext, ilist, instr,
-                    (void*)sgx_helper_rdtsc,
-                    false,  // don't save float regs
-                    1,      // 1 args
-                    OPND_CREATE_INTPTR(dcontext));
+    /* replace rdtsc with a help function */
+    dr_insert_clean_call(dcontext, ilist, instr,
+            (void*)sgx_helper_rdtsc,
+            false,  // don't save float regs
+            1,      // 1 args
+            OPND_CREATE_INTPTR(dcontext));
 
-            /* destroy the rdtsc instruction */
-            instrlist_remove(ilist, instr);
-            instr_destroy(dcontext, instr);
+    /* destroy the rdtsc instruction */
+    instrlist_remove(ilist, instr);
+    instr_destroy(dcontext, instr);
 }
 
 
