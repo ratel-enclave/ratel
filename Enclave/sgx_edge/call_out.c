@@ -50,10 +50,16 @@ void* gen_enclave_copy(void *org, int len)
     }
 }
 
-/*CPUID*/
-void our_cpuid(int res[4], int eax, int ecx)
+/* CPUID */
+void sgx_instr_cpuid(int res[4], int eax, int ecx)
 {
-    ocall_cpuid_3_ToNN(res, sizeof(int)*4, eax, ecx);
+    ocall_cpuid_ToNN(res, sizeof(int)*4, eax, ecx);
+}
+
+/* RDTSC */
+void sgx_instr_rdtsc(uint64* res)
+{
+    ocall_rdtsc_To(res, sizeof(unsigned long long));
 }
 
 //__attribute__((stdcall)) long simulate_syscall_inst(int sysno)
@@ -346,7 +352,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
     //Get syscall No.
     __asm volatile ("mov %%rax, %0": "=rm"(sysno)::"rdi","rsi","rdx","r10","r8","r9" );
 
-    ocall_print_syscallname(sysno);
+    // ocall_print_syscallname(sysno);
 
     /*fixing-up them with a sysno-to-function table*/
     switch (sysno) {

@@ -227,4 +227,41 @@ find_script_interpreter(OUT script_interpreter_t *result,
     result->argv[argc] = NULL;
     return true;
 }
+
+
+#include "instrument_api.h"
+#include "call_out.h"
+void sgx_helper_cpuid(void* drctx)
+{
+    dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
+    uint cpuid_res_local[4]; /* eax, ebx, ecx, and edx registers (in that order) */
+    uint eax, ecx;
+
+    dr_get_mcontext(drctx, &mctx);
+    eax = (uint)mctx.rax;
+    ecx = (uint)mctx.rcx;
+
+    sgx_instr_cpuid((int*)cpuid_res_local, eax, ecx);
+
+    mctx.rax = (uint64)cpuid_res_local[0];
+    mctx.rbx = (uint64)cpuid_res_local[1];
+    mctx.rcx = (uint64)cpuid_res_local[2];
+    mctx.rdx = (uint64)cpuid_res_local[3];
+    dr_set_mcontext(drctx, &mctx);
+}
+
+
+void sgx_helper_rdtsc(void* drctx)
+{
+    dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
+    uint64 res;
+
+    sgx_instr_rdtsc(&res);
+
+    dr_get_mcontext(drctx, &mctx);
+    mctx.rax = res & 0xFFFFFFFF;
+    mctx.rdx = (res << 32) & 0xFFFFFFFF;
+    dr_set_mcontext(drctx, &mctx);
+}
+
 #endif

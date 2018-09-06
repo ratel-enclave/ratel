@@ -1124,8 +1124,7 @@ decode_cti(dcontext_t *dcontext, byte *pc, instr_t *instr)
             return (start_pc + sz);
     }
 
-#ifdef FOOL_CPUID
-    /* for fooling program into thinking hardware is different than it is */
+    /* --------------Begin: SGX invalid instructions ------------*/
     if (byte0==0x0f && byte1==0xa2) { /* cpuid */
         instr_set_opcode(instr, OP_cpuid);
         /* don't bother to set dsts/srcs */
@@ -1134,10 +1133,18 @@ decode_cti(dcontext_t *dcontext, byte *pc, instr_t *instr)
         IF_X64(instr_set_rip_rel_pos(instr, rip_rel_pos));
         return (start_pc + sz);
     }
-#endif
+
+    if (byte0==0x0f && byte1==0x31) { /* rdtsc */
+        instr_set_opcode(instr, OP_rdtsc);
+        /* don't bother to set dsts/srcs */
+        instr_set_operands_valid(instr, false);
+        instr_set_raw_bits(instr, start_pc, sz);
+        IF_X64(instr_set_rip_rel_pos(instr, rip_rel_pos));
+        return (start_pc + sz);
+    }
+    /* --------------End: SGX invalid instructions ------------*/
 
     /* prefixes won't make a difference for 8-bit-offset jumps */
-
     if (byte0 == 0xeb) {                /* jmp_short */
         app_pc tgt = convert_8bit_offset(pc, byte1, 2);
         instr_set_opcode(instr, OP_jmp_short);

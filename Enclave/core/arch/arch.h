@@ -487,6 +487,13 @@ void
 mangle_single_step(dcontext_t *dcontext, instrlist_t *ilist, uint flags, instr_t *instr);
 
 #endif
+
+/* --------------Begin: SGX invalid instructions ------------*/
+void mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr, instr_t *next_instr);
+
+void mangle_rdtsc(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr, instr_t *next_instr);
+/* --------------End: SGX invalid instructions ------------*/
+
 instr_t *
 mangle_direct_call(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr,
                    instr_t *next_instr, bool mangle_calls, uint flags);

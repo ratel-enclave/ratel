@@ -45,6 +45,7 @@
 #include "instrument.h" /* for dr_insert_{save,restore}_fpstate */
 #include "instr_create.h" /* for dr_insert_{save,restore}_fpstate */
 #include "decode.h" /* for dr_insert_{save,restore}_fpstate */
+#include "call_out.h"
 
 #ifdef DEBUG
 /* case 10450: give messages to clients */
@@ -77,13 +78,13 @@ get_cache_sizes_amd(uint max_ext_val)
     uint cpuid_res_local[4]; /* eax, ebx, ecx, and edx registers (in that order) */
 
     if (max_ext_val >= 0x80000005) {
-        our_cpuid((int*)cpuid_res_local, 0x80000005, 0);
+        sgx_instr_cpuid((int*)cpuid_res_local, 0x80000005, 0);
         set_cache_size((cpuid_res_local[2]/*ecx*/ >> 24), &cpu_info.L1_icache_size);
         set_cache_size((cpuid_res_local[3]/*edx*/ >> 24), &cpu_info.L1_dcache_size);
     }
 
     if (max_ext_val >= 0x80000006) {
-        our_cpuid((int*)cpuid_res_local, 0x80000006, 0);
+        sgx_instr_cpuid((int*)cpuid_res_local, 0x80000006, 0);
         set_cache_size((cpuid_res_local[2]/*ecx*/ >> 16), &cpu_info.L2_cache_size);
     }
 }
@@ -98,7 +99,7 @@ get_cache_sizes_intel(uint max_val)
     if (max_val < 2)
         return;
 
-    our_cpuid((int*)cache_codes, 2, 0);
+    sgx_instr_cpuid((int*)cache_codes, 2, 0);
     /* The lower 8 bits of eax specify the number of times cpuid
      * must be executed to obtain a complete picture of the cache
      * characteristics.
@@ -185,7 +186,7 @@ get_processor_specific_info(void)
     }
 
     /* first verify on Intel processor */
-    our_cpuid(cpuid_res_local, 0, 0);
+    sgx_instr_cpuid(cpuid_res_local, 0, 0);
     res_eax = cpuid_res_local[0];
     res_ebx = cpuid_res_local[1];
     res_ecx = cpuid_res_local[2];
@@ -208,12 +209,12 @@ get_processor_specific_info(void)
     }
 
     /* Try to get extended cpuid information */
-    our_cpuid(cpuid_res_local, 0x80000000, 0);
+    sgx_instr_cpuid(cpuid_res_local, 0x80000000, 0);
     max_ext_val = cpuid_res_local[0]/*eax*/;
 
     /* Extended feature flags */
     if (max_ext_val >= 0x80000001) {
-        our_cpuid(cpuid_res_local, 0x80000001, 0);
+        sgx_instr_cpuid(cpuid_res_local, 0x80000001, 0);
         res_ecx = cpuid_res_local[2];
         res_edx = cpuid_res_local[3];
         cpu_info.features.ext_flags_edx = res_edx;
@@ -222,13 +223,13 @@ get_processor_specific_info(void)
 
     /* Get structured extended feature flags */
     if (max_val >= 0x7) {
-        our_cpuid(cpuid_res_local, 0x7, 0);
+        sgx_instr_cpuid(cpuid_res_local, 0x7, 0);
         res_ebx = cpuid_res_local[1];
         cpu_info.features.sext_flags_ebx = res_ebx;
     }
 
     /* now get processor info */
-    our_cpuid(cpuid_res_local, 1, 0);
+    sgx_instr_cpuid(cpuid_res_local, 1, 0);
     res_eax = cpuid_res_local[0];
     res_ebx = cpuid_res_local[1];
     res_ecx = cpuid_res_local[2];
@@ -295,9 +296,9 @@ get_processor_specific_info(void)
 
     /* Processor brand string */
     if (max_ext_val >= 0x80000004) {
-        our_cpuid((int*)&cpu_info.brand_string[0], 0x80000002, 0);
-        our_cpuid((int*)&cpu_info.brand_string[4], 0x80000003, 0);
-        our_cpuid((int*)&cpu_info.brand_string[8], 0x80000004, 0);
+        sgx_instr_cpuid((int*)&cpu_info.brand_string[0], 0x80000002, 0);
+        sgx_instr_cpuid((int*)&cpu_info.brand_string[4], 0x80000003, 0);
+        sgx_instr_cpuid((int*)&cpu_info.brand_string[8], 0x80000004, 0);
     }
 }
 

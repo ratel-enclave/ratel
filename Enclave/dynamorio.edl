@@ -60,7 +60,10 @@ enclave {
         void ocall_print_syscallname(long sysno);
 
         /******** CPUID ********/
-        void ocall_cpuid_3_ToNN([out, size=l] void *T, int l, int eax, int ecx);
+        void ocall_cpuid_ToNN([out, size=l] void *T, int l, int eax, int ecx);
+
+        /******** RDTSC ********/
+        void ocall_rdtsc_To([out, size=l] void *T, int l);
 
 
         /******** system-call parameter encoding rules ********/

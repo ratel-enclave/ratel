@@ -2679,6 +2679,7 @@ mangle_float_pc(dcontext_t *dcontext, instrlist_t *ilist,
     }
 }
 
+
 /***************************************************************************
  * CPUID FOOLING
  */
@@ -2699,8 +2700,7 @@ mangle_float_pc(dcontext_t *dcontext, instrlist_t *ilist,
 #define CPUID_1_ECX 0x00000000
 #define CPUID_1_EDX 0x000001bf
 
-static void
-mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr,
+void mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr,
              instr_t *next_instr)
 {
     /* assumption: input value is put in eax on prev instr, or
@@ -2778,7 +2778,39 @@ mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr,
     LOG(THREAD, LOG_INTERP, 1, "\tcpuid fool: giving up\n");
     return;
 }
+#else
+
+void mangle_cpuid(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr, instr_t *next_instr)
+{
+    /* replace rdtsc with a help function */
+            dr_insert_clean_call(dcontext, ilist, instr,
+                    (void*)sgx_helper_cpuid,
+                    false,  // don't save float regs
+                    1,      // 1 args
+                    OPND_CREATE_INTPTR(dcontext));
+
+            /* destroy the rdtsc instruction */
+            instrlist_remove(ilist, instr);
+            instr_destroy(dcontext, instr);
+}
+
 #endif /* FOOL_CPUID */
+
+
+void mangle_rdtsc(dcontext_t *dcontext, instrlist_t *ilist, instr_t *instr, instr_t *next_instr)
+{
+/* replace rdtsc with a help function */
+            dr_insert_clean_call(dcontext, ilist, instr,
+                    (void*)sgx_helper_rdtsc,
+                    false,  // don't save float regs
+                    1,      // 1 args
+                    OPND_CREATE_INTPTR(dcontext));
+
+            /* destroy the rdtsc instruction */
+            instrlist_remove(ilist, instr);
+            instr_destroy(dcontext, instr);
+}
+
 
 void
 mangle_exit_cti_prefixes(dcontext_t *dcontext, instr_t *instr)

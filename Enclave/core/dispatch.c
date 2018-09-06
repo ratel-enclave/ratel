@@ -161,9 +161,9 @@ dispatch(dcontext_t *dcontext)
 # endif
 #endif
 
+    YPHPRINT("dispatch: target = %lx", dcontext->next_tag);
     dispatch_enter_dynamorio(dcontext);
     LOG(THREAD, LOG_INTERP, 2, "\ndispatch: target = "PFX"\n", dcontext->next_tag);
-    YPHPRINT("dispatch: target = %lx", dcontext->next_tag);
 
     /* This is really a 1-iter loop most of the time: we only iterate
      * when we obtain a target fragment but then fail to enter the

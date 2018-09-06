@@ -56,6 +56,9 @@ ptr_int_t dynamorio_mach_syscall(uint sysnum, uint num_args, ...);
 # else
 ptr_int_t dynamorio_syscall(uint sysnum, uint num_args, ...);
 void dynamorio_syscall_inst(void);
+
+void sgx_helper_cpuid(void* drctx);
+void sgx_helper_rdtsc(void* drctx);
 # endif
 #endif
 

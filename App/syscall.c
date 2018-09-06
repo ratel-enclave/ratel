@@ -13,10 +13,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/syscall.h>
+#include <fcntl.h>
+
 
 
 //Please make me beautiful
-void ocall_cpuid_3_ToNN(void *T, int l, int eax, int ecx)
+void ocall_cpuid_ToNN(void *T, int l, int eax, int ecx)
 {
     int a, b, c,d;
 
@@ -34,6 +36,16 @@ void ocall_cpuid_3_ToNN(void *T, int l, int eax, int ecx)
     ((int*)T)[2] = c;
     ((int*)T)[3] = d;
     printf("%s\n", __FUNCTION__);
+}
+
+void ocall_rdtsc_To(void *T, int l)
+{
+    unsigned long long *t = T;
+    unsigned hi, lo;
+
+    // *t = __rdtsc();
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    *t = ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
 }
 
 
@@ -370,7 +382,7 @@ void ocall_print_syscallname(long sysno)
 void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
 {
     if (implemented)
-        printf("%s: return 0x%lx\n", fname, ret);
+        ;//printf("%s: return 0x%lx\n", fname, ret);
     else
         printf("sysno: %-4d not implemented!\n", (int)sysno);
 }
@@ -391,6 +403,7 @@ long ocall_syscall_0(long sysno)
     switch (sysno) {
         case SYS_getpid:
         case SYS_gettid:
+        case SYS_sync:
             ret = syscall(sysno);
             b = true;
             break;
@@ -519,6 +532,13 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
             ret = syscall(sysno, N1, N2);
             b = true;
             break;
+
+        case SYS_fcntl:
+            if (N1 == F_DUPFD) {
+                ret = syscall(sysno, N1, N2);
+                b = true;
+            }
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -582,6 +602,22 @@ long ocall_syscall_2_ToN(long sysno, void *V, int len, long N)
 
     if (sysno == SYS_gettimeofday) {
         ret = syscall(sysno, V, N);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+long ocall_syscall_2_SN(long sysno, const char *S, long N)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_mkdir) {
+        ret = syscall(sysno, S, N);
         b = true;
     }
 
@@ -671,6 +707,7 @@ long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
     bool b = false;
 
     if (sysno == SYS_open) {
+        printf("open file %s\n", S);
         ret = syscall(sysno, S, N1, N2);
         b = true;
     }

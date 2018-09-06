@@ -85,7 +85,7 @@ dynamorio_t.o: dynamorio_t.c
 
 ######## Dynamorio Settings ########
 BLD_DIR		?= build
-INC_DIR		:= core/arch/x86 core/unix core/arch core/lib extra extra/include/annotations
+INC_DIR		:= core/arch/x86 core/unix core/arch core/lib extra extra/include/annotations sgx_edge
 INCLUDES	:= $(addprefix -I./,$(INC_DIR))
 MODULES 	:= core core/unix core/lib core/arch core/arch/x86 third_party/libgcc
 BUILD_DIR   := $(addprefix $(BLD_DIR)/,$(MODULES))

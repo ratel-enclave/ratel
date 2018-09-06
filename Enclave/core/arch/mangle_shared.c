@@ -1022,12 +1022,15 @@ mangle(dcontext_t *dcontext, instrlist_t *ilist, uint *flags INOUT,
             }
         }
 #endif
-#ifdef FOOL_CPUID
+
         else if (instr_get_opcode(instr) == OP_cpuid) {
             mangle_cpuid(dcontext, ilist, instr, next_instr);
             continue;
         }
-#endif
+        else if (instr_get_opcode(instr) == OP_rdtsc) {
+            mangle_rdtsc(dcontext, ilist, instr, next_instr);
+            continue;
+        }
 
         if (!instr_is_cti(instr) || instr_is_meta(instr)) {
 #ifdef STEAL_REGISTER
