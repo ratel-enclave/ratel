@@ -1,12 +1,14 @@
 #include "unistd_64.h"
 #include "syscall.h"
-#include "call_out.h"
 #include "st_size.h"
 #include "sgx_trts.h"
 #include "string.h"
 #include "../dynamorio_t.h"
 
 #include "x86intrin.h"
+
+#include "sgx_mm.h"
+#include "call_out.h"
 
 
 void sgx_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
@@ -39,15 +41,13 @@ void sgx_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
 //Generate a copy within the enclave.
 void* gen_enclave_copy(void *org, int len)
 {
-    void *t;
+    void *obj = org;
 
-    if (sgx_is_within_enclave(org, len))
-        return org;
-    else {
-        t = malloc(len);
-        memcpy(t, org, len);
-        return t;
+    if (!sgx_is_within_enclave(obj, len)) {
+        obj = malloc(len);
+        memcpy(obj, org, len);
     }
+    return obj;
 }
 
 /* CPUID */
@@ -194,6 +194,7 @@ long simulate_syscall_inst_1(long sysno, long _rdi)
 long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
 {
     long ret = 0;
+    byte* addr;
 
     switch (sysno) {
         case SYS_fstat:
@@ -201,12 +202,13 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
             break;
 
         case SYS_munmap:
-            //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
-            ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
+            /* free external block */
+            addr = sgx_mm_itn2ext((byte*)_rdi);
+            sgx_mm_munmap(addr, _rsi);
+            ocall_syscall_2_NN(&ret, sysno, (ulong)addr, _rsi);
             break;
 
         case SYS_gettimeofday:
-            //ocall_syscall_2_V0N(&ret, sysno, (void*)_rdi, _rsi);
             ocall_syscall_2_ToN(&ret, sysno, (void*)_rdi, 16,  _rsi);
             break;
 
@@ -244,17 +246,24 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
 {
     long ret = 0;
     char *s, *t;
+    byte* addr;
 
     switch (sysno) {
         case SYS_open:
             s = (char*)_rdi;
-            t = gen_enclave_copy(s, strlen(s));
+            t = gen_enclave_copy(s, strlen(s)+1);
 
             ocall_syscall_3_SNN(&ret, sysno, t, _rsi, _rdx);
-            if (t != s) free(t);
+
+            /* bind the fid with filename */
+            if (ret != -1)
+                sgx_vma_set_cmt(ret, t);
+
+            /* free the enclave copy */
+            if (t != s)
+                free(t);
 
             break;
-
         case SYS_tgkill:
             ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
             break;
@@ -268,9 +277,16 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_mprotect:
-            ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
-            break;
+            addr = sgx_mm_itn2ext((byte*)_rdi);
 
+            ocall_syscall_3_NNN(&ret, sysno, (ulong)addr, _rsi, _rdx);
+
+            if (ret == 0) {
+                // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
+                sgx_mm_mprotect(addr, _rsi, _rdx);
+            }
+
+            break;
         case SYS_getdents:
             ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
@@ -313,12 +329,20 @@ long simulate_syscall_inst_5(long sysno, long _rdi, long _rsi, long _rdx, long _
 long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
     long ret = 0;
+    byte* addr;
 
     switch (sysno) {
         case SYS_mmap:
-            ocall_syscall_6_NNNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
-            break;
+            addr = sgx_mm_itn2ext((byte*)_rdi);
 
+            ocall_syscall_6_NNNNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10, _r8, _r9);
+            /* return internal address */
+            if (ret != -1) {
+                // byte* sgx_mm_mmap(byte* ext_addr, size_t len, ulong prot, ulong flags, int fd, ulong offs)
+                ret = (ulong)sgx_mm_mmap((byte*)ret, _rsi, _rdx, _r10, (int)_r8, _r9);
+            }
+
+            break;
         case SYS_futex:
             ocall_syscall_6_PoNNTiPoN(&ret, sysno, (int*)_rdi, _rsi, _rdx, (void*)_r10, len_timespec, (int*) _r8, _r9);
             break;

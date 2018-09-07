@@ -74,6 +74,14 @@ memquery_init(void);
 void
 memquery_exit(void);
 
+/*------------simulate a procmaps file in SGX--------------------*/
+int sgx_procmaps_read_start(void);
+
+void sgx_procmaps_read_stop(void);
+
+int sgx_procmaps_read_next(char *buf, int count);
+/*------------simulate a procmaps file in SGX--------------------*/
+
 /* The passed-in "start" parameter is a performance hint to start
  * iteration at the region containing that address.  However, the
  * iterator may start before that point.

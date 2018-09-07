@@ -196,8 +196,6 @@ char **our_environ;
 # include "instrument.h"
 #endif
 
-#include "sgx_vma.h"
-
 /* Cross arch syscall nums for use with struct stat64. */
 #ifdef X64
 # ifdef SYS_stat
@@ -2898,15 +2896,7 @@ osprot_replace_memprot(uint old_osprot, uint memprot)
 static inline long
 mprotect_syscall(byte *p, size_t size, uint prot)
 {
-    long ret;
-
-    p = sgx_mm_itn2ext(p);
-    ret = dynamorio_syscall(SYS_mprotect, 3, p, size, prot);
-    if (ret == 0) {
-        sgx_mm_mprotect(p, size, prot);
-    }
-
-    return ret;
+    return dynamorio_syscall(SYS_mprotect, 3, p, size, prot);
 }
 
 bool
@@ -2936,38 +2926,22 @@ mmap_syscall_succeeded(byte *retval)
 static inline byte *
 mmap_syscall(byte *addr, size_t len, ulong prot, ulong flags, ulong fd, ulong offs)
 {
-    byte* ret;
-
-    addr = sgx_mm_itn2ext(addr);
 #if defined(MACOS) && !defined(X64)
-    ret = return (byte *)(ptr_int_t)
+    return (byte *)(ptr_int_t)
         dynamorio_syscall(SYS_mmap, 7, addr, len, prot, flags, fd,
                 /* represent 64-bit arg as 2 32-bit args */
                 offs, 0);
 #else
-    ret = (byte *)(ptr_int_t)
+    return (byte *)(ptr_int_t)
         dynamorio_syscall(IF_MACOS_ELSE(SYS_mmap, IF_X64_ELSE(SYS_mmap, SYS_mmap2)), 6,
                 addr, len, prot, flags, fd, offs);
 #endif
-    if (ret != (byte*)-1) {
-        /* return internal address */
-        ret = sgx_mm_mmap(ret, len, prot, flags, (int)fd, offs);
-    }
-
-    return ret;
 }
 
 static inline long
 munmap_syscall(byte *addr, size_t len)
 {
-    long ret;
-
-    /* free external block */
-    addr = sgx_mm_itn2ext(addr);
-    sgx_mm_munmap(addr, len);
-    ret = dynamorio_syscall(SYS_munmap, 2, addr, len);
-
-    return ret;
+    return dynamorio_syscall(SYS_munmap, 2, addr, len);
 }
 
 #ifndef NOT_DYNAMORIO_CORE_PROPER
@@ -4102,18 +4076,12 @@ int
 open_syscall(const char *file, int flags, int mode)
 {
     ASSERT(file != NULL);
-    int res;
-
 #ifdef SYS_open
-    res = dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_open), 3, file, flags, mode);
+    return dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_open), 3, file, flags, mode);
 #else
-    res = dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_openat), 4,
+    return dynamorio_syscall(SYSNUM_NO_CANCEL(SYS_openat), 4,
                              AT_FDCWD, file, flags, mode);
 #endif
-    if (res != -1)
-        sgx_vma_set_cmt(res, file);
-
-    return res;
 }
 
 int
@@ -6825,12 +6793,6 @@ pre_system_call(dcontext_t *dcontext)
         dcontext->sys_param1 = len;
         dcontext->sys_param2 = prot;
         dcontext->sys_param3 = flags;
-
-        /* change internal address to external address for invoking mmap */
-        addr = sgx_mm_itn2ext(addr);
-        *sys_param_addr(dcontext, 0) = (reg_t) addr;
-        // Update sys_param0 although post_system_call doeen't use it
-        dcontext->sys_param0 = (reg_t) addr;
         break;
     }
     /* must flush stale fragments when we see munmap/mremap */
@@ -6887,9 +6849,6 @@ pre_system_call(dcontext_t *dcontext)
         memcache_remove(addr, addr + len);
         memcache_unlock();
 #endif
-        addr = sgx_mm_itn2ext(addr);
-        *sys_param_addr(dcontext, 0) = (reg_t) addr;
-        dcontext->sys_param0 = (reg_t) addr;
         break;
     }
 #ifdef LINUX
@@ -6984,10 +6943,6 @@ pre_system_call(dcontext_t *dcontext)
             /* FIXME Store state for undo if the syscall fails. */
             IF_NO_MEMQUERY(memcache_update_locked(addr, addr + len, new_memprot,
                                                   -1/*type unchanged*/, exists));
-
-            addr = sgx_mm_itn2ext(addr);
-            *sys_param_addr(dcontext, 0) = (reg_t) addr;
-            dcontext->sys_param0 = (reg_t) addr;
         }
         break;
     }
@@ -8197,9 +8152,6 @@ post_system_call(dcontext_t *dcontext)
              */
             LOG(THREAD, LOG_SYSCALLS, 2, "SYS_open %s => %d\n",
                 dcontext->sys_param0, (int)result);
-
-            //dr_printf("%s: %s => %d\n", __FUNCTION__, (const char*)dcontext->sys_param0, (int)result);
-            sgx_vma_set_cmt(result, (const char*)dcontext->sys_param0);
         }
         break;
     }
@@ -8249,14 +8201,6 @@ post_system_call(dcontext_t *dcontext)
 #if defined(LINUX) && !defined(X64) && !defined(ARM)
         }
 #endif
-        if (success) {
-            ulong ufd = sys_param(dcontext, 4);
-            ulong offs = sys_param(dcontext, 5);
-
-            base = sgx_mm_mmap(base, size, prot, flags, ufd, offs);
-            set_success_return_val(dcontext, (reg_t)base);
-        }
-
         process_mmap(dcontext, base, size, prot, flags _IF_DEBUG(map_type));
         break;
     }
@@ -8296,9 +8240,6 @@ post_system_call(dcontext_t *dcontext)
                                                                         PAGE_SIZE),
                                                   info.prot,
                                                   info.type, false/*add back*/));
-        }
-        if (success) {
-            sgx_mm_munmap(addr, len);
         }
         break;
     }
@@ -8389,9 +8330,6 @@ post_system_call(dcontext_t *dcontext)
                                                       memprot, -1/*type unchanged*/,
                                                       true/*exists*/));
             }
-        }
-        if (success) {
-            sgx_mm_mprotect(base, size, prot);
         }
         break;
     }
