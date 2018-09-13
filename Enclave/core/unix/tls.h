@@ -241,9 +241,11 @@ typedef struct _os_local_state_t {
     /* i#107 application's tls value and pointed-at base */
     ushort app_lib_tls_reg;  /* for mangling seg update/query */
     ushort app_alt_tls_reg;  /* for mangling seg update/query */
+    ushort sgx_sdk_tls_reg;
 #endif
     void  *app_lib_tls_base; /* for mangling segmented memory ref */
     void  *app_alt_tls_base; /* for mangling segmented memory ref */
+    void  *sgx_sdk_tls_base;
     union {
         /* i#107: We use space in os_tls to store thread area information
          * thread init. It will not conflict with the client_tls usage,

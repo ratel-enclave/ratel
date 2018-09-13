@@ -1874,25 +1874,27 @@ os_handle_mov_seg(dcontext_t *dcontext, byte *pc)
 static void
 os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
 {
-    app_pc app_lib_tls_base, app_alt_tls_base;
+    app_pc app_lib_tls_base, app_alt_tls_base, sgx_sdk_tls_base;
 #ifdef X86
     int i, index;
     our_modify_ldt_t *desc;
 
-    os_tls->app_lib_tls_reg = read_thread_register(TLS_REG_LIB);
-    os_tls->app_alt_tls_reg = read_thread_register(TLS_REG_ALT);
+    os_tls->app_lib_tls_reg = 0;
+    os_tls->app_alt_tls_reg = 0;
+    os_tls->sgx_sdk_tls_reg = read_thread_register(TLS_REG_LIB);
 #endif
-    app_lib_tls_base = get_segment_base(TLS_REG_LIB);
-    app_alt_tls_base = get_segment_base(TLS_REG_ALT);
+    app_lib_tls_base = NULL;
+    app_alt_tls_base = NULL;
+    sgx_sdk_tls_base = get_segment_base(TLS_REG_LIB);
+
 
     /* If we're a non-initial thread, tls will be set to the parent's value,
      * or to &uninit_tls (i#2089), both of which will be is_dynamo_address().
      */
     os_tls->app_lib_tls_base = is_dynamo_address(app_lib_tls_base) ? NULL : app_lib_tls_base;
     os_tls->app_alt_tls_base = is_dynamo_address(app_alt_tls_base) ? NULL : app_alt_tls_base;
+    os_tls->sgx_sdk_tls_base = is_dynamo_address(app_alt_tls_base) ? NULL : sgx_sdk_tls_base;
 
-    YPHASSERT(os_tls->app_lib_tls_base != NULL);
-    YPHASSERT(os_tls->app_alt_tls_base != NULL);
 #ifdef X86
     /* get all TLS thread area value */
     /* XXX: is get_thread_area supported in 64-bit kernel?
@@ -1913,18 +1915,18 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
 
     /* now allocate the tls segment for client libraries */
     if (IF_CLIENT_INTERFACE_ELSE(INTERNAL_OPTION(private_loader), false)) {
-        os_tls->os_seg_info.priv_lib_tls_base = //os_tls->app_lib_tls_base;
+        os_tls->os_seg_info.priv_lib_tls_base =
             IF_UNIT_TEST_ELSE(os_tls->app_lib_tls_base, privload_tls_init(os_tls->app_lib_tls_base));
     }
 
 #ifdef X86
     LOG(THREAD_GET, LOG_THREADS, 1,
-        "thread "TIDFMT" app lib tls reg: 0x%x, alt tls reg: 0x%x\n",
-        get_thread_id(), os_tls->app_lib_tls_reg, os_tls->app_alt_tls_reg);
+        "thread "TIDFMT" app lib tls reg: 0x%x, alt tls reg: 0x%x, sgxsdk tls reg: 0x%x\n",
+        get_thread_id(), os_tls->app_lib_tls_reg, os_tls->app_alt_tls_reg, os_tls->sgx_sdk_tls_reg);
 #endif
     LOG(THREAD_GET, LOG_THREADS, 1,
-        "thread "TIDFMT" app lib tls base: "PFX", alt tls base: "PFX"\n",
-        get_thread_id(), os_tls->app_lib_tls_base, os_tls->app_alt_tls_base);
+        "thread "TIDFMT" app lib tls base: "PFX", alt tls base: "PFX", sgxsdk tls base: "PFX"\n",
+        get_thread_id(), os_tls->app_lib_tls_base, os_tls->app_alt_tls_base, os_tls->sgx_sdk_tls_base);
     LOG(THREAD_GET, LOG_THREADS, 1,
         "thread "TIDFMT" priv lib tls base: "PFX", alt tls base: "PFX", "
         "DR's tls base: "PFX"\n",
@@ -2545,10 +2547,15 @@ os_using_app_state(dcontext_t *dcontext)
 void
 os_swap_context(dcontext_t *dcontext, bool to_app, dr_state_flags_t flags)
 {
-    if (os_should_swap_state())
+    if (os_should_swap_state()) {
+        YPHPRINT("->os_switch_seg_to_context()");
         os_switch_seg_to_context(dcontext, LIB_SEG_TLS, to_app);
-    if (TEST(DR_STATE_DR_TLS, flags))
+    }
+
+    if (TEST(DR_STATE_DR_TLS, flags)) {
+        YPHPRINT("->os_swap_dr_tls()");
         os_swap_dr_tls(dcontext, to_app);
+    }
 }
 
 void

@@ -143,6 +143,7 @@ static size_t tcb_size = IF_X86_ELSE(IF_X64_ELSE(0x900, 0x490), 0x40);
  */
 typedef struct _tcb_head_t {
 #ifdef X86
+    sgxsdk_thread_data_t td_space;
     void *tcb;
     void *dtv;
     void *self;
@@ -198,8 +199,7 @@ typedef struct _dr_pthread_t {
  * more work.  The comment above should be updated as well, as we do not use
  * the app's libc inside DR.
  */
-//# define APP_LIBC_TLS_SIZE 0x400
-# define APP_LIBC_TLS_SIZE 0x00
+# define APP_LIBC_TLS_SIZE 0x400
 #elif defined(AARCHXX)
 /* FIXME i#1551, i#1569: investigate the difference between ARM and X86 on TLS.
  * On ARM, it seems that TLS variables are not put before the thread pointer
@@ -340,9 +340,8 @@ privload_tls_init(void *app_tp)
         dynamo_memset(dest + opd->tls_image_size, 0,
                opd->tls_block_size - opd->tls_image_size);
     }
-    if (app_tp != NULL) {
-      init_slave_thread_data((thread_data_t *)seg);
-    }
+
+    init_slave_thread_data((thread_data_t *)seg);
     //return dr_tp;
     return seg;
 }
