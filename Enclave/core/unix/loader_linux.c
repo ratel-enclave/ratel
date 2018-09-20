@@ -263,12 +263,11 @@ privload_tls_init(void *app_tp)
     tcb_head_t *dr_tcb;
     uint i;
     size_t tls_bytes_read;
-    byte *seg;
 
     /* FIXME: These should be a thread logs, but dcontext is not ready yet. */
-    LOG(GLOBAL, LOG_LOADER, 2, "%s: app TLS segment base is "PFX"\n",
-        __FUNCTION__, app_tp);
-    seg = dr_tp = heap_mmap(client_tls_alloc_size, VMM_SPECIAL_MMAP);
+    LOG(GLOBAL, LOG_LOADER, 2, "%s: app TLS segment base is "PFX"\n", __FUNCTION__, app_tp);
+
+    dr_tp = heap_mmap(client_tls_alloc_size, VMM_SPECIAL_MMAP);
     ASSERT(APP_LIBC_TLS_SIZE + TLS_PRE_TCB_SIZE + tcb_size <= client_tls_alloc_size);
 #ifdef AARCHXX
     /* GDB reads some pthread members (e.g., pid, tid), so we must make sure
@@ -277,12 +276,12 @@ privload_tls_init(void *app_tp)
     ASSERT(TLS_PRE_TCB_SIZE == LIBC_PTHREAD_SIZE);
     ASSERT(LIBC_PTHREAD_TID_OFFSET == offsetof(dr_pthread_t, tid));
 #endif
-    LOG(GLOBAL, LOG_LOADER, 2, "%s: allocated %d at "PFX"\n",
-        __FUNCTION__, client_tls_alloc_size, dr_tp);
+    LOG(GLOBAL, LOG_LOADER, 2, "%s: allocated %d at "PFX"\n", __FUNCTION__, client_tls_alloc_size, dr_tp);
+
     dr_tp = dr_tp + client_tls_alloc_size - tcb_size;
     dr_tcb = (tcb_head_t *) dr_tp;
-    LOG(GLOBAL, LOG_LOADER, 2, "%s: adjust thread pointer to "PFX"\n",
-        __FUNCTION__, dr_tp);
+
+    LOG(GLOBAL, LOG_LOADER, 2, "%s: adjust thread pointer to "PFX"\n", __FUNCTION__, dr_tp);
     /* We copy the whole tcb to avoid initializing it by ourselves.
      * and update some fields accordingly.
      */
@@ -292,19 +291,16 @@ privload_tls_init(void *app_tp)
      * This copy can be avoided if we remove the DR's dependency on
      * libc.
      */
-
     if (app_tp != NULL &&
-        !safe_read_ex(app_tp - APP_LIBC_TLS_SIZE - TLS_PRE_TCB_SIZE,
-                      APP_LIBC_TLS_SIZE + TLS_PRE_TCB_SIZE + tcb_size,
-                      dr_tp  - APP_LIBC_TLS_SIZE - TLS_PRE_TCB_SIZE,
-                      &tls_bytes_read)) {
+            !safe_read_ex(app_tp - APP_LIBC_TLS_SIZE - TLS_PRE_TCB_SIZE,
+                APP_LIBC_TLS_SIZE + TLS_PRE_TCB_SIZE + tcb_size,
+                dr_tp  - APP_LIBC_TLS_SIZE - TLS_PRE_TCB_SIZE,
+                &tls_bytes_read)) {
         LOG(GLOBAL, LOG_LOADER, 2, "%s: read failed, tcb was 0x%lx bytes "
-            "instead of 0x%lx\n", __FUNCTION__, tls_bytes_read -
-            APP_LIBC_TLS_SIZE, tcb_size);
+                "instead of 0x%lx\n", __FUNCTION__, tls_bytes_read - APP_LIBC_TLS_SIZE, tcb_size);
 #ifdef AARCHXX
     } else {
-        dr_pthread_t *dp =
-            (dr_pthread_t *)(dr_tp - APP_LIBC_TLS_SIZE - TLS_PRE_TCB_SIZE);
+        dr_pthread_t *dp = (dr_pthread_t *)(dr_tp - APP_LIBC_TLS_SIZE - TLS_PRE_TCB_SIZE);
         dp->pid = get_process_id();
         dp->tid = get_sys_thread_id();
 #endif
@@ -337,13 +333,11 @@ privload_tls_init(void *app_tp)
          * We use the same way as libc to name them.
          */
         ASSERT(opd->tls_block_size >= opd->tls_image_size);
-        dynamo_memset(dest + opd->tls_image_size, 0,
-               opd->tls_block_size - opd->tls_image_size);
+        dynamo_memset(dest + opd->tls_image_size, 0, opd->tls_block_size - opd->tls_image_size);
     }
 
-    init_slave_thread_data((thread_data_t *)seg);
-    //return dr_tp;
-    return seg;
+    init_slave_thread_data((sgxsdk_thread_data_t *)dr_tcb);    // fs <-- dr_tcb
+    return dr_tp;
 }
 
 void

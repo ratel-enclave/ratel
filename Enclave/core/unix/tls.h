@@ -207,6 +207,7 @@ typedef struct _os_seg_info_t {
     int   tls_type;
     void *priv_lib_tls_base;
     void *priv_alt_tls_base;
+    void *sgx_sdk_tls_base;
     void *dr_tls_base;
 #ifdef X86
     our_modify_ldt_t app_thread_areas[GDT_NUM_TLS_SLOTS];
@@ -241,11 +242,9 @@ typedef struct _os_local_state_t {
     /* i#107 application's tls value and pointed-at base */
     ushort app_lib_tls_reg;  /* for mangling seg update/query */
     ushort app_alt_tls_reg;  /* for mangling seg update/query */
-    ushort sgx_sdk_tls_reg;
 #endif
     void  *app_lib_tls_base; /* for mangling segmented memory ref */
     void  *app_alt_tls_base; /* for mangling segmented memory ref */
-    void  *sgx_sdk_tls_base;
     union {
         /* i#107: We use space in os_tls to store thread area information
          * thread init. It will not conflict with the client_tls usage,
@@ -273,8 +272,8 @@ get_dr_tls_base_addr(void);
 #ifdef X86
 
 
-typedef struct thread_data_t thread_data_t;
-extern void init_slave_thread_data(thread_data_t *td);
+typedef struct _sgxsdk_thread_data_t sgxsdk_thread_data_t;
+extern void init_slave_thread_data(sgxsdk_thread_data_t *td);
 extern void load_fsbase(unsigned long base);
 extern void load_gsbase(unsigned long base);
 

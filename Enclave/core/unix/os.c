@@ -1874,26 +1874,22 @@ os_handle_mov_seg(dcontext_t *dcontext, byte *pc)
 static void
 os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
 {
-    app_pc app_lib_tls_base, app_alt_tls_base, sgx_sdk_tls_base;
+    app_pc app_lib_tls_base, app_alt_tls_base;
 #ifdef X86
     int i, index;
     our_modify_ldt_t *desc;
 
     os_tls->app_lib_tls_reg = 0;
     os_tls->app_alt_tls_reg = 0;
-    os_tls->sgx_sdk_tls_reg = read_thread_register(TLS_REG_LIB);
 #endif
     app_lib_tls_base = NULL;
     app_alt_tls_base = NULL;
-    sgx_sdk_tls_base = get_segment_base(TLS_REG_LIB);
-
 
     /* If we're a non-initial thread, tls will be set to the parent's value,
      * or to &uninit_tls (i#2089), both of which will be is_dynamo_address().
      */
     os_tls->app_lib_tls_base = is_dynamo_address(app_lib_tls_base) ? NULL : app_lib_tls_base;
     os_tls->app_alt_tls_base = is_dynamo_address(app_alt_tls_base) ? NULL : app_alt_tls_base;
-    os_tls->sgx_sdk_tls_base = is_dynamo_address(app_alt_tls_base) ? NULL : sgx_sdk_tls_base;
 
 #ifdef X86
     /* get all TLS thread area value */
@@ -1918,22 +1914,25 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
         os_tls->os_seg_info.priv_lib_tls_base =
             IF_UNIT_TEST_ELSE(os_tls->app_lib_tls_base, privload_tls_init(os_tls->app_lib_tls_base));
     }
+    os_tls->os_seg_info.sgx_sdk_tls_base = get_segment_base(TLS_REG_LIB);
 
 #ifdef X86
     LOG(THREAD_GET, LOG_THREADS, 1,
-        "thread "TIDFMT" app lib tls reg: 0x%x, alt tls reg: 0x%x, sgxsdk tls reg: 0x%x\n",
-        get_thread_id(), os_tls->app_lib_tls_reg, os_tls->app_alt_tls_reg, os_tls->sgx_sdk_tls_reg);
+        "thread "TIDFMT" app lib tls reg: 0x%x, alt tls reg: 0x%x\n",
+        get_thread_id(), os_tls->app_lib_tls_reg, os_tls->app_alt_tls_reg);
 #endif
     LOG(THREAD_GET, LOG_THREADS, 1,
-        "thread "TIDFMT" app lib tls base: "PFX", alt tls base: "PFX", sgxsdk tls base: "PFX"\n",
-        get_thread_id(), os_tls->app_lib_tls_base, os_tls->app_alt_tls_base, os_tls->sgx_sdk_tls_base);
+        "thread "TIDFMT" app lib tls base: "PFX", alt tls base: "PFX"\n",
+        get_thread_id(), os_tls->app_lib_tls_base, os_tls->app_alt_tls_base);
+
     LOG(THREAD_GET, LOG_THREADS, 1,
         "thread "TIDFMT" priv lib tls base: "PFX", alt tls base: "PFX", "
-        "DR's tls base: "PFX"\n",
+        "DR's tls base: "PFX", sgxsdk tls base: "PFX"\n",
         get_thread_id(),
         os_tls->os_seg_info.priv_lib_tls_base,
         os_tls->os_seg_info.priv_alt_tls_base,
-        os_tls->os_seg_info.dr_tls_base);
+        os_tls->os_seg_info.dr_tls_base,
+        os_tls->os_seg_info.sgx_sdk_tls_base);
 }
 
 void
@@ -1958,9 +1957,10 @@ os_tls_init(void)
 
     /* MUST zero out dcontext slot so uninit access gets NULL */
     dynamo_memset(segment, 0, PAGE_SIZE);
-    #ifdef X86
-    init_slave_thread_data((thread_data_t*)segment);
-    #endif
+#ifdef X86
+    init_slave_thread_data((sgxsdk_thread_data_t*)segment);  //gs <-- segment
+#endif
+
     /* store key data in the tls itself */
     os_tls->self = os_tls;
     os_tls->tid = get_sys_thread_id();
@@ -2005,7 +2005,8 @@ os_tls_init(void)
         if (last_thread_tls_exited) /* re-attach */
             last_thread_tls_exited = false;
     }
-    ASSERT(is_thread_tls_initialized());
+    // ASSERT(is_thread_tls_initialized());
+    is_thread_tls_initialized();
 }
 
 static bool
@@ -2223,6 +2224,7 @@ os_thread_init(dcontext_t *dcontext)
      */
     ostd->priv_lib_tls_base = os_tls->os_seg_info.priv_lib_tls_base;
     ostd->priv_alt_tls_base = os_tls->os_seg_info.priv_alt_tls_base;
+    ostd->sgx_sdk_tls_base = os_tls->os_seg_info.sgx_sdk_tls_base;
     ostd->dr_tls_base = os_tls->os_seg_info.dr_tls_base;
 
     LOG(THREAD, LOG_THREADS, 1, "TLS app lib base  ="PFX"\n", os_tls->app_lib_tls_base);
