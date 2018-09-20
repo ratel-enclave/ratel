@@ -1153,6 +1153,7 @@ bool bitmap_check_consistency(bitmap_t b, uint bitmap_size, uint expect_free);
   if (stats != NULL &&                           \
       stats->loglevel >= (level) &&              \
       (stats->logmask & (mask)) != 0)            \
+      print_log(file, mask, level, "\n%s:%d:%s:\n", __FILE__, __LINE__, __FUNCTION__); \
       print_log(file, mask, level, __VA_ARGS__); \
   } while (0)
   /* use DOELOG for customer visible logging. statement can be a {} block */
@@ -1175,10 +1176,14 @@ bool bitmap_check_consistency(bitmap_t b, uint bitmap_size, uint expect_free);
 #  define DOLOG(level, mask, statement)
 #  define LOG_DECLARE(declaration)
 # endif /* INTERNAL */
-# define THREAD ((dcontext == NULL) ? INVALID_FILE : \
-                 ((dcontext == GLOBAL_DCONTEXT) ? main_logfile : dcontext->logfile))
+// # define THREAD ((dcontext == NULL) ? INVALID_FILE :
+//                 ((dcontext == GLOBAL_DCONTEXT) ? main_logfile : dcontext->logfile))
+# define THREAD ((dcontext == NULL) ? INVALID_FILE :    \
+                ((dcontext == GLOBAL_DCONTEXT) ? STDOUT : dcontext->logfile))
+
 # define THREAD_GET get_thread_private_logfile()
-# define GLOBAL main_logfile
+// # define GLOBAL main_logfile
+# define GLOBAL STDOUT
 #else  /* !DEBUG */
 /* make use of gcc macro varargs, LOG's args may be ifdef DEBUG */
 /* the macro is actually ,fmt... but C99 requires one+ argument which we just strip */
@@ -1193,10 +1198,12 @@ void print_file(file_t f, const char *fmt, ...);
 
 #if defined(DEBUG)
 /* gettid() && sync() */
-#define YPHPRINT(FMT, ...)      \
-    LOG(GLOBAL, LOG_ALL, 0, "thread_%d:%s:%d:%s:" #FMT "\n", dynamorio_syscall(186, 0), __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__);   \
-    dynamorio_syscall(162, 0)
+// #define YPHPRINT(FMT, ...)
+//     LOG(GLOBAL, LOG_ALL, 0, "thread_%d:%s:%d:%s:" #FMT "\n", dynamorio_syscall(186, 0), __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__);
+//     dynamorio_syscall(162, 0)
 
+#define YPHPRINT(FMT, ...)      \
+    LOG(GLOBAL, LOG_ALL, 0, "%s:%d:%s:" #FMT "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__);
 #else
 #define YPHPRINT(...)
 #endif
