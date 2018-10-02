@@ -7,14 +7,14 @@ typedef unsigned long uint64;
 typedef unsigned long long uint64;
 #endif
 
-long simulate_syscall_inst_0(long sysno);
-long simulate_syscall_inst_1(long sysno, long _rdi);
-long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi);
-long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx);
-long simulate_syscall_inst_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10);
-long simulate_syscall_inst_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8);
-long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
-__attribute((sysv_abi)) long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
+long sgx_instr_syscall_0(long sysno);
+long sgx_instr_syscall_1(long sysno, long _rdi);
+long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi);
+long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx);
+long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10);
+long sgx_instr_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8);
+long sgx_instr_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
+__attribute((sysv_abi)) long sgx_instr_syscall(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
 
 /* --------------Begin: SGX invalid instructions ------------*/
 void sgx_instr_cpuid(int res[4], int eax, int ecx);

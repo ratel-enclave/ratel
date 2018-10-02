@@ -45,7 +45,8 @@
 START_FILE
 
 DECL_EXTERN(unexpected_return)
-DECL_EXTERN(simulate_syscall_inst)
+DECL_EXTERN(sgx_dynamorio_syscall)
+DECL_EXTERN(sgx_instr_syscall)
 
 /* we share dynamorio_syscall w/ preload */
 #ifdef UNIX
@@ -56,8 +57,15 @@ DECL_EXTERN(simulate_syscall_inst)
  * For Linux, the argument max is 6.
  * For MacOS, the argument max is 6 for x64 and 7 for x86.
  */
+
         DECLARE_FUNC(dynamorio_syscall)
 GLOBAL_LABEL(dynamorio_syscall:)
+        jmp sgx_dynamorio_syscall
+        END_FUNC(dynamorio_syscall)
+
+
+        DECLARE_FUNC(dynamorio_syscall_org)
+GLOBAL_LABEL(dynamorio_syscall_org:)
         /* x64 kernel doesn't clobber all the callee-saved registers */
         push     REG_XBX /* stack now aligned for x64 */
 # ifdef X64
@@ -88,7 +96,7 @@ GLOBAL_LABEL(dynamorio_syscall:)
         mov      ARG6, [3*ARG_SZ + REG_XSP] /* arg8: above arg7, xbx, retaddr */
 syscall_ready:
         mov      r10, rcx
-        call     simulate_syscall_inst
+        call     sgx_instr_syscall
 
 # else
         push     REG_XBP
@@ -189,7 +197,7 @@ syscall_0args:
 syscall_success:
 # endif
         ret
-        END_FUNC(dynamorio_syscall)
+        END_FUNC(dynamorio_syscall_org)
 
 
         DECLARE_FUNC(dynamorio_syscall_inst)
@@ -198,7 +206,7 @@ GLOBAL_LABEL(dynamorio_syscall_inst:)
         //call log_app_syscall
         //POPGPR
         //syscall
-        call simulate_syscall_inst
+        call sgx_instr_syscall
         ret
         END_FUNC(dynamorio_syscall_inst)
 

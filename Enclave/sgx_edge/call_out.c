@@ -10,31 +10,43 @@
 #include "sgx_mm.h"
 #include "call_out.h"
 
+extern void load_fsbase(unsigned long base);
+extern void load_gsbase(unsigned long base);
 
 void sgx_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
 {
-    /*[>int arch_prctl(int code, unsigned long addr);<]*/
-    /*[>int arch_prctl(int code, unsigned long *addr);<]*/
-    /*[>if (code == ARCH_SET_FS || code == ARCH_SET_GS)<]*/
-    /*if ((int)code == 0x1002 || (int) code == 0x1001) {*/
-        /*if ((int)code == 0x1002)*/
-            /*wrfsbase(addr);*/
-        /*else*/
-            /*wrgsbase(addr);*/
-    /*}*/
-    /*[>else if (code == ARCH_GET_FS || code == ARCH_GET_GS) <]*/
-    /*else if ((int)code == 0x1003 || (int)code == 0x1004) {*/
-        /*if ((int)code == 0x1003)*/
-            /**(unsigned long*)addr = rdfsbase();*/
-        /*else*/
-            /**(unsigned long*)addr = rdgsbase();*/
-        /*[>long v;<]*/
-        /*[>long *l = &v;<]*/
+#define ARCH_SET_GS 0x1001
+#define ARCH_SET_FS 0x1002
+#define ARCH_GET_FS 0x1003
+#define ARCH_GET_GS 0x1004
 
-        /*[>ocall_syscall_2_NTo(ret, sysno, code, l, 8);<]*/
-        /*[>*(unsigned long*)addr = v;<]*/
-    /*}*/
-    /**ret = 0;*/
+    switch (code) {
+        case ARCH_SET_GS:
+            // Fix-me
+            // load_gsbase(addr);
+
+            break;
+        case ARCH_SET_FS:
+            // Fix-me
+            // load_fsbase(addr);
+
+            break;
+        case ARCH_GET_FS:
+            // Fix-me
+            // *(unsigned long*)addr = read_fsbase();
+
+            break;
+        case ARCH_GET_GS:
+            // Fix-me
+            // *(unsigned long*)addr = read_gsbase();
+
+            break;
+        default:
+            *ret = -1;
+            return;
+            break;
+    }
+    *ret = 0;
 }
 
 
@@ -62,7 +74,7 @@ void sgx_instr_rdtsc(uint64* res)
     ocall_rdtsc_To(res, sizeof(unsigned long long));
 }
 
-//__attribute__((stdcall)) long simulate_syscall_inst(int sysno)
+//__attribute__((stdcall)) long sgx_instr_syscall(int sysno)
 //rdi, rsi, rdx, r10, r8, r9
 
 void dumb(void)
@@ -73,7 +85,7 @@ void dumb(void)
 void (*syscalls[MAX_SYSCALL_NO])(void) = {dumb};
 
 //All syscalls with 0 parameters
-long simulate_syscall_inst_0(long sysno)
+long sgx_instr_syscall_0(long sysno)
 {
     long ret;
 
@@ -83,7 +95,7 @@ long simulate_syscall_inst_0(long sysno)
 }
 
 //All syscalls with 1 parameters
-long simulate_syscall_inst_1(long sysno, long _rdi)
+long sgx_instr_syscall_1(long sysno, long _rdi)
 {
     long ret = -1;
 
@@ -191,7 +203,7 @@ long simulate_syscall_inst_1(long sysno, long _rdi)
 #include <string.h>
 
 //All syscalls with 2 parameters
-long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
+long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
 {
     long ret = 0;
     byte* addr;
@@ -233,6 +245,7 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
             break;
 
         case SYS_mkdir:
+        case SYS_access:
             ocall_syscall_2_SN(&ret, sysno, (char*)_rdi, _rsi);
             break;
     }
@@ -242,7 +255,7 @@ long simulate_syscall_inst_2(long sysno, long _rdi, long _rsi)
 
 
 //All syscalls with 3 parameters
-long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
+long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 {
     long ret = 0;
     char *s, *t;
@@ -296,7 +309,7 @@ long simulate_syscall_inst_3(long sysno, long _rdi, long _rsi, long _rdx)
     return ret;
 }
 
-long simulate_syscall_inst_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
+long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 {
     long ret = 0;
 
@@ -315,7 +328,7 @@ long simulate_syscall_inst_4(long sysno, long _rdi, long _rsi, long _rdx, long _
     return ret;
 }
 
-long simulate_syscall_inst_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
+long sgx_instr_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
 {
     long ret = 0;
 
@@ -326,7 +339,7 @@ long simulate_syscall_inst_5(long sysno, long _rdi, long _rsi, long _rdx, long _
     return ret;
 }
 
-long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
+long sgx_instr_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
     long ret = 0;
     byte* addr;
@@ -352,7 +365,7 @@ long simulate_syscall_inst_6(long sysno, long _rdi, long _rsi, long _rdx, long _
 }
 
 
-long sgx_fcntl(long cmd, long _rsi, long _rdx, long _r10)
+long sgx_syscall_fcntl(long cmd, long _rsi, long _rdx, long _r10)
 {
 #define F_DUPFD 0
 
@@ -369,15 +382,14 @@ long sgx_fcntl(long cmd, long _rsi, long _rdx, long _r10)
 
 
     __attribute ((sysv_abi))
-long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
+long sgx_instr_syscall(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
     long sysno;
 
     //Get syscall No.
-    __asm volatile ("mov %%rax, %0": "=rm"(sysno)::"rdi","rsi","rdx","r10","r8","r9" );
+    __asm__ __volatile__ ("mov %%rax, %0": "=rm"(sysno)::"rdi","rsi","rdx","r10","r8","r9" );
 
     // ocall_print_syscallname(sysno);
-
     /*fixing-up them with a sysno-to-function table*/
     switch (sysno) {
 
@@ -385,7 +397,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_getpid:
         case SYS_gettid:
         case SYS_sync:
-            return simulate_syscall_inst_0(sysno);
+            return sgx_instr_syscall_0(sysno);
             break;
 
 
@@ -397,7 +409,7 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_uname:
         /*case SYS_set_thread_area:*/
         /*case SYS_get_thread_area:*/
-            return simulate_syscall_inst_1(sysno, _rdi);
+            return sgx_instr_syscall_1(sysno, _rdi);
             break;
 
 
@@ -411,7 +423,8 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_getitimer:
         case SYS_stat:
         case SYS_mkdir:
-            return simulate_syscall_inst_2(sysno, _rdi, _rsi);
+        case SYS_access:
+            return sgx_instr_syscall_2(sysno, _rdi, _rsi);
             break;
 
 
@@ -422,34 +435,80 @@ long simulate_syscall_inst(long _rdi, long _rsi, long _rdx, long _r10, long _r8,
         case SYS_write:
         case SYS_mprotect:
         case SYS_getdents:
-            return simulate_syscall_inst_3(sysno, _rdi, _rsi, _rdx);
+            return sgx_instr_syscall_3(sysno, _rdi, _rsi, _rdx);
             break;
 
 
             //Four parameters
         case SYS_rt_sigaction:
         case SYS_rt_sigprocmask:
-            return simulate_syscall_inst_4(sysno, _rdi, _rsi, _rdx, _r10);
+            return sgx_instr_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
             break;
 
 
             //Five parameters
         case SYS_prctl:
-            return simulate_syscall_inst_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
+            return sgx_instr_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
             break;
 
             //Six parameters
         case SYS_mmap:
         case SYS_futex:
-            return simulate_syscall_inst_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
+            return sgx_instr_syscall_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
             break;
 
             //variable parameters
         case SYS_fcntl:
-            return sgx_fcntl(_rdi, _rsi, _rdx, _r10);
+            return sgx_syscall_fcntl(_rdi, _rsi, _rdx, _r10);
             break;
     }
 
-    ocall_print_syscallname(sysno);
-    return simulate_syscall_inst_0(sysno);
+    ocall_print_str("The above syscall is not implemented");
+    // ocall_print_syscallname(sysno);
+    return sgx_instr_syscall_0(sysno);
+}
+
+// signature: dynamorio_syscall(sysnum, num_args, arg1, arg2, ...)
+// <sgx_dynamorio_syscall>:      push   %rbp
+// <sgx_dynamorio_syscall+1>:    mov    %rsp,%rbp
+long sgx_dynamorio_syscall(long sysnum, long num_args, ...)
+{
+    unsigned long arg1, arg2, arg3, arg4, arg5, arg6, _rbp;
+
+    __asm__ __volatile__ (
+        "\tmov %%rdx, %0\n" \
+        "\tmov %%rcx, %1\n" \
+        "\tmov %%r8, %2\n"  \
+        "\tmov %%r9, %3\n"  \
+        "\tmov %%rbp, %4\n" \
+        :"=rm"(arg1), "=rm"(arg2), "=rm"(arg3),
+        "=rm"(arg4), "=rm"(_rbp)::);
+
+    switch(num_args) {
+        case 0:
+            return sgx_instr_syscall_0(sysnum);
+
+        case 1:
+            return sgx_instr_syscall_1(sysnum, arg1);
+
+        case 2:
+            return sgx_instr_syscall_2(sysnum, arg1, arg2);
+
+        case 3:
+            return sgx_instr_syscall_3(sysnum, arg1, arg2, arg3);
+
+        case 4:
+            return sgx_instr_syscall_4(sysnum, arg1, arg2, arg3, arg4);
+
+        case 5:
+            arg5 = *((long*)_rbp + 2);
+            return sgx_instr_syscall_5(sysnum, arg1, arg2, arg3, arg4, arg5);
+
+        case 6:
+            arg5 = *((long*)_rbp + 2);
+            arg6 = *((long*)_rbp + 3);
+            return sgx_instr_syscall_6(sysnum, arg1, arg2, arg3, arg4, arg5, arg6);
+    }
+
+    return -1;
 }

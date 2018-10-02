@@ -304,7 +304,7 @@ void sgx_mm_init_static(void)
             if (vma->comment[0] != '[') {
                 int fd;
 
-                fd = simulate_syscall_inst_2(SYS_stat, (ulong)vma->comment, (ulong)&s);
+                fd = sgx_instr_syscall_2(SYS_stat, (ulong)vma->comment, (ulong)&s);
                 YPHASSERT(fd == 0);
 
                 add->dev = s.st_dev;
@@ -341,7 +341,7 @@ int _sgx_mm_init_byreffing_procmaps(void)
 
     /* open && read external procmaps */
     // int fd = dynamorio_syscall(SYS_open, 2, PROCMAPS, O_RDONLY);
-    int fd = simulate_syscall_inst_3(SYS_open, (ulong)PROCMAPS, O_RDONLY, O_RDONLY);
+    int fd = sgx_instr_syscall_3(SYS_open, (ulong)PROCMAPS, O_RDONLY, O_RDONLY);
     if (fd == -1)
         return -1;
 
@@ -349,7 +349,7 @@ int _sgx_mm_init_byreffing_procmaps(void)
     char buf[BUF_SZ];
     ssize_t nread;
     // nread = dynamorio_syscall(SYS_read, 3, fd, buf, BUF_SZ);
-    nread = simulate_syscall_inst_3(SYS_read, fd, (ulong)buf, BUF_SZ);
+    nread = sgx_instr_syscall_3(SYS_read, fd, (ulong)buf, BUF_SZ);
     if (nread == -1)
         return -1;
 
@@ -427,7 +427,7 @@ int _sgx_mm_init_byreffing_procmaps(void)
 
     /* close external procmaps */
     // dynamorio_syscall(SYS_close, 1, fd);
-    simulate_syscall_inst_1(SYS_close, fd);
+    sgx_instr_syscall_1(SYS_close, fd);
 
 
     YPHASSERT(nRgn == 18);
@@ -543,7 +543,7 @@ void _sgx_vma_fill(sgx_vm_area_t* vma, byte* vm_start, size_t len, ulong prot, i
         *(long*)vma->comment = 0;
     }
     else {
-        res = simulate_syscall_inst_2(SYS_fstat, fd, (ulong)&s);
+        res = sgx_instr_syscall_2(SYS_fstat, fd, (ulong)&s);
         YPHASSERT(res == 0);
 
         vma->dev = s.st_dev;
