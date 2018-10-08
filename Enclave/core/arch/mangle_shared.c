@@ -707,9 +707,18 @@ mangle_syscall(dcontext_t *dcontext, instrlist_t *ilist, uint flags,
 
     mangle_syscall_arch(dcontext, ilist, flags, instr, next_instr);
 
-    instr_t *o_call = XINST_CREATE_call(dcontext, opnd_create_pc((app_pc)dynamorio_syscall_inst));
-    instrlist_replace(ilist, instr, o_call);
-    instr_destroy(dcontext, instr);
+    // instr_t *o_call = XINST_CREATE_call(dcontext, opnd_create_pc((app_pc)dynamorio_syscall_inst));
+    // instrlist_replace(ilist, instr, o_call);
+    // instr_destroy(dcontext, instr);
+
+    /* replace syscall with a help function */
+    dr_insert_clean_call(dcontext, ilist, instr,
+        (void*)sgx_helper_syscall,
+        false,  // don't save float regs
+        1,      // 1 args
+        OPND_CREATE_INTPTR(dcontext));
+
+    instrlist_remove(ilist, instr);
 }
 
 #ifdef UNIX

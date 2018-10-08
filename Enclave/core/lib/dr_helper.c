@@ -264,4 +264,26 @@ void sgx_helper_rdtsc(void* drctx)
     dr_set_mcontext(drctx, &mctx);
 }
 
+
+void sgx_helper_syscall(void* drctx)
+{
+    dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
+    unsigned long sysno, arg1, arg2, arg3, arg4, arg5, arg6;
+    unsigned long res;
+
+    dr_get_mcontext(drctx, &mctx);
+    sysno = mctx.rax;
+    arg1 = mctx.rdi;
+    arg2 = mctx.rsi;
+    arg3 = mctx.rdx;
+    arg4 = mctx.r10;
+    arg5 = mctx.r8;
+    arg6 = mctx.r9;
+
+    res = sgx_instr_syscall(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
+
+    mctx.rax = res;
+    dr_set_mcontext(drctx, &mctx);
+}
+
 #endif

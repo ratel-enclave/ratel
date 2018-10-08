@@ -59,6 +59,7 @@ void dynamorio_syscall_inst(void);
 
 void sgx_helper_cpuid(void* drctx);
 void sgx_helper_rdtsc(void* drctx);
+void sgx_helper_syscall(void* drctx);
 # endif
 #endif
 

@@ -4563,6 +4563,7 @@ emit_patch_syscall(dcontext_t *dcontext, byte *target _IF_X64(gencode_mode_t mod
 }
 #endif /* WINDOWS */
 
+#define DR_CLEAN_CALL_SIZE 114
 /* this routine performs a single system call instruction and then returns
  * to dynamo via fcache_return
  */
@@ -4585,17 +4586,19 @@ emit_do_syscall_common(dcontext_t *dcontext, generated_code_t *code,
         interrupt = 0x80;
     }
 #endif
-    if (syscall_instr != NULL)
+    if (syscall_instr != NULL) {
         syscall = syscall_instr;
+    }
     else {
         if (interrupt != 0) {
 #ifdef X86
-            syscall = INSTR_CREATE_int(dcontext,
-                                       opnd_create_immed_int((char)interrupt, OPSZ_1));
+            syscall = INSTR_CREATE_int(dcontext, opnd_create_immed_int((char)interrupt, OPSZ_1));
 #endif
             IF_ARM(ASSERT_NOT_REACHED());
-        } else
+        }
+        else {
             syscall = create_syscall_instr(dcontext);
+        }
     }
 
     /* i#821/PR 284029: for now we assume there are no syscalls in x86 code.
@@ -4629,23 +4632,26 @@ emit_do_syscall_common(dcontext_t *dcontext, generated_code_t *code,
      * stp x0, x1, [x28]
      */
     APP(&ilist, INSTR_CREATE_stp(dcontext,
-                                 opnd_create_base_disp(dr_reg_stolen, DR_REG_NULL, 0,
-                                                       0, OPSZ_16),
+                                 opnd_create_base_disp(dr_reg_stolen, DR_REG_NULL, 0, 0, OPSZ_16),
                                  opnd_create_reg(DR_REG_X0),
                                  opnd_create_reg(DR_REG_X1)));
     *syscall_offs += AARCH64_INSTR_SIZE;
 #endif
 
     /* system call itself -- using same method we've observed OS using */
-    //instr_t *o_call = INSTR_CREATE_call(dcontext, opnd_create_pc((app_pc)dynamorio_syscall_inst));
-    //APP(&ilist, o_call);
+    APP(&ilist, syscall);
 
-    dr_insert_call((void *)dcontext, &ilist, NULL/*append*/, (void *)dynamorio_syscall_inst, 0);
-    *syscall_offs = 0;
-    //*syscall_offs += instr_length(dcontext, o_call) - instr_length(dcontext, syscall);
-    //instr_destroy(dcontext, syscall);
-    //APP(&ilist, syscall);
-    //APP(&ilist, INSTR_CREATE_nop2byte(dcontext));
+    /* We replace syscall with a help function, see update_syscall() */
+    /* No we do speculative encoding to detect its code size */
+    int spv_size = DR_CLEAN_CALL_SIZE - instr_length(dcontext, syscall);
+    while (spv_size > 0) {
+        /* we could add >3-byte nop support but I'm too lazy */
+        int noplen = MIN(spv_size, 3);
+        instr_t *nop = instr_create_nbyte_nop(dcontext, noplen, true);
+        APP(&ilist, nop);
+        spv_size -= noplen;
+    }
+    *syscall_offs = DR_CLEAN_CALL_SIZE;
 
 #ifdef UNIX
     post_syscall = instrlist_last(&ilist);
@@ -4656,8 +4662,7 @@ emit_do_syscall_common(dcontext_t *dcontext, generated_code_t *code,
     if (thread_shared)
         APP(&ilist, instr_create_save_to_tls(dcontext, SCRATCH_REG0, TLS_REG0_SLOT));
     else
-        APP(&ilist, instr_create_save_to_dcontext(dcontext, SCRATCH_REG0,
-                                                  SCRATCH_REG0_OFFS));
+        APP(&ilist, instr_create_save_to_dcontext(dcontext, SCRATCH_REG0, SCRATCH_REG0_OFFS));
 
 #ifdef AARCH64
     /* Save X1 as this is used for the indirect branch in the exit stub. */
@@ -4690,7 +4695,7 @@ emit_do_syscall_common(dcontext_t *dcontext, generated_code_t *code,
 
     /* free the instrlist_t elements */
     instrlist_clear(dcontext, &ilist);
-    instr_destroy(dcontext, syscall);
+
     return pc;
 }
 
@@ -4834,10 +4839,90 @@ emit_do_syscall(dcontext_t *dcontext, generated_code_t *code, byte *pc,
     return pc;
 }
 
+#ifndef WINDOWS
+/* updates first syscall instr it finds with the new method of syscall */
+static void
+update_syscall(dcontext_t *dcontext, byte *pc)
+{
+    byte *start_pc = pc;
+    byte *prev_pc;
+    IF_ARM(dr_isa_mode_t old_mode;)
+    instrlist_t ilist;
+    instr_t instr;
+    instr_init(dcontext, &instr);
+
+# ifdef ARM
+    /* We need to switch to the mode of our gencode */
+    dr_set_isa_mode(dcontext, DEFAULT_ISA_MODE, &old_mode);
+# endif
+    /* initialize the ilist */
+    instrlist_init(&ilist);
+    do {
+        prev_pc = pc;
+        instr_reset(dcontext, &instr);
+        pc = decode_cti(dcontext, pc, &instr);
+        ASSERT(pc != NULL); /* this our own code we're decoding, should be valid */
+        /* the tail of do-syscall trampoline is filled with NOPs */
+
+        if (instr_is_syscall(&instr)) {
+            /* replace syscall with a help function */
+            dr_insert_clean_call(dcontext, &ilist, &instr,
+                (void*)sgx_helper_syscall,
+                false,  // don't save float regs
+                1,      // 1 args
+                OPND_CREATE_INTPTR(dcontext));
+
+            instrlist_remove(&ilist, &instr);
+            break;
+        }
+        else {
+            APP(&ilist, &instr);
+        }
+
+        ASSERT(pc - prev_pc < 128);
+    } while (1);
+
+    /* now encode the instructions */
+    pc = instrlist_encode(dcontext, &ilist, start_pc, false);
+    ASSERT(pc != NULL && (pc - prev_pc) == DR_CLEAN_CALL_SIZE);
+
+    machine_cache_sync(prev_pc, pc, true);
+
+    // instr_free(dcontext, &instr);
+    /* free the instrlist_t elements */
+    instrlist_clear(dcontext, &ilist);
+
+# ifdef ARM
+    dr_set_isa_mode(dcontext, old_mode, NULL);
+# endif
+
+    DOLOG(3, LOG_EMIT, {
+        LOG(THREAD, LOG_EMIT, 3, "Just updated syscall routine:\n");
+        prev_pc = pc;
+        pc = start_pc;
+        do {
+            pc = disassemble_with_bytes(dcontext, pc, THREAD);
+        } while (pc < prev_pc + 1); /* +1 to get next instr */
+        LOG(THREAD, LOG_EMIT, 3, "  ...\n");
+    });
+}
+
 void
 update_syscalls(dcontext_t *dcontext)
 {
+    byte *pc;
+    pc = get_do_syscall_entry(dcontext);
+    update_syscall(dcontext, pc);
+# ifdef X64
+    /* PR 286922: for 32-bit, we do NOT update the clone syscall as it
+     * always uses int (since can't use call to vsyscall when swapping
+     * stacks!)
+     */
+    pc = get_do_clone_syscall_entry(dcontext);
+    update_syscall(dcontext, pc);
+# endif
 }
+#endif /* !WINDOWS */
 
 /* Returns -1 on failure */
 int
@@ -4927,10 +5012,10 @@ emit_new_thread_dynamo_start(dcontext_t *dcontext, byte *pc)
                                        SCRATCH_REG0 _IF_AARCH64(false));
 # ifndef AARCH64
     /* put pre-push xsp into priv_mcontext_t.xsp slot */
-    ASSERT(offset == sizeof(priv_mcontext_t));
+    ASSERT(offset == get_clean_call_switch_stack_size());
     APP(&ilist, XINST_CREATE_add_2src
         (dcontext, opnd_create_reg(SCRATCH_REG0),
-         opnd_create_reg(REG_XSP), OPND_CREATE_INT32(sizeof(priv_mcontext_t))));
+         opnd_create_reg(REG_XSP), OPND_CREATE_INT32(offset)));
     APP(&ilist, XINST_CREATE_store
         (dcontext, OPND_CREATE_MEMPTR(REG_XSP, offsetof(priv_mcontext_t, xsp)),
          opnd_create_reg(SCRATCH_REG0)));

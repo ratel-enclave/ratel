@@ -437,8 +437,7 @@ shared_gencode_emit(generated_code_t *gencode _IF_X86_64(bool x86_mode))
             fragment = empty_fragment_mark_x86(fragment);
 #endif
         /* reset exit stub should look just like a direct exit stub */
-        pc += insert_exit_stub_other_flags
-            (GLOBAL_DCONTEXT, fragment,
+        pc += insert_exit_stub_other_flags (GLOBAL_DCONTEXT, fragment,
             (linkstub_t *) get_reset_linkstub(), pc, LINK_DIRECT);
     }
 
@@ -565,11 +564,10 @@ shared_gencode_init(IF_X86_64_ELSE(gencode_mode_t gencode_mode, void))
 #endif
 #ifdef WINDOWS_PC_SAMPLE
     if (dynamo_options.profile_pcs &&
-        dynamo_options.prof_pcs_gencode >= 2 &&
-        dynamo_options.prof_pcs_gencode <= 32) {
-        gencode->profile =
-            create_profile(gencode->gen_start_pc, gencode->gen_end_pc,
-                           dynamo_options.prof_pcs_gencode, NULL);
+            dynamo_options.prof_pcs_gencode >= 2 &&
+            dynamo_options.prof_pcs_gencode <= 32) {
+        gencode->profile = create_profile(gencode->gen_start_pc, gencode->gen_end_pc,
+                dynamo_options.prof_pcs_gencode, NULL);
         start_profile(gencode->profile);
     } else
         gencode->profile = NULL;
@@ -712,6 +710,8 @@ arch_init(void)
     }
 #endif
 
+    mangle_init();
+
     if (USE_SHARED_GENCODE()) {
         /* thread-shared generated code */
         /* Assumption: no single emit uses more than a page.
@@ -735,8 +735,10 @@ arch_init(void)
             if (DYNAMO_OPTION(x86_to_x64)) {
                 shared_gencode_init(IF_X64(GENCODE_X86_TO_X64));
                 shared_code_opposite_mode = shared_code_x86_to_x64;
-            } else
+            }
+            else {
                 shared_code_opposite_mode = shared_code_x86;
+            }
 
             /* Now link the far_ibl for each type to the corresponding regular
              * ibl of the opposite mode.
@@ -757,7 +759,6 @@ arch_init(void)
         }
 #endif
     }
-    mangle_init();
 }
 
 #ifdef WINDOWS_PC_SAMPLE
@@ -3463,7 +3464,7 @@ dump_mcontext(priv_mcontext_t *context, file_t f, bool dump_xml)
                );
 
 #ifdef X86
-    if (preserve_xmm_caller_saved()) {
+    if (false && preserve_xmm_caller_saved()) {
         int i, j;
         for (i=0; i<NUM_SIMD_SAVED; i++) {
             if (YMM_ENABLED()) {
