@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <fcntl.h>
-
+#include <unistd.h>
 
 
 //Please make me beautiful
@@ -381,10 +381,14 @@ void ocall_print_syscallname(long sysno)
 /* system calls */
 void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
 {
-    if (implemented)
-        ;//printf("%s: return 0x%lx\n", fname, ret);
-    else
+    if (implemented) {
+        ocall_print_syscallname(sysno);
+        printf("%s: return 0x%lx\n", fname, ret);
+    }
+    else {
         printf("sysno: %-4d not implemented!\n", (int)sysno);
+    }
+    fflush(stdout);
 }
 
 
@@ -616,9 +620,12 @@ long ocall_syscall_2_SN(long sysno, const char *S, long N)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_mkdir) {
-        ret = syscall(sysno, S, N);
-        b = true;
+    switch (sysno) {
+        case SYS_mkdir:
+        case SYS_access:
+            ret = syscall(sysno, S, N);
+            b = true;
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -725,6 +732,23 @@ long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long N2)
     if (sysno == SYS_write) {
         ret = syscall(sysno, N1, V, N2);
         b = true;
+        sync();
+    }
+
+    // echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+/*syscalls with 4 paramters*/
+long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_mremap) {
+        ret = syscall(sysno, N1, N2, N3, N4);
+        b = true;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -732,7 +756,6 @@ long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long N2)
     return ret;
 }
 
-/*syscalls with 4 paramters*/
 long ocall_syscall_4_NTiToN(long sysno, long N1, void *T1, long l1, void *T2, long l2, long N2)
 {
     long ret = 0;
