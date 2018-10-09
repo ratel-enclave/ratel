@@ -312,6 +312,7 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 {
     long ret = 0;
+    byte* addr;
 
     switch(sysno) {
 
@@ -323,6 +324,16 @@ long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
             ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
             break;
 
+        case SYS_mremap:
+            addr = sgx_mm_itn2ext((byte*)_rdi);
+
+            ocall_syscall_4_NNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10);
+
+            if (ret != -1) {
+                // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
+                ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
+            }
+            break;
     }
 
     return ret;
@@ -381,15 +392,9 @@ long sgx_syscall_fcntl(long cmd, long _rsi, long _rdx, long _r10)
 }
 
 
-    __attribute ((sysv_abi))
-long sgx_instr_syscall(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
+
+long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
-    long sysno;
-
-    //Get syscall No.
-    __asm__ __volatile__ ("mov %%rax, %0": "=rm"(sysno)::"rdi","rsi","rdx","r10","r8","r9" );
-
-    // ocall_print_syscallname(sysno);
     /*fixing-up them with a sysno-to-function table*/
     switch (sysno) {
 
@@ -442,6 +447,7 @@ long sgx_instr_syscall(long _rdi, long _rsi, long _rdx, long _r10, long _r8, lon
             //Four parameters
         case SYS_rt_sigaction:
         case SYS_rt_sigprocmask:
+        case SYS_mremap:
             return sgx_instr_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
             break;
 
@@ -463,9 +469,10 @@ long sgx_instr_syscall(long _rdi, long _rsi, long _rdx, long _r10, long _r8, lon
             break;
     }
 
-    ocall_print_str("The above syscall is not implemented");
-    // ocall_print_syscallname(sysno);
-    return sgx_instr_syscall_0(sysno);
+    ocall_print_str("The following syscall is not implemented, crash me!");
+    ocall_print_syscallname(sysno);
+    __asm__ __volatile__ ("int3");  // ASSERT(false);
+    return -1;
 }
 
 // signature: dynamorio_syscall(sysnum, num_args, arg1, arg2, ...)
@@ -475,6 +482,7 @@ long sgx_dynamorio_syscall(long sysnum, long num_args, ...)
 {
     unsigned long arg1, arg2, arg3, arg4, arg5, arg6, _rbp;
 
+    /* gcc uses rcx for passing the forth parameter */
     __asm__ __volatile__ (
         "\tmov %%rdx, %0\n" \
         "\tmov %%rcx, %1\n" \

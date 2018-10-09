@@ -82,5 +82,5 @@ void sgx_vma_get_cmt(ulong fd, char *buffer);
 byte*   sgx_mm_mmap(byte* ext_addr, size_t len, ulong prot, ulong flags, int fd, ulong offs);
 void    sgx_mm_munmap(byte* ext_addr, size_t len);
 int     sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot);
-
+byte*   sgx_mm_mremap(byte* ext_old_addr, size_t old_sz, byte* ext_new_addr, size_t new_sz, uint new_flags);
 #endif //_SGX_VMA_H__

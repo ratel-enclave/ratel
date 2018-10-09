@@ -14,7 +14,7 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx);
 long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10);
 long sgx_instr_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8);
 long sgx_instr_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
-__attribute((sysv_abi)) long sgx_instr_syscall(long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
+long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
 
 /* --------------Begin: SGX invalid instructions ------------*/
 void sgx_instr_cpuid(int res[4], int eax, int ecx);

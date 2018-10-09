@@ -599,6 +599,49 @@ static vma_overlap_t _sgx_vma_overlap(byte* vma_start, byte* vma_end,
 }
 
 
+/* find the vma contains regions from vma_start to vma_end */
+static sgx_vm_area_t* _sgx_find_super_vma(byte* ext_start, size_t len)
+{
+    sgx_vm_area_t *vma = NULL;
+    list_t *ll = sgxmm.in.next;
+    vma_overlap_t ot = OVERLAP_NONE;
+    byte *ref_start = ext_start;
+    byte *ref_end = ext_start + len;
+    bool ctuw = true;
+
+    YPHASSERT(ll != &sgxmm.in);
+
+    while (ctuw && ll != &sgxmm.in) {
+        vma = list_entry(ll, sgx_vm_area_t, ll);
+        ot = _sgx_vma_overlap(vma->vm_start, vma->vm_end, ref_start, ref_end);
+
+        switch (ot) {
+            case OVERLAP_NONE:
+                if (vma->vm_end <= ref_start)    /* no need to check anymore */
+                    ll = ll->next;
+                else
+                    ctuw = false;
+
+                break;
+            case OVERLAP_SUP:
+                return vma;
+
+                break;
+            case OVERLAP_HEAD:
+            case OVERLAP_TAIL:
+            case OVERLAP_SUB:
+                ctuw = false;
+
+                break;
+            default:
+                YPHASSERT(false);
+                break;
+        } /* end switch */
+    }/* end while */
+    return NULL;
+}
+
+
 /* Merge adjacent vmas */
 static sgx_vm_area_t* _sgx_vma_merge(sgx_vm_area_t* vma)
 {
@@ -1084,4 +1127,31 @@ int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
     _sgx_mm_mprotect(ext_addr, len, prot);
 
     return 0;
+}
+
+
+byte* sgx_mm_mremap(byte* ext_old_addr, size_t old_sz, byte* ext_new_addr, size_t new_sz, uint new_flags)
+{
+    sgx_vm_area_t *vma = NULL;
+    ulong perm;
+    ulong offs;
+    byte* itn_addr = NULL;
+
+    if (ext_old_addr == ext_new_addr) {
+        vma = _sgx_find_super_vma(ext_old_addr, old_sz);
+        YPHASSERT(vma != NULL);
+        vma->size = new_sz;
+        itn_addr = sgx_mm_ext2itn(ext_old_addr);
+    }
+    else {
+        vma = _sgx_find_super_vma(ext_old_addr, old_sz);
+        YPHASSERT(vma != NULL);
+        sgx_mm_munmap(ext_old_addr, old_sz);
+
+        perm = vma->perm;
+        offs = vma->offset;
+        itn_addr = sgx_mm_mmap(ext_new_addr, new_sz, perm, 0, -1, offs);
+    }
+
+    return itn_addr;
 }

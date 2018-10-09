@@ -124,7 +124,6 @@ enclave {
         //int mprotect(void *addr, size_t len, int prot);
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
 
-
         //long ocall_syscall_3_NTiT3(long sysno, long N1, [in, size=l1] void *T1, long l1, [in, out, size=l2] void *T2, long l2);
 
         //ssize_t write(int fd, const void *buf, size_t count);
@@ -137,6 +136,9 @@ enclave {
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
 
         /********syscalls with 4 paramters********/
+        //void *mremap(void *old_address, size_t old_size, size_t new_size, int flags);
+        long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4);
+
         // int rt_sigaction(int signum, const struct sigaction *act, struct sigaction *oact, size_t sigsetsize)
         long ocall_syscall_4_NTiToN(long sysno, long N1, [in, size=l1] void *Ti, long l1, [out, size=l2] void *To, long l2, long N2);
 
