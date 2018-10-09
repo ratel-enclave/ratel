@@ -161,7 +161,6 @@ dispatch(dcontext_t *dcontext)
 # endif
 #endif
 
-    YPHPRINT("dispatch: target = %lx", dcontext->next_tag);
     dispatch_enter_dynamorio(dcontext);
     LOG(THREAD, LOG_INTERP, 2, "\ndispatch: target = "PFX"\n", dcontext->next_tag);
 
@@ -240,6 +239,7 @@ dispatch(dcontext_t *dcontext)
         } while (true);
 
         if (targetf != NULL) {
+            YPHPRINT("tag = 0x%lx -> start_pc = 0x%lx", targetf->tag, targetf->start_pc);
             if (dispatch_enter_fcache(dcontext, targetf)) {
                 /* won't reach here: will re-enter dispatch() with a clean stack */
                 ASSERT_NOT_REACHED();
@@ -1741,8 +1741,9 @@ dispatch_exit_fcache_stats(dcontext_t *dcontext)
         LOG(THREAD, LOG_DISPATCH, 2, " (fragment was flushed)");
     }
     LOG(THREAD, LOG_DISPATCH, 2, "\n");
-    DOLOG(5, LOG_DISPATCH, {
-        dump_mcontext(get_mcontext(dcontext), THREAD, DUMP_NOT_XML); });
+    // DOLOG(5, LOG_DISPATCH, {
+    //     dump_mcontext(get_mcontext(dcontext), THREAD, DUMP_NOT_XML); });
+    dump_mcontext(get_mcontext(dcontext), THREAD, DUMP_NOT_XML);
     DOLOG(6, LOG_DISPATCH, { dump_mcontext_callstack(dcontext); });
     DOKSTATS({ DOLOG(6, LOG_DISPATCH, { kstats_dump_stack(dcontext); }); });
 #endif /* defined(DEBUG) || defined(KSTATS) */

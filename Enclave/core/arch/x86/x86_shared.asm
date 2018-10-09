@@ -96,7 +96,7 @@ GLOBAL_LABEL(dynamorio_syscall_org:)
         mov      ARG6, [3*ARG_SZ + REG_XSP] /* arg8: above arg7, xbx, retaddr */
 syscall_ready:
         mov      r10, rcx
-        call     sgx_instr_syscall
+        syscall
 
 # else
         push     REG_XBP
@@ -199,16 +199,6 @@ syscall_success:
         ret
         END_FUNC(dynamorio_syscall_org)
 
-
-        DECLARE_FUNC(dynamorio_syscall_inst)
-GLOBAL_LABEL(dynamorio_syscall_inst:)
-        //PUSHGPR
-        //call log_app_syscall
-        //POPGPR
-        //syscall
-        call sgx_instr_syscall
-        ret
-        END_FUNC(dynamorio_syscall_inst)
 
 # ifdef MACOS
 /* Mach dep syscall invocation.
