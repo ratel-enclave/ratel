@@ -174,6 +174,19 @@ typedef struct {
 # endif
 } kernel_ucontext_t;
 
+
+/* A package stores all contxt information, compatible with sigframe_rt_t */
+typedef kernel_ucontext_t sigctx_knl_t;
+
+typedef struct _sigcxt_pkg_t {
+    union {
+        char    *pretcode;
+        int     signum;
+    };
+    sigctx_knl_t    ctx;
+    siginfo_t       info;
+}sigcxt_pkg_t;
+
 /* SIGCXT_FROM_UCXT is in os_public.h */
 # define SIGMASK_FROM_UCXT(ucxt) (&((ucxt)->uc_sigmask))
 

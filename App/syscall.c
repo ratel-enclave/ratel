@@ -441,7 +441,7 @@ long ocall_syscall_1_N(long sysno, long N1)
 
     switch (sysno) {
         case SYS_close:
-        case SYS_exit_group:
+        case SYS_exit_group: /* fix-me: allow out-encalve code to do cleanup */
         case SYS_exit:
             ret = syscall(sysno, N1);
             b = true;
@@ -739,6 +739,24 @@ long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long N2)
 
     return ret;
 }
+
+
+long ocall_syscall_3_NTiTo(long sysno, long N0, void *V1, long N1, void *V2, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_setitimer) {
+        ret = syscall(sysno, N0, V1, V2);
+        b = true;
+        sync();
+    }
+
+    // echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 
 /*syscalls with 4 paramters*/
 long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)

@@ -1203,7 +1203,7 @@ void print_file(file_t f, const char *fmt, ...);
 //     dynamorio_syscall(162, 0)
 
 #define YPHPRINT(FMT, ...)      \
-    LOG(GLOBAL, LOG_ALL, 0, "%s:%d:%s:" #FMT "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__);
+    print_log(GLOBAL, LOG_ALL, 0, "%s:%d:%s:" #FMT "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__);
 #else
 #define YPHPRINT(...)
 #endif
@@ -1365,7 +1365,7 @@ extern mutex_t do_threshold_mutex;
 /* these use do..while w/ a local to avoid double-eval of dcontext */
 #define TRY_EXCEPT(dcontext, try_statement, except_statement) do {          \
     try_except_t *try__except = &(dcontext)->try_except;                    \
-    ASSERT((dcontext) != NULL && (dcontext) != GLOBAL_DCONTEXT);             \
+    ASSERT((dcontext) != NULL && (dcontext) != GLOBAL_DCONTEXT);            \
     TRY(try__except, try_statement, EXCEPT(try__except, except_statement)); \
 } while (0)
 

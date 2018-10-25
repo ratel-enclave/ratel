@@ -175,7 +175,7 @@ typedef struct _os_thread_data_t {
      */
     void *priv_lib_tls_base;
     void *priv_alt_tls_base;
-    void *sgx_sdk_tls_base;
+    void *sgxsdk_tls_base;
     void *dr_tls_base;
 #ifdef X86
     void *app_thread_areas; /* data structure for app's thread area info */

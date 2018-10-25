@@ -207,7 +207,7 @@ typedef struct _os_seg_info_t {
     int   tls_type;
     void *priv_lib_tls_base;
     void *priv_alt_tls_base;
-    void *sgx_sdk_tls_base;
+    void *sgxsdk_tls_base;
     void *dr_tls_base;
 #ifdef X86
     our_modify_ldt_t app_thread_areas[GDT_NUM_TLS_SLOTS];

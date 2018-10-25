@@ -1692,6 +1692,27 @@ os_get_app_tls_base(dcontext_t *dcontext, reg_id_t reg)
     return NULL;
 }
 
+void *os_get_sgxsdk_tls_base(dcontext_t *dcontext, ushort reg)
+{
+    os_local_state_t *os_tls;
+    IF_NOT_HAVE_TLS(ASSERT_NOT_REACHED());
+    ASSERT(reg == TLS_REG_LIB || reg == TLS_REG_ALT);
+    if (dcontext == NULL)
+        dcontext = get_thread_private_dcontext();
+    if (dcontext == NULL) {
+        /* No dcontext means we haven't initialized TLS, so we haven't replaced
+         * the app's segments.  get_segment_base is expensive, but this should
+         * be rare.  Re-examine if it pops up in a profile.
+         */
+        return get_segment_base(reg);
+    }
+    os_tls = get_os_tls_from_dc(dcontext);
+    return os_tls->os_seg_info.sgxsdk_tls_base;
+
+    ASSERT_NOT_REACHED();
+    return NULL;
+}
+
 ushort
 os_get_app_tls_base_offset(reg_id_t reg)
 {
@@ -1914,7 +1935,7 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
         os_tls->os_seg_info.priv_lib_tls_base =
             IF_UNIT_TEST_ELSE(os_tls->app_lib_tls_base, privload_tls_init(os_tls->app_lib_tls_base));
     }
-    os_tls->os_seg_info.sgx_sdk_tls_base = get_segment_base(TLS_REG_LIB);
+    os_tls->os_seg_info.sgxsdk_tls_base = get_segment_base(TLS_REG_LIB);
 
 #ifdef X86
     LOG(THREAD_GET, LOG_THREADS, 1,
@@ -1932,7 +1953,7 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
         os_tls->os_seg_info.priv_lib_tls_base,
         os_tls->os_seg_info.priv_alt_tls_base,
         os_tls->os_seg_info.dr_tls_base,
-        os_tls->os_seg_info.sgx_sdk_tls_base);
+        os_tls->os_seg_info.sgxsdk_tls_base);
 }
 
 void
@@ -2224,7 +2245,7 @@ os_thread_init(dcontext_t *dcontext)
      */
     ostd->priv_lib_tls_base = os_tls->os_seg_info.priv_lib_tls_base;
     ostd->priv_alt_tls_base = os_tls->os_seg_info.priv_alt_tls_base;
-    ostd->sgx_sdk_tls_base = os_tls->os_seg_info.sgx_sdk_tls_base;
+    ostd->sgxsdk_tls_base = os_tls->os_seg_info.sgxsdk_tls_base;
     ostd->dr_tls_base = os_tls->os_seg_info.dr_tls_base;
 
     LOG(THREAD, LOG_THREADS, 1, "TLS app lib base  ="PFX"\n", os_tls->app_lib_tls_base);
@@ -6554,8 +6575,8 @@ os_switch_seg_to_base(dcontext_t *dcontext, os_local_state_t *os_tls, reg_id_t s
         ASSERT_NOT_REACHED();
         return false;
     }
-    ASSERT((!to_app && seg == SEG_TLS) ||
-           BOOLS_MATCH(to_app, os_using_app_state(dcontext)));
+    // ASSERT((!to_app && seg == SEG_TLS) ||
+    //        BOOLS_MATCH(to_app, os_using_app_state(dcontext)));
     return res;
 }
 
@@ -6584,10 +6605,13 @@ os_switch_seg_to_context(dcontext_t *dcontext, reg_id_t seg, bool to_app)
                    is_thread_tls_allocated() &&
                    dcontext->owning_thread == get_sys_thread_id());
     if (to_app) {
-        base = os_get_app_tls_base(dcontext, seg);
-    } else {
+        // base = os_get_app_tls_base(dcontext, seg);
+        base = os_get_sgxsdk_tls_base(dcontext, seg);
+    }
+    else {
         base = os_get_priv_tls_base(dcontext, seg);
     }
+
     return os_switch_seg_to_base(dcontext, os_tls, seg, to_app, base);
 #elif defined(AARCHXX)
     bool res = false;

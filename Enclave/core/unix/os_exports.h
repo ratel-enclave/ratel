@@ -166,6 +166,7 @@ void os_tls_pre_init(int gdt_index);
 ushort os_get_app_tls_base_offset(ushort/*reg_id_t*/ seg);
 ushort os_get_app_tls_reg_offset(ushort/*reg_id_t*/ seg);
 void *os_get_app_tls_base(dcontext_t *dcontext, ushort/*reg_id_t*/ seg);
+void *os_get_sgxsdk_tls_base(dcontext_t *dcontext, ushort/*reg_id_t*/ seg);
 void os_swap_context_go_native(dcontext_t *dcontext, dr_state_flags_t flags);
 
 #ifdef DEBUG
@@ -320,10 +321,15 @@ bool is_DR_segment_reader_entry(app_pc pc);
 # define NUM_RT     0 /* no RT signals */
 #endif
 /* MAX_SIGNUM is the highest valid signum. */
-#define MAX_SIGNUM  ((OFFS_RT) + (NUM_RT) - 1)
+// #define MAX_SIGNUM  ((OFFS_RT) + (NUM_RT) - 1)
+
+/* but our SGX-dr doesn't support rt-signal */
+#define MAX_SIGNUM ((OFFS_RT) - 1)
+
 /* i#336: MAX_SIGNUM is a valid signal, so we must allocate space for it.
  */
-#define SIGARRAY_SIZE (MAX_SIGNUM + 1)
+// #define SIGARRAY_SIZE (MAX_SIGNUM + 1)
+#define SIGARRAY_SIZE ((OFFS_RT) + (NUM_RT))
 
 /* size of long */
 #ifdef X64
@@ -333,7 +339,8 @@ bool is_DR_segment_reader_entry(app_pc pc);
 #endif
 
 #ifdef LINUX
-# define _NSIG_WORDS (MAX_SIGNUM / _NSIG_BPW)
+// # define _NSIG_WORDS (MAX_SIGNUM / _NSIG_BPW)
+# define _NSIG_WORDS (((OFFS_RT) + (NUM_RT) - 1) / _NSIG_BPW)
 #else
 # define _NSIG_WORDS 1 /* avoid 0 */
 #endif

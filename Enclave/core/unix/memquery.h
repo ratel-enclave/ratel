@@ -80,6 +80,8 @@ int sgx_procmaps_read_start(void);
 void sgx_procmaps_read_stop(void);
 
 int sgx_procmaps_read_next(char *buf, int count);
+
+int print_sgx_procmaps(void);
 /*------------simulate a procmaps file in SGX--------------------*/
 
 /* The passed-in "start" parameter is a performance hint to start

@@ -13,42 +13,6 @@
 extern void load_fsbase(unsigned long base);
 extern void load_gsbase(unsigned long base);
 
-void sgx_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
-{
-#define ARCH_SET_GS 0x1001
-#define ARCH_SET_FS 0x1002
-#define ARCH_GET_FS 0x1003
-#define ARCH_GET_GS 0x1004
-
-    switch (code) {
-        case ARCH_SET_GS:
-            // Fix-me
-            // load_gsbase(addr);
-
-            break;
-        case ARCH_SET_FS:
-            // Fix-me
-            // load_fsbase(addr);
-
-            break;
-        case ARCH_GET_FS:
-            // Fix-me
-            // *(unsigned long*)addr = read_fsbase();
-
-            break;
-        case ARCH_GET_GS:
-            // Fix-me
-            // *(unsigned long*)addr = read_gsbase();
-
-            break;
-        default:
-            *ret = -1;
-            return;
-            break;
-    }
-    *ret = 0;
-}
-
 
 //Generate a copy within the enclave.
 void* gen_enclave_copy(void *org, int len)
@@ -62,6 +26,7 @@ void* gen_enclave_copy(void *org, int len)
     return obj;
 }
 
+/*----------------------------------sensitive machine instructions--------------------------------*/
 /* CPUID */
 void sgx_instr_cpuid(int res[4], int eax, int ecx)
 {
@@ -74,23 +39,132 @@ void sgx_instr_rdtsc(uint64* res)
     ocall_rdtsc_To(res, sizeof(unsigned long long));
 }
 
-//__attribute__((stdcall)) long sgx_instr_syscall(int sysno)
-//rdi, rsi, rdx, r10, r8, r9
+/* syscall instruction*/
+long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
+
+
+/*--------------------------------------special syscalls-------------------------------------------*/
+
 
 void dumb(void)
 {
 }
 
+void unimplemented_syscall(int sysno)
+{
+    ocall_print_syscallname(sysno);
+    ocall_print_str("The above syscall is not implemented, crash me!");
+
+    __asm__ __volatile__ ("int3");  // ASSERT(false);
+}
+
 #define MAX_SYSCALL_NO 330
 void (*syscalls[MAX_SYSCALL_NO])(void) = {dumb};
+
+
+/* sycall: arch_prctl */
+void sgx_syscall_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
+{
+#define ARCH_SET_GS 0x1001
+#define ARCH_SET_FS 0x1002
+#define ARCH_GET_FS 0x1003
+#define ARCH_GET_GS 0x1004
+
+    switch (code) {
+        case ARCH_SET_GS:
+            // Fix-me
+            // load_gsbase(addr);
+            break;
+
+        case ARCH_SET_FS:
+            // Fix-me
+            // load_fsbase(addr);
+            break;
+
+        case ARCH_GET_FS:
+            // Fix-me
+            // *(unsigned long*)addr = read_fsbase();
+            break;
+
+        case ARCH_GET_GS:
+            // Fix-me
+            // *(unsigned long*)addr = read_gsbase();
+            break;
+
+        default:
+            *ret = -1;
+            return;
+            break;
+    }
+    *ret = 0;
+}
+
+
+#define SIGARRAY_SIZE   65
+
+typedef struct loc_kernel_sigaction_t {
+    unsigned char cnt[len_kernel_sigaction];
+}loc_kernel_sigaction_t;
+
+loc_kernel_sigaction_t app_sigaction[SIGARRAY_SIZE];    // Current signal-actions
+
+long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10)
+{
+    loc_kernel_sigaction_t *act = (loc_kernel_sigaction_t*)act_ptr;
+    loc_kernel_sigaction_t *oldact = (loc_kernel_sigaction_t*)oldact_ptr;
+
+    if (oldact != NULL)
+        memcpy(oldact, &app_sigaction[signum], sizeof(loc_kernel_sigaction_t));
+    if (act != NULL)
+        memcpy(&app_sigaction[signum], act, sizeof(loc_kernel_sigaction_t));
+    sgxapp_reg_sighandler(signum);
+
+    // returns 0 on success
+    return 0;
+}
+
+
+long sgx_syscall_rt_sigprocmask(long how, long set_ptr, long oldset_ptr, long _r10)
+{
+    return 0;
+}
+
+
+/* fix-me: set a flag to indirect this syscall execute successfully,
+   and allow master_signal_handler checks this flag. */
+long sgx_syscall_sigaltstack(long ss_ptr, long oldss_ptr)
+{
+    return 0;
+}
+
+
+/* fcntl has variable parameters */
+long sgx_syscall_fcntl(long fd, long cmd, long arg1, long arg2)
+{
+#define F_DUPFD 0
+
+    long ret = -1;
+
+    switch (cmd) {
+        case F_DUPFD:
+            ocall_syscall_2_NN(&ret, SYS_fcntl, cmd, arg1);
+            break;
+    }
+
+    return ret;
+}
+
+
+/*--------------------------------------General syscalls-------------------------------------------*/
 
 //All syscalls with 0 parameters
 long sgx_instr_syscall_0(long sysno)
 {
-    long ret;
+    long ret = -1;
 
     //ocall_print_syscallname(sysno);
     ocall_syscall_0(&ret, sysno);
+
     return ret;
 }
 
@@ -195,17 +269,19 @@ long sgx_instr_syscall_1(long sysno, long _rdi)
             break;
 
         default:
+            unimplemented_syscall(sysno);
             break;
     }
 
     return ret;
 }
-#include <string.h>
 
+
+#include <string.h>
 //All syscalls with 2 parameters
 long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
 {
-    long ret = 0;
+    long ret = -1;
     byte* addr;
 
     switch (sysno) {
@@ -233,7 +309,7 @@ long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
             break;
 
         case SYS_arch_prctl:
-            sgx_arch_prctl(&ret, sysno, _rdi, _rsi);
+            sgx_syscall_arch_prctl(&ret, sysno, _rdi, _rsi);
             break;
 
         case SYS_getitimer:
@@ -248,6 +324,14 @@ long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
         case SYS_access:
             ocall_syscall_2_SN(&ret, sysno, (char*)_rdi, _rsi);
             break;
+
+        case SYS_sigaltstack:
+            ret = sgx_syscall_sigaltstack(_rdi, _rsi);
+            break;
+
+        default:
+            unimplemented_syscall(sysno);
+            break;
     }
 
     return ret;
@@ -257,7 +341,7 @@ long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
 //All syscalls with 3 parameters
 long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 {
-    long ret = 0;
+    long ret = -1;
     char *s, *t;
     byte* addr;
 
@@ -275,8 +359,8 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             /* free the enclave copy */
             if (t != s)
                 free(t);
-
             break;
+
         case SYS_tgkill:
             ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
             break;
@@ -298,10 +382,22 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
                 // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
                 sgx_mm_mprotect(addr, _rsi, _rdx);
             }
-
             break;
+
         case SYS_getdents:
             ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            break;
+
+        case SYS_setitimer:
+            ocall_syscall_3_NTiTo(&ret, sysno, _rdi, (void*)_rsi, len_itimerval, (void*)_rdx, len_itimerval);
+            break;
+
+        case SYS_fcntl:
+            ret = sgx_syscall_fcntl(_rdi, _rsi, _rdx, 0);
+            break;
+
+        default:
+            unimplemented_syscall(sysno);
             break;
 
     }
@@ -309,19 +405,22 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     return ret;
 }
 
+
 long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 {
-    long ret = 0;
+    long ret = -1;
     byte* addr;
 
     switch(sysno) {
 
         case SYS_rt_sigaction:
-            ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
+            // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
+            ret = sgx_syscall_rt_sigaction(_rdi, _rsi, _rdx, _r10);
             break;
 
         case SYS_rt_sigprocmask:
-            ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
+            // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
+            ret = sgx_syscall_rt_sigprocmask(_rdi, _rsi, _rdx, _r10);
             break;
 
         case SYS_mremap:
@@ -334,6 +433,10 @@ long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
                 ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
             }
             break;
+
+        default:
+            unimplemented_syscall(sysno);
+            break;
     }
 
     return ret;
@@ -341,7 +444,7 @@ long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
 long sgx_instr_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
 {
-    long ret = 0;
+    long ret = -1;
 
     if (sysno == SYS_prctl) {
         ocall_syscall_5_NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8);
@@ -352,7 +455,7 @@ long sgx_instr_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
 
 long sgx_instr_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
-    long ret = 0;
+    long ret = -1;
     byte* addr;
 
     switch (sysno) {
@@ -365,32 +468,19 @@ long sgx_instr_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
                 // byte* sgx_mm_mmap(byte* ext_addr, size_t len, ulong prot, ulong flags, int fd, ulong offs)
                 ret = (ulong)sgx_mm_mmap((byte*)ret, _rsi, _rdx, _r10, (int)_r8, _r9);
             }
-
             break;
+
         case SYS_futex:
             ocall_syscall_6_PoNNTiPoN(&ret, sysno, (int*)_rdi, _rsi, _rdx, (void*)_r10, len_timespec, (int*) _r8, _r9);
             break;
-    }
 
-    return ret;
-}
-
-
-long sgx_syscall_fcntl(long cmd, long _rsi, long _rdx, long _r10)
-{
-#define F_DUPFD 0
-
-    long ret = 0;
-
-    switch (cmd) {
-        case F_DUPFD:
-            ocall_syscall_2_NN(&ret, SYS_fcntl, cmd, _rsi);
+        default:
+            unimplemented_syscall(sysno);
             break;
     }
 
     return ret;
 }
-
 
 
 long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
@@ -405,18 +495,16 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
             return sgx_instr_syscall_0(sysno);
             break;
 
-
             //One paramters
         case SYS_close:
         case SYS_unlink:
         case SYS_exit:
         case SYS_exit_group:
         case SYS_uname:
-        /*case SYS_set_thread_area:*/
-        /*case SYS_get_thread_area:*/
+            /*case SYS_set_thread_area:*/
+            /*case SYS_get_thread_area:*/
             return sgx_instr_syscall_1(sysno, _rdi);
             break;
-
 
             //Two paramters
         case SYS_fstat:
@@ -432,7 +520,6 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
             return sgx_instr_syscall_2(sysno, _rdi, _rsi);
             break;
 
-
             //Three paramters
         case SYS_tgkill:
         case SYS_open:
@@ -440,9 +527,9 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_write:
         case SYS_mprotect:
         case SYS_getdents:
+        case SYS_setitimer:
             return sgx_instr_syscall_3(sysno, _rdi, _rsi, _rdx);
             break;
-
 
             //Four parameters
         case SYS_rt_sigaction:
@@ -450,7 +537,6 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_mremap:
             return sgx_instr_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
             break;
-
 
             //Five parameters
         case SYS_prctl:
@@ -467,30 +553,34 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_fcntl:
             return sgx_syscall_fcntl(_rdi, _rsi, _rdx, _r10);
             break;
-    }
 
-    ocall_print_str("The following syscall is not implemented, crash me!");
-    ocall_print_syscallname(sysno);
-    __asm__ __volatile__ ("int3");  // ASSERT(false);
-    return -1;
+        default:
+            unimplemented_syscall(sysno);
+            return -1;
+            break;
+    }
 }
 
 // signature: dynamorio_syscall(sysnum, num_args, arg1, arg2, ...)
 // <sgx_dynamorio_syscall>:      push   %rbp
 // <sgx_dynamorio_syscall+1>:    mov    %rsp,%rbp
-long sgx_dynamorio_syscall(long sysnum, long num_args, ...)
+// long sgx_dynamorio_syscall(long sysnum, long num_args, ...)
+long sgx_dynamorio_syscall(long sysnum, long num_args, long arg1,
+        long arg2, long arg3, long arg4,
+        long arg5, long arg6)
 {
-    unsigned long arg1, arg2, arg3, arg4, arg5, arg6, _rbp;
+    // unsigned long arg1, arg2, arg3, arg4, arg5, arg6, _rbp;
 
     /* gcc uses rcx for passing the forth parameter */
-    __asm__ __volatile__ (
-        "\tmov %%rdx, %0\n" \
-        "\tmov %%rcx, %1\n" \
-        "\tmov %%r8, %2\n"  \
-        "\tmov %%r9, %3\n"  \
-        "\tmov %%rbp, %4\n" \
-        :"=rm"(arg1), "=rm"(arg2), "=rm"(arg3),
-        "=rm"(arg4), "=rm"(_rbp)::);
+    // __asm__ (
+    //         "\tmov %%rdx, %0\n"
+    //         "\tmov %%rcx, %1\n"
+    //         "\tmov %%r8, %2\n"
+    //         "\tmov %%r9, %3\n"
+    //         "\tmov %%rbp, %4\n"
+    //         "\txor %%rax, %%rax\n"
+    //         :"=rm"(arg1), "=rm"(arg2), "=rm"(arg3),
+    //         "=rm"(arg4), "=rm"(_rbp)::);
 
     switch(num_args) {
         case 0:
@@ -509,14 +599,18 @@ long sgx_dynamorio_syscall(long sysnum, long num_args, ...)
             return sgx_instr_syscall_4(sysnum, arg1, arg2, arg3, arg4);
 
         case 5:
-            arg5 = *((long*)_rbp + 2);
+            // arg5 = *((long*)_rbp + 2);
             return sgx_instr_syscall_5(sysnum, arg1, arg2, arg3, arg4, arg5);
 
         case 6:
-            arg5 = *((long*)_rbp + 2);
-            arg6 = *((long*)_rbp + 3);
+            // arg5 = *((long*)_rbp + 2);
+            // arg6 = *((long*)_rbp + 3);
             return sgx_instr_syscall_6(sysnum, arg1, arg2, arg3, arg4, arg5, arg6);
-    }
 
-    return -1;
+        default:
+            ocall_print_str("too many arguments! crash me!");
+            __asm__ __volatile__ ("int3");  // ASSERT(false);
+            return -1;
+            break;
+    }
 }

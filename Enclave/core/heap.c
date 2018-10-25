@@ -668,6 +668,7 @@ vmm_in_same_block(vm_addr_t p1, vm_addr_t p2)
 static void
 vmm_dump_map(vm_heap_t *vmh)
 {
+    return;
     uint i;
     bitmap_element_t *b = vmh->blocks;
     uint bitmap_size = vmh->num_blocks;
@@ -2947,23 +2948,23 @@ heap_free_unit(heap_unit_t *unit, dcontext_t *dcontext)
      * not on the unit itself - FIXME: case 10434.  Maybe we should embed the
      * special heap unit header in the first special heap unit itself. */
     /* The hotp_only leak relaxation below is for case 9588 & 9593.  */
-    DOCHECK(CHKLVL_MEMFILL, {
-        CLIENT_ASSERT(IF_HOTP(hotp_only_contains_leaked_trampoline
-                              (unit->start_pc, unit->end_pc - unit->start_pc) ||)
-                      /* i#157: private loader => system lib allocs come here =>
-                       * they don't always clean up.  we have to relax here, but our
-                       * threadunits_exit checks should find all leaks anyway.
-                       */
-                      heapmgt->global_units.acct.cur_usage[ACCT_LIBDUP] > 0 ||
-                      is_region_memset_to_char(unit->start_pc,
-                                               unit->end_pc - unit->start_pc,
-                                               HEAP_UNALLOCATED_BYTE)
-                      /* don't assert when client does premature exit as it's
-                       * hard for Extension libs, etc. to clean up in such situations
-                       */
-                      IF_CLIENT_INTERFACE(|| client_requested_exit),
-                      "memory leak detected");
-    });
+    // DOCHECK(CHKLVL_MEMFILL, {
+    //     CLIENT_ASSERT(IF_HOTP(hotp_only_contains_leaked_trampoline
+    //                           (unit->start_pc, unit->end_pc - unit->start_pc) ||)
+    //                   /* i#157: private loader => system lib allocs come here =>
+    //                    * they don't always clean up.  we have to relax here, but our
+    //                    * threadunits_exit checks should find all leaks anyway.
+    //                    */
+    //                   heapmgt->global_units.acct.cur_usage[ACCT_LIBDUP] > 0 ||
+    //                   is_region_memset_to_char(unit->start_pc,
+    //                                            unit->end_pc - unit->start_pc,
+    //                                            HEAP_UNALLOCATED_BYTE)
+    //                   /* don't assert when client does premature exit as it's
+    //                    * hard for Extension libs, etc. to clean up in such situations
+    //                    */
+    //                   IF_CLIENT_INTERFACE(|| client_requested_exit),
+    //                   "memory leak detected");
+    // });
 #endif
     /* modifying heap list and DR areas must be atomic, and must grab
      * DR area lock before heap_unit_lock
@@ -3244,8 +3245,8 @@ threadunits_exit(thread_units_t *tu, dcontext_t *dcontext)
                 /* Don't assert when client does premature exit as it's
                  * hard for Extension libs, etc. to clean up in such situations:
                  */
-                CLIENT_ASSERT(IF_CLIENT_INTERFACE(client_requested_exit ||) false,
-                              "memory leak detected");
+                // CLIENT_ASSERT(IF_CLIENT_INTERFACE(client_requested_exit ||) false,
+                //               "memory leak detected");
             }
         }
     }
@@ -3629,41 +3630,41 @@ common_heap_alloc(thread_units_t *tu, size_t size HEAPACCT(which_heap_t which))
 
         ACCOUNT_FOR_ALLOC(alloc_new, tu, which, alloc_size, aligned_size);
     }
-    DOSTATS({
-        /* do this before done_allocating: want to ignore special-unit allocs */
-        ATOMIC_ADD(int, block_count[bucket], 1);
-        ATOMIC_ADD(int, block_total_count[bucket], 1);
-        /* FIXME: should atomically store inc-ed val in temp to avoid races w/ max */
-        ATOMIC_MAX(int, block_peak_count[bucket], block_count[bucket]);
-        ASSERT(CHECK_TRUNCATE_TYPE_uint(alloc_size - aligned_size));
-        ATOMIC_ADD(int, block_wasted[bucket], (int) (alloc_size - aligned_size));
-        /* FIXME: should atomically store val in temp to avoid races w/ max */
-        ATOMIC_MAX(int, block_peak_wasted[bucket], block_wasted[bucket]);
-        if (aligned_size > size) {
-            ASSERT(CHECK_TRUNCATE_TYPE_uint(aligned_size - size));
-            ATOMIC_ADD(int, block_align_pad[bucket], (int) (aligned_size - size));
-            /* FIXME: should atomically store val in temp to avoid races w/ max */
-            ATOMIC_MAX(int, block_peak_align_pad[bucket], block_align_pad[bucket]);
-            STATS_ADD_PEAK(heap_align, aligned_size - size);
-            LOG(GLOBAL, LOG_STATS, 5,
-                "alignment mismatch: %s ask %d, aligned is %d -> %d pad\n",
-                IF_HEAPACCT_ELSE(whichheap_name[which], ""),
-                size, aligned_size, aligned_size-size);
-        }
-        if (bucket == BLOCK_TYPES-1) {
-            STATS_ADD(heap_headers, HEADER_SIZE);
-            STATS_INC(heap_allocs_variable);
-        } else {
-            STATS_INC(heap_allocs_buckets);
-            if (alloc_size > aligned_size) {
-                STATS_ADD_PEAK(heap_bucket_pad, alloc_size - aligned_size);
-                LOG(GLOBAL, LOG_STATS, 5,
-                    "bucket mismatch: %s ask (aligned) %d, got %d, -> %d\n",
-                    IF_HEAPACCT_ELSE(whichheap_name[which], ""),
-                    aligned_size, alloc_size, alloc_size-aligned_size);
-            }
-        }
-    });
+    // DOSTATS({
+    //     /* do this before done_allocating: want to ignore special-unit allocs */
+    //     ATOMIC_ADD(int, block_count[bucket], 1);
+    //     ATOMIC_ADD(int, block_total_count[bucket], 1);
+    //     /* FIXME: should atomically store inc-ed val in temp to avoid races w/ max */
+    //     ATOMIC_MAX(int, block_peak_count[bucket], block_count[bucket]);
+    //     ASSERT(CHECK_TRUNCATE_TYPE_uint(alloc_size - aligned_size));
+    //     ATOMIC_ADD(int, block_wasted[bucket], (int) (alloc_size - aligned_size));
+    //     /* FIXME: should atomically store val in temp to avoid races w/ max */
+    //     ATOMIC_MAX(int, block_peak_wasted[bucket], block_wasted[bucket]);
+    //     if (aligned_size > size) {
+    //         ASSERT(CHECK_TRUNCATE_TYPE_uint(aligned_size - size));
+    //         ATOMIC_ADD(int, block_align_pad[bucket], (int) (aligned_size - size));
+    //         /* FIXME: should atomically store val in temp to avoid races w/ max */
+    //         ATOMIC_MAX(int, block_peak_align_pad[bucket], block_align_pad[bucket]);
+    //         STATS_ADD_PEAK(heap_align, aligned_size - size);
+    //         LOG(GLOBAL, LOG_STATS, 5,
+    //             "alignment mismatch: %s ask %d, aligned is %d -> %d pad\n",
+    //             IF_HEAPACCT_ELSE(whichheap_name[which], ""),
+    //             size, aligned_size, aligned_size-size);
+    //     }
+    //     if (bucket == BLOCK_TYPES-1) {
+    //         STATS_ADD(heap_headers, HEADER_SIZE);
+    //         STATS_INC(heap_allocs_variable);
+    //     } else {
+    //         STATS_INC(heap_allocs_buckets);
+    //         if (alloc_size > aligned_size) {
+    //             STATS_ADD_PEAK(heap_bucket_pad, alloc_size - aligned_size);
+    //             LOG(GLOBAL, LOG_STATS, 5,
+    //                 "bucket mismatch: %s ask (aligned) %d, got %d, -> %d\n",
+    //                 IF_HEAPACCT_ELSE(whichheap_name[which], ""),
+    //                 aligned_size, alloc_size, alloc_size-aligned_size);
+    //         }
+    //     }
+    // });
  done_allocating:
 #ifdef DEBUG_MEMORY
     if (bucket == BLOCK_TYPES-1 && check_alloc_size <= MAXROOM) {

@@ -56,7 +56,7 @@ extern byte* ext_vm_base;
 
 
 /* print the vma list to a buffer */
-int sgx_procmaps_read_start(void)
+int _sgx_procmaps_read_start(bool debug)
 {
     sgx_procmaps.buf = sgx_procmaps_buf;
     sgx_procmaps.buf_size = SGX_PROCMAPS_BUF_LEN;
@@ -134,8 +134,10 @@ int sgx_procmaps_read_start(void)
             start = vma->vm_start;
             end = vma->vm_end;
         }
-        nwrite = snprintf(pcnt, nleft, MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
-        // dr_printf(MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
+        if (debug)
+            dr_printf(MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
+        else
+            nwrite = snprintf(pcnt, nleft, MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
 
         sgx_procmaps.cnt_len += nwrite;
     }
@@ -143,6 +145,15 @@ int sgx_procmaps_read_start(void)
     return !INVALID_FILE;
 }
 
+int sgx_procmaps_read_start(void)
+{
+   return _sgx_procmaps_read_start(false);
+}
+
+int print_sgx_procmaps(void)
+{
+   return _sgx_procmaps_read_start(true);
+}
 
 void sgx_procmaps_read_stop(void)
 {   /* exit querying mode */

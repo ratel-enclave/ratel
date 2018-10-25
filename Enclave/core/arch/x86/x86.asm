@@ -849,17 +849,15 @@ GLOBAL_LABEL(global_do_syscall_sygate_sysenter:)
  * that we don't expect to return, so for debug builds we go into an infinite
  * loop if syscall returns.
   */
+
+
        DECLARE_FUNC(global_do_syscall_syscall)
 GLOBAL_LABEL(global_do_syscall_syscall:)
-        mov      r10, REG_XCX
-#ifdef DEBUG
-        PUSHGPR
-        //call log_global_do_syscall_syscall
-        POPGPR
-#endif
-        syscall
+        //mov      r10, REG_XCX
+        //syscall
+        call sgx_instr_syscall
 #   ifdef DEBUG
-        jmp      GLOBAL_REF(debug_infinite_loop)
+        //jmp      GLOBAL_REF(debug_infinite_loop)
 #   endif
 #   ifdef UNIX
         /* we do come here for SYS_kill which can fail: try again via exit_group */
@@ -1401,6 +1399,15 @@ dynamorio_semaphore_next:
  */
         DECLARE_FUNC(dynamorio_sys_exit_group)
 GLOBAL_LABEL(dynamorio_sys_exit_group:)
+        mov      rdx, 0 /* exit code: hardcoded */
+        mov      rsi, 1 /* 1 parameter */
+        mov      rdi, SYS_exit_group
+        jmp sgx_dynamorio_syscall
+        END_FUNC(dynamorio_sys_exit_group)
+
+
+        DECLARE_FUNC(dynamorio_sys_exit_group_org)
+GLOBAL_LABEL(dynamorio_sys_exit_group_org:)
 #ifdef X64
         mov      edi, 0 /* exit code: hardcoded */
 # ifdef MACOS
@@ -1409,11 +1416,6 @@ GLOBAL_LABEL(dynamorio_sys_exit_group:)
         mov      eax, SYS_exit_group
 # endif
         mov      r10, rcx
-#ifdef DEBUG
-        PUSHGPR
-        //call log_dynamorio_sys_exit_group
-        POPGPR
-#endif
         syscall
 #else
 # ifdef MACOS
@@ -1431,7 +1433,7 @@ GLOBAL_LABEL(dynamorio_sys_exit_group:)
         /* should not return.  if we somehow do, infinite loop is intentional.
          * FIXME: do better in release build!  why not an int3? */
         jmp      GLOBAL_REF(unexpected_return)
-        END_FUNC(dynamorio_sys_exit_group)
+        END_FUNC(dynamorio_sys_exit_group_org)
 
 #if defined(LINUX) && !defined(X64)
 /* since our handler is rt, we have no source for the kernel's/libc's
@@ -1458,8 +1460,8 @@ GLOBAL_LABEL(dynamorio_nonrt_sigreturn:)
  * read the original params.
  * See also PR 305020.
  */
-        DECLARE_FUNC(master_signal_handler)
-GLOBAL_LABEL(master_signal_handler:)
+        DECLARE_FUNC(master_signal_handler_org)
+GLOBAL_LABEL(master_signal_handler_org:)
 #ifdef X64
 # ifdef LINUX
         mov      ARG4, REG_XSP /* pass as extra arg */
@@ -1484,7 +1486,7 @@ GLOBAL_LABEL(master_signal_handler:)
         ret
 # endif
 #endif
-        END_FUNC(master_signal_handler)
+        END_FUNC(master_signal_handler_org)
 
 #else /* !HAVE_SIGALTSTACK */
 

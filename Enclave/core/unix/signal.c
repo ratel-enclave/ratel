@@ -212,8 +212,10 @@ os_cxt_ptr_t osc_empty;
 /**** function prototypes ***********************************************/
 
 /* in x86.asm */
-void
-master_signal_handler(int sig, siginfo_t *siginfo, kernel_ucontext_t *ucxt);
+
+// void
+// master_signal_handler(int sig, siginfo_t *siginfo, kernel_ucontext_t *ucxt);
+void master_signal_handler(sigcxt_pkg_t *ext_pkg);
 
 static void
 set_handler_and_record_app(dcontext_t *dcontext, thread_sig_info_t *info, int sig,
@@ -469,8 +471,7 @@ signal_exit()
 #endif
 }
 
-//#ifdef HAVE_SIGALTSTACK
-#if 0
+#ifdef HAVE_SIGALTSTACK
 /* Separated out to run from the dstack (i#2016: see below). */
 static void
 set_our_alt_stack(void *arg)
@@ -486,7 +487,7 @@ void
 signal_thread_init(dcontext_t *dcontext)
 {
     thread_sig_info_t *info = HEAP_TYPE_ALLOC(dcontext, thread_sig_info_t,
-                                              ACCT_OTHER, PROTECTED);
+            ACCT_OTHER, PROTECTED);
     size_t pend_unit_size = sizeof(sigpending_t) +
         /* include alignment for xsave on xstate */
         signal_frame_extra_size(true)
@@ -505,16 +506,14 @@ signal_thread_init(dcontext_t *dcontext)
      * but if we need a new unit that will grab a lock: we try to
      * avoid that by limiting the # of pending alarm signals (PR 596768).
      */
-    info->sigheap =
-        special_heap_init_aligned(pend_unit_size,
-                                  IF_X86_ELSE(AVX_ALIGNMENT, 0),
-                                  false /* cannot have any locking */,
-                                  false /* -x */,
-                                  true /* persistent */,
-                                  pend_unit_size * DYNAMO_OPTION(max_pending_signals));
+    info->sigheap = special_heap_init_aligned(pend_unit_size,
+            IF_X86_ELSE(AVX_ALIGNMENT, 0),
+            false /* cannot have any locking */,
+            false /* -x */,
+            true /* persistent */,
+            pend_unit_size * DYNAMO_OPTION(max_pending_signals));
 
-//#ifdef HAVE_SIGALTSTACK
-#if 0
+#ifdef HAVE_SIGALTSTACK
     /* set up alternate stack
      * i#552 we may terminate the process without freeing the stack, so we
      * stack_alloc it to exempt from the memory leak check.
@@ -532,10 +531,11 @@ signal_thread_init(dcontext_t *dcontext)
      * initial mcxt, so we use the new alt stack.
      */
     call_switch_stack((void *)info,
-                      (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
-                      set_our_alt_stack, NULL, true/*return*/);
+            (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
+            set_our_alt_stack, NULL, true/*return*/);
+
     LOG(THREAD, LOG_ASYNCH, 1, "signal stack is "PFX" - "PFX"\n",
-        info->sigstack.ss_sp, info->sigstack.ss_sp + info->sigstack.ss_size);
+            info->sigstack.ss_sp, info->sigstack.ss_sp + info->sigstack.ss_size);
     /* app_sigstack dealt with below, based on parentage */
 #endif
 
@@ -1157,7 +1157,7 @@ signal_thread_exit(dcontext_t *dcontext, bool other_thread)
     int i;
 
     /* i#1012: DR's signal handler should always be installed before this point.
-     */
+    */
     ASSERT(sigsegv_handler_is_ours() || removed_sig_handler);
 
     while (info->num_unstarted_children > 0) {
@@ -1176,7 +1176,7 @@ signal_thread_exit(dcontext_t *dcontext, bool other_thread)
 #if defined(X86) && defined(LINUX)
     if (info->xstate_alloc != NULL) {
         heap_free(dcontext, info->xstate_alloc, signal_frame_extra_size(true)
-                  HEAPACCT(ACCT_OTHER));
+                HEAPACCT(ACCT_OTHER));
     }
 #endif
 
@@ -1216,13 +1216,13 @@ signal_thread_exit(dcontext_t *dcontext, bool other_thread)
         if (info->shared_itimer_lock != NULL) {
             DELETE_RECURSIVE_LOCK(*info->shared_itimer_lock);
             global_heap_free(info->shared_itimer_lock, sizeof(recursive_lock_t)
-                             HEAPACCT(ACCT_OTHER));
+                    HEAPACCT(ACCT_OTHER));
             ASSERT(info->shared_itimer_refcount != NULL);
             global_heap_free(info->shared_itimer_refcount, sizeof(int)
-                             HEAPACCT(ACCT_OTHER));
+                    HEAPACCT(ACCT_OTHER));
             ASSERT(info->shared_itimer_underDR != NULL);
             global_heap_free(info->shared_itimer_underDR, sizeof(int)
-                             HEAPACCT(ACCT_OTHER));
+                    HEAPACCT(ACCT_OTHER));
         }
     }
     for (i = 1; i <= MAX_SIGNUM; i++) {
@@ -1239,14 +1239,14 @@ signal_thread_exit(dcontext_t *dcontext, bool other_thread)
     /* Remove our sigstack and restore the app sigstack if it had one.  */
     if (!other_thread) {
         LOG(THREAD, LOG_ASYNCH, 2, "removing our signal stack "PFX" - "PFX"\n",
-            info->sigstack.ss_sp, info->sigstack.ss_sp + info->sigstack.ss_size);
+                info->sigstack.ss_sp, info->sigstack.ss_sp + info->sigstack.ss_size);
         if (APP_HAS_SIGSTACK(info)) {
             LOG(THREAD, LOG_ASYNCH, 2, "restoring app signal stack "PFX" - "PFX"\n",
-                info->app_sigstack.ss_sp,
-                info->app_sigstack.ss_sp + info->app_sigstack.ss_size);
-        } else {
+                    info->app_sigstack.ss_sp,
+                    info->app_sigstack.ss_sp + info->app_sigstack.ss_size);
+        } /*else {
             ASSERT(TEST(SS_DISABLE, info->app_sigstack.ss_flags));
-        }
+        }*/
         if (info->sigstack.ss_sp != NULL) {
             /* i#552: to raise client exit event, we may call dynamo_process_exit
              * on sigstack in signal handler.
@@ -1283,7 +1283,7 @@ signal_thread_exit(dcontext_t *dcontext, bool other_thread)
          * In that case we set sigstack (ss_sp) NULL to avoid stack free.
          */
         stack_free(info->sigstack.ss_sp + info->sigstack.ss_size,
-                   info->sigstack.ss_size);
+                info->sigstack.ss_size);
     }
 # endif
     HEAP_TYPE_FREE(dcontext, info, thread_sig_info_t, ACCT_OTHER, PROTECTED);
@@ -1291,8 +1291,8 @@ signal_thread_exit(dcontext_t *dcontext, bool other_thread)
 #ifdef PAPI
     /* use SIGPROF for updating gui so it can be distinguished from SIGVTALRM */
     set_itimer_callback(dcontext, ITIMER_PROF, 500,
-                        (void (*func)(dcontext_t *, priv_mcontext_t *))
-                        perfctr_update_gui());
+            (void (*func)(dcontext_t *, priv_mcontext_t *))
+            perfctr_update_gui());
 #endif
 }
 
@@ -4981,6 +4981,33 @@ master_signal_handler_C(byte *xsp)
         SELF_PROTECT_LOCAL(dcontext, READONLY);
     EXITING_DR();
 }
+
+static void
+_master_signal_handler(void * arg)
+{
+    sigcxt_pkg_t *ext_pkg = (sigcxt_pkg_t*)arg;
+    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)malloc(sizeof(sigcxt_pkg_t));
+    memcpy(pkg, ext_pkg, sizeof(sigcxt_pkg_t));
+    master_signal_handler_C(pkg->signum, &pkg->info, &pkg->ctx, (byte*)pkg);
+    /* switch back to the original stack */
+}
+
+
+void master_signal_handler(sigcxt_pkg_t *ext_pkg)
+{
+    dcontext_t* ctx = get_thread_private_dcontext();
+    thread_sig_info_t *info = ctx->signal_field;
+
+#ifdef HAVE_SIGALTSTACK
+    /* swith to the stack set by sigaltstack */
+    call_switch_stack((void *)ext_pkg,
+            (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
+            _master_signal_handler, NULL, true/*return*/);
+#else
+    _master_signal_handler(ext_pkg);
+#endif
+}
+
 
 static bool
 execute_handler_from_cache(dcontext_t *dcontext, int sig, sigframe_rt_t *our_frame,
