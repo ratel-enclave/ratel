@@ -28,9 +28,11 @@ void* gen_enclave_copy(void *org, int len)
 
 /*----------------------------------sensitive machine instructions--------------------------------*/
 /* CPUID */
+#include "sgx_cpuid.h"
 void sgx_instr_cpuid(int res[4], int eax, int ecx)
 {
-    ocall_cpuid_ToNN(res, sizeof(int)*4, eax, ecx);
+    // ocall_cpuid_ToNN(res, sizeof(int)*4, eax, ecx);
+    sgx_cpuidex(res, eax, ecx);
 }
 
 /* RDTSC */

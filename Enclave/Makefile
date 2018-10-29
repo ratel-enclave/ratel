@@ -50,14 +50,14 @@ Crypto_Library_Name := sgx_tcrypto
 #       Use `--start-group' and `--end-group' to link these libraries.
 # Do NOT move the libraries linked with `--start-group' and `--end-group' within `--whole-archive' and `--no-whole-archive' options.
 # Otherwise, you may get some undesirable errors.
-SGX_ENCLAVE_LD_FLAGS := -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L$(SGX_LIBRARY_PATH) \
+SGX_ENCLAVE_LD_FLAGS := -nostdlib -nodefaultlibs -nostartfiles -L$(SGX_LIBRARY_PATH) \
 	-Wl,--whole-archive -l$(Trts_Library_Name) -Wl,--no-whole-archive \
-	-Wl,--start-group -lsgx_tstdc -lsgx_tcxx -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group \
 	-Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
 	-Wl,--export-dynamic  \
 	-Wl,--defsym,__ImageBase=0x0 -Wl,--gc-sections   \
 	-Wl,--version-script=dynamorio.lds
 
+SGX_ENCLAVE_LD_LIBS := -Wl,--start-group -lsgx_tstdc -lsgx_tcxx -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group
 
 
 ######## final target is libdynamorio ########
@@ -150,7 +150,7 @@ $(EDGE_OBJS): %.o: %.c
 
 ######## building libdynamorio ########
 $(ENCLAVE_NAME): dynamorio_t.o $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(EDGE_OBJS) ${DYNAMORIO_LDSCRIPT}
-	$(LD) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_LD_FLAGS) $(DYNAMORIO_LD_FLAGS) $(SGX_DYNAMORIO_LD_FLAGS) -o $@ $(EDGE_OBJS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o
+	$(LD) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_LD_FLAGS) $(DYNAMORIO_LD_FLAGS) $(SGX_DYNAMORIO_LD_FLAGS) -o $@ $(EDGE_OBJS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o $(SGX_ENCLAVE_LD_LIBS)
 	#$(CP) $@ $@.full
 	#$(OBJCOPY) --only-keep-debug $@ $@.debug
 	#$(OBJCOPY) --add-gnu-debuglink=$@.debug $@

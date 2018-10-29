@@ -37,6 +37,8 @@
 
 
 enclave {
+    from "sgx_tstdc.edl" import sgx_oc_cpuidex;
+
     trusted {
 
         /*
