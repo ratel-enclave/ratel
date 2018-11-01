@@ -36,158 +36,168 @@
 
 #include "instrument_api.h"
 
+/*-------------------provide a procmaps for sgx-app------------*/
+typedef struct _procmaps_t {
+    char   *data_buf;   /* point ro the current buffer; */
+    uint    buf_size;   /* the size of buffer */
+    uint    cnt_len;    /* length of content */
+    uint    read_oft;   /* offset from begining for reading */
+} procmaps_t;
+
 #define SGX_PROCMAPS_BUF_LEN   (4096*2)
 
-char sgx_procmaps_buf[SGX_PROCMAPS_BUF_LEN];
+// for performance, using a static buffer
+static char PROCMAPS_BUF[SGX_PROCMAPS_BUF_LEN];
+static procmaps_t SGX_PROCMAPS;
 
-struct procmaps_t {
-    char*   buf;        /* point ro the current buffer; */
-    size_t  buf_size;   /* the size of buffer */
-    size_t  cnt_len;    /* length of content */
-    size_t  read_oft;   /* offset from begining for reading */
-} sgx_procmaps;
+/*---------------------------------------------------------------------------*/
+extern sgx_mm_t SGX_MM;
 
 
-extern sgx_mm_t sgxmm;
-// extern byte* sgx_vm_base;
-extern byte* heap_init_end;
-extern byte* sgx_vm_base;
-extern byte* ext_vm_base;
-
-
-/* print the vma list to a buffer */
-int _sgx_procmaps_read_start(bool debug)
+void sgx_procmaps_init(void)
 {
-    sgx_procmaps.buf = sgx_procmaps_buf;
-    sgx_procmaps.buf_size = SGX_PROCMAPS_BUF_LEN;
-    sgx_procmaps.cnt_len = 0;
-    sgx_procmaps.read_oft = 0;
+    SGX_PROCMAPS.data_buf = PROCMAPS_BUF;
+    SGX_PROCMAPS.buf_size = SGX_PROCMAPS_BUF_LEN;
+}
 
-    sgx_vm_area_t *vma;
-    list_t* ll;
-    char perm[8];
-    byte* start;
-    byte* end;
+void sgx_procmaps_exit(void)
+{
+    if (SGX_PROCMAPS.data_buf != NULL && SGX_PROCMAPS.data_buf != PROCMAPS_BUF) {
+        heap_free(GLOBAL_DCONTEXT, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
+    }
+}
 
-    char *pbuf;
-    char* pcnt;
-    size_t nleft;
-    size_t nwrite;
+
+/* generate the procmaps according to the vma list */
+static bool _generate_sgx_procmaps(bool debug)
+{
+    static char perm_n2s[][8] =
+    {
+        /*0x000*/ "---p",
+        /*0x001*/ "r--p",
+        /*0x010*/ "-w-p",
+        /*0x011*/ "rw-p",
+        /*0x100*/ "--xp",
+        /*0x101*/ "r-xp",
+        /*0x110*/ "-wxp",
+        /*0x111*/ "rwxp",
+    };
+
+    /* the memrory regions are not updated, so returns the existing procmaps */
+    if (SGX_PROCMAPS.data_buf != NULL && !SGX_MM.updated && !debug) {
+        return true;
+    }
+    SGX_PROCMAPS.cnt_len = 0;
+
 
 #define MAPS_LINE_FORMAT  "%08lx-%08lx %s %08lx %-8d %-8d %8s\n"
-#define AFTER_HEAP_FLAG   (byte*)0x800000000000
 #define SGX_BUFFER_SIZE   0x000010000000
 
-    for (ll = sgxmm.in.next; ll != &sgxmm.in; ll = ll->next) {
+     /* update the procmaps */
+    list_t *ll;
+
+    for (ll = SGX_MM.in.next; ll != &SGX_MM.in; ll = ll->next) {
+        sgx_vm_area_t *vma;
+        byte *start, *end;
+        char *pbuf, *pcnt;
+        uint nleft, nwr;
+
         vma = list_entry(ll, sgx_vm_area_t, ll);
 
         /* Please don't expose the sgx-mm-buffer itself */
         // if (vma->vm_start >= sgx_vm_base && vma->vm_end <= sgx_vm_base + SGX_BUFFER_SIZE)
         // if (vma->vm_start >= SGX_VM_HEAPBASE && vma->vm_end <= (SGX_VM_HEAPBASE + SGX_BUFFER_SIZE))
-        if (vma->vm_end == heap_init_end)
-            continue;
+        // if (vma->vm_start == SGX_MM.heap_init_start || vma->vm_end == SGX_MM.heap_init_end)
+            // continue;
 
         /* TCS is not accessile to Application, making it non-visible such that would not be emulated */
         if (strncmp(vma->comment, "[TCS]", 80) == 0)
             continue;
 
-        /* perm to string */
-        strncpy(perm, "---s", 8);
-        if (vma->perm & PROT_READ)
-            perm[0] = 'r';
-        if (vma->perm & PROT_WRITE)
-            perm[1] = 'w';
-        if (vma->perm & PROT_EXEC)
-            perm[2] = 'x';
-
         /* check the buffer available for wrtting */
-        nleft = sgx_procmaps.buf_size - sgx_procmaps.cnt_len;
+        nleft = SGX_PROCMAPS.buf_size - SGX_PROCMAPS.cnt_len;
         if (nleft < 256) {
             /* dynamically allocate a big buffer */
-            sgx_procmaps.buf_size *= 2;
+            SGX_PROCMAPS.buf_size *= 2;
 
-            pbuf = (char*)heap_alloc(GLOBAL_DCONTEXT, sgx_procmaps.buf_size HEAPACCT(ACCT_OTHER));
+            pbuf = (char*)heap_alloc(GLOBAL_DCONTEXT, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
             YPHASSERT(pbuf != NULL);
 
-            memcpy(pbuf, sgx_procmaps.buf, sgx_procmaps.cnt_len);
+            memcpy(pbuf, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.cnt_len);
 
             /* free the old buffer */
-            if (sgx_procmaps.buf != sgx_procmaps_buf)
-                heap_free(GLOBAL_DCONTEXT, sgx_procmaps.buf, sgx_procmaps.buf_size HEAPACCT(ACCT_OTHER));
+            if (SGX_PROCMAPS.data_buf != PROCMAPS_BUF)
+                heap_free(GLOBAL_DCONTEXT, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
 
             /* update the fields of sgx_procmaps */
-            sgx_procmaps.buf = pbuf;
-            nleft = sgx_procmaps.buf_size - sgx_procmaps.cnt_len;
+            SGX_PROCMAPS.data_buf = pbuf;
+            nleft = SGX_PROCMAPS.buf_size - SGX_PROCMAPS.cnt_len;
         }
 
-        pcnt = sgx_procmaps.buf + sgx_procmaps.cnt_len;
-        start = sgx_mm_ext2itn(vma->vm_start);
-        if (sgx_mm_within(start, vma->vm_end - vma->vm_start)) {
-            YPHASSERT (vma->vm_sgx != NULL);
-            end = start + (vma->vm_end - vma->vm_start);
-        }
-        else if (start > AFTER_HEAP_FLAG) {
-            start = (byte*)(vma->vm_start - AFTER_HEAP_FLAG);
-            end = (byte*)(vma->vm_end - AFTER_HEAP_FLAG);
-        }
-        else {
-            start = vma->vm_start;
-            end = vma->vm_end;
-        }
+        YPHASSERT (vma->vm_sgx != NULL);
+        start = vma->vm_sgx;
+        end = start + (vma->vm_end - vma->vm_start);
+
+        pcnt = SGX_PROCMAPS.data_buf + SGX_PROCMAPS.cnt_len;
         if (debug)
-            dr_printf(MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
+            dr_printf(MAPS_LINE_FORMAT, start, end, perm_n2s[vma->perm], vma->offset, vma->dev, vma->inode, vma->comment);
         else
-            nwrite = snprintf(pcnt, nleft, MAPS_LINE_FORMAT, start, end, perm, vma->offset, vma->dev, vma->inode, vma->comment);
+            nwr = snprintf(pcnt, nleft, MAPS_LINE_FORMAT, start, end, perm_n2s[vma->perm], vma->offset, vma->dev, vma->inode, vma->comment);
 
-        sgx_procmaps.cnt_len += nwrite;
+        SGX_PROCMAPS.cnt_len += nwr;
     }
 
-    return !INVALID_FILE;
+    SGX_MM.updated = false;
+    return true;
 }
 
+/*----------------- functions for reading the virtual procmaps --------------*/
 int sgx_procmaps_read_start(void)
 {
-   return _sgx_procmaps_read_start(false);
+    bool res = _generate_sgx_procmaps(false);
+    SGX_PROCMAPS.read_oft = 0;
+
+    return res;
 }
 
-int print_sgx_procmaps(void)
-{
-   return _sgx_procmaps_read_start(true);
-}
 
 void sgx_procmaps_read_stop(void)
-{   /* exit querying mode */
-    if (sgx_procmaps.buf != sgx_procmaps_buf) {
-        heap_free(GLOBAL_DCONTEXT, sgx_procmaps.buf, sgx_procmaps.buf_size HEAPACCT(ACCT_OTHER));
-    }
-    sgx_procmaps.cnt_len = sgx_procmaps.read_oft = 0;
+{   /* exit querying mode, reset the read_oft to 0 */
+    SGX_PROCMAPS.read_oft = 0;
 }
 
 
 /* There is a synchronization problem: the vma list may be updated during querying */
 /* To simulate querying the procmaps, We make sure the caller always see the old memory layout */
-int sgx_procmaps_read_next(char *buf, int count)
+int sgx_procmaps_read_next(char *buf, uint count)
 {
-    char* pcnt;
-    size_t ncnt;
+    char *pcnt;
+    uint nleft;
 
-    if (sgx_procmaps.read_oft >= sgx_procmaps.cnt_len) {
+    /* no more data */
+    if (SGX_PROCMAPS.read_oft >= SGX_PROCMAPS.cnt_len) {
         return 0;
     }
 
-    pcnt = sgx_procmaps.buf + sgx_procmaps.read_oft;
-    ncnt = sgx_procmaps.cnt_len - sgx_procmaps.read_oft;
-    if (ncnt > count) {
+    pcnt = SGX_PROCMAPS.data_buf + SGX_PROCMAPS.read_oft;
+    nleft = SGX_PROCMAPS.cnt_len - SGX_PROCMAPS.read_oft;
+    if (nleft >= count) {
         memcpy(buf, pcnt, count);
-        sgx_procmaps.read_oft += count;
+        SGX_PROCMAPS.read_oft += count;
 
         return count;
     }
     else {
-        memcpy(buf, pcnt, ncnt);
-        buf[ncnt] = '\0';
-        sgx_procmaps.read_oft = sgx_procmaps.cnt_len;
+        memcpy(buf, pcnt, nleft);
+        buf[nleft] = '\0';
+        SGX_PROCMAPS.read_oft = SGX_PROCMAPS.cnt_len;
 
-        return ncnt;
+        return nleft;
     }
+}
+
+/* for debugging, dynamically called by gdb */
+int print_sgx_procmaps(void)
+{
+   return _generate_sgx_procmaps(true);
 }

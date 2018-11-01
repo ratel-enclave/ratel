@@ -382,7 +382,7 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             if (ret == 0) {
                 // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
-                sgx_mm_mprotect(addr, _rsi, _rdx);
+                ret = sgx_mm_mprotect(addr, _rsi, _rdx);
             }
             break;
 
