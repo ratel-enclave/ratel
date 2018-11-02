@@ -222,7 +222,7 @@ int initialize_enclave(void)
 
 
 /* Application entry */
-int SGX_CDECL main(int argc, char *argv[], char* envp[])
+int SGX_CDECL main(int argc, char* argv[], char* envp[])
 {
     /* Initialize the enclave */
     if(initialize_enclave() < 0){
@@ -232,16 +232,10 @@ int SGX_CDECL main(int argc, char *argv[], char* envp[])
 
     //dynamorio_enclave_entry(dynamo_eid, sp);
     printf("Enter dynamorio enclave\n");
-    dyn_enclave_entry(dynamo_eid, argc, &argv, &envp);
+    sgxdbi_enclave_entry(dynamo_eid, argc, argv, envp);
 
     /* Destroy the enclave */
     sgx_destroy_enclave(dynamo_eid);
     return 0;
 }
 
-
-typedef unsigned char byte;
-void init_app(byte *dr_map, size_t dr_size, byte *sp)
-{
-    printf("Hello\n");
-}

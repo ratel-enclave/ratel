@@ -189,8 +189,11 @@ long sgx_instr_syscall_1(long sysno, long _rdi)
 
         case SYS_pipe:
         case SYS_set_tid_address:
+            unimplemented_syscall(sysno);
+            break;
+
         case SYS_time:
-            //ocall_syscall_1_pint(&ret, sysno, (long*)_rdi);
+            ocall_syscall_1_To(&ret, sysno, (long*)_rdi, len_time_t);
             break;
 
         case SYS_setgid:
@@ -251,10 +254,12 @@ long sgx_instr_syscall_1(long sysno, long _rdi)
         case SYS_get_kernel_syms:
         case SYS_query_module:
             //ocall_syscall_1_not(&ret, sysno, _rdi);
+            unimplemented_syscall(sysno);
             break;
 
         case SYS__sysctl:
             //ocall_syscall_1_sysctl(&ret, sysno, (struct __sysctl_args*)_rdi);
+            unimplemented_syscall(sysno);
             break;
 
         case SYS_uname:
@@ -264,10 +269,12 @@ long sgx_instr_syscall_1(long sysno, long _rdi)
         case SYS_sysinfo:
         case SYS_times:
             //ocall_syscall_1_sysinfo(&ret, sysno, (struct sysinfo*)_rdi);
+            unimplemented_syscall(sysno);
             break;
 
         case SYS_adjtimex:
             //ocall_syscall_1_timex(&ret, sysno, (struct timex*)_rdi);
+            unimplemented_syscall(sysno);
             break;
 
         default:
@@ -503,6 +510,7 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_exit:
         case SYS_exit_group:
         case SYS_uname:
+        case SYS_time:
             /*case SYS_set_thread_area:*/
             /*case SYS_get_thread_area:*/
             return sgx_instr_syscall_1(sysno, _rdi);

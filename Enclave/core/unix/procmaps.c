@@ -63,7 +63,9 @@ void sgx_procmaps_init(void)
 void sgx_procmaps_exit(void)
 {
     if (SGX_PROCMAPS.data_buf != NULL && SGX_PROCMAPS.data_buf != PROCMAPS_BUF) {
-        heap_free(GLOBAL_DCONTEXT, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
+        /* use sgxsdk's malloc & free */
+        // heap_free(GLOBAL_DCONTEXT, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
+        free(SGX_PROCMAPS.data_buf);
     }
 }
 
@@ -120,14 +122,16 @@ static bool _generate_sgx_procmaps(bool debug)
             /* dynamically allocate a big buffer */
             SGX_PROCMAPS.buf_size *= 2;
 
-            pbuf = (char*)heap_alloc(GLOBAL_DCONTEXT, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
+            /* use sgxsdk's malloc & free */
+            // pbuf = (char*)heap_alloc(GLOBAL_DCONTEXT, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
+            pbuf = (char*)malloc(SGX_PROCMAPS.buf_size);
             YPHASSERT(pbuf != NULL);
 
             memcpy(pbuf, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.cnt_len);
 
             /* free the old buffer */
             if (SGX_PROCMAPS.data_buf != PROCMAPS_BUF)
-                heap_free(GLOBAL_DCONTEXT, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
+                free(SGX_PROCMAPS.data_buf);
 
             /* update the fields of sgx_procmaps */
             SGX_PROCMAPS.data_buf = pbuf;

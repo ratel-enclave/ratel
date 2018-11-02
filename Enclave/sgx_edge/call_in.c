@@ -1,138 +1,114 @@
 #include "../dynamorio_t.h"
 #include "asm_defines.asm"
-//#include "arch_exports.h"
 
 
-//extern void _start(void);
-extern void _start(int argc, char* argv[], char *envp[]);
-extern void unexpected_return(void);
-extern void *dynamo_memcpy(void *dest, const void *src, size_t n);
+typedef unsigned long ulong;
+typedef unsigned char byte;
+typedef unsigned char bool;
+#define true    (1)
+#define false   (0)
 
-/*void inner_overwrite_stack(void* sta, int stack_size)
-{
-    uint64_t *frame_addr = (uint64_t*)__builtin_frame_address(0);
-    int offset = last_fp - frame_addr;
-
-    if (offset!=0)  {
-        printf("two stacks don't have the same size \n");
-        abort();
-    }
-
-    memcpy(last_fp, sta, stack_size*WORD_SIZE);
-    void *ret_addr = __builtin_return_address(0);
-    if (ret_addr!=parent_ret_p) {
-        printf("overwritten stack error\n");
-        abort();
-    }
-}*/
 
 typedef struct
 {
     uint64_t a_type;      /* Entry type */
-    union
-    {
-        uint64_t a_val;       /* Integer value */
-        /* We use to have pointer elements added here.  We cannot do that,
-         *            *      though, since it does not work when using 32-bit definitions
-         *                       *           on 64-bit platforms and vice versa.  */
-    } a_un;
+    uint64_t a_val;       /* Integer value */
 } Elf64_auxv_t;
 
-#define AT_NULL     0       /* End of vector */
 
-typedef void (*fp_entry) (int argc, char* argv[], char* envp[]);
+/* Legal values for a_type (entry type).  */
+#define AT_NULL         0               /* End of vector */
+#define AT_IGNORE       1               /* Entry should be ignored */
+#define AT_EXECFD       2               /* File descriptor of program */
+#define AT_PHDR         3               /* Program headers for program */
+#define AT_PHENT        4               /* Size of program header entry */
+#define AT_PHNUM        5               /* Number of program headers */
+#define AT_PAGESZ       6               /* System page size */
+#define AT_BASE         7               /* Base address of interpreter */
+#define AT_FLAGS        8               /* Flags */
+#define AT_ENTRY        9               /* Entry point of program */
+#define AT_NOTELF       10              /* Program is not ELF */
+#define AT_UID          11              /* Real uid */
+#define AT_EUID         12              /* Effective uid */
+#define AT_GID          13              /* Real gid */
+#define AT_EGID         14              /* Effective gid */
+#define AT_CLKTCK       17              /* Frequency of times() */
+/* Pointer to the global system page used for system calls and other nice things.  */
+#define AT_SYSINFO      32
+#define AT_SYSINFO_EHDR 33
 
-void call_libstart(int argc, char**argv, char** envp, void *libstart)
+
+/*-----------------sgxdbi_enclave_entry: entry point of our sgxdbi system--------------*/
+unsigned long ORIGINAL_INIT_STACK;
+
+extern void original_dynamorio_start(int argc, char* argv[], char *envp[]);
+
+void sgxdbi_enclave_entry(long argc, char** argv, char** envp)
 {
-#define MAX_ENVP    160
-    char *new_stack[MAX_ENVP] = {0};
-    char **pstack = new_stack;
-    char *oldsp = NULL;
-    char **t;
-    int n;
+    ulong new_stack_base;   // the start address of new stack
+    ulong *pStack, *t;
+    int  nPtr;      // The number of pointers putting on the new stack.
 
-    //Count the number of env variables
-    for (t = envp, n = 0; *t != NULL; t++, n++);
+    /* reserve space for putting argc, & NULL-pointers & axuv */
+    nPtr = argc + 3 + 60;
 
-    //create a local stack
-    n += argc + 3;
-    /*assert(n < MAX_ENVP);*/
+    /* Count the number of env variables */
+    for (t = (ulong*)envp; *t != 0/*NULL*/; t++, nPtr++);
 
-    //fill the stack
-    *(long*)pstack = argc;
-    pstack++;
+    /* create a local stack */
+    asm volatile ("mov %%rsp, %0": "=rm" (new_stack_base));
+    new_stack_base -= nPtr * sizeof(ulong);
+    new_stack_base &= ~(0xf);   // aligned to 16 bytes boundary
+
+
+    /* fill the new stack as it is prepared by the kernel's ELF loader */
+    pStack = (ulong*)new_stack_base;
+    *pStack++ = argc;
 
     //copy argv[]
-    for (t = argv, n = 0; *t != NULL && n < MAX_ENVP; t++, pstack++)
-        *pstack = *t;
-    *pstack++ = NULL;
-    /*assert(new_stack[1] == argv[0]);*/
+    for (t = (ulong*)argv; *t != 0/*NULL*/; t++) *pStack++ = *t;
+    *pStack++ = 0/*NULL*/;
 
     //copy envp[]
-    for (t = envp, n = 0; *t != NULL && n < MAX_ENVP; t++, pstack++)
-        *pstack = *t;
-    *pstack++ = NULL;
-    /*assert(new_stack[argc+2] == envp[0]);*/
+    for (t = (ulong*)envp; *t != 0/*NULL*/; t++) *pStack++ = *t;
+    *pStack++ = 0/*NULL*/;
+    t++;
 
     //copy auxv[]
-    Elf64_auxv_t *auxv_n = (Elf64_auxv_t*)pstack;
-    Elf64_auxv_t *auxv_o = (Elf64_auxv_t*)(t+1);
+    Elf64_auxv_t *auxv_n = (Elf64_auxv_t*)pStack;
+    Elf64_auxv_t *auxv_o = (Elf64_auxv_t*)t;
     do {
         *auxv_n = *auxv_o;
-        auxv_n++;
+
+        /* Hide the vdso page */
+        if (auxv_n->a_type == AT_SYSINFO)
+            auxv_n->a_val = 0;
+        else if (auxv_n->a_type == AT_SYSINFO_EHDR)
+            auxv_n->a_val = 0;
+
         auxv_o++;
+        auxv_n++;
+
     } while (auxv_o->a_type != AT_NULL);
 
-    /*asm volatile ("\n\t"*/
-    /*"push %0    \n\t"*/
-    /*"push %1    \n\t"*/
-    /*"push %2    \n\t"*/
-    /*"xor %%rdi,%%rdi  \n\t"*/
-    /*"jmp *%3   \n\t"*/
-    /*::"rm"(envp), "rm"(argv), "rm"((long)argc), "rm"(libstart));*/
 
-    asm volatile ("mov %%rsp, %0   \n\t"
-            "mov %1, %%rsp   \n\t"
-            /*"xor %%rdi,%%rdi  \n\t"*/
-            "jmp *%2   \n\t"
-            ::"rm"(oldsp), "rm"(new_stack), "rm"(libstart));
-
-    //fix-me: restore the original stack to exit current process elegently.
+    /* switch to the new stack */
+    asm volatile ("\tmov %%rbp, %0   \n"
+            "\tmov %1, %%rsp   \n"
+            //"\txor %%rdi,%%rdi \n"
+            "\tjmp *%2   \n"
+            :"=rm"(ORIGINAL_INIT_STACK)
+            :"rm"(new_stack_base), "rm"(original_dynamorio_start));
+    /* unexpected_return(); */
 }
 
-//unsigned long global_sp;
-//void dynamorio_enclave_entry(unsigned long execve_sp)
-void dyn_enclave_entry(int argc, char***p_argv, char***p_envp)
+void sgxdbi_enclave_exit(void)
 {
-    //unsigned long newsp, sz;
-    //int argc;
-    //char* argv[], char* envp[];
-    //ocall_all_syscalls("This is a test\n");
-    //restore the stack
-    //asm volatile ("mov %%rsp, %0 \n\t"
-    //        :"=rm"(global_sp)::);
+    /* switch-back to the initial stack */
+    asm volatile ("\tmov %0, %%rbp \n"
+            "\tpop %%rsp   \n"
+            "jmp *%%rsp   \n\t"
+            ::"rm"(ORIGINAL_INIT_STACK));
 
-    //sz = 0x2000 - (execve_sp & 0xfff) - sizeof(long);
-    //newsp = global_sp - sz - 0x1000;
-    //dynamo_memcpy((void*)newsp, (void*)execve_sp, sz);
-
-    //restore the stack in the encalve
-	//inner_overwrite_stack();
-
-	//Jump to the entry of original dynamorio version, .i.e. _start
-    //asm volatile ( "mov %1, %%rsp \n\t"
-    //        "xor %%rdi, %%rdi \n\t"
-    //        "jmp *%0 \n\t"
-    //        ::"r"(_start),"rm"(newsp));
-    //asm volatile (
-    //        "jmp *%0 \n\t"
-    //        ::"r"(_start),"rm"(newsp));
-    //_start(argc, argv, envp);
-    //unexpected_return();
-    ocall_print_str("I am in dyn_enclave_entry.");
-
-    call_libstart(argc, *p_argv, *p_envp, (void*)_start);
-
-    return;
+    /* unexpected_return(); */
 }
-

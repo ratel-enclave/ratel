@@ -48,12 +48,9 @@ enclave {
          *      the buffer inside the enclave will by copied into outside 'val' again.
          */
 
-        //public void dynamorio_enclave_entry([in, out] int *val);
         /********public void dyn_enclave_entry(int argc, [in] char *(*p_argv)[], [in] char *(*p_env)[]);********/
-        public void dyn_enclave_entry(int argc, [in] char ***p_argv, [in] char ***p_env);
-
-
-        //public void dyn_enclave_entry(unsigned long sp);
+        /* public void sgxdbi_enclave_entry(int argc, [in] char ***p_argv, [in] char ***p_env); */
+        public void sgxdbi_enclave_entry(long argc, [user_check] char** p_argv, [user_check] char** p_env);
     };
 
     untrusted {
@@ -92,6 +89,7 @@ enclave {
         long ocall_syscall_1_Ti(long sysno, [in, size=l] void *T, int l);
 
         //long uname(long sysno, struct old_utsname* uname);
+        //time_t time(time_t *tloc);
         long ocall_syscall_1_To(long sysno, [out, size=l] void *T, int l);
 
         //long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info);

@@ -92,7 +92,8 @@ all: $(APP_NAME)
 
 
 ######## App Objects ########
-APP_AS_SRCS	:= startup/x86.asm
+#APP_AS_SRCS	:= startup/x86.asm
+APP_AS_SRCS	:=
 APP_AS_ASMS	:= $(patsubst %,%.s,$(APP_AS_SRCS))
 APP_AS_OBJS	:= $(patsubst %,%.o,$(APP_AS_SRCS))
 APP_AS_FALG	:= $(BASIC_AS_FLAGS)

@@ -1158,8 +1158,8 @@ GLOBAL_LABEL(client_int_syscall:)
  * If we reload ourselves (i#1227) we'll set xdi and xsi to the base and size
  * of the old library that needs to be unmapped.
  */
-        DECLARE_EXPORTED_FUNC(_start)
-GLOBAL_LABEL(_start:)
+        DECLARE_EXPORTED_FUNC(original_dynamorio_start)
+GLOBAL_LABEL(original_dynamorio_start:)
         /* i#1676, i#1708: relocate dynamorio if it is not loaded to preferred address.
          * We call this here to ensure it's safe to access globals once in C code
          * (xref i#1865).
@@ -1189,7 +1189,7 @@ reloaded_xfer:
 # endif
         CALLC0(GLOBAL_REF(privload_early_inject))
         jmp     GLOBAL_REF(unexpected_return)
-        END_FUNC(_start)
+        END_FUNC(original_dynamorio_start)
 #endif /* !STANDALONE_UNIT_TEST && !STATIC_LIBRARY */
 
 
@@ -1397,6 +1397,7 @@ dynamorio_semaphore_next:
  * SYS_kill via cleanup_and_terminate fails.
  * XXX: on 32-bit MacOS this does use the stack.
  */
+ /* fix-me: allow out-encalve code to do cleanup */
         DECLARE_FUNC(dynamorio_sys_exit_group)
 GLOBAL_LABEL(dynamorio_sys_exit_group:)
         mov      rdx, 0 /* exit code: hardcoded */

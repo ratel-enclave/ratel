@@ -90,7 +90,7 @@ GLOBAL_LABEL(app_start:)
          */
         CALLC3(GLOBAL_REF(init_app), 0, 0, REG_XSP)
         //jmp     GLOBAL_REF(unexpected_return)
-        END_FUNC(_start)
+        END_FUNC(app_start)
 #endif /* !STANDALONE_UNIT_TEST && !STATIC_LIBRARY */
 
 
