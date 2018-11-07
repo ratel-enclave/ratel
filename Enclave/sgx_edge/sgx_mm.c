@@ -6,15 +6,31 @@
 #include "defines.h"
 #include "sgx_mm.h"
 
-#define YPHASSERT(...)
+#define YPHASSERT(...)          \
+    do {                        \
+        if (!(__VA_ARGS__)) {   \
+            asm volatile ("movl $0, 0"); \
+        }                       \
+    } while (0);
 
-/* The realationship of memory regions */
+/* The overlap-relationship of current vma region with a reference region */
 typedef enum _vma_overlap_t {
-    OVERLAP_NONE = 0,   // Not overlap
-    OVERLAP_SUB,        // A sub-region of current VMA
-    OVERLAP_SUP,        // A super-region covers current VMA
-    OVERLAP_HEAD,       // The head portion of current VMA is overlapped
-    OVERLAP_TAIL,       // The tail portion of current VMA is overlapped
+    OVERLAP_NONE = 0,       // Not overlapped
+
+    OVERLAP_HEAD_ALN,       // The front-part is overlapped, have same start-vma
+    OVERLAP_HEAD_OVF,       // The front-part is overlapped, don't have same start-vma
+
+    OVERLAP_TAIL_ALG,       // The tail-part is overlapped, have same end-vma
+    OVERLAP_TAIL_OVF,       // The tail-part is overlapped, don't have same end-vma
+
+    OVERLAP_ALL_OVFH,       // A super-region covers current VMA, same end-vma
+    OVERLAP_ALL_OVFT,       // A super-region covers current VMA, same start-vma
+    OVERLAP_ALL_OVFHT,      // A super-region covers current VMA, no same start-vma or end-vma
+
+    OVERLAP_MID,            // A sub-region of current VMA, no same start-vma or end-vma
+
+    OVERLAP_SAME,           // Exactly the same region.
+
 }vma_overlap_t;
 
 
@@ -69,11 +85,12 @@ static char SGXMM_MAPED_FILES[SGX_PROCMAPS_MAX_FILE][64];
 // Start address of external memory region needing to be mapped into enclave
 #define SGX_PAGE_SIZE 4096
 #define DR_START            (byte*)0x600000000000
-// only map the region 0x7ffffxxxxxxx
-#define EXTN_MEM_REGION     (byte*)0x7ffff0000000
 #define DR_CODE_CACHE_BASE  (DR_START + 1 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
+
 #define SGX_BUFFER_BASE     (DR_START + 17 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
-#define SGX_BUFFER_SIZE     0x000010000000
+#define SGX_BUFFER_SIZE     0x000018000000          // 384M
+// only map the region 0x7fffe0000000 ~ 0x7ffff8000000
+#define EXTN_MEM_REGION     (byte*)0x7fffe0000000
 
 
 /* exported out for debugging, we have unit-tests */
@@ -260,7 +277,7 @@ sgx_vm_area_t memlayout_init_encalve[] = {
 static sgx_vm_area_t* _sgx_vma_alloc(list_t* llp, list_t* lln);
 static void _sgx_vma_free(sgx_vm_area_t* vma);
 static void _sgx_vma_initialize(sgx_vm_area_t* vma, byte* ext_addr,
-    size_t len, ulong prot, int fd, ulong offs);
+        size_t len, ulong prot, int fd, ulong offs);
 
 /*----------------sgx_mm_init() initialized with memlayout_init_encalve----------------*/
 void sgx_mm_init_static(void)
@@ -478,7 +495,7 @@ static int _sgx_mm_init_byreffing_external_procmaps(void)
             if (szProt[1] == 'w') nProt += 2;
             if (szProt[2] == 'x') nProt += 4;
         }
-         _sgx_vma_initialize(vmaAdd, vmStart, nEnd - nStart, nProt, -1, nOfft);
+        _sgx_vma_initialize(vmaAdd, vmStart, nEnd - nStart, nProt, -1, nOfft);
 
         /* initialize the other fields */
         vmaAdd->vm_sgx = (byte*)nStart;
@@ -613,42 +630,48 @@ static void _sgx_vma_deep_copy(sgx_vm_area_t* dst, sgx_vm_area_t* src)
 }
 
 
-/* Test if current VMA is coverred by a given region */
+/* Test the overlap-relatinship of current VMA (vma_start, vma_end) with region (ref_start, ref_end) */
 static vma_overlap_t _sgx_vma_overlap(byte *vma_start, byte* vma_end,
         byte* ref_start, byte* ref_end)
 {
     if (ref_start < vma_start) {
         if (ref_end <= vma_start)
-            return OVERLAP_NONE;
+            return OVERLAP_NONE;        // don't overlap
         else if (ref_end < vma_end)
-            return OVERLAP_HEAD;
+            return OVERLAP_HEAD_OVF;    // the front-part of vma is overlapped, and don't have the same start-vma
+        else if (ref_end == vma_end)
+            return OVERLAP_ALL_OVFH;    // the whole VMA is overlapped, no same start-vma but have same end-vma
         else
-            return OVERLAP_SUP;
+            return OVERLAP_ALL_OVFHT;    // the whole VMA is overlapped, no same start-vma or end-vma
     }
     else if (ref_start == vma_start) {
         if (ref_end < vma_end)
-            return OVERLAP_HEAD;
+            return OVERLAP_HEAD_ALN;    // the front-part of vma is overlapped, and have the same start-vma
+        else if(ref_end == vma_end)
+            return OVERLAP_SAME;        // exactly the same region
         else
-            return OVERLAP_SUP;
+            return OVERLAP_ALL_OVFT;    // the whole VMA is overlapped, same start-vma but no same end-vma
     }
     else if (ref_start < vma_end) {
         if (ref_end < vma_end)
-            return OVERLAP_SUB;
+            return OVERLAP_MID;         // the middle-part of vma is overlapped
+        else if (ref_end == vma_end)
+            return OVERLAP_TAIL_ALG;    // the tail-part of vma is overlapped, the same end-vma
         else
-            return OVERLAP_TAIL;
+            return OVERLAP_TAIL_OVF;    // the tail-part of vma is overlapped, no same end-vma
     }
     else {
-        return OVERLAP_NONE;
+        return OVERLAP_NONE;        // no overlap
     }
 }
 
 
-/* find the vma contains regions from vma_start to vma_end */
+/* find the vma super-contains regions from vma_start to vma_end */
 static sgx_vm_area_t* _sgx_find_super_vma(byte *ext_start, size_t len)
 {
+    vma_overlap_t ot = OVERLAP_NONE;
     sgx_vm_area_t *vma = NULL;
     list_t *ll = SGX_MM.in.next;
-    vma_overlap_t ot = OVERLAP_NONE;
     byte *ref_start = ext_start;
     byte *ref_end = ext_start + len;
     bool ctuw = true;
@@ -661,22 +684,24 @@ static sgx_vm_area_t* _sgx_find_super_vma(byte *ext_start, size_t len)
 
         switch (ot) {
             case OVERLAP_NONE:
-                if (vma->vm_end <= ref_start)    /* no need to check anymore */
+                if (vma->vm_end <= ref_start)    /* no need to check anymore ? */
                     ll = ll->next;
                 else
                     ctuw = false;
-
                 break;
-            case OVERLAP_SUP:
+
+            case OVERLAP_HEAD_ALN:
+            case OVERLAP_TAIL_ALG:
+            case OVERLAP_MID:
+            case OVERLAP_SAME:
                 return vma;
-
                 break;
-            case OVERLAP_HEAD:
-            case OVERLAP_TAIL:
-            case OVERLAP_SUB:
+
+            case OVERLAP_HEAD_OVF:
+            case OVERLAP_TAIL_OVF:
                 ctuw = false;
-
                 break;
+
             default:
                 YPHASSERT(false);
                 break;
@@ -757,9 +782,10 @@ static size_t _sgx_vma_split(vma_overlap_t ot, sgx_vm_area_t** head,
     *tail = NULL;
     switch (ot) {
         case OVERLAP_NONE:
-
             break;
-        case OVERLAP_HEAD:  /* head vma  NULL */
+
+        case OVERLAP_HEAD_ALN:  /* head vma  NULL */
+        case OVERLAP_HEAD_OVF:
             add = _sgx_vma_alloc(llp, ll);
 
             _sgx_vma_deep_copy(add, vma);
@@ -772,9 +798,10 @@ static size_t _sgx_vma_split(vma_overlap_t ot, sgx_vm_area_t** head,
                 vma->offset += len;
 
             *head = add;
-
             break;
-        case OVERLAP_TAIL:  /* NULL vma tail */
+
+        case OVERLAP_TAIL_ALG:  /* NULL vma tail */
+        case OVERLAP_TAIL_OVF:
             add = _sgx_vma_alloc(ll, lln);
 
             _sgx_vma_deep_copy(add, vma);
@@ -787,14 +814,18 @@ static size_t _sgx_vma_split(vma_overlap_t ot, sgx_vm_area_t** head,
                 add->offset += len;
 
             *tail = add;
-
             break;
-        case OVERLAP_SUP:   /* NULL vma NULL */
+
+        case OVERLAP_ALL_OVFH:   /* NULL vma NULL */
+        case OVERLAP_ALL_OVFT:
+        case OVERLAP_ALL_OVFHT:
+        case OVERLAP_SAME:
             len = vma->vm_end - vma->vm_start;
-
             break;
-        case OVERLAP_SUB:   /* head vma tail */
-            if (vma->vm_start != ref_start) {
+
+        case OVERLAP_MID:   /* head vma tail */
+            YPHASSERT (vma->vm_start != ref_start);
+            {
                 add = _sgx_vma_alloc(llp, ll);
 
                 _sgx_vma_deep_copy(add, vma);
@@ -808,7 +839,8 @@ static size_t _sgx_vma_split(vma_overlap_t ot, sgx_vm_area_t** head,
                 *head = add;
             }
 
-            if (vma->vm_end != ref_end) {
+            YPHASSERT (vma->vm_end != ref_end);
+            {
                 add = _sgx_vma_alloc(ll, lln);
 
                 _sgx_vma_deep_copy(add, vma);
@@ -822,11 +854,10 @@ static size_t _sgx_vma_split(vma_overlap_t ot, sgx_vm_area_t** head,
                 *tail = add;
             }
             len = ref_end - ref_start;
-
             break;
+
         default:
             YPHASSERT(false);
-
             break;
     } /* end switch */
 
@@ -863,7 +894,7 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
 
                 break;
 
-            case OVERLAP_HEAD:
+            case OVERLAP_HEAD_ALN:
                 if (vma->perm == prot)  {/* already have the same property */
                     len -= vma->vm_end - vma->vm_start;
                 }
@@ -875,14 +906,48 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
                     if (head->vm_sgx != NULL) {
                         // call mprotect on sgx-mm-buffer
                     }
+                }
 
+                ctuw = false;
+                break;
+
+            case OVERLAP_HEAD_OVF:
+                if (vma->perm == prot)  {/* already have the same property */
+                    len -= vma->vm_end - vma->vm_start;
+                }
+                else {
+                    len -= _sgx_vma_split(ot, &head, vma, &tail, ref_start, ref_end);
+                    YPHASSERT(head != NULL);
+
+                    head->perm = prot;
+                    if (head->vm_sgx != NULL) {
+                        // call mprotect on sgx-mm-buffer
+                    }
                     _sgx_vma_merge(head);
                 }
 
                 ctuw = false;
                 break;
 
-            case OVERLAP_TAIL:
+            case OVERLAP_TAIL_ALG:
+                if (vma->perm == prot) { /* already have the same property */
+                    len -= vma->vm_start - vma->vm_end;
+                }
+                else {
+                    len -= _sgx_vma_split(ot, &head, vma, &tail, ref_start, ref_end);
+                    YPHASSERT(tail != NULL);
+
+                    tail->perm = prot;
+                    if (head->vm_sgx != NULL) {
+                        // call mprotect on sgx-mm-buffer
+                    }
+                    _sgx_vma_merge(tail);
+                }
+
+                ctuw = false;
+                break;
+
+            case OVERLAP_TAIL_OVF:
                 if (vma->perm == prot) { /* already have the same property */
                     len -= vma->vm_start - vma->vm_end;
                     ll = ll->next;
@@ -896,16 +961,14 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
                         // call mprotect on sgx-mm-buffer
                     }
                     /* please don't call _sgx_vma_merge */;
-
                     ll = tail->ll.next;
                 }
 
                 break;
 
-            case OVERLAP_SUP:
-                if (vma->perm == prot) { /* already have the same property */
-                }
-                else {
+            case OVERLAP_ALL_OVFH:
+            case OVERLAP_ALL_OVFHT:
+                if (vma->perm != prot) { /* don't have the same property */
                     vma->perm = prot;
                     if (vma->vm_sgx != NULL) {
                         // call mprotect on sgx-mm-buffer
@@ -915,21 +978,40 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
                 _sgx_vma_merge(vma);
 
                 ll = ll->next;
-
                 break;
 
-            case OVERLAP_SUB:
-                if (vma->perm == prot) { /* already have the same property */
+            case OVERLAP_ALL_OVFT:
+                if (vma->perm != prot) { /* don't have the same property */
+                    vma->perm = prot;
+                    if (vma->vm_sgx != NULL) {
+                        // call mprotect on sgx-mm-buffer
+                    }
                 }
-                else {
+                len -= vma->vm_end - vma->vm_start;
+                ll = ll->next;
+                break;
+
+            case OVERLAP_MID:
+                if (vma->perm != prot) { /* don't have the same property */
                     len -= _sgx_vma_split(ot, &head, vma, &tail, ref_start, ref_end);
                     vma->perm = prot;
                     if (vma->vm_sgx != NULL) {
                         // call mprotect on sgx-mm-buffer
                     }
                 }
-
                 /* Please don't invoke _sgx_vma_merge */
+                len = 0;
+                ctuw = false;
+                break;
+
+            case OVERLAP_SAME:
+                if (vma->perm != prot) {
+                    vma->perm = prot;
+                    if (vma->vm_sgx != NULL) {
+                        // call mprotect on sgx-mm-buffer
+                    }
+                }
+                _sgx_vma_merge(vma);
                 len = 0;
                 ctuw = false;
                 break;
@@ -964,7 +1046,6 @@ static void _sgx_mm_munmap(byte *ext_addr, size_t len)
     while (ctuw && ll != &SGX_MM.in) {
         vma = list_entry(ll, sgx_vm_area_t, ll);
         ot = _sgx_vma_overlap(vma->vm_start, vma->vm_end, ext_addr, ext_addr + len);
-
         switch (ot) {
             case OVERLAP_NONE:
                 if (vma->vm_start < ref_start) {
@@ -973,46 +1054,61 @@ static void _sgx_mm_munmap(byte *ext_addr, size_t len)
                 else {
                     ctuw = false;
                 }
-
                 break;
-            case OVERLAP_HEAD:
+
+            case OVERLAP_HEAD_ALN:
+            case OVERLAP_HEAD_OVF:
                 _sgx_vma_split(ot, &head, vma, &tail, ref_start, ref_end);
 
                 YPHASSERT(head != NULL);
                 _sgx_vma_free(head);
                 ctuw = false;
-
                 break;
-            case OVERLAP_TAIL:
+
+            case OVERLAP_TAIL_ALG:
+                _sgx_vma_split(ot, &head, vma, &tail, ref_start, ref_end);
+
+                YPHASSERT(tail != NULL);
+                _sgx_vma_free(tail);
+                ctuw = false;
+                break;
+
+            case OVERLAP_TAIL_OVF:
                 _sgx_vma_split(ot, &head, vma, &tail, ref_start, ref_end);
 
                 YPHASSERT(tail != NULL);
                 _sgx_vma_free(tail);
 
                 ll = vma->ll.next;
-
                 break;
-            case OVERLAP_SUP:
-                ll = vma->ll.next;
 
+            case OVERLAP_ALL_OVFH:
+            case OVERLAP_SAME:
                 _sgx_vma_free(vma);
-
+                ctuw = false;
                 break;
-            case OVERLAP_SUB:
+
+
+            case OVERLAP_ALL_OVFT:
+            case OVERLAP_ALL_OVFHT:
+                ll = vma->ll.next;
+                _sgx_vma_free(vma);
+                break;
+
+            case OVERLAP_MID:
                 _sgx_vma_split(ot, &head, vma, &tail, ref_start, ref_end);
 
                 YPHASSERT(vma != NULL);
                 _sgx_vma_free(vma);
                 ctuw = false;
-
                 break;
+
             default:
                 YPHASSERT(false);
                 break;
         } /* end switch */
     }/* end while */
 }
-
 
 
 /* Allocating sgx_vm_area_t to track mmap event */
@@ -1118,42 +1214,53 @@ void sgx_mm_munmap(byte *ext_addr, size_t len)
                 else {
                     ctuw = false;
                 }
-
                 break;
-            case OVERLAP_HEAD:
+
+            case OVERLAP_HEAD_ALN:
+            case OVERLAP_HEAD_OVF:
+            case OVERLAP_TAIL_ALG:
                 if (vma->inode != 0 && vma->vm_sgx != NULL) {
                     /* flush content to external file */
                 }
 
                 ctuw = false;
-
                 break;
-            case OVERLAP_TAIL:
+
+            case OVERLAP_TAIL_OVF:
                 if (vma->inode != 0 && vma->vm_sgx != NULL) {
                     /* flush content to external file */
                 }
 
                 ll = vma->ll.next;
-
                 break;
-            case OVERLAP_SUP:
-                ll = vma->ll.next;
 
+            case OVERLAP_ALL_OVFH:
+            case OVERLAP_SAME:
                 if (vma->inode != 0 && vma->vm_sgx != NULL) {
                     /* flush content to external file */
                 }
-
+                ctuw = false;
                 break;
-            case OVERLAP_SUB:
+
+            case OVERLAP_ALL_OVFT:
+            case OVERLAP_ALL_OVFHT:
+                if (vma->inode != 0 && vma->vm_sgx != NULL) {
+                    /* flush content to external file */
+                }
+                ll = vma->ll.next;
+                break;
+
+            case OVERLAP_MID:
                 if (vma->inode != 0 && vma->vm_sgx != NULL) {
                     /* flush content to external file */
                 }
 
                 ctuw = false;
-
                 break;
+
             default:
                 YPHASSERT(false);
+                break;
         } /* end case */
     } /* end while */
 
@@ -1185,23 +1292,29 @@ byte* sgx_mm_mremap(byte *ext_old_addr, size_t old_sz, byte* ext_new_addr, size_
     SGX_MM.updated = true;
 
     sgx_vm_area_t *vma = NULL;
-    ulong perm;
-    ulong offs;
     byte* itn_addr = NULL;
 
-    if (ext_old_addr == ext_new_addr) {
+
+    if (ext_old_addr == ext_new_addr) { /* just resize current vma */
         vma = _sgx_find_super_vma(ext_old_addr, old_sz);
         YPHASSERT(vma != NULL);
         vma->size = new_sz;
         itn_addr = sgx_mm_ext2itn(ext_old_addr);
     }
     else {
+        ulong perm;
+        ulong offs;
+
+        /* get the attributes of current vma */
         vma = _sgx_find_super_vma(ext_old_addr, old_sz);
         YPHASSERT(vma != NULL);
-        sgx_mm_munmap(ext_old_addr, old_sz);
-
         perm = vma->perm;
         offs = vma->offset;
+
+        /* munmap the old vma */
+        sgx_mm_munmap(ext_old_addr, old_sz);
+
+        /* mmap a new vma with the above attributes */
         itn_addr = sgx_mm_mmap(ext_new_addr, new_sz, perm, 0, -1, offs);
     }
 
