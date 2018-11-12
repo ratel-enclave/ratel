@@ -65,6 +65,8 @@
 # define CHKLVL_MEMFILL CHKLVL_DEFAULT
 #endif
 
+#include "memquery.h"
+
 extern bool vm_areas_exited;
 
 /***************************************************************************
@@ -723,12 +725,16 @@ vmm_heap_initialize_unusable(vm_heap_t *vmh)
 static void
 vmm_heap_unit_init(vm_heap_t *vmh, size_t size)
 {
-    ptr_uint_t preferred = 0;
     heap_error_code_t error_code = 0;
+    ptr_uint_t preferred = 0;
+
     ASSIGN_INIT_LOCK_FREE(vmh->lock, vmh_lock);
 
-    size = ALIGN_FORWARD(size, DYNAMO_OPTION(vmm_block_size));
+    size = sgx_mm_dyRIO_heap_size();
+    // size = ALIGN_FORWARD(size, DYNAMO_OPTION(vmm_block_size));
+    size = ALIGN_BACKWARD(size, DYNAMO_OPTION(vmm_block_size));
     ASSERT(size <= MAX_VMM_HEAP_UNIT_SIZE);
+
     vmh->alloc_size = size;
     vmh->start_addr = NULL;
 
@@ -787,13 +793,16 @@ vmm_heap_unit_init(vm_heap_t *vmh, size_t size)
         //              + get_random_offset(DYNAMO_OPTION(vm_max_offset) /
         //                                  DYNAMO_OPTION(vmm_block_size)) *
         //              DYNAMO_OPTION(vmm_block_size));
-        preferred = 0x600000000000 + 4096 * 4096;
-        preferred = ALIGN_FORWARD(preferred, DYNAMO_OPTION(vmm_block_size));
+        preferred = (ptr_uint_t)sgx_mm_dyRIO_heap_offset();
+        // preferred = ALIGN_FORWARD(preferred, DYNAMO_OPTION(vmm_block_size));
+        preferred = ALIGN_BACKWARD(preferred, DYNAMO_OPTION(vmm_block_size));
         /* overflow check: w/ vm_base shouldn't happen so debug-only check */
         ASSERT(!POINTER_OVERFLOW_ON_ADD(preferred, size));
+
         /* let's assume a single chunk is sufficient to reserve */
 #ifdef X64
-        if ((byte *)preferred < heap_allowable_region_start ||
+        if ((byte *)
+            preferred < heap_allowable_region_start ||
             (byte *)preferred + size > heap_allowable_region_end) {
             error_code = HEAP_ERROR_NOT_AT_PREFERRED;
         } else {
@@ -3240,8 +3249,8 @@ threadunits_exit(thread_units_t *tu, dcontext_t *dcontext)
                  */
                 j != ACCT_LIBDUP &&
                 INTERNAL_OPTION(heap_accounting_assert)) {
-                SYSLOG_INTERNAL_ERROR("memory leak: %s "SZFMT" bytes not freed",
-                                      whichheap_name[j], tu->acct.cur_usage[j]);
+                // SYSLOG_INTERNAL_ERROR("memory leak: %s "SZFMT" bytes not freed",
+                //                       whichheap_name[j], tu->acct.cur_usage[j]);
                 /* Don't assert when client does premature exit as it's
                  * hard for Extension libs, etc. to clean up in such situations:
                  */

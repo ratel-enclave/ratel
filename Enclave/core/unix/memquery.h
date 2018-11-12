@@ -75,6 +75,9 @@ void
 memquery_exit(void);
 
 /*------------simulate a procmaps file in SGX--------------------*/
+byte*   sgx_mm_dyRIO_heap_offset(void);
+size_t  sgx_mm_dyRIO_heap_size(void);
+
 
 int sgx_procmaps_read_start(void);
 

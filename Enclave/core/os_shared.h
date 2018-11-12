@@ -77,9 +77,6 @@ void detach_finalize_cleanup(void);
 void os_heap_init(void);
 void os_heap_exit(void);
 
-void sgx_mm_init(void);
-void sgx_mm_exit(void);
-
 /* os provided heap routines */
 /* caller is required to handle thread synchronization and to update dynamo vm areas.
  * size must be PAGE_SIZE-aligned.

@@ -13,26 +13,7 @@
         }                       \
     } while (0);
 
-/* The overlap-relationship of current vma region with a reference region */
-typedef enum _vma_overlap_t {
-    OVERLAP_NONE = 0,       // Not overlapped
-
-    OVERLAP_HEAD_ALN,       // The front-part is overlapped, have same start-vma
-    OVERLAP_HEAD_OVF,       // The front-part is overlapped, don't have same start-vma
-
-    OVERLAP_TAIL_ALG,       // The tail-part is overlapped, have same end-vma
-    OVERLAP_TAIL_OVF,       // The tail-part is overlapped, don't have same end-vma
-
-    OVERLAP_ALL_OVFH,       // A super-region covers current VMA, same end-vma
-    OVERLAP_ALL_OVFT,       // A super-region covers current VMA, same start-vma
-    OVERLAP_ALL_OVFHT,      // A super-region covers current VMA, no same start-vma or end-vma
-
-    OVERLAP_MID,            // A sub-region of current VMA, no same start-vma or end-vma
-
-    OVERLAP_SAME,           // Exactly the same region.
-
-}vma_overlap_t;
-
+/*-------------------- Used for managing vmas in program-arena --------------*/
 
 /* add new item between llp and lln */
 static void list_add(list_t *llp, list_t *lln, list_t *ll)
@@ -62,94 +43,12 @@ static void list_del(list_t *ll)
     llp->next = lln;
 }
 
+/*------------- export function for dynamoRIO && dyRIO-sgx-adapter ----------*/
 
-/* simulate the memory region manager as Linux Kernel task_struct::mm_struct*/
-sgx_mm_t    SGX_MM;
-
-// /* the start address of Enclave's memory region for loading libraries into SGX-enclave */
-// byte*   sgx_vm_base = NULL;
-
-//  the start address of external memory that needs to be mapped into SGX-enclave
-// byte*   ext_vm_base = NULL;
-
-// /* used for identifying the rwx heap */
-// byte*   heap_init_start = NULL;
-// byte*   heap_init_end = NULL;
-
-/* simulate the task_struct::fs[] */
+/* simulate the task_struct::fs[], so remember the files mapped into SGX-enclave */
 #define SGX_PROCMAPS_MAX_FILE 40
 static char SGXMM_MAPED_FILES[SGX_PROCMAPS_MAX_FILE][64];
 
-/* simulate the task_struct::mm */
-/* -dr-codecache-sgxbuffer-threadcontext- */
-// Start address of external memory region needing to be mapped into enclave
-#define SGX_PAGE_SIZE 4096
-#define DR_START            (byte*)0x600000000000
-#define DR_CODE_CACHE_BASE  (DR_START + 1 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
-
-#define SGX_BUFFER_BASE     (DR_START + 17 * SGX_PAGE_SIZE * SGX_PAGE_SIZE)
-#define SGX_BUFFER_SIZE     0x000018000000          // 384M
-// only map the region 0x7fffe0000000 ~ 0x7ffff8000000
-#define EXTN_MEM_REGION     (byte*)0x7fffe0000000
-
-
-/* exported out for debugging, we have unit-tests */
-sgx_mm_t* sgx_mm_getmm(void)
-{
-    return &SGX_MM;
-}
-
-/*----------------------------address translation----------------------------*/
-bool sgx_mm_within_sgxbuf(byte *addr, size_t len)
-{
-    YPHASSERT(len > 0);
-
-    byte *itn_upper;
-
-    /* the uppper bound for translating */
-    itn_upper = SGX_MM.sgx_buf_base + SGX_BUFFER_SIZE;
-
-    return (addr >= SGX_MM.sgx_buf_base && addr + len <= itn_upper);
-}
-
-static byte* _sgx_mm_itn2ext(byte *itn_addr, bool start_vma)
-{
-    byte *addr = itn_addr;
-
-    start_vma ? (addr++) : (addr--);
-    if (sgx_mm_within_sgxbuf(addr, 1))
-        return (itn_addr - SGX_MM.sgx_buf_base) + SGX_MM.ext_vmm_base;
-    else
-        return itn_addr;    // passed in an external address
-}
-
-static byte* _sgx_mm_ext2itn(byte *ext_addr, bool start_vma)
-{
-    /* passed in an internal address */
-    if (ext_addr < SGX_MM.ext_vmm_base || ext_addr > SGX_MM.ext_vmm_base+SGX_BUFFER_SIZE)
-        return ext_addr;
-
-    byte* itn_addr = (ext_addr - SGX_MM.ext_vmm_base) + SGX_MM.sgx_buf_base;
-    byte* addr = itn_addr;
-
-    start_vma ? (addr ++) : (addr --);
-    if (sgx_mm_within_sgxbuf(addr, 1))
-        return itn_addr;
-    else
-        return ext_addr;    // cannot mapped into SGX-mm-buffer
-}
-
-byte* sgx_mm_itn2ext(byte *itn_addr)
-{
-    return _sgx_mm_itn2ext(itn_addr, true);
-}
-
-byte* sgx_mm_ext2itn(byte *ext_addr)
-{
-    return _sgx_mm_ext2itn(ext_addr, true);
-}
-
-/*---------------- remember the files mapped into SGX-enclave----------------*/
 void sgx_vma_set_cmt(ulong fd, const char *fname)
 {
     if (fd >= SGX_PROCMAPS_MAX_FILE)
@@ -170,6 +69,34 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
     strncpy(buffer, SGXMM_MAPED_FILES[fd], VMA_CMT_MAXLEN);
 }
 
+
+/*------------------------- program-arena in sgx-enclave --------------------*/
+
+/* simulate the memory region manager as Linux Kernel task_struct::mm_struct*/
+sgx_mm_t    SGX_MM;
+
+extern global_data_t g_global_data;
+extern void* g_enclave_image_base;
+
+
+/* simulate the task_struct::mm */
+/* -dr-codecache-sgxbuffer-threadcontext- */
+// Start address of external memory region needing to be mapped into enclave
+#define SGX_PAGE_SIZE 4096
+
+// Ensure the external prog-arena is only with 0x7fffe0000000 ~ 0x7ffff8000000
+#define EXTN_MEM_REGION     (byte*)0x7fffe0000000
+
+
+/* exported out for debugging, we have unit-tests */
+sgx_mm_t* sgx_mm_getmm(void)
+{
+    return &SGX_MM;
+}
+
+
+/*------------ initialize program-arena with memlayout_init_encalve------------*/
+
 /* The memroy layout when Dynamorio is executed */
 #define DR_CODE1_SZ     0x3bc000
 #define DR_HOLE1_SZ     0x1000
@@ -179,6 +106,7 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 #define DR_RDDATA_SZ    0x24000
 #define DR_RWDATA_SZ    0x60000
 
+#define DR_START        (byte*)0x600000000000
 #define DR_CODE1_START  (DR_START)
 #define DR_CODE1_END    (DR_CODE1_START + DR_CODE1_SZ)
 #define DR_HOLE1_START  (DR_CODE1_END)
@@ -205,12 +133,12 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 #define TD_SZ           (1 * SGX_PAGE_SIZE)
 #define XTA_TDCXT_SZ    0x3f95b000
 
-#define AFTER_HEAP_FLAG 0x800000000000
+#define AFTER_ARENA_FLAG 0x800000000000
 #define HEAP_MIN_START  (DR_RWDATA_END)
 #define HEAP_MIN_END    (HEAP_MIN_START + HEAP_MIN_SZ)
 #define HEAP_INIT_START (HEAP_MIN_END)
 #define HEAP_INIT_END   (HEAP_INIT_START + HEAP_INIT_SZ)
-#define GUARD_PG1_START (HEAP_INIT_END + AFTER_HEAP_FLAG)
+#define GUARD_PG1_START (HEAP_INIT_END + AFTER_ARENA_FLAG)
 #define GUARD_PG1_END   (GUARD_PG1_START + GUARD_PG_SZ)
 #define STACK_MAX_START (GUARD_PG1_END)
 #define STACK_MAX_END   (STACK_MAX_START + STACK_MAX_SZ)
@@ -271,15 +199,13 @@ sgx_vm_area_t memlayout_init_encalve[] = {
 };
 
 
-
-
 //forward declaration
 static sgx_vm_area_t* _sgx_vma_alloc(list_t* llp, list_t* lln);
 static void _sgx_vma_free(sgx_vm_area_t* vma);
 static void _sgx_vma_initialize(sgx_vm_area_t* vma, byte* ext_addr,
         size_t len, ulong prot, int fd, ulong offs);
 
-/*----------------sgx_mm_init() initialized with memlayout_init_encalve----------------*/
+
 void sgx_mm_init_static(void)
 {
     sgx_vm_area_t *vma = NULL;
@@ -288,8 +214,11 @@ void sgx_mm_init_static(void)
     uint    idx;
 
     /* hard-allocate a big buffer for loading target program into SGX-enclave*/
-    SGX_MM.sgx_buf_base = SGX_BUFFER_BASE;
-    SGX_MM.sgx_buf_size = SGX_BUFFER_SIZE;
+    SGX_MM.heap_offset = (byte*)g_enclave_image_base + g_global_data.heap_offset;
+    SGX_MM.dyRIO_heap_base = (byte*)g_enclave_image_base + g_global_data.dyRIO_cache_offset;
+    SGX_MM.dyRIO_heap_size = g_global_data.dyRIO_cache_size;
+    SGX_MM.prog_arena_base = (byte*)g_enclave_image_base + g_global_data.prog_arena_offset;
+    SGX_MM.prog_arena_size = g_global_data.prog_arena_size;
     SGX_MM.ext_vmm_base = EXTN_MEM_REGION;
 
     YPHASSERT(SGX_VMA_MAX_CNT > 2);
@@ -338,12 +267,173 @@ void sgx_mm_init_static(void)
 }
 
 
-/*----------------sgx_mm_init() initialized by referring external procmaps----------------*/
+/*--------- initialize program-arena in sgx-enclave && vma management--------*/
+
+/* The overlap-relationship of current vma region with a reference region */
+typedef enum _vma_overlap_t {
+    OVERLAP_NONE = 0,       // Not overlapped
+
+    OVERLAP_HEAD_ALN,       // The front-part is overlapped, have same start-vma
+    OVERLAP_HEAD_OVF,       // The front-part is overlapped, don't have same start-vma
+
+    OVERLAP_TAIL_ALG,       // The tail-part is overlapped, have same end-vma
+    OVERLAP_TAIL_OVF,       // The tail-part is overlapped, don't have same end-vma
+
+    OVERLAP_ALL_OVFH,       // A super-region covers current VMA, same end-vma
+    OVERLAP_ALL_OVFT,       // A super-region covers current VMA, same start-vma
+    OVERLAP_ALL_OVFHT,      // A super-region covers current VMA, no same start-vma or end-vma
+
+    OVERLAP_MID,            // A sub-region of current VMA, no same start-vma or end-vma
+
+    OVERLAP_SAME,           // Exactly the same region.
+
+}vma_overlap_t;
+
+
+extern int our_sscanf(const char *str, const char *fmt, ...);
+
+static int _sgx_mm_init_byreffing_external_procmaps(void)
+{
+#define MAPS_LINE_FORMAT4 "%08x-%08x %s %08x %*s %llu %4096s"
+#define MAPS_LINE_FORMAT8 "%016llx-%016llx %s %016llx %*s %llu %4096s"
+#define HEPA_INIT_SEG_SZ 0x3ffff000
+#define READ_BUF_SZ 4096
+
+    static const char* PROCMAPS_FILE = "/proc/self/maps";
+    static const char* AFTER_HEAP_SEG[] =
+    {
+        "[heap min]",
+        "[heap init]",
+        "[guard]",
+        "[dyRIO heap]", // dr-heap && code-cache
+        "[guard]",
+        "",             // prog-arena
+        "[guard]",
+        "[stack max]",
+        "[stack min]",
+        "[guard]",
+        "[TCS]",
+        "[SSA]",
+        "[guard]",
+        "[FIRST_TD]",
+        "[XTA_TDCXT]",
+    };
+
+    /* open && read external procmaps */
+    // int fd = dynamorio_syscall(SYS_open, 2, PROCMAPS, O_RDONLY);
+    int fd = sgx_instr_syscall_3(SYS_open, (ulong)PROCMAPS_FILE, O_RDONLY, O_RDONLY);
+    if (fd == -1)
+        return -1;
+
+
+    char szBuf[READ_BUF_SZ];
+    ssize_t nRead;
+    // nread = dynamorio_syscall(SYS_read, 3, fd, szBuf, READ_BUF_SZ);
+    nRead = sgx_instr_syscall_3(SYS_read, fd, (ulong)szBuf, READ_BUF_SZ);
+    if (nRead == -1)
+        return -1;
+
+    /* parsing each line of procmaps */
+    char *pLine = szBuf;
+    char *pRC = NULL;   //return carriage?
+
+    bool bAfter_heap_segmt = false; //after the heap_init segment of sgx-app
+    bool bAfter_prog_arena = false;
+    int  nSGXVMARgn = 0;   //Number of memory regions already added into SGX
+    int  nAfterHeap = 0;
+
+    szBuf[READ_BUF_SZ-1] = '\0';
+    do {
+        unsigned long nStart, nEnd, nProt, nOfft, nNode;
+        char szProt[8];
+        char szCmt[80];
+        byte *vmStart;
+        sgx_vm_area_t *vmaAdd;
+
+        pRC = strchr(pLine, '\n');
+        if (pRC == NULL)
+            break;
+
+        *pRC = '\0';
+        szCmt[0] = '\0';
+        our_sscanf(pLine, sizeof(void*) == 4 ? MAPS_LINE_FORMAT4 : MAPS_LINE_FORMAT8,
+                (ulong*)&nStart, (ulong*)&nEnd, szProt, (ulong*)&nOfft, &nNode, szCmt);
+        pLine = pRC+1;
+
+        /* All memory region of enclave are commented with /dev/isgx */
+        if (strncmp("/dev/isgx", szCmt, 80) != 0) {
+            if (nSGXVMARgn == 0)   // Encalve memory regions have not yet appeared!
+                continue;
+            else                // All encalve memory regions alredy scanned!
+                break;
+        }
+
+        /* check if we have already scanned heap_init segment */
+        if (!bAfter_heap_segmt && nStart == (unsigned long)SGX_MM.heap_offset) {
+            bAfter_heap_segmt = true;
+        }
+
+        if (bAfter_heap_segmt && !bAfter_prog_arena &&
+            nStart == (unsigned long)SGX_MM.prog_arena_base) {
+
+            bAfter_prog_arena = true;
+
+            nSGXVMARgn ++;
+            nAfterHeap++;
+
+            // Skip this segment as we don't want to expose this region
+            continue;
+        }
+
+        /* create and add current new vma */
+        vmaAdd = _sgx_vma_alloc(SGX_MM.in.prev, &SGX_MM.in);
+
+        if (!bAfter_prog_arena)
+            vmStart = (byte*)nStart;
+        else
+            vmStart = (byte*)(nStart | AFTER_ARENA_FLAG);
+
+        // set permmision flag
+        {
+            nProt = 0;
+            if (szProt[0] == 'r') nProt += 1;
+            if (szProt[1] == 'w') nProt += 2;
+            if (szProt[2] == 'x') nProt += 4;
+        }
+        _sgx_vma_initialize(vmaAdd, vmStart, nEnd - nStart, nProt, -1, nOfft);
+
+        /* initialize the other fields */
+        vmaAdd->vm_sgx = (byte*)nStart;
+        if (!bAfter_heap_segmt) {
+            vmaAdd->dev = 8;
+            vmaAdd->inode = nNode;
+            vmaAdd->size = nEnd - nStart;
+            strncpy(vmaAdd->comment, DR_PATH, 80);
+        }
+        else {
+            vmaAdd->dev = 0;       //Not associated with dev
+            vmaAdd->inode = 0;     //Not associated with inode
+            vmaAdd->size = 0;
+            strncpy(vmaAdd->comment, AFTER_HEAP_SEG[nAfterHeap++], 80);
+        }
+
+        nSGXVMARgn ++;
+
+    } while(pRC != NULL);
+
+    /* close external procmaps */
+    // dynamorio_syscall(SYS_close, 1, fd);
+    sgx_instr_syscall_1(SYS_close, fd);
+
+
+    YPHASSERT(nSGXVMARgn == 22);
+
+    return 0;
+}
+
 
 extern void sgx_procmaps_init(void);
 extern void sgx_procmaps_exit(void);
-
-static int _sgx_mm_init_byreffing_external_procmaps(void);
 
 void sgx_mm_init(void)
 {
@@ -352,8 +442,11 @@ void sgx_mm_init(void)
     uint     idx;
 
     /* hard-allocate a big buffer for loading target program into SGX-enclave*/
-    SGX_MM.sgx_buf_base = SGX_BUFFER_BASE;
-    SGX_MM.sgx_buf_size = SGX_BUFFER_SIZE;
+    SGX_MM.heap_offset = (byte*)g_enclave_image_base + g_global_data.heap_offset;
+    SGX_MM.dyRIO_heap_base = (byte*)g_enclave_image_base + g_global_data.dyRIO_cache_offset;
+    SGX_MM.dyRIO_heap_size = g_global_data.dyRIO_cache_size;
+    SGX_MM.prog_arena_base = (byte*)g_enclave_image_base + g_global_data.prog_arena_offset;
+    SGX_MM.prog_arena_size = g_global_data.prog_arena_size;
     SGX_MM.ext_vmm_base = EXTN_MEM_REGION;
 
     YPHASSERT(SGX_VMA_MAX_CNT > 2);
@@ -389,144 +482,6 @@ void sgx_mm_exit(void)
 {
     sgx_procmaps_exit();
 }
-
-extern int our_sscanf(const char *str, const char *fmt, ...);
-
-static int _sgx_mm_init_byreffing_external_procmaps(void)
-{
-#define MAPS_LINE_FORMAT4 "%08x-%08x %s %08x %*s %llu %4096s"
-#define MAPS_LINE_FORMAT8 "%016llx-%016llx %s %016llx %*s %llu %4096s"
-#define HEPA_INIT_SEG_SZ 0x3ffff000
-#define READ_BUF_SZ 4096
-
-    static const char* PROCMAPS_FILE = "/proc/self/maps";
-    static const char* AFTER_HEAP_SEG[] =
-    {
-        "[heap min]",
-        "", //[heap init]",
-        "[guard]",
-        "[stack max]",
-        "[stack min]",
-        "[guard]",
-        "[TCS]",
-        "[SSA]",
-        "[guard]",
-        "[FIRST_TD]",
-        "[XTA_TDCXT]",
-    };
-
-    /* open && read external procmaps */
-    // int fd = dynamorio_syscall(SYS_open, 2, PROCMAPS, O_RDONLY);
-    int fd = sgx_instr_syscall_3(SYS_open, (ulong)PROCMAPS_FILE, O_RDONLY, O_RDONLY);
-    if (fd == -1)
-        return -1;
-
-
-    char szBuf[READ_BUF_SZ];
-    ssize_t nRead;
-    // nread = dynamorio_syscall(SYS_read, 3, fd, szBuf, READ_BUF_SZ);
-    nRead = sgx_instr_syscall_3(SYS_read, fd, (ulong)szBuf, READ_BUF_SZ);
-    if (nRead == -1)
-        return -1;
-
-    /* parsing each line of procmaps */
-    char *pLine = szBuf;
-    char *pRC = NULL;   //return carriage?
-
-    int  nSGXRgn = 0;   //Number of memory regions already added into SGX
-    bool bAfter_heap_init = false;  //after the heap_init segment of sgx-app
-    int  nAfter = 0;
-
-    szBuf[READ_BUF_SZ-1] = '\0';
-    do {
-        unsigned long nStart, nEnd, nProt, nOfft, nNode;
-        char szProt[8];
-        char szCmt[80];
-        byte *vmStart;
-        sgx_vm_area_t *vmaAdd;
-
-        pRC = strchr(pLine, '\n');
-        if (pRC == NULL)
-            break;
-
-        *pRC = '\0';
-        szCmt[0] = '\0';
-        our_sscanf(pLine, sizeof(void*) == 4 ? MAPS_LINE_FORMAT4 : MAPS_LINE_FORMAT8,
-                (ulong*)&nStart, (ulong*)&nEnd, szProt, (ulong*)&nOfft, &nNode, szCmt);
-        pLine = pRC+1;
-
-        /* All memory region of enclave are commented with /dev/isgx */
-        if (strncmp("/dev/isgx", szCmt, 80) != 0) {
-            if (nSGXRgn == 0)   // Encalve memory regions have not yet appeared!
-                continue;
-            else                // All encalve memory regions alredy scanned!
-                break;
-        }
-
-        /* check if we have already scanned heap_init segment */
-        if (!bAfter_heap_init && (nEnd - nStart == HEAP_INIT_SZ) && (nSGXRgn != 0)) {
-            /* fix previous heap_min vmarea */
-            if (vmaAdd != NULL) {
-                vmaAdd->dev = 0;                                   //Not associated with dev
-                vmaAdd->inode = 0;                                 //Not associated with inode
-                strncpy(vmaAdd->comment, AFTER_HEAP_SEG[nAfter++], 80);   //comment vma heap_min
-            }
-            SGX_MM.heap_init_start = (byte*)nStart;
-            SGX_MM.heap_init_end = (byte*)nEnd;
-
-            bAfter_heap_init = true;
-
-            nSGXRgn ++;
-            nAfter++;
-            continue;   /* don't expose this region */
-        }
-
-        /* create and add current new vma */
-        vmaAdd = _sgx_vma_alloc(SGX_MM.in.prev, &SGX_MM.in);
-
-        if (!bAfter_heap_init)
-            vmStart = (byte*)nStart;
-        else
-            vmStart = (byte*)(nStart | AFTER_HEAP_FLAG);
-
-        {
-            nProt = 0;
-            if (szProt[0] == 'r') nProt += 1;
-            if (szProt[1] == 'w') nProt += 2;
-            if (szProt[2] == 'x') nProt += 4;
-        }
-        _sgx_vma_initialize(vmaAdd, vmStart, nEnd - nStart, nProt, -1, nOfft);
-
-        /* initialize the other fields */
-        vmaAdd->vm_sgx = (byte*)nStart;
-        if (!bAfter_heap_init) {
-            vmaAdd->dev = 8;
-            vmaAdd->inode = nNode;
-            vmaAdd->size = nEnd - nStart;
-            strncpy(vmaAdd->comment, DR_PATH, 80);
-        }
-        else {
-            vmaAdd->dev = 0;       //Not associated with dev
-            vmaAdd->inode = 0;     //Not associated with inode
-            vmaAdd->size = 0;
-            strncpy(vmaAdd->comment, AFTER_HEAP_SEG[nAfter++], 80);
-        }
-
-        nSGXRgn ++;
-
-    } while(pRC != NULL);
-
-    /* close external procmaps */
-    // dynamorio_syscall(SYS_close, 1, fd);
-    sgx_instr_syscall_1(SYS_close, fd);
-
-
-    YPHASSERT(nSGXRgn == 18);
-
-    return 0;
-}
-
-/*-----------------------end sgx_mm_init()-----------------------------*/
 
 
 /* Allocate a sgx-mm-buffer for mapping external memory region */
@@ -906,6 +861,7 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
                     if (head->vm_sgx != NULL) {
                         // call mprotect on sgx-mm-buffer
                     }
+                    _sgx_vma_merge(head);
                 }
 
                 ctuw = false;
@@ -923,7 +879,6 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
                     if (head->vm_sgx != NULL) {
                         // call mprotect on sgx-mm-buffer
                     }
-                    _sgx_vma_merge(head);
                 }
 
                 ctuw = false;
@@ -967,7 +922,7 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
                 break;
 
             case OVERLAP_ALL_OVFH:
-            case OVERLAP_ALL_OVFHT:
+            case OVERLAP_ALL_OVFT:
                 if (vma->perm != prot) { /* don't have the same property */
                     vma->perm = prot;
                     if (vma->vm_sgx != NULL) {
@@ -980,7 +935,7 @@ static int _sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
                 ll = ll->next;
                 break;
 
-            case OVERLAP_ALL_OVFT:
+            case OVERLAP_ALL_OVFHT:
                 if (vma->perm != prot) { /* don't have the same property */
                     vma->perm = prot;
                     if (vma->vm_sgx != NULL) {
@@ -1146,6 +1101,63 @@ static sgx_vm_area_t* _sgx_mm_mmap(byte *ext_addr, size_t len,
     return vma;
 }
 
+
+/*----- export function for bridge-trts, providing MM in program arena ------*/
+
+bool sgx_mm_within_sgxbuf(byte *addr, size_t len)
+{
+    YPHASSERT(len > 0);
+
+    byte *itn_upper;
+
+    /* the uppper bound for translating */
+    itn_upper = SGX_MM.prog_arena_base + SGX_MM.prog_arena_size;
+
+    return (addr >= SGX_MM.prog_arena_base && addr + len <= itn_upper);
+}
+
+static byte* _sgx_mm_itn2ext(byte *itn_addr, bool start_vma)
+{
+    byte *addr = itn_addr;
+
+    start_vma ? (addr++) : (addr--);
+    if (sgx_mm_within_sgxbuf(addr, 1))
+        return (itn_addr - SGX_MM.prog_arena_base) + SGX_MM.ext_vmm_base;
+    else
+        return itn_addr;    // passed in an external address
+}
+
+
+static byte* _sgx_mm_ext2itn(byte *ext_addr, bool start_vma)
+{
+    /* passed in an internal address */
+    if (ext_addr < SGX_MM.ext_vmm_base ||
+        ext_addr > SGX_MM.ext_vmm_base+SGX_MM.prog_arena_size)
+        return ext_addr;
+
+    byte* itn_addr = (ext_addr - SGX_MM.ext_vmm_base) + SGX_MM.prog_arena_base;
+    byte* addr = itn_addr;
+
+    start_vma ? (addr ++) : (addr --);
+    if (sgx_mm_within_sgxbuf(addr, 1))
+        return itn_addr;
+    else
+        return ext_addr;    // cannot mapped into SGX-mm-buffer
+}
+
+
+byte* sgx_mm_itn2ext(byte *itn_addr)
+{
+    return _sgx_mm_itn2ext(itn_addr, true);
+}
+
+
+byte* sgx_mm_ext2itn(byte *ext_addr)
+{
+    return _sgx_mm_ext2itn(ext_addr, true);
+}
+
+
 // Allocate a sgx-vma whether the given external memory region can be casted into a sgx-mm-buffer.
 // If yes, allocates a sgx-mm-buffer. Test the vma->vm_sgx field for checking.
 // ext_addr: external address, maybe NULL; should not be internal address
@@ -1169,7 +1181,8 @@ byte* sgx_mm_mmap(byte *ext_addr, size_t len,
     /* copy the content from external to internal if needs */
     if (vma->vm_sgx != NULL) {
         if (vma->inode != 0) {
-            int ncpy = (vma->size-offs < len) ? ((vma->size-offs + SGX_PAGE_SIZE - 1) & ~(SGX_PAGE_SIZE - 1)) : len;
+            int ncpy = (vma->size-offs < len) ?
+                ((vma->size-offs + SGX_PAGE_SIZE - 1) & ~(SGX_PAGE_SIZE - 1)) : len;
             memcpy(vma->vm_sgx, ext_addr, ncpy);
             memset(vma->vm_sgx + ncpy, 0, len - ncpy);
         }
@@ -1204,7 +1217,8 @@ void sgx_mm_munmap(byte *ext_addr, size_t len)
     /* flush content to external file if needs */
     while (ctuw && ll != &SGX_MM.in) {
         vma = list_entry(ll, sgx_vm_area_t, ll);
-        ot = _sgx_vma_overlap(vma->vm_start, vma->vm_end, ext_addr, ext_addr + len);
+        ot = _sgx_vma_overlap(vma->vm_start, vma->vm_end,
+            ext_addr, ext_addr + len);
 
         switch (ot) {
             case OVERLAP_NONE:
@@ -1287,7 +1301,8 @@ int sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot)
 }
 
 
-byte* sgx_mm_mremap(byte *ext_old_addr, size_t old_sz, byte* ext_new_addr, size_t new_sz, uint new_flags)
+byte* sgx_mm_mremap(byte *ext_old_addr, size_t old_sz,
+    byte* ext_new_addr, size_t new_sz, uint new_flags)
 {
     SGX_MM.updated = true;
 

@@ -54,6 +54,17 @@ static procmaps_t SGX_PROCMAPS;
 extern sgx_mm_t SGX_MM;
 
 
+byte* sgx_mm_dyRIO_heap_offset(void)
+{
+    return SGX_MM.dyRIO_heap_base;
+}
+
+size_t sgx_mm_dyRIO_heap_size(void)
+{
+    return SGX_MM.dyRIO_heap_size;
+}
+
+
 void sgx_procmaps_init(void)
 {
     SGX_PROCMAPS.data_buf = PROCMAPS_BUF;

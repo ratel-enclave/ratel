@@ -68,7 +68,9 @@ enclave {
         /******** system-call parameter encoding rules ********/
         /********S:  const sting, just used for passed in parameters ***************/
         /********N:  long integer value, just used for passed in parameters ********/
-        /********Ti: long integer value, just used for passed in parameters ********/
+        /********Pi: Pointing to a buffer, just used for passed in parameters ********/
+        /********Po: Pointing to a buffer, just used for passed out parameters ********/
+        /********Pio: Pointing to a buffer, just used for passed in/out parameters ********/
         /********Ti: Pointing to a data structure, just used for passed in parameters ********/
         /********To: Pointing to a data structure, just used for passed out parameters *******/
         /********Tio:Pointing to a data structure, used for passed in/out parameters *********/
@@ -120,23 +122,35 @@ enclave {
         long ocall_syscall_2_STo(long sysno, [in, string] const char *S, [out, size=l] void *T, int l);
 
 
-        /********syscalls with 3 paramters********/
+        /****************************syscalls with 3 paramters**********************************************/
         //int mprotect(void *addr, size_t len, int prot);
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
 
-        //long ocall_syscall_3_NTiT3(long sysno, long N1, [in, size=l1] void *T1, long l1, [in, out, size=l2] void *T2, long l2);
 
-        //ssize_t write(int fd, const void *buf, size_t count);
-        long ocall_syscall_3_NTiN(long sysno, long N1, [in, size=N2] void *T, long N2);
+        //int open(const char *pathname, int flags, mode_t mode);
+        long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
 
-        //int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
-        long ocall_syscall_3_NTiTo(long sysno, long N1, [in, size=N2] void *T1, long N2, [out, size=N3] void *T2, long N3);
 
         //ssize_t read(int fd, void *buf, size_t count);
         //int getdents(unsigned int fd, struct linux_dirent *dirp, unsigned int count);
-        long ocall_syscall_3_NToN(long sysno, long N1, [out, size=N2] void *T, long N2);
+        long ocall_syscall_3_NPoN(long sysno, long N1, [out, size=N2] void *T, long N2);
 
-        long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
+
+        //ssize_t write(int fd, const void *buf, size_t count);
+        long ocall_syscall_3_NPiN(long sysno, long N1, [in, size=N2] void *T, long N2);
+
+
+        //ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+        long ocall_syscall_3_NToN(long sysno, long N1, [out, size=dumb] void *T, long dumb, long N2);
+
+
+        //ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
+        long ocall_syscall_3_NTiN(long sysno, long N1, [in, size=dumb] void *T, long dumb, long N2);
+
+
+        //int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
+        long ocall_syscall_3_NTiTo(long sysno, long N1, [in, size=dumb1] void *T1, long dumb1, [out, size=dumb2] void *T2, long dumb2);
+
 
         /********syscalls with 4 paramters********/
         //void *mremap(void *old_address, size_t old_size, size_t new_size, int flags);

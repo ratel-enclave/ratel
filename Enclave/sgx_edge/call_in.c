@@ -1,12 +1,6 @@
 #include "../dynamorio_t.h"
+#include "sgx_mm.h"
 #include "asm_defines.asm"
-
-
-typedef unsigned long ulong;
-typedef unsigned char byte;
-typedef unsigned char bool;
-#define true    (1)
-#define false   (0)
 
 
 typedef struct
@@ -45,6 +39,8 @@ extern void original_dynamorio_start(int argc, char* argv[], char *envp[]);
 
 void sgxdbi_enclave_entry(long argc, char** argv, char** envp)
 {
+    sgx_mm_init();
+
     ulong new_stack_base;   // the start address of new stack
     ulong *pStack, *t;
     int  nPtr;      // The number of pointers putting on the new stack.
@@ -104,6 +100,8 @@ void sgxdbi_enclave_entry(long argc, char** argv, char** envp)
 
 void sgxdbi_enclave_exit(void)
 {
+    sgx_mm_exit();
+
     /* switch-back to the initial stack */
     asm volatile ("\tmov %0, %%rbp \n"
             "\tpop %%rsp   \n"

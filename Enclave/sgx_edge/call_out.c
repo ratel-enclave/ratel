@@ -141,15 +141,30 @@ long sgx_syscall_sigaltstack(long ss_ptr, long oldss_ptr)
 
 
 /* fcntl has variable parameters */
-long sgx_syscall_fcntl(long fd, long cmd, long arg1, long arg2)
+long sgx_syscall_fcntl(long fd, long cmd, long arg1)
 {
-#define F_DUPFD 0
+#define F_DUPFD     0       /* duplicate file descriptor, F_DUPFD (int) */
+#define F_GETFD     1       /* get file descriptor flags, F_GETFD (void) */
+#define F_SETFD     2       /* set file descriptor flags, F_SETFD (int) */
+#define F_GETFL     3       /* get file status flags, F_GETFL (void) */
+#define F_SETFL     4       /* set file status flags, F_SETFL (int) */
 
     long ret = -1;
 
     switch (cmd) {
         case F_DUPFD:
-            ocall_syscall_2_NN(&ret, SYS_fcntl, cmd, arg1);
+        case F_SETFD:
+        case F_SETFL:
+            ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, arg1);
+            break;
+
+        case F_GETFD:
+        case F_GETFL:
+            ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, 0);    /* tricky */
+            break;
+
+        default:
+            unimplemented_syscall(SYS_fcntl);
             break;
     }
 
@@ -326,6 +341,7 @@ long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
             break;
 
         case SYS_stat:
+        case SYS_lstat:
             ocall_syscall_2_STo(&ret, sysno, (char*)_rdi, (void*)_rsi, len_stat);
             break;
 
@@ -375,11 +391,19 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_read:
-            ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
 
         case SYS_write:
-            ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            ocall_syscall_3_NPiN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            break;
+
+        case SYS_readv:
+            ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, len_iovec, _rdx);
+            break;
+
+        case SYS_writev:
+            ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void*)_rsi, len_iovec, _rdx);
             break;
 
         case SYS_mprotect:
@@ -394,7 +418,7 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_getdents:
-            ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
 
         case SYS_setitimer:
@@ -402,7 +426,7 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_fcntl:
-            ret = sgx_syscall_fcntl(_rdi, _rsi, _rdx, 0);
+            ret = sgx_syscall_fcntl(_rdi, _rsi, _rdx);
             break;
 
         default:
@@ -525,6 +549,7 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_arch_prctl:
         case SYS_getitimer:
         case SYS_stat:
+        case SYS_lstat:
         case SYS_mkdir:
         case SYS_access:
             return sgx_instr_syscall_2(sysno, _rdi, _rsi);
@@ -535,6 +560,8 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_open:
         case SYS_read:
         case SYS_write:
+        case SYS_readv:
+        case SYS_writev:
         case SYS_mprotect:
         case SYS_getdents:
         case SYS_setitimer:
@@ -561,9 +588,10 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
 
             //variable parameters
         case SYS_fcntl:
-            return sgx_syscall_fcntl(_rdi, _rsi, _rdx, _r10);
+            return sgx_syscall_fcntl(_rdi, _rsi, _rdx);
             break;
 
+        case SYS_chmod:
         default:
             unimplemented_syscall(sysno);
             return -1;
