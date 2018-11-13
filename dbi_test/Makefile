@@ -1,14 +1,19 @@
 #!/usr/bin/make
 
+SRCS	:= $(abspath $(wildcard *.c))
+TGTS	:= $(patsubst %.c,%,$(SRCS))
+CC_FLAGS	:= -fPIC -pie
+
+
 .PHONY: all
 
 
-all: sgx_mm
+all: $(TGTS)
 
 
-sgx_mm:
-	gcc -fPIC -pie -o sgx_mm sgx_mm.c
+$(TGTS) : %: %.c
+	gcc $(CC_FLAGS) -o $@ $<
 
 
 clean:
-	rm -rf sgx_mm
+	rm -rf $(TGTS)
