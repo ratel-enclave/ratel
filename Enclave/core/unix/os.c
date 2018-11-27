@@ -6695,6 +6695,7 @@ pre_system_call(dcontext_t *dcontext)
     priv_mcontext_t *mc = get_mcontext(dcontext);
     bool execute_syscall = true;
     where_am_i_t old_whereami = dcontext->whereami;
+
     dcontext->whereami = WHERE_SYSCALL_HANDLER;
     /* FIXME We haven't yet done the work to detect which syscalls we
      * can determine a priori will fail. Once we do, we will set the
@@ -6762,6 +6763,7 @@ pre_system_call(dcontext_t *dcontext)
          */
         mmap_arg_struct_t *arg = (mmap_arg_struct_t *) sys_param(dcontext, 0);
         mmap_arg_struct_t arg_buf;
+
         if (safe_read(arg, sizeof(mmap_arg_struct_t), &arg_buf)) {
             void *addr = (void *) arg->addr;
             size_t len = (size_t) arg->len;
@@ -6800,11 +6802,13 @@ pre_system_call(dcontext_t *dcontext)
         size_t len = (size_t) sys_param(dcontext, 1);
         uint prot = (uint) sys_param(dcontext, 2);
         uint flags = (uint) sys_param(dcontext, 3);
+
         LOG(THREAD, LOG_SYSCALLS, 2,
             "syscall: mmap2 addr="PFX" size="PIFX" prot=0x%x"
             " flags="PIFX" offset="PIFX" fd=%d\n",
             addr, len, prot, flags,
             sys_param(dcontext, 5), sys_param(dcontext, 4));
+
         /* Check for overlap with existing code or patch-proof regions */
         if (addr != NULL &&
             !app_memory_pre_alloc(dcontext, addr, len, osprot_to_memprot(prot),
@@ -6821,6 +6825,7 @@ pre_system_call(dcontext_t *dcontext)
                 break;
             }
         }
+
         /* post_system_call does the work */
         dcontext->sys_param0 = (reg_t) addr;
         dcontext->sys_param1 = len;
@@ -6936,6 +6941,7 @@ pre_system_call(dcontext_t *dcontext)
         dcontext->sys_param0 = (reg_t) addr;
         dcontext->sys_param1 = len;
         dcontext->sys_param2 = prot;
+
         LOG(THREAD, LOG_SYSCALLS, 2,
             "syscall: mprotect addr="PFX" size="PFX" prot=%s\n",
             addr, len, memprot_string(osprot_to_memprot(prot)));
@@ -8573,6 +8579,12 @@ post_system_call(dcontext_t *dcontext)
             tls_handle_post_arch_prctl(dcontext, dcontext->sys_param0,
                                        dcontext->sys_param1);
         }
+
+        if (dcontext->sys_param0 == ARCH_SET_FS || dcontext->sys_param0 == ARCH_SET_GS) {
+            *sys_param_addr(dcontext, 0) = dcontext->sys_param0;
+            *sys_param_addr(dcontext, 1) = dcontext->sys_param1;
+        }
+
         break;
     }
 #endif
@@ -9076,7 +9088,7 @@ os_walk_address_space(memquery_iter_t *iter, bool add_modules)
         LOG(GLOBAL, LOG_VMAREAS, 2,
             "start="PFX" end="PFX" prot=%x comment=%s\n",
             iter->vm_start, iter->vm_end, iter->prot, iter->comment);
-        YPHPRINT("start=0x%lx end=0x%lx prot=%x comment=%s", iter->vm_start, iter->vm_end, iter->prot, iter->comment);
+        // YPHPRINT("start=0x%lx end=0x%lx prot=%x comment=%s", iter->vm_start, iter->vm_end, iter->prot, iter->comment);
         /* Issue 89: the vdso might be loaded inside ld.so as below,
          * which causes ASSERT_CURIOSITY in mmap_check_for_module_overlap fail.
          * b7fa3000-b7fbd000 r-xp 00000000 08:01 108679     /lib/ld-2.8.90.so
