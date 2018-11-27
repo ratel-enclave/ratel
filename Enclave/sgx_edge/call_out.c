@@ -5,14 +5,21 @@
 #include "string.h"
 #include "../dynamorio_t.h"
 
-#include "x86intrin.h"
-
 #include "sgx_mm.h"
 #include "call_out.h"
 
 extern void load_fsbase(unsigned long base);
 extern void load_gsbase(unsigned long base);
 
+
+/* export for external use */
+int     open_procmaps_file(void);
+int     read_procmaps_file(char buf[], size_t len);
+void    close_procmaps_file(void);
+
+
+/* the file descpritor of sgx-procmaps: GX_PROCMAPS_MAX_FILE */
+#define SGX_PROCMAPS_FD 40
 
 //Generate a copy within the enclave.
 void* gen_enclave_copy(void *org, int len)
@@ -42,12 +49,39 @@ void sgx_instr_rdtsc(uint64* res)
 }
 
 /* syscall instruction*/
-long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
+
+// unsigned long arg1, arg2, arg3, arg4, arg5, arg6, _rbp;
+
+/* gcc uses rcx for passing the forth parameter */
+// __asm__ (
+//         "\tmov %%rdx, %0\n"
+//         "\tmov %%rcx, %1\n"
+//         "\tmov %%r8, %2\n"
+//         "\tmov %%r9, %3\n"
+//         "\tmov %%rbp, %4\n"
+//         "\txor %%rax, %%rax\n"
+//         :"=rm"(arg1), "=rm"(arg2), "=rm"(arg3),
+//         "=rm"(arg4), "=rm"(_rbp)::);
+
+
+// signature: dynamorio_syscall(sysnum, num_args, arg1, arg2, ...)
+// <sgx_dynamorio_syscall>:      push   %rbp
+// <sgx_dynamorio_syscall+1>:    mov    %rsp,%rbp
+long sgx_instr_syscall(long arg1, long arg2, long arg3, long arg4, long arg5, long arg6)
+{
+    long sysno;
+
+    /* gcc uses rcx for passing the forth parameter */
+    asm volatile (
+        "\tmov %%rax, %0\n"
+        "\tmov %%r10, %1\n"
+        :"=rm"(sysno), "=rm" (arg4));
+
+    return sgx_syscall(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
+}
 
 
 /*--------------------------------------special syscalls-------------------------------------------*/
-
-
 void dumb(void)
 {
 }
@@ -175,7 +209,7 @@ long sgx_syscall_fcntl(long fd, long cmd, long arg1)
 /*--------------------------------------General syscalls-------------------------------------------*/
 
 //All syscalls with 0 parameters
-long sgx_instr_syscall_0(long sysno)
+long sgx_syscall_0(long sysno)
 {
     long ret = -1;
 
@@ -186,7 +220,7 @@ long sgx_instr_syscall_0(long sysno)
 }
 
 //All syscalls with 1 parameters
-long sgx_instr_syscall_1(long sysno, long _rdi)
+long sgx_syscall_1(long sysno, long _rdi)
 {
     long ret = -1;
 
@@ -218,7 +252,6 @@ long sgx_instr_syscall_1(long sysno, long _rdi)
         case SYS_io_destroy:
         case SYS_exit:
         case SYS_exit_group:
-        case SYS_close:
         case SYS_fchdir:
         case SYS_fdatasync:
         case SYS_fsync:
@@ -243,6 +276,16 @@ long sgx_instr_syscall_1(long sysno, long _rdi)
         case SYS_unshare:
         case SYS_rt_sigreturn:
             ocall_syscall_1_N(&ret, sysno, _rdi);
+            break;
+
+        case SYS_close:
+            if (sgx_mm_initialized &&_rdi == SGX_PROCMAPS_FD) {
+                close_procmaps_file();
+                ret  = 0;
+            }
+            else {
+                ocall_syscall_1_N(&ret, sysno, _rdi);
+            }
             break;
 
         case SYS_get_thread_area:
@@ -303,7 +346,7 @@ long sgx_instr_syscall_1(long sysno, long _rdi)
 
 #include <string.h>
 //All syscalls with 2 parameters
-long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
+long sgx_syscall_2(long sysno, long _rdi, long _rsi)
 {
     long ret = -1;
     byte* addr;
@@ -347,6 +390,7 @@ long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
 
         case SYS_mkdir:
         case SYS_access:
+        case SYS_creat:
             ocall_syscall_2_SN(&ret, sysno, (char*)_rdi, _rsi);
             break;
 
@@ -364,7 +408,7 @@ long sgx_instr_syscall_2(long sysno, long _rdi, long _rsi)
 
 
 //All syscalls with 3 parameters
-long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
+long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 {
     long ret = -1;
     char *s, *t;
@@ -375,11 +419,17 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             s = (char*)_rdi;
             t = gen_enclave_copy(s, strlen(s)+1);
 
-            ocall_syscall_3_SNN(&ret, sysno, t, _rsi, _rdx);
+            if (sgx_mm_initialized && strcmp(t, "/proc/self/maps") == 0 /*|| strcmp(t, "/proc//tid//maps") == 0*/) {
+                open_procmaps_file();
+                ret = SGX_PROCMAPS_FD;
+            }
+            else {
+                ocall_syscall_3_SNN(&ret, sysno, t, _rsi, _rdx);
 
-            /* bind the fid with filename */
-            if (ret != -1)
-                sgx_vma_set_cmt(ret, t);
+                /* bind the fid with filename */
+                if (ret != -1)
+                    sgx_vma_set_cmt(ret, t);
+            }
 
             /* free the enclave copy */
             if (t != s)
@@ -391,7 +441,13 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_read:
-            ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            if (sgx_mm_initialized && _rdi == SGX_PROCMAPS_FD) {
+                ret = read_procmaps_file((char*)_rsi, _rdx);
+            }
+            else {
+                ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
+            }
+
             break;
 
         case SYS_write:
@@ -439,7 +495,7 @@ long sgx_instr_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 }
 
 
-long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
+long sgx_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 {
     long ret = -1;
     byte* addr;
@@ -475,7 +531,7 @@ long sgx_instr_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
     return ret;
 }
 
-long sgx_instr_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
+long sgx_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
 {
     long ret = -1;
 
@@ -486,7 +542,7 @@ long sgx_instr_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
     return ret;
 }
 
-long sgx_instr_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
+long sgx_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
     long ret = -1;
     byte* addr;
@@ -516,7 +572,7 @@ long sgx_instr_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
 }
 
 
-long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
+long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
     /*fixing-up them with a sysno-to-function table*/
     switch (sysno) {
@@ -525,7 +581,7 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_getpid:
         case SYS_gettid:
         case SYS_sync:
-            return sgx_instr_syscall_0(sysno);
+            return sgx_syscall_0(sysno);
             break;
 
             //One paramters
@@ -537,7 +593,7 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_time:
             /*case SYS_set_thread_area:*/
             /*case SYS_get_thread_area:*/
-            return sgx_instr_syscall_1(sysno, _rdi);
+            return sgx_syscall_1(sysno, _rdi);
             break;
 
             //Two paramters
@@ -552,7 +608,8 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_lstat:
         case SYS_mkdir:
         case SYS_access:
-            return sgx_instr_syscall_2(sysno, _rdi, _rsi);
+        case SYS_creat:
+            return sgx_syscall_2(sysno, _rdi, _rsi);
             break;
 
             //Three paramters
@@ -565,25 +622,25 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         case SYS_mprotect:
         case SYS_getdents:
         case SYS_setitimer:
-            return sgx_instr_syscall_3(sysno, _rdi, _rsi, _rdx);
+            return sgx_syscall_3(sysno, _rdi, _rsi, _rdx);
             break;
 
             //Four parameters
         case SYS_rt_sigaction:
         case SYS_rt_sigprocmask:
         case SYS_mremap:
-            return sgx_instr_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
+            return sgx_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
             break;
 
             //Five parameters
         case SYS_prctl:
-            return sgx_instr_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
+            return sgx_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
             break;
 
             //Six parameters
         case SYS_mmap:
         case SYS_futex:
-            return sgx_instr_syscall_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
+            return sgx_syscall_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
             break;
 
             //variable parameters
@@ -599,51 +656,37 @@ long sgx_instr_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     }
 }
 
-// signature: dynamorio_syscall(sysnum, num_args, arg1, arg2, ...)
-// <sgx_dynamorio_syscall>:      push   %rbp
-// <sgx_dynamorio_syscall+1>:    mov    %rsp,%rbp
-// long sgx_dynamorio_syscall(long sysnum, long num_args, ...)
-long sgx_dynamorio_syscall(long sysnum, long num_args, long arg1,
-        long arg2, long arg3, long arg4,
+
+long sgx_dynamorio_syscall(
+        long sysnum, long num_args,
+        long arg1, long arg2,
+        long arg3, long arg4,
         long arg5, long arg6)
 {
-    // unsigned long arg1, arg2, arg3, arg4, arg5, arg6, _rbp;
-
-    /* gcc uses rcx for passing the forth parameter */
-    // __asm__ (
-    //         "\tmov %%rdx, %0\n"
-    //         "\tmov %%rcx, %1\n"
-    //         "\tmov %%r8, %2\n"
-    //         "\tmov %%r9, %3\n"
-    //         "\tmov %%rbp, %4\n"
-    //         "\txor %%rax, %%rax\n"
-    //         :"=rm"(arg1), "=rm"(arg2), "=rm"(arg3),
-    //         "=rm"(arg4), "=rm"(_rbp)::);
-
     switch(num_args) {
         case 0:
-            return sgx_instr_syscall_0(sysnum);
+            return sgx_syscall_0(sysnum);
 
         case 1:
-            return sgx_instr_syscall_1(sysnum, arg1);
+            return sgx_syscall_1(sysnum, arg1);
 
         case 2:
-            return sgx_instr_syscall_2(sysnum, arg1, arg2);
+            return sgx_syscall_2(sysnum, arg1, arg2);
 
         case 3:
-            return sgx_instr_syscall_3(sysnum, arg1, arg2, arg3);
+            return sgx_syscall_3(sysnum, arg1, arg2, arg3);
 
         case 4:
-            return sgx_instr_syscall_4(sysnum, arg1, arg2, arg3, arg4);
+            return sgx_syscall_4(sysnum, arg1, arg2, arg3, arg4);
 
         case 5:
             // arg5 = *((long*)_rbp + 2);
-            return sgx_instr_syscall_5(sysnum, arg1, arg2, arg3, arg4, arg5);
+            return sgx_syscall_5(sysnum, arg1, arg2, arg3, arg4, arg5);
 
         case 6:
             // arg5 = *((long*)_rbp + 2);
             // arg6 = *((long*)_rbp + 3);
-            return sgx_instr_syscall_6(sysnum, arg1, arg2, arg3, arg4, arg5, arg6);
+            return sgx_syscall_6(sysnum, arg1, arg2, arg3, arg4, arg5, arg6);
 
         default:
             ocall_print_str("too many arguments! crash me!");

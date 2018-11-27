@@ -280,7 +280,7 @@ void sgx_helper_syscall(void* drctx)
     arg5 = mctx.r8;
     arg6 = mctx.r9;
 
-    res = sgx_instr_syscall(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
+    res = sgx_syscall(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
 
     mctx.rax = res;
     dr_set_mcontext(drctx, &mctx);

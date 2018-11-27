@@ -55,7 +55,7 @@ int64 dynamorio_mach_dep_syscall(uint sysnum, uint num_args, ...);
 ptr_int_t dynamorio_mach_syscall(uint sysnum, uint num_args, ...);
 # else
 ptr_int_t dynamorio_syscall(uint sysnum, uint num_args, ...);
-void dynamorio_syscall_inst(void);
+long sgx_instr_syscall(long arg1, long arg2, long arg3, long arg4, long arg5, long arg6);
 
 void sgx_helper_cpuid(void* drctx);
 void sgx_helper_rdtsc(void* drctx);

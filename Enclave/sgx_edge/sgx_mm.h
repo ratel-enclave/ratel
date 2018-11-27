@@ -54,7 +54,7 @@ typedef struct _sgx_vm_area_t {
 
 
 /*------------------------- program-arena in sgx-enclave --------------------*/
-#define SGX_VMA_MAX_CNT 96
+#define SGX_VMA_MAX_CNT 200
 typedef struct _sgx_mm_t {
     /* The start address of heap reserved by sgxsdk */
     byte*   heap_offset;
@@ -70,17 +70,19 @@ typedef struct _sgx_mm_t {
     /* start address of external vmas mapped into SGX-enclave */
     byte*   ext_vmm_base;
 
-    /* vm areas */
-    sgx_vm_area_t slots[SGX_VMA_MAX_CNT];
-
     /* Used for managing vm areas */
-    list_t  *un;
-    list_t  in;
     uint    nin;
     uint    nun;
     bool    updated;
+
+    list_t  *un;
+    list_t  in;
+    /* vm areas */
+    sgx_vm_area_t slots[SGX_VMA_MAX_CNT];
 } sgx_mm_t;
 
+
+extern bool sgx_mm_initialized;
 
 /*------------- export function for dynamoRIO && dyRIO-sgx-adapter ----------*/
 
