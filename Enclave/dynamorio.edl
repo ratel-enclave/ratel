@@ -79,9 +79,8 @@ enclave {
 
         long ocall_syscall_0(long sysno);
 
-
+        //int unlink(const char *pathname);
         long ocall_syscall_1_S(long sysno, [in, string] char *S);
-        /********long ocall_syscall_1_pint(long sysno, [in, out] long* pval);********/
 
         long ocall_syscall_1_N(long sysno, long N1);
         /********long ocall_syscall_1_not(long sysno, long unimplemented);********/
@@ -116,6 +115,7 @@ enclave {
         long ocall_syscall_2_NTo(long sysno, long N, [out, size=l] void *T, int l);
 
         //int mkdir(const char *pathname, mode_t mode);
+        //int creat(const char *pathname, mode_t mode);
         long ocall_syscall_2_SN(long sysno, [in, string] const char *S, long N1);
 
         //int stat(const char *pathname, struct stat *buf);
