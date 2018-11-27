@@ -140,10 +140,12 @@ $(foreach bdir,$(BUILD_DIR),$(eval $(call make-goal,$(bdir))))
 ######## sgx_edge Objects ########
 
 EDGE_DIR	:= sgx_edge
+EDGE_INCS	:= $(wildcard $(EDGE_DIR)/*.h)
 EDGE_SRCS	:= $(wildcard $(EDGE_DIR)/*.c)
 EDGE_OBJS	:= $(patsubst %c,%o,$(EDGE_SRCS))
 DYNAMORIO_DEFINES	:= -DINTERNAL -DDEBUG -DDRSTATS_DEMO -DX86 -DX64 -DLINUX -DUNIX -DCLIENT_INTERFACE -DAPP_EXPORTS -DKSTATS -DHAVE_FVISIBILITY -
 
+$(EDGE_OBJS): $(EDGE_INCS)
 $(EDGE_OBJS): %.o: %.c
 	$(CC) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_CC_FLAGS) $(DYNAMORIO_CC_FLAGS) -fPIC  -c $< -o $@
 
@@ -174,3 +176,4 @@ clean:
 	@rm -f .config_* $(ENCLAVE_NAME) $(SIGNED_ENCLAVE_NAME) dynamorio_t.*
 	@rm	-rf $(BUILD_DIR)
 	@rm	-rf $(BLD_DIR)
+	@rm -rf $(EDGE_OBJS)
