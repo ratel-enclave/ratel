@@ -382,13 +382,13 @@ void ocall_print_syscallname(long sysno)
 void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
 {
     if (implemented) {
-        ocall_print_syscallname(sysno);
-        printf("%s: return 0x%lx\n", fname, ret);
+        //ocall_print_syscallname(sysno);
+        //printf("%s: return 0x%lx\n", fname, ret);
     }
     else {
         printf("sysno: %-4d not implemented!\n", (int)sysno);
     }
-    fflush(stdout);
+    //fflush(stdout);
 }
 
 
@@ -422,13 +422,16 @@ long ocall_syscall_0(long sysno)
 long ocall_syscall_1_S(long sysno, char *S)
 {
     long ret;
+    bool b = false;
 
-    if (sysno == SYS_unlink) {
-        ret = syscall(sysno, S);
-        printf("%s: return 0x%lx\n", __FUNCTION__, ret);
+    switch (sysno) {
+        case SYS_unlink:
+            ret = syscall(sysno, S);
+            b = true;
+            break;
     }
-    else
-        printf("Not implemented for sysno: %ld !\n", sysno);
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
@@ -482,6 +485,12 @@ long ocall_syscall_1_To(long sysno, void *T, int l)
             ret = syscall(sysno, T);
             b = true;
             break;
+
+        case SYS_time:
+            ret = syscall(sysno, T);
+            b = true;
+            break;
+
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -535,13 +544,6 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
         case SYS_arch_prctl:
             ret = syscall(sysno, N1, N2);
             b = true;
-            break;
-
-        case SYS_fcntl:
-            if (N1 == F_DUPFD) {
-                ret = syscall(sysno, N1, N2);
-                b = true;
-            }
             break;
     }
 
@@ -623,6 +625,7 @@ long ocall_syscall_2_SN(long sysno, const char *S, long N)
     switch (sysno) {
         case SYS_mkdir:
         case SYS_access:
+        case SYS_creat:
             ret = syscall(sysno, S, N);
             b = true;
             break;
@@ -639,9 +642,15 @@ long ocall_syscall_2_STo(long sysno, const char *S, void *T, int l)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_stat) {
-        ret = syscall(sysno, S, T);
-        b = true;
+    switch (sysno) {
+        case SYS_stat:
+        case SYS_lstat:
+            ret = syscall(sysno, S, T);
+            b = true;
+            break;
+
+        default:
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -658,6 +667,7 @@ long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
     switch (sysno) {
         case SYS_tgkill:
         case SYS_mprotect:
+        case SYS_fcntl:
             ret = syscall(sysno, N1, N2, N3);
             b = true;
             break;
@@ -669,7 +679,24 @@ long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
 }
 
 
-long ocall_syscall_3_NToN(long sysno, long N1, void *V, long N2)
+long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_open) {
+        printf("open file %s, %lx, %lx\n", S, N1, N2);
+        ret = syscall(sysno, S, N1, N2);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+long ocall_syscall_3_NPoN(long sysno, long N1, void *V, long N2)
 {
     long ret = 0;
     bool b = false;
@@ -687,15 +714,34 @@ long ocall_syscall_3_NToN(long sysno, long N1, void *V, long N2)
     return ret;
 }
 
-long ocall_syscall_3_NT1T3(long sysno, long N1, void *T1, long l1, void *T2, long l2)
+
+long ocall_syscall_3_NPiN(long sysno, long N1, void *V, long N2)
 {
     long ret = 0;
     bool b = false;
 
     switch (sysno) {
-        case SYS_rt_sigaction:
-        case SYS_rt_sigprocmask:
-            ret = syscall(sysno, N1, T1, T2);
+        case  SYS_write:
+        ret = syscall(sysno, N1, V, N2);
+        b = true;
+        /*sync();*/
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+
+long ocall_syscall_3_NToN(long sysno, long N1, void *V, long dumb, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno) {
+        case SYS_readv:
+            ret = syscall(sysno, N1, V, N2);
             b = true;
             break;
     }
@@ -703,20 +749,19 @@ long ocall_syscall_3_NT1T3(long sysno, long N1, void *T1, long l1, void *T2, lon
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
-
 }
 
 
-
-long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
+long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long dumb, long N2)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_open) {
-        printf("open file %s\n", S);
-        ret = syscall(sysno, S, N1, N2);
-        b = true;
+    switch (sysno) {
+        case SYS_writev:
+            ret = syscall(sysno, N1, V, N2);
+            b = true;
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -724,24 +769,8 @@ long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
     return ret;
 }
 
-long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long N2)
-{
-    long ret = 0;
-    bool b = false;
 
-    if (sysno == SYS_write) {
-        ret = syscall(sysno, N1, V, N2);
-        b = true;
-        sync();
-    }
-
-    // echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-
-long ocall_syscall_3_NTiTo(long sysno, long N0, void *V1, long N1, void *V2, long N2)
+long ocall_syscall_3_NTiTo(long sysno, long N0, void *V1, long dumb1, void *V2, long dumb2)
 {
     long ret = 0;
     bool b = false;
@@ -749,10 +778,9 @@ long ocall_syscall_3_NTiTo(long sysno, long N0, void *V1, long N1, void *V2, lon
     if (sysno == SYS_setitimer) {
         ret = syscall(sysno, N0, V1, V2);
         b = true;
-        sync();
     }
 
-    // echo_fun_return(sysno, b, __FUNCTION__, ret);
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
