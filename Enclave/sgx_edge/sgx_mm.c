@@ -1202,7 +1202,7 @@ byte* sgx_mm_mmap(byte *ext_addr, size_t len,
         memset(vma->vm_sgx + ncpy, 0, len - ncpy);
     }
     else {
-        //memset(vma->vm_sgx, 0, len);
+        memset(vma->vm_sgx, 0, len);
     }
 
     /* do merge if needs for anonymous-mappings */
