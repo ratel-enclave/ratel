@@ -86,7 +86,6 @@ enclave {
         /********long ocall_syscall_1_not(long sysno, long unimplemented);********/
         /********long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);********/
 
-
         long ocall_syscall_1_Ti(long sysno, [in, size=l] void *T, int l);
 
         //long uname(long sysno, struct old_utsname* uname);
@@ -116,7 +115,11 @@ enclave {
 
         //int mkdir(const char *pathname, mode_t mode);
         //int creat(const char *pathname, mode_t mode);
+        //int chmod(const char *pathname, mode_t mode);
         long ocall_syscall_2_SN(long sysno, [in, string] const char *S, long N1);
+
+        //int utime(const char *filename, const struct utimbuf *times);
+        long ocall_syscall_2_STi(long sysno, [in, string] const char *S, [in, size=l] void *T, int l);
 
         //int stat(const char *pathname, struct stat *buf);
         long ocall_syscall_2_STo(long sysno, [in, string] const char *S, [out, size=l] void *T, int l);
@@ -128,6 +131,7 @@ enclave {
 
 
         //int open(const char *pathname, int flags, mode_t mode);
+        //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
 
 

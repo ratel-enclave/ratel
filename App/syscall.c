@@ -626,8 +626,30 @@ long ocall_syscall_2_SN(long sysno, const char *S, long N)
         case SYS_mkdir:
         case SYS_access:
         case SYS_creat:
+        case SYS_chmod:
             ret = syscall(sysno, S, N);
             b = true;
+            break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+long ocall_syscall_2_STi(long sysno, const char *S, void *T, int l)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno) {
+        case SYS_utime:
+            ret = syscall(sysno, S, T);
+            b = true;
+            break;
+
+        default:
             break;
     }
 
@@ -684,10 +706,18 @@ long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_open) {
-        printf("open file %s, %lx, %lx\n", S, N1, N2);
-        ret = syscall(sysno, S, N1, N2);
-        b = true;
+    switch (sysno) {
+
+        case SYS_open:
+            printf("open file %s, %lx, %lx\n", S, N1, N2);
+            ret = syscall(sysno, S, N1, N2);
+            b = true;
+            break;
+
+        case SYS_chown:
+            ret = syscall(sysno, S, N1, N2);
+            b = true;
+            break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);

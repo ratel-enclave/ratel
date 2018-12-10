@@ -383,6 +383,10 @@ long sgx_syscall_2(long sysno, long _rdi, long _rsi)
             ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_itimerval);
             break;
 
+        case SYS_utime:
+            ocall_syscall_2_STi(&ret, sysno, (char*)_rdi, (void*)_rsi, len_utimbuf);
+            break;
+
         case SYS_stat:
         case SYS_lstat:
             ocall_syscall_2_STo(&ret, sysno, (char*)_rdi, (void*)_rsi, len_stat);
@@ -391,6 +395,7 @@ long sgx_syscall_2(long sysno, long _rdi, long _rsi)
         case SYS_mkdir:
         case SYS_access:
         case SYS_creat:
+        case SYS_chmod:
             ocall_syscall_2_SN(&ret, sysno, (char*)_rdi, _rsi);
             break;
 
@@ -479,6 +484,10 @@ long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
         case SYS_setitimer:
             ocall_syscall_3_NTiTo(&ret, sysno, _rdi, (void*)_rsi, len_itimerval, (void*)_rdx, len_itimerval);
+            break;
+
+        case SYS_chown:
+            ocall_syscall_3_SNN(&ret, sysno, (const char*)_rdi, _rsi, _rdx);
             break;
 
         case SYS_fcntl:
@@ -609,6 +618,8 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_mkdir:
         case SYS_access:
         case SYS_creat:
+        case SYS_chmod:
+        case SYS_utime:
             return sgx_syscall_2(sysno, _rdi, _rsi);
             break;
 
@@ -622,6 +633,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_mprotect:
         case SYS_getdents:
         case SYS_setitimer:
+        case SYS_chown:
             return sgx_syscall_3(sysno, _rdi, _rsi, _rdx);
             break;
 
@@ -648,7 +660,6 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
             return sgx_syscall_fcntl(_rdi, _rsi, _rdx);
             break;
 
-        case SYS_chmod:
         default:
             unimplemented_syscall(sysno);
             return -1;
