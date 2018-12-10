@@ -183,12 +183,13 @@ static bool _generate_sgx_procmaps(big_buffer_t *buf, bool debug)
         start = vma->vm_sgx;
         end = start + (vma->vm_end - vma->vm_start);
 
-        if (debug)
+        if (debug) {
             dr_printf(MAPS_LINE_FORMAT, start, end, perm_n2s[vma->perm], vma->offset, vma->dev, vma->inode, vma->comment);
-        else
+        }
+        else {
             nwr = snprintf(pcnt, nleft, MAPS_LINE_FORMAT, start, end, perm_n2s[vma->perm], vma->offset, vma->dev, vma->inode, vma->comment);
-
-        buf->used += nwr;
+            buf->used += nwr;
+        }
     }
 
     return true;
