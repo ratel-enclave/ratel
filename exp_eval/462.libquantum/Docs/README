@@ -1,0 +1,21 @@
+libquantum 0.2.2 README file
+----------------------------
+
+libquantum is a C library for quantum computing. It provides quantum
+registers, unitary operations and measurement functions. The main goal
+is a physically precise simulation of a quantum computer with high
+performance.
+
+Implementations of Shor's factoring algorithm and Grover's search
+algorithm are included with this release.
+
+See the file INSTALL for help on the installation.
+
+libquantum is distributed under the terms of the GNU General Public
+License (GPL), which is located in the file COPYING.
+
+Send inquiries, comments, bug reports, suggestions, patches, etc. to:
+libquantum@enyo.de
+
+See also the libquantum website:
+http://www.enyo.de/libquantum/

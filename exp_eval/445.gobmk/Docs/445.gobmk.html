@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style type="text/css">
+.new         {color:#074015; background:#ffffc0; font-size:80%; font-style:italic;}
+.ttnobr      {font-family:monospace; white-space:nowrap;} 
+</style>
+<title>445.gobmk: SPEC CPU2006 Benchmark Description</title>
+</head>
+<body>
+<div style="text-align: center">
+<h1>445.gobmk<br />
+SPEC CPU2006 Benchmark Description</h1>
+</div>
+
+<h2>Benchmark Name</h2>
+
+<p>445.gobmk</p>
+
+<hr />
+
+<h2>Benchmark Author</h2>
+
+<p>GNU Go authors (in chronological order of contribution) are Man
+Lung Li, Wayne Iba, Daniel Bump, David Denholm, Gunnar Farneb&auml;ck,
+Nils Lohner, Jerome Dumonteil, Tommy Thorn, Nicklas Ekstrand, Inge
+Wallin, Thomas Traber, Douglas Ridgway, Teun Burgers, Tanguy Urvoy,
+Thien-Thi Nguyen, Heikki Levanto, Mark Vytlacil, Adriaan van
+Kessel, Wolfgang Manner, Jens Yllman, Don Dailey, Mans Ullerstam,
+Arend Bayer, Trevor Morris, Evan Berggren Daniel, Fernando Portela,
+Paul Pogonyshev, S.P. Lee, Stephane Nicolet and Martin
+Holters.<br />
+(List taken from development page at<br />
+<a href="http://www.gnu.org/software/gnugo/devel.html">http://www.gnu.org/software/gnugo/devel.html</a>)</p>
+
+<hr />
+
+<h2>Benchmark Program General Category</h2>
+
+<p>Artificial intelligence - game playing.</p>
+
+<h2>Benchmark Description</h2>
+
+<p>The program plays Go and executes a set of commands to analyze
+Go positions.</p>
+
+<hr />
+
+<h2>Input Description</h2>
+
+<p>Most input is in "SmartGo Format" (.sgf), a widely used de facto
+standard representation of Go games. A typical test involves
+reading in a game to a certain point, then executing a command to
+analyze the position.</p>
+
+<hr />
+
+<h2>Output Description</h2>
+
+<p>Output is typically an ascii description of a sequence of Go
+moves.</p>
+
+<hr />
+
+<h2>Programming Language</h2>
+
+<p>C</p>
+
+<hr />
+
+<h2>Known portability issues</h2>
+
+<p>None as of September 2007</p>
+
+<hr />
+<h2 id="fixed">Portability issues fixed subsequent to the release of SPEC CPU2006 V1.0</h2>
+
+   <ul>
+      <li><span class="new">In V1.1 of CPU2006</span>, renamed <span class="ttnobr">_getopt_internal</span> to <span
+      class="ttnobr">getopt_internal</span> to avoid possible name clash (user functions are not supposed to start with
+      underscore).</li>
+      <li><span class="new">In V1.1 of CPU2006</span>, added explicit inclusion of cstring header file.</li>
+   </ul>
+
+
+<hr />
+
+<h2>References</h2>
+
+<ul>
+<li><a href="http://www.gnu.org/software/gnugo/devel.html">http://www.gnu.org/software/gnugo/devel.html</a></li>
+</ul>
+
+<hr />
+
+<p>Last updated: $Date: 2008-04-12 08:31:17 -0400 (Sat, 12 Apr 2008) $</p>
+</body>
+</html>

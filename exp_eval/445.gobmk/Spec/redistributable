@@ -1,0 +1,3 @@
+src
+!Makefile
+data/*/input

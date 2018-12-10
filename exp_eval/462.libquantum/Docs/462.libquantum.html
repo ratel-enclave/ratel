@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style type="text/css">
+.new         {color:#074015; background:#ffffc0; font-size:80%; font-style:italic;}
+.ttnobr      {font-family:monospace; white-space:nowrap;} 
+</style>
+<title>462.libquantum: SPEC CPU2006 Benchmark Description</title>
+</head>
+<body>
+<div style="text-align: center">
+<h1>462.libquantum<br />
+SPEC CPU2006 Benchmark Description</h1>
+</div>
+
+<h2>Benchmark Name</h2>
+
+<p>462.libquantum</p>
+
+<hr />
+
+<h2>Benchmark Author</h2>
+
+<p>Bj&ouml;rn Butscher, Hendrik Weimer &lt;libquantum &#x5b;at&#x5d; enyo.de&gt;</p>
+
+<hr />
+
+<h2>Benchmark Program General Category</h2>
+
+<p>Physics / Quantum Computing</p>
+
+<hr />
+
+<h2>Benchmark Description</h2>
+
+<p>libquantum is a library for the simulation of a quantum
+computer. Quantum computers are based on the principles of quantum
+mechanics and can solve certain computationally hard tasks in
+polynomial time. In 1994, Peter Shor discovered a polynomial-time
+algorithm for the factorization of numbers, a problem of particular
+interest for cryptanalysis, as the widely used RSA cryptosystem
+depends on prime factorization being a problem only to be solvable
+in exponential time. An implementation of Shor's factorization
+algorithm is included in libquantum.</p>
+
+<p>libquantum provides a structure for representing a quantum
+register and some elementary gates. Measurements can be used to
+extract information from the system. Additionally, libquantum
+offers the simulation of decoherence, the most important obstacle
+in building practical quantum computers. It is thus not only
+possible to simulate any quantum algorithm, but also to develop
+quantum error correction algorithms. As libquantum allows to add
+new gates, it can easily be extended to fit the ongoing research,
+e.g. it has been deployed to analyze quantum cryptography.</p>
+
+<hr />
+
+<h2>Input Description</h2>
+
+<p>The benchmark program expects the number to be factorized as a
+command-line parameter. An additional parameter can be supplied to
+specify a base for the modular exponentiation part of Shor's
+algorithm.</p>
+
+<hr />
+
+<h2>Output Description</h2>
+
+<p>The program gives a brief explanation on what it is doing and
+the factors of the input number if the factorization was
+successful.</p>
+
+<hr />
+
+<h2>Programming Language</h2>
+
+<p>ISO/IEC 9899:1999 ("C99")</p>
+
+<hr />
+
+<h2>Known portability issues</h2>
+
+<ul>
+<li>On Solaris prior to version 10, <tt>/usr/include/complex.h</tt>
+is not available, causing error messages such as:
+
+<pre>
+   "config.h", line 19: cannot find include file: &lt;complex.h&gt;
+   
+</pre>
+You can work around this by including <kbd>-I. -lcplxsupp</kbd> in
+your compilation flags.</li>
+</ul>
+
+<hr />
+<h2 id="fixed">Portability issues fixed subsequent to the release of SPEC CPU2006 V1.0</h2>
+   <ul>
+      <li>In config.h, there is a list of platforms that have &lt;complex.h&gt; included.  <span class="new">As of CPU2006
+      V1.1</span>, additional platforms can now be accomodated by setting <span
+      class="ttnobr">-DSPEC_CPU_NEED_COMPLEX_H.</span></li>
+   </ul>
+
+<hr />
+
+<h2>References</h2>
+
+<ul>
+<li><a href="http://www.enyo.de/libquantum/">libquantum Website</a>
+</li>
+
+<li><a href=
+"http://en.wikipedia.org/wiki/Quantum_computer">Wikipedia: Quantum
+Computer</a>
+</li>
+
+<li><a href="http://www.arxiv.org/abs/quant-ph/9508027">Peter W.
+Shor: Polynomial-Time Algorithms for Prime Factorization and
+Discrete Logarithms on a Quantum Computer</a>
+</li>
+</ul>
+
+<hr />
+
+<p>Last updated: $Date: 2008-04-12 08:31:17 -0400 (Sat, 12 Apr 2008) $</p>
+</body>
+</html>

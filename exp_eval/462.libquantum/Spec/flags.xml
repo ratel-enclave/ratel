@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<!DOCTYPE flagsdescription SYSTEM
+       "http://www.spec.org/dtd/cpuflags1.dtd">
+
+<!-- This file defines flags that appear in the sources for 462.libquantum.
+
+  Copyright (C) 2005-2006 Standard Performance Evaluation Corporation
+
+  $Revision: 6034 $
+  $Date: 2008-04-08 10:58:14 -0400 (Tue, 08 Apr 2008) $
+-->
+<flagsdescription>
+
+<!-- Normal flags file should suggest a name for themselves -->
+<filename>462.libquantum.flags</filename>
+
+<title>462.libquantum Flags</title>
+
+<header>
+<![CDATA[
+<p>These are flags that appear in the benchmark sources, categorized as to
+whether they are portability candidates, mandatory, or forbidden.
+</p>
+]]>
+</header>
+
+<flag name="DDEBUG_MEM" class="forbidden">
+Enables extra debugging output which is not allowed in the release product
+</flag>
+
+<flag name="DHAVE_UNISTD_H" class="portability">
+Allows user to define if unistd.h exists in his compilation environment 
+</flag>
+
+<flag name="DSPEC_CPU" class="mandatory">
+This flag sets all the portability changes including using fabsf instead of fabs
+</flag>
+
+<flag name="DSPEC_CPU_AIX" class="portability">
+Portability changes for AIX
+</flag>
+
+<flag name="DSPEC_CPU_HPUX" class="portability">
+Portability changes for HP-UX
+</flag>
+
+<flag name="DSPEC_CPU_ICL" class="portability">
+Portability changes for the Intel Compiler
+</flag>
+
+<flag name="DSPEC_CPU_IRIX" class="portability">
+Portability changes for IRIX
+</flag>
+
+<flag name="DSPEC_CPU_LINUX" class="portability">
+Portability changes for Linux
+</flag>
+
+<flag name="DSPEC_CPU_MACOSX" class="portability">
+Portability changes for MacOS X
+</flag>
+
+<flag name="DSPEC_CPU_COMPLEX_I" class="portability">
+This flag may be used for Windows systems where IMAGINARY should be defined
+as "_Complex_I" instead of "__I__".
+</flag>
+
+<flag name="DSPEC_CPU_NEED_COMPLEX_I" class="portability">
+Portability changes for systems which need _Complex_I to be defined as 1.0fi
+</flag>
+
+<flag name="DSPEC_CPU_NO_COMPLEX_H" class="portability">
+Defines this for systems which do not have complex.h
+</flag>
+
+<flag name="DSPEC_CPU_NEED_COMPLEX_H" class="portability">
+Defines this for systems which do need to have complex.h included to build.
+</flag>
+
+<flag name="DSPEC_CPU_NO_FABSF" class="portability">
+Define this for systems which do not have the fabsf function
+</flag>
+
+<flag name="DSPEC_CPU_SOLARIS" class="portability">
+Enables portability changes for Solaris
+</flag>
+
+<flag name="D__CLASSIC_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__COMPLEX_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__DECOHERENCE_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__DEFS_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__EXPN_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__GATES_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__MATRIX_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__MEASURE_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__OADDN_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__OBJCODE_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__OMULN_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__QEC_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__QFT_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__QUANTUM_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__QUREG_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="D__VERSION_H" class="forbidden">
+Prevents multiple inclusion of header files
+</flag>
+
+<flag name="Dinline" class="portability">
+Allows user to define the inline keyword according to his compilation environment
+</flag>
+
+
+</flagsdescription>

@@ -1,0 +1,135 @@
+                                  471.omnetpp
+                       SPEC CPU2006 Benchmark Description
+
+Benchmark Name
+
+   471.omnetpp
+
+   --------------------------------------------------------------------------
+
+Benchmark Author
+
+   Andras Varga
+
+   Omnest Global, Inc.
+   andras.varga [at] omnest.com
+
+   --------------------------------------------------------------------------
+
+Benchmark Program General Category
+
+   Discrete Event Simulation
+
+   --------------------------------------------------------------------------
+
+Benchmark Description
+
+   The benchmark performs discrete event simulation of a large Ethernet
+   network. The simulation is based on the OMNeT++ discrete event simulation
+   system ([1]www.omnetpp.org), a generic and open simulation framework.
+   OMNeT++'s primary application area is the simulation of communication
+   networks, but its generic and flexible architecture allows for its use in
+   other areas such as the simulation of IT systems, queueing networks,
+   hardware architectures or business processes as well. The Ethernet model
+   used in this benchmark is publicly available from the address given in the
+   References.
+
+   For the reference workload, the simulated network models a large Ethernet
+   campus backbone, with several smaller LANs of various sizes hanging off
+   each backbone switch. The model contains altogether about 8000 computers
+   (hosts), and 900 switches and hubs. It mixes all kinds of Ethernet
+   technology: Gigabit Ethernet, 100Mb full duplex, 100Mb half duplex, 10Mb
+   UTP, 10Mb bus ("thin Ethernet"), switched hubs, repeating hubs.
+
+   The training workload models a smaller LAN with several hubs and busses.
+
+   The model is accurate in the sense that the CSMA/CD protocol of Ethernet
+   and the Ethernet frame are faithfully modelled. The host model contains a
+   traffic generator which implements a generic request-response based
+   protocol. (Higher layer protocols are not modelled in detail.) With
+   appropriate configuration, the traffic generator can be tuned become a
+   rough model for protocols such as SMB/CIFS (the Windows file sharing
+   protocol), HTTP, or a database client-server protocol.
+
+   A pointer to the detailed documentation of the model can be found among
+   the References.
+
+   --------------------------------------------------------------------------
+
+Input Description
+
+   The topology of the network and structure of hosts, switches and hubs are
+   described in NED files (NED is the network description language of
+   OMNeT++.) Operation of the Ethernet MAC, traffic generator etc. are in
+   C++.
+
+   Several model parameters are specified in the omnetpp.ini file. These
+   parameters include the number of switches on the backbone, the number of
+   small, medium and large LANs on each backbone switch, the number of hosts
+   in small, medium and large LANs as well as switch, host configuration and
+   parameters of the traffic model. Request and reply lengths are configured
+   in omnetpp.ini as intuniform(50,1400) and truncnormal(5000,5000) for the
+   reference input. The volume of the traffic can most easily be controlled
+   with the time period between sending requests; this is currently set in
+   omnetpp.ini to exponential(0.33) (that is, average 3 requests per second)
+   for the reference input. This already causes frames to be dropped in some
+   of the backbone switches, so the network is a bit overloaded with the
+   current settings.
+
+   --------------------------------------------------------------------------
+
+Output Description
+
+   The model generates extensive statistics. MACs (and most other model
+   components too) write statistics into the omnetpp.sca file at the end of
+   the simulation: number of frames sent, received, dropped, etc. These are
+   only basic statistics; however, if all nodes were allowed to record them,
+   omnetpp.sca would grow to about 28 megabytes. To make the output more
+   reasonable in size, recording statistics is only enabled in a few nodes
+   ("writeScalars" parameter in omnetpp.ini.)
+
+   The easiest way to view and plot the data in omnetpp.sca is the Scalars
+   tool of OMNeT++ 3.0, but because the file is a simple text file, a
+   spreadsheet program (e.g. Microsoft Excel or OpenOffice) will also do.
+
+   The model could also record output vectors (omnetpp.vec), but this feature
+   is disabled in omnetpp.ini because the generated file can easily reach
+   gigabyte sizes.
+
+   --------------------------------------------------------------------------
+
+Programming Language
+
+   C++
+
+   --------------------------------------------------------------------------
+
+Known portability issues
+
+   None.
+
+   --------------------------------------------------------------------------
+
+Portability issues fixed subsequent to the release of SPEC CPU2006 V1.0
+
+     * New with CPU2006 V1.1, renamed random.h to avoid clashes with system
+       headers.
+
+   --------------------------------------------------------------------------
+
+References
+
+     * OMNeT++ Community Site: [2]http://www.omnetpp.org
+     * Ethernet simulation model:
+       [3]http://ctieware.eng.monash.edu.au/twiki/bin/view/Simulation/EtherNet
+
+   --------------------------------------------------------------------------
+
+   Last updated: $Date: 2011-08-16 18:23:17 -0400 (Tue, 16 Aug 2011) $
+
+References
+
+   Visible links
+   1. http://www.omnetpp.org/
+   2. http://www.omnetpp.org/
+   3. http://ctieware.eng.monash.edu.au/twiki/bin/view/Simulation/EtherNet

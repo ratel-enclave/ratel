@@ -1,0 +1,108 @@
+libquantum 0.2.2 installation guide
+-----------------------------------
+
+Contents:
+
+0.	Requirements
+1.  	Configure and make
+2. 	Installation of the library
+3. 	Write your own programs
+
+
+0. Requirements
+---------------
+
+libquantum needs a C compiler with complex number support (C99
+prefered). A recent gcc (>=2.95) will do the job. Furthermore, the
+host must support 64-bit integers, even if it is not a 64-bit machine.
+
+If you encounter any difficulties while building, installing or using
+libquantum, we would like to hear from you. Just send a mail to
+libquantum@enyo.de.
+
+
+1. Configure and Make
+---------------------
+
+As libquantum was created using autoconf and libtool, this step should
+not be a major problem. Simply extract the tarball to a directory:
+
+	tar xzvf libquantum-0.2.2.tar.gz
+
+Next, run the configure script:
+
+	./configure
+
+Now you can build the beast:
+
+	make
+
+By now, you can create two demo programs which show Shor's factoring
+algorithm and Grover's search algorithm:
+
+	make demos
+
+For the Shor algorithm demo, the number to be factored is given on the
+command line as the first parameter. To factor 15, simply type:
+
+	./shor 15
+
+The demo for Grover's algorithm requires the number of the marked
+element (i.e. the desired result of the search) as the first argument
+on the command line. The number of qubits may be given as a second
+arguments. To mark element No. 42 in a database of 10 qubits (which
+means 2^10 = 1024 elements):
+
+	./grover 42 10
+
+To see which quantum operations a program or an algorithm actually
+performs, the concept of quantum object code (quobcode) has been
+developed. Two helper tools can be built by typing
+
+	make quobtools
+
+This will create two programs, quobdump and quobprint. quobdump can
+generate the object code directly from a program, which does not need
+to be recompiled. It requires as arguements the file to which the
+object code shall be written and the name of the program for which the
+quobcode shall be created (plus the arguments for this program). For
+example:
+
+	./quobdump output_file ./shor 15
+
+Quobcode files are binary data files. quobprint can be used to view
+these files and takes the quobcode file as the only argument:
+
+	./quobprint output_file
+
+Each line of output contains the number of the operation, the type of
+operation and its arguments.
+
+
+2. Installation of the library
+------------------------------
+
+For this step you will need to have superuser privileges. Just type
+
+	make install
+
+to get libquantum installed into the default directory, which is
+usually /usr/local/bin. Note that on some systems this directories is
+not in the standard search path for libraries. Take a look at the
+output of the last command to get some advice on how to deal with
+this.
+
+To install the quobcode tools on your system type
+
+	make quobtools_install
+
+
+3. Writing your own programs
+----------------------------
+
+You can use libquantum as any other C library. Just #include
+<quantum.h> in your source file and link the library into your program
+with the linker flag -lquantum.
+
+For a detailed guide on programming with libquantum take a look at
+http://www.enyo.de/libquantum/.

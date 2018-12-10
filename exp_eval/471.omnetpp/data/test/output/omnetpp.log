@@ -1,0 +1,42 @@
+OMNeT++ Discrete Event Simulation  (C) 1992-2003 Andras Varga
+See the license for distribution terms and warranty disclaimer
+Setting up Cmdenv (command-line user interface)...
+
+Preparing for Run #1...
+Setting up network `twoHosts'...
+Running simulation...
+twoHosts.hostA.srv registering DSAP 241
+twoHosts.hostB.srv registering DSAP 241
+twoHosts.hostA.cli registering DSAP 240
+twoHosts.hostB.cli registering DSAP 240
+** Event #0   T=0.0000000  ( 0.00s)
+     Messages:  created: 20
+** Event #100000   T=14.836799  (14.83s)
+     Messages:  created: 48540
+** Event #200000   T=29.571801  (29.57s)
+     Messages:  created: 97064
+** Event #300000   T=44.401886  (44.40s)
+     Messages:  created: 145570
+** Event #400000   T=59.434241  (59.43s)
+     Messages:  created: 194096
+** Event #500000   T=74.211485 ( 1m 14s)
+     Messages:  created: 242608
+** Event #600000   T=89.306257 ( 1m 29s)
+     Messages:  created: 291116
+** Event #700000   T=103.92283 ( 1m 43s)
+     Messages:  created: 339640
+** Event #800000   T=119.27061 ( 1m 59s)
+     Messages:  created: 388154
+** Event #900000   T=133.81414 ( 2m 13s)
+     Messages:  created: 436666
+** Event #1000000   T=148.38048 ( 2m 28s)
+     Messages:  created: 485196
+** Event #1100000   T=163.10847 ( 2m 43s)
+     Messages:  created: 533702
+** Event #1200000   T=177.83484 ( 2m 57s)
+     Messages:  created: 582219
+<!> Simulation time limit reached -- simulation stopped.
+
+Calling finish() at end of Run #1...
+
+End run of OMNeT++

@@ -1,0 +1,2706 @@
+run 1 "largeLAN"
+scalar "largeLAN.switch.relayUnit" 	"processed frames" 	516049
+scalar "largeLAN.switch.relayUnit" 	"dropped frames" 	0
+scalar "largeLAN.switch.mac[0]" 	"simulated time" 	420.010088
+scalar "largeLAN.switch.mac[0]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[0]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[0]" 	"rx channel idle (%)" 	98.731077
+scalar "largeLAN.switch.mac[0]" 	"rx channel utilization (%)" 	1.26892297
+scalar "largeLAN.switch.mac[0]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames sent" 	29945
+scalar "largeLAN.switch.mac[0]" 	"frames rcvd" 	50576
+scalar "largeLAN.switch.mac[0]" 	"bytes sent" 	34856017
+scalar "largeLAN.switch.mac[0]" 	"bytes rcvd" 	66215448
+scalar "largeLAN.switch.mac[0]" 	"frames from higher layer" 	29945
+scalar "largeLAN.switch.mac[0]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames passed up to HL" 	50576
+scalar "largeLAN.switch.mac[0]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[0]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[0]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[0]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames/sec sent" 	71.2959065
+scalar "largeLAN.switch.mac[0]" 	"frames/sec rcvd" 	120.416155
+scalar "largeLAN.switch.mac[0]" 	"bits/sec sent" 	663908.186
+scalar "largeLAN.switch.mac[0]" 	"bits/sec rcvd" 	1261216.33
+scalar "largeLAN.switch.mac[1]" 	"simulated time" 	420.010088
+scalar "largeLAN.switch.mac[1]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[1]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[1]" 	"rx channel idle (%)" 	98.7551572
+scalar "largeLAN.switch.mac[1]" 	"rx channel utilization (%)" 	1.24484277
+scalar "largeLAN.switch.mac[1]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames sent" 	30235
+scalar "largeLAN.switch.mac[1]" 	"frames rcvd" 	49709
+scalar "largeLAN.switch.mac[1]" 	"bytes sent" 	35374684
+scalar "largeLAN.switch.mac[1]" 	"bytes rcvd" 	64958143
+scalar "largeLAN.switch.mac[1]" 	"frames from higher layer" 	30235
+scalar "largeLAN.switch.mac[1]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames passed up to HL" 	49709
+scalar "largeLAN.switch.mac[1]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[1]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[1]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[1]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames/sec sent" 	71.9863661
+scalar "largeLAN.switch.mac[1]" 	"frames/sec rcvd" 	118.351919
+scalar "largeLAN.switch.mac[1]" 	"bits/sec sent" 	673787.32
+scalar "largeLAN.switch.mac[1]" 	"bits/sec rcvd" 	1237268.24
+scalar "largeLAN.switch.mac[2]" 	"simulated time" 	420.010088
+scalar "largeLAN.switch.mac[2]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[2]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[2]" 	"rx channel idle (%)" 	98.7428856
+scalar "largeLAN.switch.mac[2]" 	"rx channel utilization (%)" 	1.25711443
+scalar "largeLAN.switch.mac[2]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames sent" 	29814
+scalar "largeLAN.switch.mac[2]" 	"frames rcvd" 	50141
+scalar "largeLAN.switch.mac[2]" 	"bytes sent" 	34659213
+scalar "largeLAN.switch.mac[2]" 	"bytes rcvd" 	65598965
+scalar "largeLAN.switch.mac[2]" 	"frames from higher layer" 	29814
+scalar "largeLAN.switch.mac[2]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames passed up to HL" 	50141
+scalar "largeLAN.switch.mac[2]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[2]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[2]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[2]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames/sec sent" 	70.9840093
+scalar "largeLAN.switch.mac[2]" 	"frames/sec rcvd" 	119.380466
+scalar "largeLAN.switch.mac[2]" 	"bits/sec sent" 	660159.629
+scalar "largeLAN.switch.mac[2]" 	"bits/sec rcvd" 	1249474.08
+scalar "largeLAN.switch.mac[3]" 	"simulated time" 	420.010088
+scalar "largeLAN.switch.mac[3]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[3]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[3]" 	"rx channel idle (%)" 	97.7949907
+scalar "largeLAN.switch.mac[3]" 	"rx channel utilization (%)" 	2.20500934
+scalar "largeLAN.switch.mac[3]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames sent" 	37832
+scalar "largeLAN.switch.mac[3]" 	"frames rcvd" 	86562
+scalar "largeLAN.switch.mac[3]" 	"bytes sent" 	40932833
+scalar "largeLAN.switch.mac[3]" 	"bytes rcvd" 	115073275
+scalar "largeLAN.switch.mac[3]" 	"frames from higher layer" 	37832
+scalar "largeLAN.switch.mac[3]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames passed up to HL" 	86562
+scalar "largeLAN.switch.mac[3]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[3]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[3]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[3]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames/sec sent" 	90.0740269
+scalar "largeLAN.switch.mac[3]" 	"frames/sec rcvd" 	206.09505
+scalar "largeLAN.switch.mac[3]" 	"bits/sec sent" 	779654.282
+scalar "largeLAN.switch.mac[3]" 	"bits/sec rcvd" 	2191819.26
+scalar "largeLAN.switch.mac[4]" 	"simulated time" 	420.010088
+scalar "largeLAN.switch.mac[4]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[4]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[4]" 	"rx channel idle (%)" 	95.0584243
+scalar "largeLAN.switch.mac[4]" 	"rx channel utilization (%)" 	4.94157574
+scalar "largeLAN.switch.mac[4]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames sent" 	58985
+scalar "largeLAN.switch.mac[4]" 	"frames rcvd" 	191405
+scalar "largeLAN.switch.mac[4]" 	"bytes sent" 	56506459
+scalar "largeLAN.switch.mac[4]" 	"bytes rcvd" 	257907718
+scalar "largeLAN.switch.mac[4]" 	"frames from higher layer" 	58985
+scalar "largeLAN.switch.mac[4]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames passed up to HL" 	191405
+scalar "largeLAN.switch.mac[4]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[4]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[4]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[4]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames/sec sent" 	140.437103
+scalar "largeLAN.switch.mac[4]" 	"frames/sec rcvd" 	455.715244
+scalar "largeLAN.switch.mac[4]" 	"bits/sec sent" 	1076287.65
+scalar "largeLAN.switch.mac[4]" 	"bits/sec rcvd" 	4912409.97
+scalar "largeLAN.switch.mac[5]" 	"simulated time" 	420.010088
+scalar "largeLAN.switch.mac[5]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[5]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[5]" 	"rx channel idle (%)" 	99.411387
+scalar "largeLAN.switch.mac[5]" 	"rx channel utilization (%)" 	0.588613023
+scalar "largeLAN.switch.mac[5]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames sent" 	24759
+scalar "largeLAN.switch.mac[5]" 	"frames rcvd" 	24505
+scalar "largeLAN.switch.mac[5]" 	"bytes sent" 	31143702
+scalar "largeLAN.switch.mac[5]" 	"bytes rcvd" 	30706886
+scalar "largeLAN.switch.mac[5]" 	"frames from higher layer" 	24759
+scalar "largeLAN.switch.mac[5]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames passed up to HL" 	24505
+scalar "largeLAN.switch.mac[5]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[5]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[5]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[5]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames/sec sent" 	58.9485841
+scalar "largeLAN.switch.mac[5]" 	"frames/sec rcvd" 	58.3438367
+scalar "largeLAN.switch.mac[5]" 	"bits/sec sent" 	593199.123
+scalar "largeLAN.switch.mac[5]" 	"bits/sec rcvd" 	584879.018
+scalar "largeLAN.switch.mac[7]" 	"simulated time" 	420.010088
+scalar "largeLAN.switch.mac[7]" 	"txrate (Mb)" 	10
+scalar "largeLAN.switch.mac[7]" 	"full duplex" 	0
+scalar "largeLAN.switch.mac[7]" 	"rx channel idle (%)" 	12.249501
+scalar "largeLAN.switch.mac[7]" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.switch.mac[7]" 	"rx channel collision (%)" 	74.8148218
+scalar "largeLAN.switch.mac[7]" 	"frames sent" 	301043
+scalar "largeLAN.switch.mac[7]" 	"frames rcvd" 	63151
+scalar "largeLAN.switch.mac[7]" 	"bytes sent" 	409641124
+scalar "largeLAN.switch.mac[7]" 	"bytes rcvd" 	47211324
+scalar "largeLAN.switch.mac[7]" 	"frames from higher layer" 	304504
+scalar "largeLAN.switch.mac[7]" 	"frames from higher layer dropped (queue full)" 	3461
+scalar "largeLAN.switch.mac[7]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[7]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[7]" 	"frames passed up to HL" 	63151
+scalar "largeLAN.switch.mac[7]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[7]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[7]" 	"collisions" 	195325
+scalar "largeLAN.switch.mac[7]" 	"backoffs" 	190663
+scalar "largeLAN.switch.mac[7]" 	"frames/sec sent" 	716.751831
+scalar "largeLAN.switch.mac[7]" 	"frames/sec rcvd" 	150.355912
+scalar "largeLAN.switch.mac[7]" 	"bits/sec sent" 	7802500.66
+scalar "largeLAN.switch.mac[7]" 	"bits/sec rcvd" 	899241.715
+scalar "largeLAN.host[0].cli" 	"packets sent" 	4235
+scalar "largeLAN.host[0].cli" 	"packets rcvd" 	20273
+scalar "largeLAN.host[0].cli" 	"end-to-end delay mean" 	0.000571862093
+scalar "largeLAN.host[0].cli" 	"end-to-end delay stddev" 	0.000294235023
+scalar "largeLAN.host[0].cli" 	"end-to-end delay min" 	2.364e-05
+scalar "largeLAN.host[0].cli" 	"end-to-end delay max" 	0.00225412
+scalar "largeLAN.host[0].srv" 	"packets sent" 	46341
+scalar "largeLAN.host[0].srv" 	"packets rcvd" 	9668
+scalar "largeLAN.host[0].srv" 	"end-to-end delay mean" 	0.0181865548
+scalar "largeLAN.host[0].srv" 	"end-to-end delay stddev" 	0.0476947685
+scalar "largeLAN.host[0].srv" 	"end-to-end delay min" 	2.492e-05
+scalar "largeLAN.host[0].srv" 	"end-to-end delay max" 	0.441645462
+scalar "largeLAN.host[0].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[0].llc" 	"packets from higher layer" 	50576
+scalar "largeLAN.host[0].llc" 	"frames from MAC" 	29941
+scalar "largeLAN.host[0].llc" 	"packets passed up" 	29941
+scalar "largeLAN.host[0].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[0].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.host[0].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[0].mac" 	"full duplex" 	1
+scalar "largeLAN.host[0].mac" 	"rx channel idle (%)" 	99.3315289
+scalar "largeLAN.host[0].mac" 	"rx channel utilization (%)" 	0.668471124
+scalar "largeLAN.host[0].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[0].mac" 	"frames sent" 	50576
+scalar "largeLAN.host[0].mac" 	"frames rcvd" 	29945
+scalar "largeLAN.host[0].mac" 	"bytes sent" 	66215448
+scalar "largeLAN.host[0].mac" 	"bytes rcvd" 	34856017
+scalar "largeLAN.host[0].mac" 	"frames from higher layer" 	50576
+scalar "largeLAN.host[0].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[0].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[0].mac" 	"frames dropped (not for us)" 	4
+scalar "largeLAN.host[0].mac" 	"frames passed up to HL" 	29941
+scalar "largeLAN.host[0].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[0].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[0].mac" 	"collisions" 	0
+scalar "largeLAN.host[0].mac" 	"backoffs" 	0
+scalar "largeLAN.host[0].mac" 	"frames/sec sent" 	120.416155
+scalar "largeLAN.host[0].mac" 	"frames/sec rcvd" 	71.2959065
+scalar "largeLAN.host[0].mac" 	"bits/sec sent" 	1261216.33
+scalar "largeLAN.host[0].mac" 	"bits/sec rcvd" 	663908.186
+scalar "largeLAN.host[1].cli" 	"packets sent" 	4352
+scalar "largeLAN.host[1].cli" 	"packets rcvd" 	20775
+scalar "largeLAN.host[1].cli" 	"end-to-end delay mean" 	0.000568044853
+scalar "largeLAN.host[1].cli" 	"end-to-end delay stddev" 	0.000290271012
+scalar "largeLAN.host[1].cli" 	"end-to-end delay min" 	2.364e-05
+scalar "largeLAN.host[1].cli" 	"end-to-end delay max" 	0.0022482
+scalar "largeLAN.host[1].srv" 	"packets sent" 	45357
+scalar "largeLAN.host[1].srv" 	"packets rcvd" 	9456
+scalar "largeLAN.host[1].srv" 	"end-to-end delay mean" 	0.0176042364
+scalar "largeLAN.host[1].srv" 	"end-to-end delay stddev" 	0.0485302831
+scalar "largeLAN.host[1].srv" 	"end-to-end delay min" 	2.476e-05
+scalar "largeLAN.host[1].srv" 	"end-to-end delay max" 	0.510947715
+scalar "largeLAN.host[1].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[1].llc" 	"packets from higher layer" 	49709
+scalar "largeLAN.host[1].llc" 	"frames from MAC" 	30231
+scalar "largeLAN.host[1].llc" 	"packets passed up" 	30231
+scalar "largeLAN.host[1].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[1].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.host[1].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[1].mac" 	"full duplex" 	1
+scalar "largeLAN.host[1].mac" 	"rx channel idle (%)" 	99.3216056
+scalar "largeLAN.host[1].mac" 	"rx channel utilization (%)" 	0.678394448
+scalar "largeLAN.host[1].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[1].mac" 	"frames sent" 	49709
+scalar "largeLAN.host[1].mac" 	"frames rcvd" 	30235
+scalar "largeLAN.host[1].mac" 	"bytes sent" 	64958143
+scalar "largeLAN.host[1].mac" 	"bytes rcvd" 	35374684
+scalar "largeLAN.host[1].mac" 	"frames from higher layer" 	49709
+scalar "largeLAN.host[1].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[1].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[1].mac" 	"frames dropped (not for us)" 	4
+scalar "largeLAN.host[1].mac" 	"frames passed up to HL" 	30231
+scalar "largeLAN.host[1].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[1].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[1].mac" 	"collisions" 	0
+scalar "largeLAN.host[1].mac" 	"backoffs" 	0
+scalar "largeLAN.host[1].mac" 	"frames/sec sent" 	118.351919
+scalar "largeLAN.host[1].mac" 	"frames/sec rcvd" 	71.9863661
+scalar "largeLAN.host[1].mac" 	"bits/sec sent" 	1237268.24
+scalar "largeLAN.host[1].mac" 	"bits/sec rcvd" 	673787.32
+scalar "largeLAN.host[2].cli" 	"packets sent" 	4185
+scalar "largeLAN.host[2].cli" 	"packets rcvd" 	20239
+scalar "largeLAN.host[2].cli" 	"end-to-end delay mean" 	0.000578991545
+scalar "largeLAN.host[2].cli" 	"end-to-end delay stddev" 	0.000299143454
+scalar "largeLAN.host[2].cli" 	"end-to-end delay min" 	2.364e-05
+scalar "largeLAN.host[2].cli" 	"end-to-end delay max" 	0.00256836
+scalar "largeLAN.host[2].srv" 	"packets sent" 	45956
+scalar "largeLAN.host[2].srv" 	"packets rcvd" 	9570
+scalar "largeLAN.host[2].srv" 	"end-to-end delay mean" 	0.0173341741
+scalar "largeLAN.host[2].srv" 	"end-to-end delay stddev" 	0.0468886571
+scalar "largeLAN.host[2].srv" 	"end-to-end delay min" 	2.47600001e-05
+scalar "largeLAN.host[2].srv" 	"end-to-end delay max" 	0.42143687
+scalar "largeLAN.host[2].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[2].llc" 	"packets from higher layer" 	50141
+scalar "largeLAN.host[2].llc" 	"frames from MAC" 	29809
+scalar "largeLAN.host[2].llc" 	"packets passed up" 	29809
+scalar "largeLAN.host[2].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[2].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.host[2].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[2].mac" 	"full duplex" 	1
+scalar "largeLAN.host[2].mac" 	"rx channel idle (%)" 	99.3352974
+scalar "largeLAN.host[2].mac" 	"rx channel utilization (%)" 	0.664702605
+scalar "largeLAN.host[2].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[2].mac" 	"frames sent" 	50141
+scalar "largeLAN.host[2].mac" 	"frames rcvd" 	29814
+scalar "largeLAN.host[2].mac" 	"bytes sent" 	65598965
+scalar "largeLAN.host[2].mac" 	"bytes rcvd" 	34659213
+scalar "largeLAN.host[2].mac" 	"frames from higher layer" 	50141
+scalar "largeLAN.host[2].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[2].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[2].mac" 	"frames dropped (not for us)" 	5
+scalar "largeLAN.host[2].mac" 	"frames passed up to HL" 	29809
+scalar "largeLAN.host[2].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[2].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[2].mac" 	"collisions" 	0
+scalar "largeLAN.host[2].mac" 	"backoffs" 	0
+scalar "largeLAN.host[2].mac" 	"frames/sec sent" 	119.380466
+scalar "largeLAN.host[2].mac" 	"frames/sec rcvd" 	70.9840093
+scalar "largeLAN.host[2].mac" 	"bits/sec sent" 	1249474.08
+scalar "largeLAN.host[2].mac" 	"bits/sec rcvd" 	660159.629
+scalar "largeLAN.host[3].cli" 	"packets sent" 	4342
+scalar "largeLAN.host[3].cli" 	"packets rcvd" 	20734
+scalar "largeLAN.host[3].cli" 	"end-to-end delay mean" 	0.000585890082
+scalar "largeLAN.host[3].cli" 	"end-to-end delay stddev" 	0.000311332718
+scalar "largeLAN.host[3].cli" 	"end-to-end delay min" 	2.364e-05
+scalar "largeLAN.host[3].cli" 	"end-to-end delay max" 	0.00340142844
+scalar "largeLAN.host[3].srv" 	"packets sent" 	82220
+scalar "largeLAN.host[3].srv" 	"packets rcvd" 	17094
+scalar "largeLAN.host[3].srv" 	"end-to-end delay mean" 	0.0241901876
+scalar "largeLAN.host[3].srv" 	"end-to-end delay stddev" 	0.0545011965
+scalar "largeLAN.host[3].srv" 	"end-to-end delay min" 	2.476e-05
+scalar "largeLAN.host[3].srv" 	"end-to-end delay max" 	0.544143089
+scalar "largeLAN.host[3].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[3].llc" 	"packets from higher layer" 	86562
+scalar "largeLAN.host[3].llc" 	"frames from MAC" 	37828
+scalar "largeLAN.host[3].llc" 	"packets passed up" 	37828
+scalar "largeLAN.host[3].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[3].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.host[3].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[3].mac" 	"full duplex" 	1
+scalar "largeLAN.host[3].mac" 	"rx channel idle (%)" 	99.214581
+scalar "largeLAN.host[3].mac" 	"rx channel utilization (%)" 	0.78541902
+scalar "largeLAN.host[3].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[3].mac" 	"frames sent" 	86562
+scalar "largeLAN.host[3].mac" 	"frames rcvd" 	37832
+scalar "largeLAN.host[3].mac" 	"bytes sent" 	115073275
+scalar "largeLAN.host[3].mac" 	"bytes rcvd" 	40932833
+scalar "largeLAN.host[3].mac" 	"frames from higher layer" 	86562
+scalar "largeLAN.host[3].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[3].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[3].mac" 	"frames dropped (not for us)" 	4
+scalar "largeLAN.host[3].mac" 	"frames passed up to HL" 	37828
+scalar "largeLAN.host[3].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[3].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[3].mac" 	"collisions" 	0
+scalar "largeLAN.host[3].mac" 	"backoffs" 	0
+scalar "largeLAN.host[3].mac" 	"frames/sec sent" 	206.09505
+scalar "largeLAN.host[3].mac" 	"frames/sec rcvd" 	90.0740269
+scalar "largeLAN.host[3].mac" 	"bits/sec sent" 	2191819.26
+scalar "largeLAN.host[3].mac" 	"bits/sec rcvd" 	779654.282
+scalar "largeLAN.host[4].cli" 	"packets sent" 	4194
+scalar "largeLAN.host[4].cli" 	"packets rcvd" 	20214
+scalar "largeLAN.host[4].cli" 	"end-to-end delay mean" 	0.000573797835
+scalar "largeLAN.host[4].cli" 	"end-to-end delay stddev" 	0.000295026275
+scalar "largeLAN.host[4].cli" 	"end-to-end delay min" 	2.364e-05
+scalar "largeLAN.host[4].cli" 	"end-to-end delay max" 	0.00209076
+scalar "largeLAN.host[4].srv" 	"packets sent" 	187211
+scalar "largeLAN.host[4].srv" 	"packets rcvd" 	38768
+scalar "largeLAN.host[4].srv" 	"end-to-end delay mean" 	0.0284759346
+scalar "largeLAN.host[4].srv" 	"end-to-end delay stddev" 	0.0581189325
+scalar "largeLAN.host[4].srv" 	"end-to-end delay min" 	2.476e-05
+scalar "largeLAN.host[4].srv" 	"end-to-end delay max" 	0.493220276
+scalar "largeLAN.host[4].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[4].llc" 	"packets from higher layer" 	191405
+scalar "largeLAN.host[4].llc" 	"frames from MAC" 	58982
+scalar "largeLAN.host[4].llc" 	"packets passed up" 	58982
+scalar "largeLAN.host[4].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[4].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.host[4].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[4].mac" 	"full duplex" 	1
+scalar "largeLAN.host[4].mac" 	"rx channel idle (%)" 	98.9147244
+scalar "largeLAN.host[4].mac" 	"rx channel utilization (%)" 	1.08527563
+scalar "largeLAN.host[4].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[4].mac" 	"frames sent" 	191405
+scalar "largeLAN.host[4].mac" 	"frames rcvd" 	58985
+scalar "largeLAN.host[4].mac" 	"bytes sent" 	257907718
+scalar "largeLAN.host[4].mac" 	"bytes rcvd" 	56506459
+scalar "largeLAN.host[4].mac" 	"frames from higher layer" 	191405
+scalar "largeLAN.host[4].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[4].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[4].mac" 	"frames dropped (not for us)" 	3
+scalar "largeLAN.host[4].mac" 	"frames passed up to HL" 	58982
+scalar "largeLAN.host[4].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[4].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[4].mac" 	"collisions" 	0
+scalar "largeLAN.host[4].mac" 	"backoffs" 	0
+scalar "largeLAN.host[4].mac" 	"frames/sec sent" 	455.715244
+scalar "largeLAN.host[4].mac" 	"frames/sec rcvd" 	140.437103
+scalar "largeLAN.host[4].mac" 	"bits/sec sent" 	4912409.97
+scalar "largeLAN.host[4].mac" 	"bits/sec rcvd" 	1076287.65
+scalar "largeLAN.host[5].cli" 	"packets sent" 	4291
+scalar "largeLAN.host[5].cli" 	"packets rcvd" 	20562
+scalar "largeLAN.host[5].cli" 	"end-to-end delay mean" 	0.000571206353
+scalar "largeLAN.host[5].cli" 	"end-to-end delay stddev" 	0.000291019262
+scalar "largeLAN.host[5].cli" 	"end-to-end delay min" 	2.364e-05
+scalar "largeLAN.host[5].cli" 	"end-to-end delay max" 	0.00195172
+scalar "largeLAN.host[5].srv" 	"packets sent" 	20214
+scalar "largeLAN.host[5].srv" 	"packets rcvd" 	4194
+scalar "largeLAN.host[5].srv" 	"end-to-end delay mean" 	0.000152336653
+scalar "largeLAN.host[5].srv" 	"end-to-end delay stddev" 	0.000121628046
+scalar "largeLAN.host[5].srv" 	"end-to-end delay min" 	2.476e-05
+scalar "largeLAN.host[5].srv" 	"end-to-end delay max" 	0.00200395745
+scalar "largeLAN.host[5].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[5].llc" 	"packets from higher layer" 	24505
+scalar "largeLAN.host[5].llc" 	"frames from MAC" 	24756
+scalar "largeLAN.host[5].llc" 	"packets passed up" 	24756
+scalar "largeLAN.host[5].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[5].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.host[5].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[5].mac" 	"full duplex" 	1
+scalar "largeLAN.host[5].mac" 	"rx channel idle (%)" 	99.4030282
+scalar "largeLAN.host[5].mac" 	"rx channel utilization (%)" 	0.596971832
+scalar "largeLAN.host[5].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[5].mac" 	"frames sent" 	24505
+scalar "largeLAN.host[5].mac" 	"frames rcvd" 	24759
+scalar "largeLAN.host[5].mac" 	"bytes sent" 	30706886
+scalar "largeLAN.host[5].mac" 	"bytes rcvd" 	31143702
+scalar "largeLAN.host[5].mac" 	"frames from higher layer" 	24505
+scalar "largeLAN.host[5].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[5].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[5].mac" 	"frames dropped (not for us)" 	3
+scalar "largeLAN.host[5].mac" 	"frames passed up to HL" 	24756
+scalar "largeLAN.host[5].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[5].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[5].mac" 	"collisions" 	0
+scalar "largeLAN.host[5].mac" 	"backoffs" 	0
+scalar "largeLAN.host[5].mac" 	"frames/sec sent" 	58.3438367
+scalar "largeLAN.host[5].mac" 	"frames/sec rcvd" 	58.9485841
+scalar "largeLAN.host[5].mac" 	"bits/sec sent" 	584879.018
+scalar "largeLAN.host[5].mac" 	"bits/sec rcvd" 	593199.123
+scalar "largeLAN.hub" 	"simulated time" 	420.010088
+scalar "largeLAN.hub" 	"messages handled" 	1264947
+scalar "largeLAN.hub" 	"messages/sec" 	3011.70623
+scalar "largeLAN.hhost[0].cli" 	"packets sent" 	2832
+scalar "largeLAN.hhost[0].cli" 	"packets rcvd" 	12584
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay mean" 	0.0157096212
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay stddev" 	0.0130021659
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay min" 	8.862e-05
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay max" 	0.07062088
+scalar "largeLAN.hhost[0].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[0].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[0].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[0].llc" 	"packets from higher layer" 	2832
+scalar "largeLAN.hhost[0].llc" 	"frames from MAC" 	12584
+scalar "largeLAN.hhost[0].llc" 	"packets passed up" 	12584
+scalar "largeLAN.hhost[0].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[0].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[0].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[0].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[0].mac" 	"rx channel idle (%)" 	12.2517159
+scalar "largeLAN.hhost[0].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[0].mac" 	"rx channel collision (%)" 	73.8845647
+scalar "largeLAN.hhost[0].mac" 	"frames sent" 	2655
+scalar "largeLAN.hhost[0].mac" 	"frames rcvd" 	361539
+scalar "largeLAN.hhost[0].mac" 	"bytes sent" 	1979885
+scalar "largeLAN.hhost[0].mac" 	"bytes rcvd" 	454872563
+scalar "largeLAN.hhost[0].mac" 	"frames from higher layer" 	2832
+scalar "largeLAN.hhost[0].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[0].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[0].mac" 	"frames dropped (not for us)" 	348955
+scalar "largeLAN.hhost[0].mac" 	"frames passed up to HL" 	12584
+scalar "largeLAN.hhost[0].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[0].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[0].mac" 	"collisions" 	195317
+scalar "largeLAN.hhost[0].mac" 	"backoffs" 	10908
+scalar "largeLAN.hhost[0].mac" 	"frames/sec sent" 	6.32127673
+scalar "largeLAN.hhost[0].mac" 	"frames/sec rcvd" 	860.786467
+scalar "largeLAN.hhost[0].mac" 	"bits/sec sent" 	37711.1894
+scalar "largeLAN.hhost[0].mac" 	"bits/sec rcvd" 	8664031.19
+scalar "largeLAN.hhost[1].cli" 	"packets sent" 	2800
+scalar "largeLAN.hhost[1].cli" 	"packets rcvd" 	12507
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay mean" 	0.0159211679
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay stddev" 	0.0132925117
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay min" 	0.00015638
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay max" 	0.0683607
+scalar "largeLAN.hhost[1].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[1].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[1].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[1].llc" 	"packets from higher layer" 	2800
+scalar "largeLAN.hhost[1].llc" 	"frames from MAC" 	12507
+scalar "largeLAN.hhost[1].llc" 	"packets passed up" 	12507
+scalar "largeLAN.hhost[1].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[1].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[1].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[1].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[1].mac" 	"rx channel idle (%)" 	12.251718
+scalar "largeLAN.hhost[1].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[1].mac" 	"rx channel collision (%)" 	73.8836721
+scalar "largeLAN.hhost[1].mac" 	"frames sent" 	2644
+scalar "largeLAN.hhost[1].mac" 	"frames rcvd" 	361550
+scalar "largeLAN.hhost[1].mac" 	"bytes sent" 	1972073
+scalar "largeLAN.hhost[1].mac" 	"bytes rcvd" 	454880375
+scalar "largeLAN.hhost[1].mac" 	"frames from higher layer" 	2800
+scalar "largeLAN.hhost[1].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[1].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[1].mac" 	"frames dropped (not for us)" 	349043
+scalar "largeLAN.hhost[1].mac" 	"frames passed up to HL" 	12507
+scalar "largeLAN.hhost[1].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[1].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[1].mac" 	"collisions" 	195316
+scalar "largeLAN.hhost[1].mac" 	"backoffs" 	10264
+scalar "largeLAN.hhost[1].mac" 	"frames/sec sent" 	6.29508689
+scalar "largeLAN.hhost[1].mac" 	"frames/sec rcvd" 	860.812657
+scalar "largeLAN.hhost[1].mac" 	"bits/sec sent" 	37562.393
+scalar "largeLAN.hhost[1].mac" 	"bits/sec rcvd" 	8664179.98
+scalar "largeLAN.hhost[2].cli" 	"packets sent" 	2676
+scalar "largeLAN.hhost[2].cli" 	"packets rcvd" 	11876
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay mean" 	0.015692785
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay stddev" 	0.0130688186
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay min" 	8.422e-05
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay max" 	0.07243806
+scalar "largeLAN.hhost[2].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[2].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[2].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[2].llc" 	"packets from higher layer" 	2676
+scalar "largeLAN.hhost[2].llc" 	"frames from MAC" 	11876
+scalar "largeLAN.hhost[2].llc" 	"packets passed up" 	11876
+scalar "largeLAN.hhost[2].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[2].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[2].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[2].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[2].mac" 	"rx channel idle (%)" 	12.2517176
+scalar "largeLAN.hhost[2].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[2].mac" 	"rx channel collision (%)" 	73.8838641
+scalar "largeLAN.hhost[2].mac" 	"frames sent" 	2518
+scalar "largeLAN.hhost[2].mac" 	"frames rcvd" 	361676
+scalar "largeLAN.hhost[2].mac" 	"bytes sent" 	1829418
+scalar "largeLAN.hhost[2].mac" 	"bytes rcvd" 	455023030
+scalar "largeLAN.hhost[2].mac" 	"frames from higher layer" 	2676
+scalar "largeLAN.hhost[2].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[2].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[2].mac" 	"frames dropped (not for us)" 	349800
+scalar "largeLAN.hhost[2].mac" 	"frames passed up to HL" 	11876
+scalar "largeLAN.hhost[2].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[2].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[2].mac" 	"collisions" 	195317
+scalar "largeLAN.hhost[2].mac" 	"backoffs" 	10440
+scalar "largeLAN.hhost[2].mac" 	"frames/sec sent" 	5.99509409
+scalar "largeLAN.hhost[2].mac" 	"frames/sec rcvd" 	861.112649
+scalar "largeLAN.hhost[2].mac" 	"bits/sec sent" 	34845.2202
+scalar "largeLAN.hhost[2].mac" 	"bits/sec rcvd" 	8666897.16
+scalar "largeLAN.hhost[3].cli" 	"packets sent" 	2741
+scalar "largeLAN.hhost[3].cli" 	"packets rcvd" 	12121
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay mean" 	0.0159717942
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay stddev" 	0.0133954327
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay min" 	8.422e-05
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay max" 	0.0708101517
+scalar "largeLAN.hhost[3].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[3].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[3].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[3].llc" 	"packets from higher layer" 	2741
+scalar "largeLAN.hhost[3].llc" 	"frames from MAC" 	12121
+scalar "largeLAN.hhost[3].llc" 	"packets passed up" 	12121
+scalar "largeLAN.hhost[3].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[3].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[3].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[3].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[3].mac" 	"rx channel idle (%)" 	12.2517199
+scalar "largeLAN.hhost[3].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[3].mac" 	"rx channel collision (%)" 	73.8828584
+scalar "largeLAN.hhost[3].mac" 	"frames sent" 	2570
+scalar "largeLAN.hhost[3].mac" 	"frames rcvd" 	361624
+scalar "largeLAN.hhost[3].mac" 	"bytes sent" 	1942123
+scalar "largeLAN.hhost[3].mac" 	"bytes rcvd" 	454910325
+scalar "largeLAN.hhost[3].mac" 	"frames from higher layer" 	2741
+scalar "largeLAN.hhost[3].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[3].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[3].mac" 	"frames dropped (not for us)" 	349503
+scalar "largeLAN.hhost[3].mac" 	"frames passed up to HL" 	12121
+scalar "largeLAN.hhost[3].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[3].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[3].mac" 	"collisions" 	195315
+scalar "largeLAN.hhost[3].mac" 	"backoffs" 	10404
+scalar "largeLAN.hhost[3].mac" 	"frames/sec sent" 	6.11890064
+scalar "largeLAN.hhost[3].mac" 	"frames/sec rcvd" 	860.988843
+scalar "largeLAN.hhost[3].mac" 	"bits/sec sent" 	36991.9305
+scalar "largeLAN.hhost[3].mac" 	"bits/sec rcvd" 	8664750.44
+scalar "largeLAN.hhost[4].cli" 	"packets sent" 	2726
+scalar "largeLAN.hhost[4].cli" 	"packets rcvd" 	12257
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay mean" 	0.0159332404
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay stddev" 	0.0132407698
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay min" 	8.422e-05
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay max" 	0.07301766
+scalar "largeLAN.hhost[4].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[4].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[4].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[4].llc" 	"packets from higher layer" 	2726
+scalar "largeLAN.hhost[4].llc" 	"frames from MAC" 	12257
+scalar "largeLAN.hhost[4].llc" 	"packets passed up" 	12257
+scalar "largeLAN.hhost[4].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[4].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[4].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[4].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[4].mac" 	"rx channel idle (%)" 	12.2517196
+scalar "largeLAN.hhost[4].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[4].mac" 	"rx channel collision (%)" 	73.8829918
+scalar "largeLAN.hhost[4].mac" 	"frames sent" 	2548
+scalar "largeLAN.hhost[4].mac" 	"frames rcvd" 	361646
+scalar "largeLAN.hhost[4].mac" 	"bytes sent" 	1902363
+scalar "largeLAN.hhost[4].mac" 	"bytes rcvd" 	454950085
+scalar "largeLAN.hhost[4].mac" 	"frames from higher layer" 	2726
+scalar "largeLAN.hhost[4].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[4].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[4].mac" 	"frames dropped (not for us)" 	349389
+scalar "largeLAN.hhost[4].mac" 	"frames passed up to HL" 	12257
+scalar "largeLAN.hhost[4].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[4].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[4].mac" 	"collisions" 	195315
+scalar "largeLAN.hhost[4].mac" 	"backoffs" 	10860
+scalar "largeLAN.hhost[4].mac" 	"frames/sec sent" 	6.06652095
+scalar "largeLAN.hhost[4].mac" 	"frames/sec rcvd" 	861.041223
+scalar "largeLAN.hhost[4].mac" 	"bits/sec sent" 	36234.6154
+scalar "largeLAN.hhost[4].mac" 	"bits/sec rcvd" 	8665507.76
+scalar "largeLAN.hhost[5].cli" 	"packets sent" 	2777
+scalar "largeLAN.hhost[5].cli" 	"packets rcvd" 	12490
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay mean" 	0.0161737753
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay stddev" 	0.0133366272
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay min" 	8.42200001e-05
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay max" 	0.07356947
+scalar "largeLAN.hhost[5].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[5].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[5].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[5].llc" 	"packets from higher layer" 	2777
+scalar "largeLAN.hhost[5].llc" 	"frames from MAC" 	12490
+scalar "largeLAN.hhost[5].llc" 	"packets passed up" 	12490
+scalar "largeLAN.hhost[5].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[5].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[5].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[5].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[5].mac" 	"rx channel idle (%)" 	12.2517193
+scalar "largeLAN.hhost[5].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[5].mac" 	"rx channel collision (%)" 	73.8831147
+scalar "largeLAN.hhost[5].mac" 	"frames sent" 	2607
+scalar "largeLAN.hhost[5].mac" 	"frames rcvd" 	361587
+scalar "largeLAN.hhost[5].mac" 	"bytes sent" 	1969237
+scalar "largeLAN.hhost[5].mac" 	"bytes rcvd" 	454883211
+scalar "largeLAN.hhost[5].mac" 	"frames from higher layer" 	2777
+scalar "largeLAN.hhost[5].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[5].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[5].mac" 	"frames dropped (not for us)" 	349097
+scalar "largeLAN.hhost[5].mac" 	"frames passed up to HL" 	12490
+scalar "largeLAN.hhost[5].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[5].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[5].mac" 	"collisions" 	195316
+scalar "largeLAN.hhost[5].mac" 	"backoffs" 	10471
+scalar "largeLAN.hhost[5].mac" 	"frames/sec sent" 	6.20699377
+scalar "largeLAN.hhost[5].mac" 	"frames/sec rcvd" 	860.90075
+scalar "largeLAN.hhost[5].mac" 	"bits/sec sent" 	37508.3752
+scalar "largeLAN.hhost[5].mac" 	"bits/sec rcvd" 	8664234
+scalar "largeLAN.hhost[6].cli" 	"packets sent" 	2776
+scalar "largeLAN.hhost[6].cli" 	"packets rcvd" 	12093
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay mean" 	0.0158291878
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay stddev" 	0.0132970784
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay min" 	8.422e-05
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay max" 	0.0886542349
+scalar "largeLAN.hhost[6].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[6].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[6].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[6].llc" 	"packets from higher layer" 	2776
+scalar "largeLAN.hhost[6].llc" 	"frames from MAC" 	12093
+scalar "largeLAN.hhost[6].llc" 	"packets passed up" 	12093
+scalar "largeLAN.hhost[6].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[6].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[6].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[6].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[6].mac" 	"rx channel idle (%)" 	12.2517179
+scalar "largeLAN.hhost[6].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[6].mac" 	"rx channel collision (%)" 	73.8837086
+scalar "largeLAN.hhost[6].mac" 	"frames sent" 	2601
+scalar "largeLAN.hhost[6].mac" 	"frames rcvd" 	361593
+scalar "largeLAN.hhost[6].mac" 	"bytes sent" 	1930893
+scalar "largeLAN.hhost[6].mac" 	"bytes rcvd" 	454921555
+scalar "largeLAN.hhost[6].mac" 	"frames from higher layer" 	2776
+scalar "largeLAN.hhost[6].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[6].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[6].mac" 	"frames dropped (not for us)" 	349500
+scalar "largeLAN.hhost[6].mac" 	"frames passed up to HL" 	12093
+scalar "largeLAN.hhost[6].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[6].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[6].mac" 	"collisions" 	195316
+scalar "largeLAN.hhost[6].mac" 	"backoffs" 	10706
+scalar "largeLAN.hhost[6].mac" 	"frames/sec sent" 	6.19270839
+scalar "largeLAN.hhost[6].mac" 	"frames/sec rcvd" 	860.915035
+scalar "largeLAN.hhost[6].mac" 	"bits/sec sent" 	36778.0309
+scalar "largeLAN.hhost[6].mac" 	"bits/sec rcvd" 	8664964.34
+scalar "largeLAN.hhost[7].cli" 	"packets sent" 	2743
+scalar "largeLAN.hhost[7].cli" 	"packets rcvd" 	12301
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay mean" 	0.016465936
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay stddev" 	0.0138437679
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay min" 	8.42200001e-05
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay max" 	0.0745325
+scalar "largeLAN.hhost[7].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[7].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[7].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[7].llc" 	"packets from higher layer" 	2743
+scalar "largeLAN.hhost[7].llc" 	"frames from MAC" 	12301
+scalar "largeLAN.hhost[7].llc" 	"packets passed up" 	12301
+scalar "largeLAN.hhost[7].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[7].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.hhost[7].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[7].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[7].mac" 	"rx channel idle (%)" 	12.2517188
+scalar "largeLAN.hhost[7].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.hhost[7].mac" 	"rx channel collision (%)" 	73.8833438
+scalar "largeLAN.hhost[7].mac" 	"frames sent" 	2583
+scalar "largeLAN.hhost[7].mac" 	"frames rcvd" 	361611
+scalar "largeLAN.hhost[7].mac" 	"bytes sent" 	1912688
+scalar "largeLAN.hhost[7].mac" 	"bytes rcvd" 	454939760
+scalar "largeLAN.hhost[7].mac" 	"frames from higher layer" 	2743
+scalar "largeLAN.hhost[7].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[7].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[7].mac" 	"frames dropped (not for us)" 	349310
+scalar "largeLAN.hhost[7].mac" 	"frames passed up to HL" 	12301
+scalar "largeLAN.hhost[7].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[7].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[7].mac" 	"collisions" 	195314
+scalar "largeLAN.hhost[7].mac" 	"backoffs" 	10286
+scalar "largeLAN.hhost[7].mac" 	"frames/sec sent" 	6.14985228
+scalar "largeLAN.hhost[7].mac" 	"frames/sec rcvd" 	860.957891
+scalar "largeLAN.hhost[7].mac" 	"bits/sec sent" 	36431.2773
+scalar "largeLAN.hhost[7].mac" 	"bits/sec rcvd" 	8665311.1
+scalar "largeLAN.bus" 	"simulated time" 	420.010088
+scalar "largeLAN.bus" 	"messages handled" 	0
+scalar "largeLAN.bus" 	"messages/sec" 	0
+scalar "largeLAN.bhost[0].cli" 	"packets sent" 	2891
+scalar "largeLAN.bhost[0].cli" 	"packets rcvd" 	12894
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay mean" 	0.015488722
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay stddev" 	0.0132620615
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay min" 	8.45199998e-05
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay max" 	0.07542233
+scalar "largeLAN.bhost[0].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[0].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[0].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[0].llc" 	"packets from higher layer" 	2890
+scalar "largeLAN.bhost[0].llc" 	"frames from MAC" 	12894
+scalar "largeLAN.bhost[0].llc" 	"packets passed up" 	12894
+scalar "largeLAN.bhost[0].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[0].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[0].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[0].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[0].mac" 	"rx channel idle (%)" 	12.2523377
+scalar "largeLAN.bhost[0].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[0].mac" 	"rx channel collision (%)" 	73.6234167
+scalar "largeLAN.bhost[0].mac" 	"frames sent" 	2722
+scalar "largeLAN.bhost[0].mac" 	"frames rcvd" 	361472
+scalar "largeLAN.bhost[0].mac" 	"bytes sent" 	2044398
+scalar "largeLAN.bhost[0].mac" 	"bytes rcvd" 	454808050
+scalar "largeLAN.bhost[0].mac" 	"frames from higher layer" 	2890
+scalar "largeLAN.bhost[0].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[0].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[0].mac" 	"frames dropped (not for us)" 	348578
+scalar "largeLAN.bhost[0].mac" 	"frames passed up to HL" 	12894
+scalar "largeLAN.bhost[0].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[0].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[0].mac" 	"collisions" 	195309
+scalar "largeLAN.bhost[0].mac" 	"backoffs" 	10952
+scalar "largeLAN.bhost[0].mac" 	"frames/sec sent" 	6.48079671
+scalar "largeLAN.bhost[0].mac" 	"frames/sec rcvd" 	860.626947
+scalar "largeLAN.bhost[0].mac" 	"bits/sec sent" 	38939.979
+scalar "largeLAN.bhost[0].mac" 	"bits/sec rcvd" 	8662802.4
+scalar "largeLAN.bhost[1].cli" 	"packets sent" 	2744
+scalar "largeLAN.bhost[1].cli" 	"packets rcvd" 	12234
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay mean" 	0.0157319667
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay stddev" 	0.0130364499
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay min" 	8.44949998e-05
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay max" 	0.069750845
+scalar "largeLAN.bhost[1].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[1].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[1].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[1].llc" 	"packets from higher layer" 	2744
+scalar "largeLAN.bhost[1].llc" 	"frames from MAC" 	12234
+scalar "largeLAN.bhost[1].llc" 	"packets passed up" 	12234
+scalar "largeLAN.bhost[1].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[1].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[1].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[1].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[1].mac" 	"rx channel idle (%)" 	12.2523565
+scalar "largeLAN.bhost[1].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[1].mac" 	"rx channel collision (%)" 	73.6155199
+scalar "largeLAN.bhost[1].mac" 	"frames sent" 	2577
+scalar "largeLAN.bhost[1].mac" 	"frames rcvd" 	361617
+scalar "largeLAN.bhost[1].mac" 	"bytes sent" 	1947119
+scalar "largeLAN.bhost[1].mac" 	"bytes rcvd" 	454905329
+scalar "largeLAN.bhost[1].mac" 	"frames from higher layer" 	2744
+scalar "largeLAN.bhost[1].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[1].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[1].mac" 	"frames dropped (not for us)" 	349383
+scalar "largeLAN.bhost[1].mac" 	"frames passed up to HL" 	12234
+scalar "largeLAN.bhost[1].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[1].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[1].mac" 	"collisions" 	195309
+scalar "largeLAN.bhost[1].mac" 	"backoffs" 	10547
+scalar "largeLAN.bhost[1].mac" 	"frames/sec sent" 	6.13556691
+scalar "largeLAN.bhost[1].mac" 	"frames/sec rcvd" 	860.972177
+scalar "largeLAN.bhost[1].mac" 	"bits/sec sent" 	37087.0901
+scalar "largeLAN.bhost[1].mac" 	"bits/sec rcvd" 	8664655.29
+scalar "largeLAN.bhost[2].cli" 	"packets sent" 	2859
+scalar "largeLAN.bhost[2].cli" 	"packets rcvd" 	12977
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay mean" 	0.0158155221
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay stddev" 	0.0129890501
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay min" 	8.44700001e-05
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay max" 	0.0688574717
+scalar "largeLAN.bhost[2].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[2].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[2].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[2].llc" 	"packets from higher layer" 	2859
+scalar "largeLAN.bhost[2].llc" 	"frames from MAC" 	12977
+scalar "largeLAN.bhost[2].llc" 	"packets passed up" 	12977
+scalar "largeLAN.bhost[2].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[2].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[2].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[2].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[2].mac" 	"rx channel idle (%)" 	12.2523889
+scalar "largeLAN.bhost[2].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[2].mac" 	"rx channel collision (%)" 	73.6018891
+scalar "largeLAN.bhost[2].mac" 	"frames sent" 	2700
+scalar "largeLAN.bhost[2].mac" 	"frames rcvd" 	361494
+scalar "largeLAN.bhost[2].mac" 	"bytes sent" 	2009879
+scalar "largeLAN.bhost[2].mac" 	"bytes rcvd" 	454842569
+scalar "largeLAN.bhost[2].mac" 	"frames from higher layer" 	2859
+scalar "largeLAN.bhost[2].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[2].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[2].mac" 	"frames dropped (not for us)" 	348517
+scalar "largeLAN.bhost[2].mac" 	"frames passed up to HL" 	12977
+scalar "largeLAN.bhost[2].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[2].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[2].mac" 	"collisions" 	195308
+scalar "largeLAN.bhost[2].mac" 	"backoffs" 	10745
+scalar "largeLAN.bhost[2].mac" 	"frames/sec sent" 	6.42841702
+scalar "largeLAN.bhost[2].mac" 	"frames/sec rcvd" 	860.679327
+scalar "largeLAN.bhost[2].mac" 	"bits/sec sent" 	38282.49
+scalar "largeLAN.bhost[2].mac" 	"bits/sec rcvd" 	8663459.89
+scalar "largeLAN.bhost[3].cli" 	"packets sent" 	2777
+scalar "largeLAN.bhost[3].cli" 	"packets rcvd" 	12466
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay mean" 	0.0154786486
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay stddev" 	0.0127931466
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay min" 	8.44449999e-05
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay max" 	0.0699159943
+scalar "largeLAN.bhost[3].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[3].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[3].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[3].llc" 	"packets from higher layer" 	2777
+scalar "largeLAN.bhost[3].llc" 	"frames from MAC" 	12466
+scalar "largeLAN.bhost[3].llc" 	"packets passed up" 	12466
+scalar "largeLAN.bhost[3].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[3].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[3].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[3].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[3].mac" 	"rx channel idle (%)" 	12.2524366
+scalar "largeLAN.bhost[3].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[3].mac" 	"rx channel collision (%)" 	73.5818661
+scalar "largeLAN.bhost[3].mac" 	"frames sent" 	2620
+scalar "largeLAN.bhost[3].mac" 	"frames rcvd" 	361574
+scalar "largeLAN.bhost[3].mac" 	"bytes sent" 	1943754
+scalar "largeLAN.bhost[3].mac" 	"bytes rcvd" 	454908694
+scalar "largeLAN.bhost[3].mac" 	"frames from higher layer" 	2777
+scalar "largeLAN.bhost[3].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[3].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[3].mac" 	"frames dropped (not for us)" 	349108
+scalar "largeLAN.bhost[3].mac" 	"frames passed up to HL" 	12466
+scalar "largeLAN.bhost[3].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[3].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[3].mac" 	"collisions" 	195309
+scalar "largeLAN.bhost[3].mac" 	"backoffs" 	10891
+scalar "largeLAN.bhost[3].mac" 	"frames/sec sent" 	6.2379454
+scalar "largeLAN.bhost[3].mac" 	"frames/sec rcvd" 	860.869798
+scalar "largeLAN.bhost[3].mac" 	"bits/sec sent" 	37022.9964
+scalar "largeLAN.bhost[3].mac" 	"bits/sec rcvd" 	8664719.38
+scalar "largeLAN.bhost[4].cli" 	"packets sent" 	2754
+scalar "largeLAN.bhost[4].cli" 	"packets rcvd" 	12376
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay mean" 	0.0154169377
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay stddev" 	0.0130204233
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay min" 	8.44200003e-05
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay max" 	0.07045841
+scalar "largeLAN.bhost[4].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[4].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[4].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[4].llc" 	"packets from higher layer" 	2754
+scalar "largeLAN.bhost[4].llc" 	"frames from MAC" 	12376
+scalar "largeLAN.bhost[4].llc" 	"packets passed up" 	12376
+scalar "largeLAN.bhost[4].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[4].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[4].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[4].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[4].mac" 	"rx channel idle (%)" 	12.2524997
+scalar "largeLAN.bhost[4].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[4].mac" 	"rx channel collision (%)" 	73.5553582
+scalar "largeLAN.bhost[4].mac" 	"frames sent" 	2597
+scalar "largeLAN.bhost[4].mac" 	"frames rcvd" 	361597
+scalar "largeLAN.bhost[4].mac" 	"bytes sent" 	1947065
+scalar "largeLAN.bhost[4].mac" 	"bytes rcvd" 	454905383
+scalar "largeLAN.bhost[4].mac" 	"frames from higher layer" 	2754
+scalar "largeLAN.bhost[4].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[4].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[4].mac" 	"frames dropped (not for us)" 	349221
+scalar "largeLAN.bhost[4].mac" 	"frames passed up to HL" 	12376
+scalar "largeLAN.bhost[4].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[4].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[4].mac" 	"collisions" 	195309
+scalar "largeLAN.bhost[4].mac" 	"backoffs" 	10737
+scalar "largeLAN.bhost[4].mac" 	"frames/sec sent" 	6.18318481
+scalar "largeLAN.bhost[4].mac" 	"frames/sec rcvd" 	860.924559
+scalar "largeLAN.bhost[4].mac" 	"bits/sec sent" 	37086.0616
+scalar "largeLAN.bhost[4].mac" 	"bits/sec rcvd" 	8664656.31
+scalar "largeLAN.bhost[5].cli" 	"packets sent" 	2827
+scalar "largeLAN.bhost[5].cli" 	"packets rcvd" 	12965
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay mean" 	0.0160814395
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay stddev" 	0.0132717718
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay min" 	8.87949999e-05
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay max" 	0.0714914767
+scalar "largeLAN.bhost[5].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[5].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[5].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[5].llc" 	"packets from higher layer" 	2827
+scalar "largeLAN.bhost[5].llc" 	"frames from MAC" 	12965
+scalar "largeLAN.bhost[5].llc" 	"packets passed up" 	12965
+scalar "largeLAN.bhost[5].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[5].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[5].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[5].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[5].mac" 	"rx channel idle (%)" 	12.2525698
+scalar "largeLAN.bhost[5].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[5].mac" 	"rx channel collision (%)" 	73.5259243
+scalar "largeLAN.bhost[5].mac" 	"frames sent" 	2661
+scalar "largeLAN.bhost[5].mac" 	"frames rcvd" 	361533
+scalar "largeLAN.bhost[5].mac" 	"bytes sent" 	2035887
+scalar "largeLAN.bhost[5].mac" 	"bytes rcvd" 	454816561
+scalar "largeLAN.bhost[5].mac" 	"frames from higher layer" 	2827
+scalar "largeLAN.bhost[5].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[5].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[5].mac" 	"frames dropped (not for us)" 	348568
+scalar "largeLAN.bhost[5].mac" 	"frames passed up to HL" 	12965
+scalar "largeLAN.bhost[5].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[5].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[5].mac" 	"collisions" 	195309
+scalar "largeLAN.bhost[5].mac" 	"backoffs" 	10732
+scalar "largeLAN.bhost[5].mac" 	"frames/sec sent" 	6.33556211
+scalar "largeLAN.bhost[5].mac" 	"frames/sec rcvd" 	860.772181
+scalar "largeLAN.bhost[5].mac" 	"bits/sec sent" 	38777.8686
+scalar "largeLAN.bhost[5].mac" 	"bits/sec rcvd" 	8662964.51
+scalar "largeLAN.bhost[6].cli" 	"packets sent" 	2833
+scalar "largeLAN.bhost[6].cli" 	"packets rcvd" 	12559
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay mean" 	0.0157264811
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay stddev" 	0.0132504932
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay min" 	8.43699999e-05
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay max" 	0.073220087
+scalar "largeLAN.bhost[6].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[6].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[6].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[6].llc" 	"packets from higher layer" 	2833
+scalar "largeLAN.bhost[6].llc" 	"frames from MAC" 	12559
+scalar "largeLAN.bhost[6].llc" 	"packets passed up" 	12559
+scalar "largeLAN.bhost[6].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[6].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[6].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[6].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[6].mac" 	"rx channel idle (%)" 	12.2526415
+scalar "largeLAN.bhost[6].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[6].mac" 	"rx channel collision (%)" 	73.4958128
+scalar "largeLAN.bhost[6].mac" 	"frames sent" 	2656
+scalar "largeLAN.bhost[6].mac" 	"frames rcvd" 	361538
+scalar "largeLAN.bhost[6].mac" 	"bytes sent" 	1973334
+scalar "largeLAN.bhost[6].mac" 	"bytes rcvd" 	454879114
+scalar "largeLAN.bhost[6].mac" 	"frames from higher layer" 	2833
+scalar "largeLAN.bhost[6].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[6].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[6].mac" 	"frames dropped (not for us)" 	348979
+scalar "largeLAN.bhost[6].mac" 	"frames passed up to HL" 	12559
+scalar "largeLAN.bhost[6].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[6].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[6].mac" 	"collisions" 	195309
+scalar "largeLAN.bhost[6].mac" 	"backoffs" 	11015
+scalar "largeLAN.bhost[6].mac" 	"frames/sec sent" 	6.32365763
+scalar "largeLAN.bhost[6].mac" 	"frames/sec rcvd" 	860.784086
+scalar "largeLAN.bhost[6].mac" 	"bits/sec sent" 	37586.4115
+scalar "largeLAN.bhost[6].mac" 	"bits/sec rcvd" 	8664155.96
+scalar "largeLAN.bhost[7].cli" 	"packets sent" 	2754
+scalar "largeLAN.bhost[7].cli" 	"packets rcvd" 	12427
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay mean" 	0.0156995192
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay stddev" 	0.0131114042
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay min" 	8.43449999e-05
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay max" 	0.070860455
+scalar "largeLAN.bhost[7].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[7].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[7].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[7].llc" 	"packets from higher layer" 	2754
+scalar "largeLAN.bhost[7].llc" 	"frames from MAC" 	12427
+scalar "largeLAN.bhost[7].llc" 	"packets passed up" 	12427
+scalar "largeLAN.bhost[7].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[7].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[7].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[7].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[7].mac" 	"rx channel idle (%)" 	12.2527139
+scalar "largeLAN.bhost[7].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[7].mac" 	"rx channel collision (%)" 	73.4653685
+scalar "largeLAN.bhost[7].mac" 	"frames sent" 	2598
+scalar "largeLAN.bhost[7].mac" 	"frames rcvd" 	361596
+scalar "largeLAN.bhost[7].mac" 	"bytes sent" 	1962260
+scalar "largeLAN.bhost[7].mac" 	"bytes rcvd" 	454890188
+scalar "largeLAN.bhost[7].mac" 	"frames from higher layer" 	2754
+scalar "largeLAN.bhost[7].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[7].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[7].mac" 	"frames dropped (not for us)" 	349169
+scalar "largeLAN.bhost[7].mac" 	"frames passed up to HL" 	12427
+scalar "largeLAN.bhost[7].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[7].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[7].mac" 	"collisions" 	195309
+scalar "largeLAN.bhost[7].mac" 	"backoffs" 	10366
+scalar "largeLAN.bhost[7].mac" 	"frames/sec sent" 	6.18556571
+scalar "largeLAN.bhost[7].mac" 	"frames/sec rcvd" 	860.922178
+scalar "largeLAN.bhost[7].mac" 	"bits/sec sent" 	37375.4832
+scalar "largeLAN.bhost[7].mac" 	"bits/sec rcvd" 	8664366.89
+scalar "largeLAN.bhost[8].cli" 	"packets sent" 	2875
+scalar "largeLAN.bhost[8].cli" 	"packets rcvd" 	12980
+scalar "largeLAN.bhost[8].cli" 	"end-to-end delay mean" 	0.0152587939
+scalar "largeLAN.bhost[8].cli" 	"end-to-end delay stddev" 	0.0128166082
+scalar "largeLAN.bhost[8].cli" 	"end-to-end delay min" 	8.432e-05
+scalar "largeLAN.bhost[8].cli" 	"end-to-end delay max" 	0.06978785
+scalar "largeLAN.bhost[8].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[8].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[8].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[8].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[8].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[8].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[8].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[8].llc" 	"packets from higher layer" 	2875
+scalar "largeLAN.bhost[8].llc" 	"frames from MAC" 	12980
+scalar "largeLAN.bhost[8].llc" 	"packets passed up" 	12980
+scalar "largeLAN.bhost[8].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[8].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[8].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[8].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[8].mac" 	"rx channel idle (%)" 	12.2527762
+scalar "largeLAN.bhost[8].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[8].mac" 	"rx channel collision (%)" 	73.4392092
+scalar "largeLAN.bhost[8].mac" 	"frames sent" 	2702
+scalar "largeLAN.bhost[8].mac" 	"frames rcvd" 	361492
+scalar "largeLAN.bhost[8].mac" 	"bytes sent" 	2020210
+scalar "largeLAN.bhost[8].mac" 	"bytes rcvd" 	454832238
+scalar "largeLAN.bhost[8].mac" 	"frames from higher layer" 	2875
+scalar "largeLAN.bhost[8].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[8].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[8].mac" 	"frames dropped (not for us)" 	348512
+scalar "largeLAN.bhost[8].mac" 	"frames passed up to HL" 	12980
+scalar "largeLAN.bhost[8].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[8].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[8].mac" 	"collisions" 	195308
+scalar "largeLAN.bhost[8].mac" 	"backoffs" 	10948
+scalar "largeLAN.bhost[8].mac" 	"frames/sec sent" 	6.43317881
+scalar "largeLAN.bhost[8].mac" 	"frames/sec rcvd" 	860.674565
+scalar "largeLAN.bhost[8].mac" 	"bits/sec sent" 	38479.2662
+scalar "largeLAN.bhost[8].mac" 	"bits/sec rcvd" 	8663263.11
+scalar "largeLAN.bhost[9].cli" 	"packets sent" 	2883
+scalar "largeLAN.bhost[9].cli" 	"packets rcvd" 	12821
+scalar "largeLAN.bhost[9].cli" 	"end-to-end delay mean" 	0.015966307
+scalar "largeLAN.bhost[9].cli" 	"end-to-end delay stddev" 	0.013394729
+scalar "largeLAN.bhost[9].cli" 	"end-to-end delay min" 	8.4295e-05
+scalar "largeLAN.bhost[9].cli" 	"end-to-end delay max" 	0.074101495
+scalar "largeLAN.bhost[9].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[9].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[9].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[9].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[9].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[9].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[9].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[9].llc" 	"packets from higher layer" 	2883
+scalar "largeLAN.bhost[9].llc" 	"frames from MAC" 	12821
+scalar "largeLAN.bhost[9].llc" 	"packets passed up" 	12821
+scalar "largeLAN.bhost[9].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[9].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[9].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[9].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[9].mac" 	"rx channel idle (%)" 	12.2528109
+scalar "largeLAN.bhost[9].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[9].mac" 	"rx channel collision (%)" 	73.4246634
+scalar "largeLAN.bhost[9].mac" 	"frames sent" 	2722
+scalar "largeLAN.bhost[9].mac" 	"frames rcvd" 	361472
+scalar "largeLAN.bhost[9].mac" 	"bytes sent" 	2060047
+scalar "largeLAN.bhost[9].mac" 	"bytes rcvd" 	454792401
+scalar "largeLAN.bhost[9].mac" 	"frames from higher layer" 	2883
+scalar "largeLAN.bhost[9].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[9].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[9].mac" 	"frames dropped (not for us)" 	348651
+scalar "largeLAN.bhost[9].mac" 	"frames passed up to HL" 	12821
+scalar "largeLAN.bhost[9].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[9].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[9].mac" 	"collisions" 	195310
+scalar "largeLAN.bhost[9].mac" 	"backoffs" 	10721
+scalar "largeLAN.bhost[9].mac" 	"frames/sec sent" 	6.48079671
+scalar "largeLAN.bhost[9].mac" 	"frames/sec rcvd" 	860.626947
+scalar "largeLAN.bhost[9].mac" 	"bits/sec sent" 	39238.048
+scalar "largeLAN.bhost[9].mac" 	"bits/sec rcvd" 	8662504.33
+scalar "largeLAN.bhost[10].cli" 	"packets sent" 	2810
+scalar "largeLAN.bhost[10].cli" 	"packets rcvd" 	12640
+scalar "largeLAN.bhost[10].cli" 	"end-to-end delay mean" 	0.0157357548
+scalar "largeLAN.bhost[10].cli" 	"end-to-end delay stddev" 	0.0132063534
+scalar "largeLAN.bhost[10].cli" 	"end-to-end delay min" 	8.42699999e-05
+scalar "largeLAN.bhost[10].cli" 	"end-to-end delay max" 	0.0711166164
+scalar "largeLAN.bhost[10].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[10].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[10].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[10].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[10].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[10].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[10].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[10].llc" 	"packets from higher layer" 	2810
+scalar "largeLAN.bhost[10].llc" 	"frames from MAC" 	12640
+scalar "largeLAN.bhost[10].llc" 	"packets passed up" 	12640
+scalar "largeLAN.bhost[10].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[10].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[10].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[10].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[10].mac" 	"rx channel idle (%)" 	12.25281
+scalar "largeLAN.bhost[10].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[10].mac" 	"rx channel collision (%)" 	73.4250264
+scalar "largeLAN.bhost[10].mac" 	"frames sent" 	2668
+scalar "largeLAN.bhost[10].mac" 	"frames rcvd" 	361526
+scalar "largeLAN.bhost[10].mac" 	"bytes sent" 	1989216
+scalar "largeLAN.bhost[10].mac" 	"bytes rcvd" 	454863232
+scalar "largeLAN.bhost[10].mac" 	"frames from higher layer" 	2810
+scalar "largeLAN.bhost[10].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[10].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[10].mac" 	"frames dropped (not for us)" 	348886
+scalar "largeLAN.bhost[10].mac" 	"frames passed up to HL" 	12640
+scalar "largeLAN.bhost[10].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[10].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[10].mac" 	"collisions" 	195311
+scalar "largeLAN.bhost[10].mac" 	"backoffs" 	10501
+scalar "largeLAN.bhost[10].mac" 	"frames/sec sent" 	6.35222837
+scalar "largeLAN.bhost[10].mac" 	"frames/sec rcvd" 	860.755515
+scalar "largeLAN.bhost[10].mac" 	"bits/sec sent" 	37888.9185
+scalar "largeLAN.bhost[10].mac" 	"bits/sec rcvd" 	8663853.46
+scalar "largeLAN.bhost[11].cli" 	"packets sent" 	2866
+scalar "largeLAN.bhost[11].cli" 	"packets rcvd" 	12858
+scalar "largeLAN.bhost[11].cli" 	"end-to-end delay mean" 	0.0156157627
+scalar "largeLAN.bhost[11].cli" 	"end-to-end delay stddev" 	0.0131729278
+scalar "largeLAN.bhost[11].cli" 	"end-to-end delay min" 	8.4245e-05
+scalar "largeLAN.bhost[11].cli" 	"end-to-end delay max" 	0.070750485
+scalar "largeLAN.bhost[11].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[11].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[11].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[11].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[11].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[11].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[11].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[11].llc" 	"packets from higher layer" 	2866
+scalar "largeLAN.bhost[11].llc" 	"frames from MAC" 	12858
+scalar "largeLAN.bhost[11].llc" 	"packets passed up" 	12858
+scalar "largeLAN.bhost[11].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[11].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[11].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[11].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[11].mac" 	"rx channel idle (%)" 	12.2527739
+scalar "largeLAN.bhost[11].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[11].mac" 	"rx channel collision (%)" 	73.4401825
+scalar "largeLAN.bhost[11].mac" 	"frames sent" 	2710
+scalar "largeLAN.bhost[11].mac" 	"frames rcvd" 	361484
+scalar "largeLAN.bhost[11].mac" 	"bytes sent" 	2022076
+scalar "largeLAN.bhost[11].mac" 	"bytes rcvd" 	454830372
+scalar "largeLAN.bhost[11].mac" 	"frames from higher layer" 	2866
+scalar "largeLAN.bhost[11].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[11].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[11].mac" 	"frames dropped (not for us)" 	348626
+scalar "largeLAN.bhost[11].mac" 	"frames passed up to HL" 	12858
+scalar "largeLAN.bhost[11].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[11].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[11].mac" 	"collisions" 	195311
+scalar "largeLAN.bhost[11].mac" 	"backoffs" 	10989
+scalar "largeLAN.bhost[11].mac" 	"frames/sec sent" 	6.45222597
+scalar "largeLAN.bhost[11].mac" 	"frames/sec rcvd" 	860.655518
+scalar "largeLAN.bhost[11].mac" 	"bits/sec sent" 	38514.8082
+scalar "largeLAN.bhost[11].mac" 	"bits/sec rcvd" 	8663227.57
+scalar "largeLAN.bhost[12].cli" 	"packets sent" 	2799
+scalar "largeLAN.bhost[12].cli" 	"packets rcvd" 	12612
+scalar "largeLAN.bhost[12].cli" 	"end-to-end delay mean" 	0.0156199905
+scalar "largeLAN.bhost[12].cli" 	"end-to-end delay stddev" 	0.0128808452
+scalar "largeLAN.bhost[12].cli" 	"end-to-end delay min" 	0.00010182
+scalar "largeLAN.bhost[12].cli" 	"end-to-end delay max" 	0.0698279267
+scalar "largeLAN.bhost[12].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[12].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[12].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[12].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[12].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[12].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[12].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[12].llc" 	"packets from higher layer" 	2799
+scalar "largeLAN.bhost[12].llc" 	"frames from MAC" 	12612
+scalar "largeLAN.bhost[12].llc" 	"packets passed up" 	12612
+scalar "largeLAN.bhost[12].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[12].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[12].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[12].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[12].mac" 	"rx channel idle (%)" 	12.252694
+scalar "largeLAN.bhost[12].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[12].mac" 	"rx channel collision (%)" 	73.4737543
+scalar "largeLAN.bhost[12].mac" 	"frames sent" 	2651
+scalar "largeLAN.bhost[12].mac" 	"frames rcvd" 	361543
+scalar "largeLAN.bhost[12].mac" 	"bytes sent" 	2001100
+scalar "largeLAN.bhost[12].mac" 	"bytes rcvd" 	454851348
+scalar "largeLAN.bhost[12].mac" 	"frames from higher layer" 	2799
+scalar "largeLAN.bhost[12].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[12].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[12].mac" 	"frames dropped (not for us)" 	348931
+scalar "largeLAN.bhost[12].mac" 	"frames passed up to HL" 	12612
+scalar "largeLAN.bhost[12].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[12].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[12].mac" 	"collisions" 	195311
+scalar "largeLAN.bhost[12].mac" 	"backoffs" 	10377
+scalar "largeLAN.bhost[12].mac" 	"frames/sec sent" 	6.31175315
+scalar "largeLAN.bhost[12].mac" 	"frames/sec rcvd" 	860.79599
+scalar "largeLAN.bhost[12].mac" 	"bits/sec sent" 	38115.275
+scalar "largeLAN.bhost[12].mac" 	"bits/sec rcvd" 	8663627.1
+scalar "largeLAN.bhost[13].cli" 	"packets sent" 	2820
+scalar "largeLAN.bhost[13].cli" 	"packets rcvd" 	12853
+scalar "largeLAN.bhost[13].cli" 	"end-to-end delay mean" 	0.0157138792
+scalar "largeLAN.bhost[13].cli" 	"end-to-end delay stddev" 	0.0129805296
+scalar "largeLAN.bhost[13].cli" 	"end-to-end delay min" 	8.8595e-05
+scalar "largeLAN.bhost[13].cli" 	"end-to-end delay max" 	0.0688250895
+scalar "largeLAN.bhost[13].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[13].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[13].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[13].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[13].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[13].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[13].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[13].llc" 	"packets from higher layer" 	2820
+scalar "largeLAN.bhost[13].llc" 	"frames from MAC" 	12853
+scalar "largeLAN.bhost[13].llc" 	"packets passed up" 	12853
+scalar "largeLAN.bhost[13].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[13].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[13].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[13].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[13].mac" 	"rx channel idle (%)" 	12.2525391
+scalar "largeLAN.bhost[13].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[13].mac" 	"rx channel collision (%)" 	73.5388094
+scalar "largeLAN.bhost[13].mac" 	"frames sent" 	2663
+scalar "largeLAN.bhost[13].mac" 	"frames rcvd" 	361531
+scalar "largeLAN.bhost[13].mac" 	"bytes sent" 	1979224
+scalar "largeLAN.bhost[13].mac" 	"bytes rcvd" 	454873224
+scalar "largeLAN.bhost[13].mac" 	"frames from higher layer" 	2820
+scalar "largeLAN.bhost[13].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[13].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[13].mac" 	"frames dropped (not for us)" 	348678
+scalar "largeLAN.bhost[13].mac" 	"frames passed up to HL" 	12853
+scalar "largeLAN.bhost[13].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[13].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[13].mac" 	"collisions" 	195312
+scalar "largeLAN.bhost[13].mac" 	"backoffs" 	10693
+scalar "largeLAN.bhost[13].mac" 	"frames/sec sent" 	6.3403239
+scalar "largeLAN.bhost[13].mac" 	"frames/sec rcvd" 	860.76742
+scalar "largeLAN.bhost[13].mac" 	"bits/sec sent" 	37698.5992
+scalar "largeLAN.bhost[13].mac" 	"bits/sec rcvd" 	8664043.78
+scalar "largeLAN.bhost[14].cli" 	"packets sent" 	2741
+scalar "largeLAN.bhost[14].cli" 	"packets rcvd" 	12470
+scalar "largeLAN.bhost[14].cli" 	"end-to-end delay mean" 	0.0157240005
+scalar "largeLAN.bhost[14].cli" 	"end-to-end delay stddev" 	0.0129660824
+scalar "largeLAN.bhost[14].cli" 	"end-to-end delay min" 	0.00014929
+scalar "largeLAN.bhost[14].cli" 	"end-to-end delay max" 	0.0696716967
+scalar "largeLAN.bhost[14].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[14].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[14].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[14].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[14].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[14].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[14].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[14].llc" 	"packets from higher layer" 	2741
+scalar "largeLAN.bhost[14].llc" 	"frames from MAC" 	12470
+scalar "largeLAN.bhost[14].llc" 	"packets passed up" 	12470
+scalar "largeLAN.bhost[14].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[14].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[14].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[14].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[14].mac" 	"rx channel idle (%)" 	12.2523397
+scalar "largeLAN.bhost[14].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[14].mac" 	"rx channel collision (%)" 	73.6225618
+scalar "largeLAN.bhost[14].mac" 	"frames sent" 	2578
+scalar "largeLAN.bhost[14].mac" 	"frames rcvd" 	361616
+scalar "largeLAN.bhost[14].mac" 	"bytes sent" 	1895523
+scalar "largeLAN.bhost[14].mac" 	"bytes rcvd" 	454956925
+scalar "largeLAN.bhost[14].mac" 	"frames from higher layer" 	2741
+scalar "largeLAN.bhost[14].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[14].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[14].mac" 	"frames dropped (not for us)" 	349146
+scalar "largeLAN.bhost[14].mac" 	"frames passed up to HL" 	12470
+scalar "largeLAN.bhost[14].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[14].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[14].mac" 	"collisions" 	195312
+scalar "largeLAN.bhost[14].mac" 	"backoffs" 	10605
+scalar "largeLAN.bhost[14].mac" 	"frames/sec sent" 	6.13794781
+scalar "largeLAN.bhost[14].mac" 	"frames/sec rcvd" 	860.969796
+scalar "largeLAN.bhost[14].mac" 	"bits/sec sent" 	36104.3328
+scalar "largeLAN.bhost[14].mac" 	"bits/sec rcvd" 	8665638.04
+scalar "largeLAN.bhost[15].cli" 	"packets sent" 	2771
+scalar "largeLAN.bhost[15].cli" 	"packets rcvd" 	12680
+scalar "largeLAN.bhost[15].cli" 	"end-to-end delay mean" 	0.0161690143
+scalar "largeLAN.bhost[15].cli" 	"end-to-end delay stddev" 	0.0133152828
+scalar "largeLAN.bhost[15].cli" 	"end-to-end delay min" 	8.76650001e-05
+scalar "largeLAN.bhost[15].cli" 	"end-to-end delay max" 	0.0724685343
+scalar "largeLAN.bhost[15].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[15].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[15].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[15].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[15].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[15].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[15].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[15].llc" 	"packets from higher layer" 	2771
+scalar "largeLAN.bhost[15].llc" 	"frames from MAC" 	12680
+scalar "largeLAN.bhost[15].llc" 	"packets passed up" 	12680
+scalar "largeLAN.bhost[15].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[15].mac" 	"simulated time" 	420.010088
+scalar "largeLAN.bhost[15].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[15].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[15].mac" 	"rx channel idle (%)" 	12.2520836
+scalar "largeLAN.bhost[15].mac" 	"rx channel utilization (%)" 	87.5723727
+scalar "largeLAN.bhost[15].mac" 	"rx channel collision (%)" 	73.7301382
+scalar "largeLAN.bhost[15].mac" 	"frames sent" 	2600
+scalar "largeLAN.bhost[15].mac" 	"frames rcvd" 	361594
+scalar "largeLAN.bhost[15].mac" 	"bytes sent" 	1941552
+scalar "largeLAN.bhost[15].mac" 	"bytes rcvd" 	454910896
+scalar "largeLAN.bhost[15].mac" 	"frames from higher layer" 	2771
+scalar "largeLAN.bhost[15].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[15].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[15].mac" 	"frames dropped (not for us)" 	348914
+scalar "largeLAN.bhost[15].mac" 	"frames passed up to HL" 	12680
+scalar "largeLAN.bhost[15].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[15].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[15].mac" 	"collisions" 	195313
+scalar "largeLAN.bhost[15].mac" 	"backoffs" 	10632
+scalar "largeLAN.bhost[15].mac" 	"frames/sec sent" 	6.1903275
+scalar "largeLAN.bhost[15].mac" 	"frames/sec rcvd" 	860.917416
+scalar "largeLAN.bhost[15].mac" 	"bits/sec sent" 	36981.0546
+scalar "largeLAN.bhost[15].mac" 	"bits/sec rcvd" 	8664761.32
+run 2 "largeLAN"
+scalar "largeLAN.switch.relayUnit" 	"processed frames" 	443890
+scalar "largeLAN.switch.relayUnit" 	"dropped frames" 	0
+scalar "largeLAN.switch.mac[0]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[0]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[0]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[0]" 	"rx channel idle (%)" 	99.6647066
+scalar "largeLAN.switch.mac[0]" 	"rx channel utilization (%)" 	0.335293406
+scalar "largeLAN.switch.mac[0]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames sent" 	20679
+scalar "largeLAN.switch.mac[0]" 	"frames rcvd" 	14564
+scalar "largeLAN.switch.mac[0]" 	"bytes sent" 	27497572
+scalar "largeLAN.switch.mac[0]" 	"bytes rcvd" 	17486432
+scalar "largeLAN.switch.mac[0]" 	"frames from higher layer" 	20679
+scalar "largeLAN.switch.mac[0]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames passed up to HL" 	14564
+scalar "largeLAN.switch.mac[0]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[0]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[0]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[0]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[0]" 	"frames/sec sent" 	49.2356019
+scalar "largeLAN.switch.mac[0]" 	"frames/sec rcvd" 	34.6761113
+scalar "largeLAN.switch.mac[0]" 	"bits/sec sent" 	523762.081
+scalar "largeLAN.switch.mac[0]" 	"bits/sec rcvd" 	333074.135
+scalar "largeLAN.switch.mac[1]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[1]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[1]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[1]" 	"rx channel idle (%)" 	99.6350499
+scalar "largeLAN.switch.mac[1]" 	"rx channel utilization (%)" 	0.364950119
+scalar "largeLAN.switch.mac[1]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames sent" 	20754
+scalar "largeLAN.switch.mac[1]" 	"frames rcvd" 	15637
+scalar "largeLAN.switch.mac[1]" 	"bytes sent" 	27491707
+scalar "largeLAN.switch.mac[1]" 	"bytes rcvd" 	19034829
+scalar "largeLAN.switch.mac[1]" 	"frames from higher layer" 	20754
+scalar "largeLAN.switch.mac[1]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames passed up to HL" 	15637
+scalar "largeLAN.switch.mac[1]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[1]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[1]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[1]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[1]" 	"frames/sec sent" 	49.4141729
+scalar "largeLAN.switch.mac[1]" 	"frames/sec rcvd" 	37.2308674
+scalar "largeLAN.switch.mac[1]" 	"bits/sec sent" 	523650.367
+scalar "largeLAN.switch.mac[1]" 	"bits/sec rcvd" 	362567.344
+scalar "largeLAN.switch.mac[2]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[2]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[2]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[2]" 	"rx channel idle (%)" 	99.6394951
+scalar "largeLAN.switch.mac[2]" 	"rx channel utilization (%)" 	0.360504853
+scalar "largeLAN.switch.mac[2]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames sent" 	21290
+scalar "largeLAN.switch.mac[2]" 	"frames rcvd" 	15549
+scalar "largeLAN.switch.mac[2]" 	"bytes sent" 	28253241
+scalar "largeLAN.switch.mac[2]" 	"bytes rcvd" 	18802156
+scalar "largeLAN.switch.mac[2]" 	"frames from higher layer" 	21290
+scalar "largeLAN.switch.mac[2]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames passed up to HL" 	15549
+scalar "largeLAN.switch.mac[2]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[2]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[2]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[2]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[2]" 	"frames/sec sent" 	50.6903605
+scalar "largeLAN.switch.mac[2]" 	"frames/sec rcvd" 	37.0213441
+scalar "largeLAN.switch.mac[2]" 	"bits/sec sent" 	538155.743
+scalar "largeLAN.switch.mac[2]" 	"bits/sec rcvd" 	358135.487
+scalar "largeLAN.switch.mac[3]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[3]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[3]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[3]" 	"rx channel idle (%)" 	97.2572759
+scalar "largeLAN.switch.mac[3]" 	"rx channel utilization (%)" 	2.74272412
+scalar "largeLAN.switch.mac[3]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames sent" 	36492
+scalar "largeLAN.switch.mac[3]" 	"frames rcvd" 	105192
+scalar "largeLAN.switch.mac[3]" 	"bytes sent" 	39185376
+scalar "largeLAN.switch.mac[3]" 	"bytes rcvd" 	143151809
+scalar "largeLAN.switch.mac[3]" 	"frames from higher layer" 	36492
+scalar "largeLAN.switch.mac[3]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames passed up to HL" 	105192
+scalar "largeLAN.switch.mac[3]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[3]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[3]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[3]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[3]" 	"frames/sec sent" 	86.885516
+scalar "largeLAN.switch.mac[3]" 	"frames/sec rcvd" 	250.456571
+scalar "largeLAN.switch.mac[3]" 	"bits/sec sent" 	746386.411
+scalar "largeLAN.switch.mac[3]" 	"bits/sec rcvd" 	2726694.9
+scalar "largeLAN.switch.mac[4]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[4]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[4]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[4]" 	"rx channel idle (%)" 	99.6381909
+scalar "largeLAN.switch.mac[4]" 	"rx channel utilization (%)" 	0.36180906
+scalar "largeLAN.switch.mac[4]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames sent" 	20949
+scalar "largeLAN.switch.mac[4]" 	"frames rcvd" 	15590
+scalar "largeLAN.switch.mac[4]" 	"bytes sent" 	27707641
+scalar "largeLAN.switch.mac[4]" 	"bytes rcvd" 	18870299
+scalar "largeLAN.switch.mac[4]" 	"frames from higher layer" 	20949
+scalar "largeLAN.switch.mac[4]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames passed up to HL" 	15590
+scalar "largeLAN.switch.mac[4]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[4]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[4]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[4]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[4]" 	"frames/sec sent" 	49.8784576
+scalar "largeLAN.switch.mac[4]" 	"frames/sec rcvd" 	37.1189629
+scalar "largeLAN.switch.mac[4]" 	"bits/sec sent" 	527763.386
+scalar "largeLAN.switch.mac[4]" 	"bits/sec rcvd" 	359433.446
+scalar "largeLAN.switch.mac[5]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[5]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[5]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[5]" 	"rx channel idle (%)" 	99.637088
+scalar "largeLAN.switch.mac[5]" 	"rx channel utilization (%)" 	0.362911953
+scalar "largeLAN.switch.mac[5]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames sent" 	18568
+scalar "largeLAN.switch.mac[5]" 	"frames rcvd" 	15628
+scalar "largeLAN.switch.mac[5]" 	"bytes sent" 	24469139
+scalar "largeLAN.switch.mac[5]" 	"bytes rcvd" 	18927897
+scalar "largeLAN.switch.mac[5]" 	"frames from higher layer" 	18568
+scalar "largeLAN.switch.mac[5]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames passed up to HL" 	15628
+scalar "largeLAN.switch.mac[5]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[5]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[5]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[5]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[5]" 	"frames/sec sent" 	44.2094229
+scalar "largeLAN.switch.mac[5]" 	"frames/sec rcvd" 	37.2094389
+scalar "largeLAN.switch.mac[5]" 	"bits/sec sent" 	466077.774
+scalar "largeLAN.switch.mac[5]" 	"bits/sec rcvd" 	360530.549
+scalar "largeLAN.switch.mac[6]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[6]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[6]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[6]" 	"rx channel idle (%)" 	99.6338261
+scalar "largeLAN.switch.mac[6]" 	"rx channel utilization (%)" 	0.366173869
+scalar "largeLAN.switch.mac[6]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[6]" 	"frames sent" 	18369
+scalar "largeLAN.switch.mac[6]" 	"frames rcvd" 	15685
+scalar "largeLAN.switch.mac[6]" 	"bytes sent" 	24224622
+scalar "largeLAN.switch.mac[6]" 	"bytes rcvd" 	19098692
+scalar "largeLAN.switch.mac[6]" 	"frames from higher layer" 	18369
+scalar "largeLAN.switch.mac[6]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[6]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[6]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[6]" 	"frames passed up to HL" 	15685
+scalar "largeLAN.switch.mac[6]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[6]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[6]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[6]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[6]" 	"frames/sec sent" 	43.7356145
+scalar "largeLAN.switch.mac[6]" 	"frames/sec rcvd" 	37.3451529
+scalar "largeLAN.switch.mac[6]" 	"bits/sec sent" 	461420.318
+scalar "largeLAN.switch.mac[6]" 	"bits/sec rcvd" 	363783.779
+scalar "largeLAN.switch.mac[7]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[7]" 	"txrate (Mb)" 	100
+scalar "largeLAN.switch.mac[7]" 	"full duplex" 	1
+scalar "largeLAN.switch.mac[7]" 	"rx channel idle (%)" 	98.3877953
+scalar "largeLAN.switch.mac[7]" 	"rx channel utilization (%)" 	1.61220466
+scalar "largeLAN.switch.mac[7]" 	"rx channel collision (%)" 	0
+scalar "largeLAN.switch.mac[7]" 	"frames sent" 	26420
+scalar "largeLAN.switch.mac[7]" 	"frames rcvd" 	62601
+scalar "largeLAN.switch.mac[7]" 	"bytes sent" 	30171880
+scalar "largeLAN.switch.mac[7]" 	"bytes rcvd" 	84140130
+scalar "largeLAN.switch.mac[7]" 	"frames from higher layer" 	26420
+scalar "largeLAN.switch.mac[7]" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.switch.mac[7]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[7]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[7]" 	"frames passed up to HL" 	62601
+scalar "largeLAN.switch.mac[7]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[7]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[7]" 	"collisions" 	0
+scalar "largeLAN.switch.mac[7]" 	"backoffs" 	0
+scalar "largeLAN.switch.mac[7]" 	"frames/sec sent" 	62.9046183
+scalar "largeLAN.switch.mac[7]" 	"frames/sec rcvd" 	149.04966
+scalar "largeLAN.switch.mac[7]" 	"bits/sec sent" 	574701.164
+scalar "largeLAN.switch.mac[7]" 	"bits/sec rcvd" 	1602665.48
+scalar "largeLAN.switch.mac[9]" 	"simulated time" 	420.000959
+scalar "largeLAN.switch.mac[9]" 	"txrate (Mb)" 	10
+scalar "largeLAN.switch.mac[9]" 	"full duplex" 	0
+scalar "largeLAN.switch.mac[9]" 	"rx channel idle (%)" 	14.3033924
+scalar "largeLAN.switch.mac[9]" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.switch.mac[9]" 	"rx channel collision (%)" 	76.5034262
+scalar "largeLAN.switch.mac[9]" 	"frames sent" 	168732
+scalar "largeLAN.switch.mac[9]" 	"frames rcvd" 	183444
+scalar "largeLAN.switch.mac[9]" 	"bytes sent" 	217192271
+scalar "largeLAN.switch.mac[9]" 	"bytes rcvd" 	228942245
+scalar "largeLAN.switch.mac[9]" 	"frames from higher layer" 	260446
+scalar "largeLAN.switch.mac[9]" 	"frames from higher layer dropped (queue full)" 	91704
+scalar "largeLAN.switch.mac[9]" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.switch.mac[9]" 	"frames dropped (not for us)" 	0
+scalar "largeLAN.switch.mac[9]" 	"frames passed up to HL" 	183444
+scalar "largeLAN.switch.mac[9]" 	"PAUSE frames sent" 	0
+scalar "largeLAN.switch.mac[9]" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.switch.mac[9]" 	"collisions" 	212152
+scalar "largeLAN.switch.mac[9]" 	"backoffs" 	154875
+scalar "largeLAN.switch.mac[9]" 	"frames/sec sent" 	401.74194
+scalar "largeLAN.switch.mac[9]" 	"frames/sec rcvd" 	436.770432
+scalar "largeLAN.switch.mac[9]" 	"bits/sec sent" 	4136986.2
+scalar "largeLAN.switch.mac[9]" 	"bits/sec rcvd" 	4360794.71
+scalar "largeLAN.host[0].cli" 	"packets sent" 	4223
+scalar "largeLAN.host[0].cli" 	"packets rcvd" 	18871
+scalar "largeLAN.host[0].cli" 	"end-to-end delay mean" 	0.100594659
+scalar "largeLAN.host[0].cli" 	"end-to-end delay stddev" 	0.104493673
+scalar "largeLAN.host[0].cli" 	"end-to-end delay min" 	0.00011062
+scalar "largeLAN.host[0].cli" 	"end-to-end delay max" 	0.714422457
+scalar "largeLAN.host[0].srv" 	"packets sent" 	10341
+scalar "largeLAN.host[0].srv" 	"packets rcvd" 	1798
+scalar "largeLAN.host[0].srv" 	"end-to-end delay mean" 	0.0943055095
+scalar "largeLAN.host[0].srv" 	"end-to-end delay stddev" 	0.115875433
+scalar "largeLAN.host[0].srv" 	"end-to-end delay min" 	9.126e-05
+scalar "largeLAN.host[0].srv" 	"end-to-end delay max" 	0.878303717
+scalar "largeLAN.host[0].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[0].llc" 	"packets from higher layer" 	14564
+scalar "largeLAN.host[0].llc" 	"frames from MAC" 	20669
+scalar "largeLAN.host[0].llc" 	"packets passed up" 	20669
+scalar "largeLAN.host[0].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[0].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[0].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[0].mac" 	"full duplex" 	1
+scalar "largeLAN.host[0].mac" 	"rx channel idle (%)" 	99.4730868
+scalar "largeLAN.host[0].mac" 	"rx channel utilization (%)" 	0.526913159
+scalar "largeLAN.host[0].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[0].mac" 	"frames sent" 	14564
+scalar "largeLAN.host[0].mac" 	"frames rcvd" 	20679
+scalar "largeLAN.host[0].mac" 	"bytes sent" 	17486432
+scalar "largeLAN.host[0].mac" 	"bytes rcvd" 	27497572
+scalar "largeLAN.host[0].mac" 	"frames from higher layer" 	14564
+scalar "largeLAN.host[0].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[0].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[0].mac" 	"frames dropped (not for us)" 	10
+scalar "largeLAN.host[0].mac" 	"frames passed up to HL" 	20669
+scalar "largeLAN.host[0].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[0].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[0].mac" 	"collisions" 	0
+scalar "largeLAN.host[0].mac" 	"backoffs" 	0
+scalar "largeLAN.host[0].mac" 	"frames/sec sent" 	34.6761113
+scalar "largeLAN.host[0].mac" 	"frames/sec rcvd" 	49.2356019
+scalar "largeLAN.host[0].mac" 	"bits/sec sent" 	333074.135
+scalar "largeLAN.host[0].mac" 	"bits/sec rcvd" 	523762.081
+scalar "largeLAN.host[1].cli" 	"packets sent" 	4166
+scalar "largeLAN.host[1].cli" 	"packets rcvd" 	18752
+scalar "largeLAN.host[1].cli" 	"end-to-end delay mean" 	0.100311069
+scalar "largeLAN.host[1].cli" 	"end-to-end delay stddev" 	0.105663036
+scalar "largeLAN.host[1].cli" 	"end-to-end delay min" 	8.41949999e-05
+scalar "largeLAN.host[1].cli" 	"end-to-end delay max" 	0.686239996
+scalar "largeLAN.host[1].srv" 	"packets sent" 	11471
+scalar "largeLAN.host[1].srv" 	"packets rcvd" 	1993
+scalar "largeLAN.host[1].srv" 	"end-to-end delay mean" 	0.0326771595
+scalar "largeLAN.host[1].srv" 	"end-to-end delay stddev" 	0.0604037907
+scalar "largeLAN.host[1].srv" 	"end-to-end delay min" 	0.0001115
+scalar "largeLAN.host[1].srv" 	"end-to-end delay max" 	0.415728727
+scalar "largeLAN.host[1].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[1].llc" 	"packets from higher layer" 	15637
+scalar "largeLAN.host[1].llc" 	"frames from MAC" 	20745
+scalar "largeLAN.host[1].llc" 	"packets passed up" 	20745
+scalar "largeLAN.host[1].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[1].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[1].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[1].mac" 	"full duplex" 	1
+scalar "largeLAN.host[1].mac" 	"rx channel idle (%)" 	99.4731871
+scalar "largeLAN.host[1].mac" 	"rx channel utilization (%)" 	0.526812874
+scalar "largeLAN.host[1].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[1].mac" 	"frames sent" 	15637
+scalar "largeLAN.host[1].mac" 	"frames rcvd" 	20754
+scalar "largeLAN.host[1].mac" 	"bytes sent" 	19034829
+scalar "largeLAN.host[1].mac" 	"bytes rcvd" 	27491707
+scalar "largeLAN.host[1].mac" 	"frames from higher layer" 	15637
+scalar "largeLAN.host[1].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[1].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[1].mac" 	"frames dropped (not for us)" 	9
+scalar "largeLAN.host[1].mac" 	"frames passed up to HL" 	20745
+scalar "largeLAN.host[1].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[1].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[1].mac" 	"collisions" 	0
+scalar "largeLAN.host[1].mac" 	"backoffs" 	0
+scalar "largeLAN.host[1].mac" 	"frames/sec sent" 	37.2308674
+scalar "largeLAN.host[1].mac" 	"frames/sec rcvd" 	49.4141729
+scalar "largeLAN.host[1].mac" 	"bits/sec sent" 	362567.344
+scalar "largeLAN.host[1].mac" 	"bits/sec rcvd" 	523650.367
+scalar "largeLAN.host[2].cli" 	"packets sent" 	4251
+scalar "largeLAN.host[2].cli" 	"packets rcvd" 	19284
+scalar "largeLAN.host[2].cli" 	"end-to-end delay mean" 	0.103509754
+scalar "largeLAN.host[2].cli" 	"end-to-end delay stddev" 	0.10724396
+scalar "largeLAN.host[2].cli" 	"end-to-end delay min" 	0.00014733
+scalar "largeLAN.host[2].cli" 	"end-to-end delay max" 	0.786056663
+scalar "largeLAN.host[2].srv" 	"packets sent" 	11298
+scalar "largeLAN.host[2].srv" 	"packets rcvd" 	1996
+scalar "largeLAN.host[2].srv" 	"end-to-end delay mean" 	0.0300676601
+scalar "largeLAN.host[2].srv" 	"end-to-end delay stddev" 	0.0563628322
+scalar "largeLAN.host[2].srv" 	"end-to-end delay min" 	9.12600001e-05
+scalar "largeLAN.host[2].srv" 	"end-to-end delay max" 	0.332251847
+scalar "largeLAN.host[2].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[2].llc" 	"packets from higher layer" 	15549
+scalar "largeLAN.host[2].llc" 	"frames from MAC" 	21280
+scalar "largeLAN.host[2].llc" 	"packets passed up" 	21280
+scalar "largeLAN.host[2].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[2].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[2].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[2].mac" 	"full duplex" 	1
+scalar "largeLAN.host[2].mac" 	"rx channel idle (%)" 	99.4586001
+scalar "largeLAN.host[2].mac" 	"rx channel utilization (%)" 	0.541399926
+scalar "largeLAN.host[2].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[2].mac" 	"frames sent" 	15549
+scalar "largeLAN.host[2].mac" 	"frames rcvd" 	21290
+scalar "largeLAN.host[2].mac" 	"bytes sent" 	18802156
+scalar "largeLAN.host[2].mac" 	"bytes rcvd" 	28253241
+scalar "largeLAN.host[2].mac" 	"frames from higher layer" 	15549
+scalar "largeLAN.host[2].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[2].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[2].mac" 	"frames dropped (not for us)" 	10
+scalar "largeLAN.host[2].mac" 	"frames passed up to HL" 	21280
+scalar "largeLAN.host[2].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[2].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[2].mac" 	"collisions" 	0
+scalar "largeLAN.host[2].mac" 	"backoffs" 	0
+scalar "largeLAN.host[2].mac" 	"frames/sec sent" 	37.0213441
+scalar "largeLAN.host[2].mac" 	"frames/sec rcvd" 	50.6903605
+scalar "largeLAN.host[2].mac" 	"bits/sec sent" 	358135.487
+scalar "largeLAN.host[2].mac" 	"bits/sec rcvd" 	538155.743
+scalar "largeLAN.host[3].cli" 	"packets sent" 	4172
+scalar "largeLAN.host[3].cli" 	"packets rcvd" 	18860
+scalar "largeLAN.host[3].cli" 	"end-to-end delay mean" 	0.101064081
+scalar "largeLAN.host[3].cli" 	"end-to-end delay stddev" 	0.102899255
+scalar "largeLAN.host[3].cli" 	"end-to-end delay min" 	8.4145e-05
+scalar "largeLAN.host[3].cli" 	"end-to-end delay max" 	0.786695567
+scalar "largeLAN.host[3].srv" 	"packets sent" 	101020
+scalar "largeLAN.host[3].srv" 	"packets rcvd" 	17623
+scalar "largeLAN.host[3].srv" 	"end-to-end delay mean" 	0.0348066858
+scalar "largeLAN.host[3].srv" 	"end-to-end delay stddev" 	0.0648021996
+scalar "largeLAN.host[3].srv" 	"end-to-end delay min" 	9.038e-05
+scalar "largeLAN.host[3].srv" 	"end-to-end delay max" 	0.624495918
+scalar "largeLAN.host[3].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[3].llc" 	"packets from higher layer" 	105192
+scalar "largeLAN.host[3].llc" 	"frames from MAC" 	36483
+scalar "largeLAN.host[3].llc" 	"packets passed up" 	36483
+scalar "largeLAN.host[3].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[3].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[3].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[3].mac" 	"full duplex" 	1
+scalar "largeLAN.host[3].mac" 	"rx channel idle (%)" 	99.2480529
+scalar "largeLAN.host[3].mac" 	"rx channel utilization (%)" 	0.751947084
+scalar "largeLAN.host[3].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[3].mac" 	"frames sent" 	105192
+scalar "largeLAN.host[3].mac" 	"frames rcvd" 	36492
+scalar "largeLAN.host[3].mac" 	"bytes sent" 	143151809
+scalar "largeLAN.host[3].mac" 	"bytes rcvd" 	39185376
+scalar "largeLAN.host[3].mac" 	"frames from higher layer" 	105192
+scalar "largeLAN.host[3].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[3].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[3].mac" 	"frames dropped (not for us)" 	9
+scalar "largeLAN.host[3].mac" 	"frames passed up to HL" 	36483
+scalar "largeLAN.host[3].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[3].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[3].mac" 	"collisions" 	0
+scalar "largeLAN.host[3].mac" 	"backoffs" 	0
+scalar "largeLAN.host[3].mac" 	"frames/sec sent" 	250.456571
+scalar "largeLAN.host[3].mac" 	"frames/sec rcvd" 	86.885516
+scalar "largeLAN.host[3].mac" 	"bits/sec sent" 	2726694.9
+scalar "largeLAN.host[3].mac" 	"bits/sec rcvd" 	746386.411
+scalar "largeLAN.host[4].cli" 	"packets sent" 	4229
+scalar "largeLAN.host[4].cli" 	"packets rcvd" 	18986
+scalar "largeLAN.host[4].cli" 	"end-to-end delay mean" 	0.112066024
+scalar "largeLAN.host[4].cli" 	"end-to-end delay stddev" 	0.116698962
+scalar "largeLAN.host[4].cli" 	"end-to-end delay min" 	8.422e-05
+scalar "largeLAN.host[4].cli" 	"end-to-end delay max" 	0.732320779
+scalar "largeLAN.host[4].srv" 	"packets sent" 	11361
+scalar "largeLAN.host[4].srv" 	"packets rcvd" 	1953
+scalar "largeLAN.host[4].srv" 	"end-to-end delay mean" 	0.0309188026
+scalar "largeLAN.host[4].srv" 	"end-to-end delay stddev" 	0.0582510297
+scalar "largeLAN.host[4].srv" 	"end-to-end delay min" 	9.40000002e-05
+scalar "largeLAN.host[4].srv" 	"end-to-end delay max" 	0.344308769
+scalar "largeLAN.host[4].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[4].llc" 	"packets from higher layer" 	15590
+scalar "largeLAN.host[4].llc" 	"frames from MAC" 	20939
+scalar "largeLAN.host[4].llc" 	"packets passed up" 	20939
+scalar "largeLAN.host[4].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[4].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[4].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[4].mac" 	"full duplex" 	1
+scalar "largeLAN.host[4].mac" 	"rx channel idle (%)" 	99.4690444
+scalar "largeLAN.host[4].mac" 	"rx channel utilization (%)" 	0.530955607
+scalar "largeLAN.host[4].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[4].mac" 	"frames sent" 	15590
+scalar "largeLAN.host[4].mac" 	"frames rcvd" 	20949
+scalar "largeLAN.host[4].mac" 	"bytes sent" 	18870299
+scalar "largeLAN.host[4].mac" 	"bytes rcvd" 	27707641
+scalar "largeLAN.host[4].mac" 	"frames from higher layer" 	15590
+scalar "largeLAN.host[4].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[4].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[4].mac" 	"frames dropped (not for us)" 	10
+scalar "largeLAN.host[4].mac" 	"frames passed up to HL" 	20939
+scalar "largeLAN.host[4].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[4].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[4].mac" 	"collisions" 	0
+scalar "largeLAN.host[4].mac" 	"backoffs" 	0
+scalar "largeLAN.host[4].mac" 	"frames/sec sent" 	37.1189629
+scalar "largeLAN.host[4].mac" 	"frames/sec rcvd" 	49.8784576
+scalar "largeLAN.host[4].mac" 	"bits/sec sent" 	359433.446
+scalar "largeLAN.host[4].mac" 	"bits/sec rcvd" 	527763.386
+scalar "largeLAN.host[5].cli" 	"packets sent" 	4313
+scalar "largeLAN.host[5].cli" 	"packets rcvd" 	16574
+scalar "largeLAN.host[5].cli" 	"end-to-end delay mean" 	0.148981701
+scalar "largeLAN.host[5].cli" 	"end-to-end delay stddev" 	0.124773852
+scalar "largeLAN.host[5].cli" 	"end-to-end delay min" 	9.732e-05
+scalar "largeLAN.host[5].cli" 	"end-to-end delay max" 	0.887407236
+scalar "largeLAN.host[5].srv" 	"packets sent" 	11315
+scalar "largeLAN.host[5].srv" 	"packets rcvd" 	1984
+scalar "largeLAN.host[5].srv" 	"end-to-end delay mean" 	0.0321405954
+scalar "largeLAN.host[5].srv" 	"end-to-end delay stddev" 	0.0593407472
+scalar "largeLAN.host[5].srv" 	"end-to-end delay min" 	9.13350002e-05
+scalar "largeLAN.host[5].srv" 	"end-to-end delay max" 	0.33046513
+scalar "largeLAN.host[5].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[5].llc" 	"packets from higher layer" 	15628
+scalar "largeLAN.host[5].llc" 	"frames from MAC" 	18558
+scalar "largeLAN.host[5].llc" 	"packets passed up" 	18558
+scalar "largeLAN.host[5].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[5].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[5].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[5].mac" 	"full duplex" 	1
+scalar "largeLAN.host[5].mac" 	"rx channel idle (%)" 	99.5310928
+scalar "largeLAN.host[5].mac" 	"rx channel utilization (%)" 	0.468907177
+scalar "largeLAN.host[5].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[5].mac" 	"frames sent" 	15628
+scalar "largeLAN.host[5].mac" 	"frames rcvd" 	18568
+scalar "largeLAN.host[5].mac" 	"bytes sent" 	18927897
+scalar "largeLAN.host[5].mac" 	"bytes rcvd" 	24469139
+scalar "largeLAN.host[5].mac" 	"frames from higher layer" 	15628
+scalar "largeLAN.host[5].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[5].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[5].mac" 	"frames dropped (not for us)" 	10
+scalar "largeLAN.host[5].mac" 	"frames passed up to HL" 	18558
+scalar "largeLAN.host[5].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[5].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[5].mac" 	"collisions" 	0
+scalar "largeLAN.host[5].mac" 	"backoffs" 	0
+scalar "largeLAN.host[5].mac" 	"frames/sec sent" 	37.2094389
+scalar "largeLAN.host[5].mac" 	"frames/sec rcvd" 	44.2094229
+scalar "largeLAN.host[5].mac" 	"bits/sec sent" 	360530.549
+scalar "largeLAN.host[5].mac" 	"bits/sec rcvd" 	466077.774
+scalar "largeLAN.host[6].cli" 	"packets sent" 	4208
+scalar "largeLAN.host[6].cli" 	"packets rcvd" 	16381
+scalar "largeLAN.host[6].cli" 	"end-to-end delay mean" 	0.14348556
+scalar "largeLAN.host[6].cli" 	"end-to-end delay stddev" 	0.115784596
+scalar "largeLAN.host[6].cli" 	"end-to-end delay min" 	0.00013252
+scalar "largeLAN.host[6].cli" 	"end-to-end delay max" 	1.10012377
+scalar "largeLAN.host[6].srv" 	"packets sent" 	11477
+scalar "largeLAN.host[6].srv" 	"packets rcvd" 	1978
+scalar "largeLAN.host[6].srv" 	"end-to-end delay mean" 	0.0319435281
+scalar "largeLAN.host[6].srv" 	"end-to-end delay stddev" 	0.0586726169
+scalar "largeLAN.host[6].srv" 	"end-to-end delay min" 	0.00010715
+scalar "largeLAN.host[6].srv" 	"end-to-end delay max" 	0.306502648
+scalar "largeLAN.host[6].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[6].llc" 	"packets from higher layer" 	15685
+scalar "largeLAN.host[6].llc" 	"frames from MAC" 	18359
+scalar "largeLAN.host[6].llc" 	"packets passed up" 	18359
+scalar "largeLAN.host[6].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[6].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[6].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[6].mac" 	"full duplex" 	1
+scalar "largeLAN.host[6].mac" 	"rx channel idle (%)" 	99.5357806
+scalar "largeLAN.host[6].mac" 	"rx channel utilization (%)" 	0.464219398
+scalar "largeLAN.host[6].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[6].mac" 	"frames sent" 	15685
+scalar "largeLAN.host[6].mac" 	"frames rcvd" 	18369
+scalar "largeLAN.host[6].mac" 	"bytes sent" 	19098692
+scalar "largeLAN.host[6].mac" 	"bytes rcvd" 	24224622
+scalar "largeLAN.host[6].mac" 	"frames from higher layer" 	15685
+scalar "largeLAN.host[6].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[6].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[6].mac" 	"frames dropped (not for us)" 	10
+scalar "largeLAN.host[6].mac" 	"frames passed up to HL" 	18359
+scalar "largeLAN.host[6].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[6].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[6].mac" 	"collisions" 	0
+scalar "largeLAN.host[6].mac" 	"backoffs" 	0
+scalar "largeLAN.host[6].mac" 	"frames/sec sent" 	37.3451529
+scalar "largeLAN.host[6].mac" 	"frames/sec rcvd" 	43.7356145
+scalar "largeLAN.host[6].mac" 	"bits/sec sent" 	363783.779
+scalar "largeLAN.host[6].mac" 	"bits/sec rcvd" 	461420.318
+scalar "largeLAN.host[7].cli" 	"packets sent" 	4129
+scalar "largeLAN.host[7].cli" 	"packets rcvd" 	16240
+scalar "largeLAN.host[7].cli" 	"end-to-end delay mean" 	0.150468931
+scalar "largeLAN.host[7].cli" 	"end-to-end delay stddev" 	0.127465397
+scalar "largeLAN.host[7].cli" 	"end-to-end delay min" 	9.742e-05
+scalar "largeLAN.host[7].cli" 	"end-to-end delay max" 	1.09901346
+scalar "largeLAN.host[7].srv" 	"packets sent" 	58472
+scalar "largeLAN.host[7].srv" 	"packets rcvd" 	10171
+scalar "largeLAN.host[7].srv" 	"end-to-end delay mean" 	0.0571505856
+scalar "largeLAN.host[7].srv" 	"end-to-end delay stddev" 	0.0836439941
+scalar "largeLAN.host[7].srv" 	"end-to-end delay min" 	9.0305e-05
+scalar "largeLAN.host[7].srv" 	"end-to-end delay max" 	0.784353248
+scalar "largeLAN.host[7].llc" 	"dsaps registered" 	2
+scalar "largeLAN.host[7].llc" 	"packets from higher layer" 	62601
+scalar "largeLAN.host[7].llc" 	"frames from MAC" 	26411
+scalar "largeLAN.host[7].llc" 	"packets passed up" 	26411
+scalar "largeLAN.host[7].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.host[7].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.host[7].mac" 	"txrate (Mb)" 	100
+scalar "largeLAN.host[7].mac" 	"full duplex" 	1
+scalar "largeLAN.host[7].mac" 	"rx channel idle (%)" 	99.4212729
+scalar "largeLAN.host[7].mac" 	"rx channel utilization (%)" 	0.57872706
+scalar "largeLAN.host[7].mac" 	"rx channel collision (%)" 	0
+scalar "largeLAN.host[7].mac" 	"frames sent" 	62601
+scalar "largeLAN.host[7].mac" 	"frames rcvd" 	26420
+scalar "largeLAN.host[7].mac" 	"bytes sent" 	84140130
+scalar "largeLAN.host[7].mac" 	"bytes rcvd" 	30171880
+scalar "largeLAN.host[7].mac" 	"frames from higher layer" 	62601
+scalar "largeLAN.host[7].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.host[7].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.host[7].mac" 	"frames dropped (not for us)" 	9
+scalar "largeLAN.host[7].mac" 	"frames passed up to HL" 	26411
+scalar "largeLAN.host[7].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.host[7].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.host[7].mac" 	"collisions" 	0
+scalar "largeLAN.host[7].mac" 	"backoffs" 	0
+scalar "largeLAN.host[7].mac" 	"frames/sec sent" 	149.04966
+scalar "largeLAN.host[7].mac" 	"frames/sec rcvd" 	62.9046183
+scalar "largeLAN.host[7].mac" 	"bits/sec sent" 	1602665.48
+scalar "largeLAN.host[7].mac" 	"bits/sec rcvd" 	574701.164
+scalar "largeLAN.hub" 	"simulated time" 	420.000959
+scalar "largeLAN.hub" 	"messages handled" 	1355764
+scalar "largeLAN.hub" 	"messages/sec" 	3228.00216
+scalar "largeLAN.hhost[0].cli" 	"packets sent" 	2043
+scalar "largeLAN.hhost[0].cli" 	"packets rcvd" 	5607
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay mean" 	0.0953653261
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay stddev" 	0.053142156
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay min" 	0.0002259
+scalar "largeLAN.hhost[0].cli" 	"end-to-end delay max" 	0.28700447
+scalar "largeLAN.hhost[0].srv" 	"packets sent" 	58727
+scalar "largeLAN.hhost[0].srv" 	"packets rcvd" 	10176
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay mean" 	0.0663602757
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay stddev" 	0.055547435
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay min" 	9.39e-05
+scalar "largeLAN.hhost[0].srv" 	"end-to-end delay max" 	0.329883062
+scalar "largeLAN.hhost[0].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[0].llc" 	"packets from higher layer" 	60770
+scalar "largeLAN.hhost[0].llc" 	"frames from MAC" 	15783
+scalar "largeLAN.hhost[0].llc" 	"packets passed up" 	15783
+scalar "largeLAN.hhost[0].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[0].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[0].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[0].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[0].mac" 	"rx channel idle (%)" 	14.3036141
+scalar "largeLAN.hhost[0].mac" 	"rx channel utilization (%)" 	85.5147477
+scalar "largeLAN.hhost[0].mac" 	"rx channel collision (%)" 	76.2882463
+scalar "largeLAN.hhost[0].mac" 	"frames sent" 	50994
+scalar "largeLAN.hhost[0].mac" 	"frames rcvd" 	301183
+scalar "largeLAN.hhost[0].mac" 	"bytes sent" 	69661534
+scalar "largeLAN.hhost[0].mac" 	"bytes rcvd" 	376474500
+scalar "largeLAN.hhost[0].mac" 	"frames from higher layer" 	60770
+scalar "largeLAN.hhost[0].mac" 	"frames from higher layer dropped (queue full)" 	9229
+scalar "largeLAN.hhost[0].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[0].mac" 	"frames dropped (not for us)" 	285400
+scalar "largeLAN.hhost[0].mac" 	"frames passed up to HL" 	15783
+scalar "largeLAN.hhost[0].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[0].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[0].mac" 	"collisions" 	212145
+scalar "largeLAN.hhost[0].mac" 	"backoffs" 	59175
+scalar "largeLAN.hhost[0].mac" 	"frames/sec sent" 	121.414009
+scalar "largeLAN.hhost[0].mac" 	"frames/sec rcvd" 	717.100744
+scalar "largeLAN.hhost[0].mac" 	"bits/sec sent" 	1326883.33
+scalar "largeLAN.hhost[0].mac" 	"bits/sec rcvd" 	7170926.49
+scalar "largeLAN.hhost[1].cli" 	"packets sent" 	2115
+scalar "largeLAN.hhost[1].cli" 	"packets rcvd" 	7176
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay mean" 	0.0690533565
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay stddev" 	0.0565305886
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay min" 	8.42200001e-05
+scalar "largeLAN.hhost[1].cli" 	"end-to-end delay max" 	0.275205405
+scalar "largeLAN.hhost[1].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[1].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[1].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[1].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[1].llc" 	"packets from higher layer" 	2115
+scalar "largeLAN.hhost[1].llc" 	"frames from MAC" 	7176
+scalar "largeLAN.hhost[1].llc" 	"packets passed up" 	7176
+scalar "largeLAN.hhost[1].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[1].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[1].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[1].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[1].mac" 	"rx channel idle (%)" 	14.3041642
+scalar "largeLAN.hhost[1].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[1].mac" 	"rx channel collision (%)" 	76.1792714
+scalar "largeLAN.hhost[1].mac" 	"frames sent" 	1993
+scalar "largeLAN.hhost[1].mac" 	"frames rcvd" 	350183
+scalar "largeLAN.hhost[1].mac" 	"bytes sent" 	1507024
+scalar "largeLAN.hhost[1].mac" 	"bytes rcvd" 	444627492
+scalar "largeLAN.hhost[1].mac" 	"frames from higher layer" 	2115
+scalar "largeLAN.hhost[1].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[1].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[1].mac" 	"frames dropped (not for us)" 	343007
+scalar "largeLAN.hhost[1].mac" 	"frames passed up to HL" 	7176
+scalar "largeLAN.hhost[1].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[1].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[1].mac" 	"collisions" 	212142
+scalar "largeLAN.hhost[1].mac" 	"backoffs" 	8443
+scalar "largeLAN.hhost[1].mac" 	"frames/sec sent" 	4.74522726
+scalar "largeLAN.hhost[1].mac" 	"frames/sec rcvd" 	833.767145
+scalar "largeLAN.hhost[1].mac" 	"bits/sec sent" 	28705.1535
+scalar "largeLAN.hhost[1].mac" 	"bits/sec rcvd" 	8469075.76
+scalar "largeLAN.hhost[2].cli" 	"packets sent" 	2102
+scalar "largeLAN.hhost[2].cli" 	"packets rcvd" 	7277
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay mean" 	0.070906625
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay stddev" 	0.0588975084
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay min" 	8.42200001e-05
+scalar "largeLAN.hhost[2].cli" 	"end-to-end delay max" 	0.28657728
+scalar "largeLAN.hhost[2].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[2].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[2].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[2].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[2].llc" 	"packets from higher layer" 	2102
+scalar "largeLAN.hhost[2].llc" 	"frames from MAC" 	7277
+scalar "largeLAN.hhost[2].llc" 	"packets passed up" 	7277
+scalar "largeLAN.hhost[2].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[2].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[2].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[2].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[2].mac" 	"rx channel idle (%)" 	14.3041679
+scalar "largeLAN.hhost[2].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[2].mac" 	"rx channel collision (%)" 	76.1777241
+scalar "largeLAN.hhost[2].mac" 	"frames sent" 	1996
+scalar "largeLAN.hhost[2].mac" 	"frames rcvd" 	350180
+scalar "largeLAN.hhost[2].mac" 	"bytes sent" 	1498694
+scalar "largeLAN.hhost[2].mac" 	"bytes rcvd" 	444635822
+scalar "largeLAN.hhost[2].mac" 	"frames from higher layer" 	2102
+scalar "largeLAN.hhost[2].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[2].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[2].mac" 	"frames dropped (not for us)" 	342903
+scalar "largeLAN.hhost[2].mac" 	"frames passed up to HL" 	7277
+scalar "largeLAN.hhost[2].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[2].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[2].mac" 	"collisions" 	212141
+scalar "largeLAN.hhost[2].mac" 	"backoffs" 	8047
+scalar "largeLAN.hhost[2].mac" 	"frames/sec sent" 	4.75237011
+scalar "largeLAN.hhost[2].mac" 	"frames/sec rcvd" 	833.760002
+scalar "largeLAN.hhost[2].mac" 	"bits/sec sent" 	28546.4872
+scalar "largeLAN.hhost[2].mac" 	"bits/sec rcvd" 	8469234.42
+scalar "largeLAN.hhost[3].cli" 	"packets sent" 	2030
+scalar "largeLAN.hhost[3].cli" 	"packets rcvd" 	7101
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay mean" 	0.0707890524
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay stddev" 	0.0589523719
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay min" 	8.422e-05
+scalar "largeLAN.hhost[3].cli" 	"end-to-end delay max" 	0.28741377
+scalar "largeLAN.hhost[3].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[3].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[3].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[3].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[3].llc" 	"packets from higher layer" 	2030
+scalar "largeLAN.hhost[3].llc" 	"frames from MAC" 	7101
+scalar "largeLAN.hhost[3].llc" 	"packets passed up" 	7101
+scalar "largeLAN.hhost[3].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[3].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[3].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[3].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[3].mac" 	"rx channel idle (%)" 	14.3041626
+scalar "largeLAN.hhost[3].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[3].mac" 	"rx channel collision (%)" 	76.1799262
+scalar "largeLAN.hhost[3].mac" 	"frames sent" 	1913
+scalar "largeLAN.hhost[3].mac" 	"frames rcvd" 	350263
+scalar "largeLAN.hhost[3].mac" 	"bytes sent" 	1433858
+scalar "largeLAN.hhost[3].mac" 	"bytes rcvd" 	444700658
+scalar "largeLAN.hhost[3].mac" 	"frames from higher layer" 	2030
+scalar "largeLAN.hhost[3].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[3].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[3].mac" 	"frames dropped (not for us)" 	343162
+scalar "largeLAN.hhost[3].mac" 	"frames passed up to HL" 	7101
+scalar "largeLAN.hhost[3].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[3].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[3].mac" 	"collisions" 	212142
+scalar "largeLAN.hhost[3].mac" 	"backoffs" 	8067
+scalar "largeLAN.hhost[3].mac" 	"frames/sec sent" 	4.55475151
+scalar "largeLAN.hhost[3].mac" 	"frames/sec rcvd" 	833.95762
+scalar "largeLAN.hhost[3].mac" 	"bits/sec sent" 	27311.5186
+scalar "largeLAN.hhost[3].mac" 	"bits/sec rcvd" 	8470469.39
+scalar "largeLAN.hhost[4].cli" 	"packets sent" 	2015
+scalar "largeLAN.hhost[4].cli" 	"packets rcvd" 	7289
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay mean" 	0.0708873706
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay stddev" 	0.0570680235
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay min" 	0.00085686
+scalar "largeLAN.hhost[4].cli" 	"end-to-end delay max" 	0.25001676
+scalar "largeLAN.hhost[4].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[4].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[4].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[4].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[4].llc" 	"packets from higher layer" 	2015
+scalar "largeLAN.hhost[4].llc" 	"frames from MAC" 	7289
+scalar "largeLAN.hhost[4].llc" 	"packets passed up" 	7289
+scalar "largeLAN.hhost[4].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[4].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[4].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[4].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[4].mac" 	"rx channel idle (%)" 	14.3041657
+scalar "largeLAN.hhost[4].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[4].mac" 	"rx channel collision (%)" 	76.1786312
+scalar "largeLAN.hhost[4].mac" 	"frames sent" 	1912
+scalar "largeLAN.hhost[4].mac" 	"frames rcvd" 	350264
+scalar "largeLAN.hhost[4].mac" 	"bytes sent" 	1412583
+scalar "largeLAN.hhost[4].mac" 	"bytes rcvd" 	444721933
+scalar "largeLAN.hhost[4].mac" 	"frames from higher layer" 	2015
+scalar "largeLAN.hhost[4].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[4].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[4].mac" 	"frames dropped (not for us)" 	342975
+scalar "largeLAN.hhost[4].mac" 	"frames passed up to HL" 	7289
+scalar "largeLAN.hhost[4].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[4].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[4].mac" 	"collisions" 	212141
+scalar "largeLAN.hhost[4].mac" 	"backoffs" 	8049
+scalar "largeLAN.hhost[4].mac" 	"frames/sec sent" 	4.55237056
+scalar "largeLAN.hhost[4].mac" 	"frames/sec rcvd" 	833.960001
+scalar "largeLAN.hhost[4].mac" 	"bits/sec sent" 	26906.2814
+scalar "largeLAN.hhost[4].mac" 	"bits/sec rcvd" 	8470874.63
+scalar "largeLAN.hhost[5].cli" 	"packets sent" 	2133
+scalar "largeLAN.hhost[5].cli" 	"packets rcvd" 	7631
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay mean" 	0.0722451889
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay stddev" 	0.0610768615
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay min" 	0.00039198
+scalar "largeLAN.hhost[5].cli" 	"end-to-end delay max" 	0.307228328
+scalar "largeLAN.hhost[5].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[5].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[5].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[5].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[5].llc" 	"packets from higher layer" 	2133
+scalar "largeLAN.hhost[5].llc" 	"frames from MAC" 	7631
+scalar "largeLAN.hhost[5].llc" 	"packets passed up" 	7631
+scalar "largeLAN.hhost[5].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[5].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[5].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[5].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[5].mac" 	"rx channel idle (%)" 	14.3041653
+scalar "largeLAN.hhost[5].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[5].mac" 	"rx channel collision (%)" 	76.1788201
+scalar "largeLAN.hhost[5].mac" 	"frames sent" 	2014
+scalar "largeLAN.hhost[5].mac" 	"frames rcvd" 	350162
+scalar "largeLAN.hhost[5].mac" 	"bytes sent" 	1477021
+scalar "largeLAN.hhost[5].mac" 	"bytes rcvd" 	444657495
+scalar "largeLAN.hhost[5].mac" 	"frames from higher layer" 	2133
+scalar "largeLAN.hhost[5].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[5].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[5].mac" 	"frames dropped (not for us)" 	342531
+scalar "largeLAN.hhost[5].mac" 	"frames passed up to HL" 	7631
+scalar "largeLAN.hhost[5].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[5].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[5].mac" 	"collisions" 	212140
+scalar "largeLAN.hhost[5].mac" 	"backoffs" 	8343
+scalar "largeLAN.hhost[5].mac" 	"frames/sec sent" 	4.79522715
+scalar "largeLAN.hhost[5].mac" 	"frames/sec rcvd" 	833.717145
+scalar "largeLAN.hhost[5].mac" 	"bits/sec sent" 	28133.6691
+scalar "largeLAN.hhost[5].mac" 	"bits/sec rcvd" 	8469647.24
+scalar "largeLAN.hhost[6].cli" 	"packets sent" 	2101
+scalar "largeLAN.hhost[6].cli" 	"packets rcvd" 	7007
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay mean" 	0.0724765755
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay stddev" 	0.0586886382
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay min" 	0.00013972
+scalar "largeLAN.hhost[6].cli" 	"end-to-end delay max" 	0.308626177
+scalar "largeLAN.hhost[6].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[6].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[6].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[6].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[6].llc" 	"packets from higher layer" 	2101
+scalar "largeLAN.hhost[6].llc" 	"frames from MAC" 	7007
+scalar "largeLAN.hhost[6].llc" 	"packets passed up" 	7007
+scalar "largeLAN.hhost[6].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[6].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[6].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[6].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[6].mac" 	"rx channel idle (%)" 	14.304163
+scalar "largeLAN.hhost[6].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[6].mac" 	"rx channel collision (%)" 	76.1797601
+scalar "largeLAN.hhost[6].mac" 	"frames sent" 	1984
+scalar "largeLAN.hhost[6].mac" 	"frames rcvd" 	350192
+scalar "largeLAN.hhost[6].mac" 	"bytes sent" 	1480444
+scalar "largeLAN.hhost[6].mac" 	"bytes rcvd" 	444654072
+scalar "largeLAN.hhost[6].mac" 	"frames from higher layer" 	2101
+scalar "largeLAN.hhost[6].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[6].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[6].mac" 	"frames dropped (not for us)" 	343185
+scalar "largeLAN.hhost[6].mac" 	"frames passed up to HL" 	7007
+scalar "largeLAN.hhost[6].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[6].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[6].mac" 	"collisions" 	212142
+scalar "largeLAN.hhost[6].mac" 	"backoffs" 	8496
+scalar "largeLAN.hhost[6].mac" 	"frames/sec sent" 	4.72379874
+scalar "largeLAN.hhost[6].mac" 	"frames/sec rcvd" 	833.788573
+scalar "largeLAN.hhost[6].mac" 	"bits/sec sent" 	28198.869
+scalar "largeLAN.hhost[6].mac" 	"bits/sec rcvd" 	8469582.04
+scalar "largeLAN.hhost[7].cli" 	"packets sent" 	2098
+scalar "largeLAN.hhost[7].cli" 	"packets rcvd" 	7438
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay mean" 	0.0699381122
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay stddev" 	0.0571551973
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay min" 	0.0001379
+scalar "largeLAN.hhost[7].cli" 	"end-to-end delay max" 	0.314542296
+scalar "largeLAN.hhost[7].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[7].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[7].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[7].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[7].llc" 	"packets from higher layer" 	2098
+scalar "largeLAN.hhost[7].llc" 	"frames from MAC" 	7438
+scalar "largeLAN.hhost[7].llc" 	"packets passed up" 	7438
+scalar "largeLAN.hhost[7].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[7].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[7].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[7].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[7].mac" 	"rx channel idle (%)" 	14.3041628
+scalar "largeLAN.hhost[7].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[7].mac" 	"rx channel collision (%)" 	76.179862
+scalar "largeLAN.hhost[7].mac" 	"frames sent" 	1982
+scalar "largeLAN.hhost[7].mac" 	"frames rcvd" 	350194
+scalar "largeLAN.hhost[7].mac" 	"bytes sent" 	1471509
+scalar "largeLAN.hhost[7].mac" 	"bytes rcvd" 	444663007
+scalar "largeLAN.hhost[7].mac" 	"frames from higher layer" 	2098
+scalar "largeLAN.hhost[7].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[7].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[7].mac" 	"frames dropped (not for us)" 	342756
+scalar "largeLAN.hhost[7].mac" 	"frames passed up to HL" 	7438
+scalar "largeLAN.hhost[7].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[7].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[7].mac" 	"collisions" 	212142
+scalar "largeLAN.hhost[7].mac" 	"backoffs" 	8131
+scalar "largeLAN.hhost[7].mac" 	"frames/sec sent" 	4.71903685
+scalar "largeLAN.hhost[7].mac" 	"frames/sec rcvd" 	833.793335
+scalar "largeLAN.hhost[7].mac" 	"bits/sec sent" 	28028.6789
+scalar "largeLAN.hhost[7].mac" 	"bits/sec rcvd" 	8469752.23
+scalar "largeLAN.hhost[8].cli" 	"packets sent" 	2050
+scalar "largeLAN.hhost[8].cli" 	"packets rcvd" 	7166
+scalar "largeLAN.hhost[8].cli" 	"end-to-end delay mean" 	0.0739979708
+scalar "largeLAN.hhost[8].cli" 	"end-to-end delay stddev" 	0.0604440769
+scalar "largeLAN.hhost[8].cli" 	"end-to-end delay min" 	0.00024878
+scalar "largeLAN.hhost[8].cli" 	"end-to-end delay max" 	0.32672171
+scalar "largeLAN.hhost[8].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[8].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[8].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[8].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[8].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[8].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[8].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[8].llc" 	"packets from higher layer" 	2050
+scalar "largeLAN.hhost[8].llc" 	"frames from MAC" 	7166
+scalar "largeLAN.hhost[8].llc" 	"packets passed up" 	7166
+scalar "largeLAN.hhost[8].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[8].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[8].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[8].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[8].mac" 	"rx channel idle (%)" 	14.3041668
+scalar "largeLAN.hhost[8].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[8].mac" 	"rx channel collision (%)" 	76.178191
+scalar "largeLAN.hhost[8].mac" 	"frames sent" 	1937
+scalar "largeLAN.hhost[8].mac" 	"frames rcvd" 	350239
+scalar "largeLAN.hhost[8].mac" 	"bytes sent" 	1410260
+scalar "largeLAN.hhost[8].mac" 	"bytes rcvd" 	444724256
+scalar "largeLAN.hhost[8].mac" 	"frames from higher layer" 	2050
+scalar "largeLAN.hhost[8].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[8].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[8].mac" 	"frames dropped (not for us)" 	343073
+scalar "largeLAN.hhost[8].mac" 	"frames passed up to HL" 	7166
+scalar "largeLAN.hhost[8].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[8].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[8].mac" 	"collisions" 	212142
+scalar "largeLAN.hhost[8].mac" 	"backoffs" 	8239
+scalar "largeLAN.hhost[8].mac" 	"frames/sec sent" 	4.61189424
+scalar "largeLAN.hhost[8].mac" 	"frames/sec rcvd" 	833.900478
+scalar "largeLAN.hhost[8].mac" 	"bits/sec sent" 	26862.0339
+scalar "largeLAN.hhost[8].mac" 	"bits/sec rcvd" 	8470918.88
+scalar "largeLAN.hhost[9].cli" 	"packets sent" 	2031
+scalar "largeLAN.hhost[9].cli" 	"packets rcvd" 	7050
+scalar "largeLAN.hhost[9].cli" 	"end-to-end delay mean" 	0.0736818517
+scalar "largeLAN.hhost[9].cli" 	"end-to-end delay stddev" 	0.0600922567
+scalar "largeLAN.hhost[9].cli" 	"end-to-end delay min" 	0.00023734
+scalar "largeLAN.hhost[9].cli" 	"end-to-end delay max" 	0.29805097
+scalar "largeLAN.hhost[9].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[9].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[9].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[9].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[9].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[9].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[9].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[9].llc" 	"packets from higher layer" 	2031
+scalar "largeLAN.hhost[9].llc" 	"frames from MAC" 	7050
+scalar "largeLAN.hhost[9].llc" 	"packets passed up" 	7050
+scalar "largeLAN.hhost[9].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[9].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[9].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[9].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[9].mac" 	"rx channel idle (%)" 	14.3041635
+scalar "largeLAN.hhost[9].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[9].mac" 	"rx channel collision (%)" 	76.1795781
+scalar "largeLAN.hhost[9].mac" 	"frames sent" 	1919
+scalar "largeLAN.hhost[9].mac" 	"frames rcvd" 	350257
+scalar "largeLAN.hhost[9].mac" 	"bytes sent" 	1434400
+scalar "largeLAN.hhost[9].mac" 	"bytes rcvd" 	444700116
+scalar "largeLAN.hhost[9].mac" 	"frames from higher layer" 	2031
+scalar "largeLAN.hhost[9].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[9].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[9].mac" 	"frames dropped (not for us)" 	343207
+scalar "largeLAN.hhost[9].mac" 	"frames passed up to HL" 	7050
+scalar "largeLAN.hhost[9].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[9].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[9].mac" 	"collisions" 	212143
+scalar "largeLAN.hhost[9].mac" 	"backoffs" 	8118
+scalar "largeLAN.hhost[9].mac" 	"frames/sec sent" 	4.56903719
+scalar "largeLAN.hhost[9].mac" 	"frames/sec rcvd" 	833.943335
+scalar "largeLAN.hhost[9].mac" 	"bits/sec sent" 	27321.8424
+scalar "largeLAN.hhost[9].mac" 	"bits/sec rcvd" 	8470459.07
+scalar "largeLAN.hhost[10].cli" 	"packets sent" 	2035
+scalar "largeLAN.hhost[10].cli" 	"packets rcvd" 	7308
+scalar "largeLAN.hhost[10].cli" 	"end-to-end delay mean" 	0.0681796946
+scalar "largeLAN.hhost[10].cli" 	"end-to-end delay stddev" 	0.0562219797
+scalar "largeLAN.hhost[10].cli" 	"end-to-end delay min" 	8.42200001e-05
+scalar "largeLAN.hhost[10].cli" 	"end-to-end delay max" 	0.271476583
+scalar "largeLAN.hhost[10].srv" 	"packets sent" 	0
+scalar "largeLAN.hhost[10].srv" 	"packets rcvd" 	0
+scalar "largeLAN.hhost[10].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.hhost[10].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.hhost[10].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.hhost[10].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.hhost[10].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[10].llc" 	"packets from higher layer" 	2035
+scalar "largeLAN.hhost[10].llc" 	"frames from MAC" 	7308
+scalar "largeLAN.hhost[10].llc" 	"packets passed up" 	7308
+scalar "largeLAN.hhost[10].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[10].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[10].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[10].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[10].mac" 	"rx channel idle (%)" 	14.304165
+scalar "largeLAN.hhost[10].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[10].mac" 	"rx channel collision (%)" 	76.1789127
+scalar "largeLAN.hhost[10].mac" 	"frames sent" 	1922
+scalar "largeLAN.hhost[10].mac" 	"frames rcvd" 	350254
+scalar "largeLAN.hhost[10].mac" 	"bytes sent" 	1445112
+scalar "largeLAN.hhost[10].mac" 	"bytes rcvd" 	444689404
+scalar "largeLAN.hhost[10].mac" 	"frames from higher layer" 	2035
+scalar "largeLAN.hhost[10].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.hhost[10].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[10].mac" 	"frames dropped (not for us)" 	342946
+scalar "largeLAN.hhost[10].mac" 	"frames passed up to HL" 	7308
+scalar "largeLAN.hhost[10].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[10].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[10].mac" 	"collisions" 	212141
+scalar "largeLAN.hhost[10].mac" 	"backoffs" 	8206
+scalar "largeLAN.hhost[10].mac" 	"frames/sec sent" 	4.57618003
+scalar "largeLAN.hhost[10].mac" 	"frames/sec rcvd" 	833.936192
+scalar "largeLAN.hhost[10].mac" 	"bits/sec sent" 	27525.88
+scalar "largeLAN.hhost[10].mac" 	"bits/sec rcvd" 	8470255.03
+scalar "largeLAN.hhost[11].cli" 	"packets sent" 	2135
+scalar "largeLAN.hhost[11].cli" 	"packets rcvd" 	6795
+scalar "largeLAN.hhost[11].cli" 	"end-to-end delay mean" 	0.0790807319
+scalar "largeLAN.hhost[11].cli" 	"end-to-end delay stddev" 	0.0569622606
+scalar "largeLAN.hhost[11].cli" 	"end-to-end delay min" 	0.00033766
+scalar "largeLAN.hhost[11].cli" 	"end-to-end delay max" 	0.32939698
+scalar "largeLAN.hhost[11].srv" 	"packets sent" 	19430
+scalar "largeLAN.hhost[11].srv" 	"packets rcvd" 	3436
+scalar "largeLAN.hhost[11].srv" 	"end-to-end delay mean" 	0.0659701789
+scalar "largeLAN.hhost[11].srv" 	"end-to-end delay stddev" 	0.0557125108
+scalar "largeLAN.hhost[11].srv" 	"end-to-end delay min" 	0.000114158871
+scalar "largeLAN.hhost[11].srv" 	"end-to-end delay max" 	0.323467184
+scalar "largeLAN.hhost[11].llc" 	"dsaps registered" 	2
+scalar "largeLAN.hhost[11].llc" 	"packets from higher layer" 	21565
+scalar "largeLAN.hhost[11].llc" 	"frames from MAC" 	10231
+scalar "largeLAN.hhost[11].llc" 	"packets passed up" 	10231
+scalar "largeLAN.hhost[11].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.hhost[11].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.hhost[11].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.hhost[11].mac" 	"full duplex" 	0
+scalar "largeLAN.hhost[11].mac" 	"rx channel idle (%)" 	14.3040424
+scalar "largeLAN.hhost[11].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.hhost[11].mac" 	"rx channel collision (%)" 	76.2304296
+scalar "largeLAN.hhost[11].mac" 	"frames sent" 	21026
+scalar "largeLAN.hhost[11].mac" 	"frames rcvd" 	331150
+scalar "largeLAN.hhost[11].mac" 	"bytes sent" 	27781360
+scalar "largeLAN.hhost[11].mac" 	"bytes rcvd" 	418353156
+scalar "largeLAN.hhost[11].mac" 	"frames from higher layer" 	21565
+scalar "largeLAN.hhost[11].mac" 	"frames from higher layer dropped (queue full)" 	145
+scalar "largeLAN.hhost[11].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.hhost[11].mac" 	"frames dropped (not for us)" 	320919
+scalar "largeLAN.hhost[11].mac" 	"frames passed up to HL" 	10231
+scalar "largeLAN.hhost[11].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.hhost[11].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.hhost[11].mac" 	"collisions" 	212141
+scalar "largeLAN.hhost[11].mac" 	"backoffs" 	34142
+scalar "largeLAN.hhost[11].mac" 	"frames/sec sent" 	50.0617905
+scalar "largeLAN.hhost[11].mac" 	"frames/sec rcvd" 	788.450581
+scalar "largeLAN.hhost[11].mac" 	"bits/sec sent" 	529167.554
+scalar "largeLAN.hhost[11].mac" 	"bits/sec rcvd" 	7968613.36
+scalar "largeLAN.bus" 	"simulated time" 	420.000959
+scalar "largeLAN.bus" 	"messages handled" 	0
+scalar "largeLAN.bus" 	"messages/sec" 	0
+scalar "largeLAN.bhost[0].cli" 	"packets sent" 	2071
+scalar "largeLAN.bhost[0].cli" 	"packets rcvd" 	7408
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay mean" 	0.0717150097
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay stddev" 	0.0564620104
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay min" 	0.00022512
+scalar "largeLAN.bhost[0].cli" 	"end-to-end delay max" 	0.276245414
+scalar "largeLAN.bhost[0].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[0].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[0].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[0].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[0].llc" 	"packets from higher layer" 	2071
+scalar "largeLAN.bhost[0].llc" 	"frames from MAC" 	7408
+scalar "largeLAN.bhost[0].llc" 	"packets passed up" 	7408
+scalar "largeLAN.bhost[0].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[0].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[0].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[0].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[0].mac" 	"rx channel idle (%)" 	14.3037096
+scalar "largeLAN.bhost[0].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[0].mac" 	"rx channel collision (%)" 	76.3702078
+scalar "largeLAN.bhost[0].mac" 	"frames sent" 	1953
+scalar "largeLAN.bhost[0].mac" 	"frames rcvd" 	350223
+scalar "largeLAN.bhost[0].mac" 	"bytes sent" 	1442599
+scalar "largeLAN.bhost[0].mac" 	"bytes rcvd" 	444691917
+scalar "largeLAN.bhost[0].mac" 	"frames from higher layer" 	2071
+scalar "largeLAN.bhost[0].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[0].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[0].mac" 	"frames dropped (not for us)" 	342815
+scalar "largeLAN.bhost[0].mac" 	"frames passed up to HL" 	7408
+scalar "largeLAN.bhost[0].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[0].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[0].mac" 	"collisions" 	212141
+scalar "largeLAN.bhost[0].mac" 	"backoffs" 	8292
+scalar "largeLAN.bhost[0].mac" 	"frames/sec sent" 	4.64998939
+scalar "largeLAN.bhost[0].mac" 	"frames/sec rcvd" 	833.862383
+scalar "largeLAN.bhost[0].mac" 	"bits/sec sent" 	27478.0135
+scalar "largeLAN.bhost[0].mac" 	"bits/sec rcvd" 	8470302.9
+scalar "largeLAN.bhost[1].cli" 	"packets sent" 	2112
+scalar "largeLAN.bhost[1].cli" 	"packets rcvd" 	7400
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay mean" 	0.0703583775
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay stddev" 	0.0571633047
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay min" 	0.000107175
+scalar "largeLAN.bhost[1].cli" 	"end-to-end delay max" 	0.27677868
+scalar "largeLAN.bhost[1].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[1].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[1].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[1].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[1].llc" 	"packets from higher layer" 	2112
+scalar "largeLAN.bhost[1].llc" 	"frames from MAC" 	7400
+scalar "largeLAN.bhost[1].llc" 	"packets passed up" 	7400
+scalar "largeLAN.bhost[1].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[1].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[1].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[1].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[1].mac" 	"rx channel idle (%)" 	14.3037192
+scalar "largeLAN.bhost[1].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[1].mac" 	"rx channel collision (%)" 	76.3661837
+scalar "largeLAN.bhost[1].mac" 	"frames sent" 	1984
+scalar "largeLAN.bhost[1].mac" 	"frames rcvd" 	350192
+scalar "largeLAN.bhost[1].mac" 	"bytes sent" 	1467690
+scalar "largeLAN.bhost[1].mac" 	"bytes rcvd" 	444666826
+scalar "largeLAN.bhost[1].mac" 	"frames from higher layer" 	2112
+scalar "largeLAN.bhost[1].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[1].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[1].mac" 	"frames dropped (not for us)" 	342792
+scalar "largeLAN.bhost[1].mac" 	"frames passed up to HL" 	7400
+scalar "largeLAN.bhost[1].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[1].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[1].mac" 	"collisions" 	212141
+scalar "largeLAN.bhost[1].mac" 	"backoffs" 	8523
+scalar "largeLAN.bhost[1].mac" 	"frames/sec sent" 	4.72379874
+scalar "largeLAN.bhost[1].mac" 	"frames/sec rcvd" 	833.788573
+scalar "largeLAN.bhost[1].mac" 	"bits/sec sent" 	27955.9362
+scalar "largeLAN.bhost[1].mac" 	"bits/sec rcvd" 	8469824.97
+scalar "largeLAN.bhost[2].cli" 	"packets sent" 	2094
+scalar "largeLAN.bhost[2].cli" 	"packets rcvd" 	7280
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay mean" 	0.0699150584
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay stddev" 	0.0583020129
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay min" 	0.00034563
+scalar "largeLAN.bhost[2].cli" 	"end-to-end delay max" 	0.31953592
+scalar "largeLAN.bhost[2].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[2].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[2].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[2].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[2].llc" 	"packets from higher layer" 	2094
+scalar "largeLAN.bhost[2].llc" 	"frames from MAC" 	7280
+scalar "largeLAN.bhost[2].llc" 	"packets passed up" 	7280
+scalar "largeLAN.bhost[2].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[2].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[2].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[2].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[2].mac" 	"rx channel idle (%)" 	14.3037387
+scalar "largeLAN.bhost[2].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[2].mac" 	"rx channel collision (%)" 	76.3579809
+scalar "largeLAN.bhost[2].mac" 	"frames sent" 	1978
+scalar "largeLAN.bhost[2].mac" 	"frames rcvd" 	350198
+scalar "largeLAN.bhost[2].mac" 	"bytes sent" 	1462453
+scalar "largeLAN.bhost[2].mac" 	"bytes rcvd" 	444672063
+scalar "largeLAN.bhost[2].mac" 	"frames from higher layer" 	2094
+scalar "largeLAN.bhost[2].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[2].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[2].mac" 	"frames dropped (not for us)" 	342918
+scalar "largeLAN.bhost[2].mac" 	"frames passed up to HL" 	7280
+scalar "largeLAN.bhost[2].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[2].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[2].mac" 	"collisions" 	212141
+scalar "largeLAN.bhost[2].mac" 	"backoffs" 	8360
+scalar "largeLAN.bhost[2].mac" 	"frames/sec sent" 	4.70951306
+scalar "largeLAN.bhost[2].mac" 	"frames/sec rcvd" 	833.802859
+scalar "largeLAN.bhost[2].mac" 	"bits/sec sent" 	27856.184
+scalar "largeLAN.bhost[2].mac" 	"bits/sec rcvd" 	8469924.73
+scalar "largeLAN.bhost[3].cli" 	"packets sent" 	2059
+scalar "largeLAN.bhost[3].cli" 	"packets rcvd" 	7365
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay mean" 	0.0713011726
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay stddev" 	0.0572041383
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay min" 	0.000114165
+scalar "largeLAN.bhost[3].cli" 	"end-to-end delay max" 	0.273878926
+scalar "largeLAN.bhost[3].srv" 	"packets sent" 	0
+scalar "largeLAN.bhost[3].srv" 	"packets rcvd" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay mean" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay stddev" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay min" 	0
+scalar "largeLAN.bhost[3].srv" 	"end-to-end delay max" 	0
+scalar "largeLAN.bhost[3].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[3].llc" 	"packets from higher layer" 	2059
+scalar "largeLAN.bhost[3].llc" 	"frames from MAC" 	7365
+scalar "largeLAN.bhost[3].llc" 	"packets passed up" 	7365
+scalar "largeLAN.bhost[3].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[3].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[3].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[3].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[3].mac" 	"rx channel idle (%)" 	14.3037634
+scalar "largeLAN.bhost[3].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[3].mac" 	"rx channel collision (%)" 	76.3476145
+scalar "largeLAN.bhost[3].mac" 	"frames sent" 	1943
+scalar "largeLAN.bhost[3].mac" 	"frames rcvd" 	350233
+scalar "largeLAN.bhost[3].mac" 	"bytes sent" 	1450980
+scalar "largeLAN.bhost[3].mac" 	"bytes rcvd" 	444683536
+scalar "largeLAN.bhost[3].mac" 	"frames from higher layer" 	2059
+scalar "largeLAN.bhost[3].mac" 	"frames from higher layer dropped (queue full)" 	0
+scalar "largeLAN.bhost[3].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[3].mac" 	"frames dropped (not for us)" 	342868
+scalar "largeLAN.bhost[3].mac" 	"frames passed up to HL" 	7365
+scalar "largeLAN.bhost[3].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[3].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[3].mac" 	"collisions" 	212141
+scalar "largeLAN.bhost[3].mac" 	"backoffs" 	8016
+scalar "largeLAN.bhost[3].mac" 	"frames/sec sent" 	4.62617992
+scalar "largeLAN.bhost[3].mac" 	"frames/sec rcvd" 	833.886192
+scalar "largeLAN.bhost[3].mac" 	"bits/sec sent" 	27637.6512
+scalar "largeLAN.bhost[3].mac" 	"bits/sec rcvd" 	8470143.26
+scalar "largeLAN.bhost[4].cli" 	"packets sent" 	2137
+scalar "largeLAN.bhost[4].cli" 	"packets rcvd" 	7040
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay mean" 	0.0801129194
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay stddev" 	0.0603369887
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay min" 	8.422e-05
+scalar "largeLAN.bhost[4].cli" 	"end-to-end delay max" 	0.27750642
+scalar "largeLAN.bhost[4].srv" 	"packets sent" 	19256
+scalar "largeLAN.bhost[4].srv" 	"packets rcvd" 	3380
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay mean" 	0.0658648843
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay stddev" 	0.055325846
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay min" 	0.00010974
+scalar "largeLAN.bhost[4].srv" 	"end-to-end delay max" 	0.288700669
+scalar "largeLAN.bhost[4].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[4].llc" 	"packets from higher layer" 	21393
+scalar "largeLAN.bhost[4].llc" 	"frames from MAC" 	10420
+scalar "largeLAN.bhost[4].llc" 	"packets passed up" 	10420
+scalar "largeLAN.bhost[4].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[4].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[4].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[4].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[4].mac" 	"rx channel idle (%)" 	14.3037961
+scalar "largeLAN.bhost[4].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[4].mac" 	"rx channel collision (%)" 	76.3338545
+scalar "largeLAN.bhost[4].mac" 	"frames sent" 	20924
+scalar "largeLAN.bhost[4].mac" 	"frames rcvd" 	331252
+scalar "largeLAN.bhost[4].mac" 	"bytes sent" 	27687010
+scalar "largeLAN.bhost[4].mac" 	"bytes rcvd" 	418447506
+scalar "largeLAN.bhost[4].mac" 	"frames from higher layer" 	21393
+scalar "largeLAN.bhost[4].mac" 	"frames from higher layer dropped (queue full)" 	129
+scalar "largeLAN.bhost[4].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[4].mac" 	"frames dropped (not for us)" 	320832
+scalar "largeLAN.bhost[4].mac" 	"frames passed up to HL" 	10420
+scalar "largeLAN.bhost[4].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[4].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[4].mac" 	"collisions" 	212140
+scalar "largeLAN.bhost[4].mac" 	"backoffs" 	33311
+scalar "largeLAN.bhost[4].mac" 	"frames/sec sent" 	49.8189339
+scalar "largeLAN.bhost[4].mac" 	"frames/sec rcvd" 	788.693438
+scalar "largeLAN.bhost[4].mac" 	"bits/sec sent" 	527370.415
+scalar "largeLAN.bhost[4].mac" 	"bits/sec rcvd" 	7970410.49
+scalar "largeLAN.bhost[5].cli" 	"packets sent" 	2083
+scalar "largeLAN.bhost[5].cli" 	"packets rcvd" 	6629
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay mean" 	0.081090705
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay stddev" 	0.0617924137
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay min" 	0.000144915
+scalar "largeLAN.bhost[5].cli" 	"end-to-end delay max" 	0.315059125
+scalar "largeLAN.bhost[5].srv" 	"packets sent" 	19025
+scalar "largeLAN.bhost[5].srv" 	"packets rcvd" 	3348
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay mean" 	0.0682262725
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay stddev" 	0.056353684
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay min" 	0.000107075
+scalar "largeLAN.bhost[5].srv" 	"end-to-end delay max" 	0.280904263
+scalar "largeLAN.bhost[5].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[5].llc" 	"packets from higher layer" 	21108
+scalar "largeLAN.bhost[5].llc" 	"frames from MAC" 	9977
+scalar "largeLAN.bhost[5].llc" 	"packets passed up" 	9977
+scalar "largeLAN.bhost[5].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[5].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[5].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[5].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[5].mac" 	"rx channel idle (%)" 	14.3038604
+scalar "largeLAN.bhost[5].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[5].mac" 	"rx channel collision (%)" 	76.3068547
+scalar "largeLAN.bhost[5].mac" 	"frames sent" 	20765
+scalar "largeLAN.bhost[5].mac" 	"frames rcvd" 	331411
+scalar "largeLAN.bhost[5].mac" 	"bytes sent" 	27471482
+scalar "largeLAN.bhost[5].mac" 	"bytes rcvd" 	418663034
+scalar "largeLAN.bhost[5].mac" 	"frames from higher layer" 	21108
+scalar "largeLAN.bhost[5].mac" 	"frames from higher layer dropped (queue full)" 	28
+scalar "largeLAN.bhost[5].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[5].mac" 	"frames dropped (not for us)" 	321434
+scalar "largeLAN.bhost[5].mac" 	"frames passed up to HL" 	9977
+scalar "largeLAN.bhost[5].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[5].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[5].mac" 	"collisions" 	212141
+scalar "largeLAN.bhost[5].mac" 	"backoffs" 	33318
+scalar "largeLAN.bhost[5].mac" 	"frames/sec sent" 	49.4403633
+scalar "largeLAN.bhost[5].mac" 	"frames/sec rcvd" 	789.072009
+scalar "largeLAN.bhost[5].mac" 	"bits/sec sent" 	523265.13
+scalar "largeLAN.bhost[5].mac" 	"bits/sec rcvd" 	7974515.78
+scalar "largeLAN.bhost[6].cli" 	"packets sent" 	2149
+scalar "largeLAN.bhost[6].cli" 	"packets rcvd" 	6731
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay mean" 	0.0825047905
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay stddev" 	0.0583168822
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay min" 	0.00034711
+scalar "largeLAN.bhost[6].cli" 	"end-to-end delay max" 	0.293641947
+scalar "largeLAN.bhost[6].srv" 	"packets sent" 	19672
+scalar "largeLAN.bhost[6].srv" 	"packets rcvd" 	3385
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay mean" 	0.066410384
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay stddev" 	0.0549798249
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay min" 	9.737e-05
+scalar "largeLAN.bhost[6].srv" 	"end-to-end delay max" 	0.295505774
+scalar "largeLAN.bhost[6].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[6].llc" 	"packets from higher layer" 	21821
+scalar "largeLAN.bhost[6].llc" 	"frames from MAC" 	10116
+scalar "largeLAN.bhost[6].llc" 	"packets passed up" 	10116
+scalar "largeLAN.bhost[6].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[6].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[6].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[6].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[6].mac" 	"rx channel idle (%)" 	14.303956
+scalar "largeLAN.bhost[6].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[6].mac" 	"rx channel collision (%)" 	76.2667048
+scalar "largeLAN.bhost[6].mac" 	"frames sent" 	21350
+scalar "largeLAN.bhost[6].mac" 	"frames rcvd" 	330826
+scalar "largeLAN.bhost[6].mac" 	"bytes sent" 	28282576
+scalar "largeLAN.bhost[6].mac" 	"bytes rcvd" 	417851940
+scalar "largeLAN.bhost[6].mac" 	"frames from higher layer" 	21821
+scalar "largeLAN.bhost[6].mac" 	"frames from higher layer dropped (queue full)" 	124
+scalar "largeLAN.bhost[6].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[6].mac" 	"frames dropped (not for us)" 	320710
+scalar "largeLAN.bhost[6].mac" 	"frames passed up to HL" 	10116
+scalar "largeLAN.bhost[6].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[6].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[6].mac" 	"collisions" 	212142
+scalar "largeLAN.bhost[6].mac" 	"backoffs" 	34079
+scalar "largeLAN.bhost[6].mac" 	"frames/sec sent" 	50.8332173
+scalar "largeLAN.bhost[6].mac" 	"frames/sec rcvd" 	787.679155
+scalar "largeLAN.bhost[6].mac" 	"bits/sec sent" 	538714.504
+scalar "largeLAN.bhost[6].mac" 	"bits/sec rcvd" 	7959066.41
+scalar "largeLAN.bhost[7].cli" 	"packets sent" 	2191
+scalar "largeLAN.bhost[7].cli" 	"packets rcvd" 	6952
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay mean" 	0.0752680094
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay stddev" 	0.0583323288
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay min" 	0.000534505
+scalar "largeLAN.bhost[7].cli" 	"end-to-end delay max" 	0.314094463
+scalar "largeLAN.bhost[7].srv" 	"packets sent" 	19167
+scalar "largeLAN.bhost[7].srv" 	"packets rcvd" 	3357
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay mean" 	0.067014113
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay stddev" 	0.0560277617
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay min" 	0.000101745
+scalar "largeLAN.bhost[7].srv" 	"end-to-end delay max" 	0.324696184
+scalar "largeLAN.bhost[7].llc" 	"dsaps registered" 	2
+scalar "largeLAN.bhost[7].llc" 	"packets from higher layer" 	21358
+scalar "largeLAN.bhost[7].llc" 	"frames from MAC" 	10309
+scalar "largeLAN.bhost[7].llc" 	"packets passed up" 	10309
+scalar "largeLAN.bhost[7].llc" 	"packets dropped - unknown DSAP" 	0
+scalar "largeLAN.bhost[7].mac" 	"simulated time" 	420.000959
+scalar "largeLAN.bhost[7].mac" 	"txrate (Mb)" 	10
+scalar "largeLAN.bhost[7].mac" 	"full duplex" 	0
+scalar "largeLAN.bhost[7].mac" 	"rx channel idle (%)" 	14.3040627
+scalar "largeLAN.bhost[7].mac" 	"rx channel utilization (%)" 	85.514457
+scalar "largeLAN.bhost[7].mac" 	"rx channel collision (%)" 	76.2218904
+scalar "largeLAN.bhost[7].mac" 	"frames sent" 	20956
+scalar "largeLAN.bhost[7].mac" 	"frames rcvd" 	331220
+scalar "largeLAN.bhost[7].mac" 	"bytes sent" 	27665174
+scalar "largeLAN.bhost[7].mac" 	"bytes rcvd" 	418469342
+scalar "largeLAN.bhost[7].mac" 	"frames from higher layer" 	21358
+scalar "largeLAN.bhost[7].mac" 	"frames from higher layer dropped (queue full)" 	51
+scalar "largeLAN.bhost[7].mac" 	"frames dropped (bit error)" 	0
+scalar "largeLAN.bhost[7].mac" 	"frames dropped (not for us)" 	320911
+scalar "largeLAN.bhost[7].mac" 	"frames passed up to HL" 	10309
+scalar "largeLAN.bhost[7].mac" 	"PAUSE frames sent" 	0
+scalar "largeLAN.bhost[7].mac" 	"PAUSE frames rcvd" 	0
+scalar "largeLAN.bhost[7].mac" 	"collisions" 	212142
+scalar "largeLAN.bhost[7].mac" 	"backoffs" 	33720
+scalar "largeLAN.bhost[7].mac" 	"frames/sec sent" 	49.8951242
+scalar "largeLAN.bhost[7].mac" 	"frames/sec rcvd" 	788.617248
+scalar "largeLAN.bhost[7].mac" 	"bits/sec sent" 	526954.493
+scalar "largeLAN.bhost[7].mac" 	"bits/sec rcvd" 	7970826.42

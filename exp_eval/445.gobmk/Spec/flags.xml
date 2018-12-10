@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<!DOCTYPE flagsdescription SYSTEM
+       "http://www.spec.org/dtd/cpuflags1.dtd">
+
+<!-- This file defines flags that appear in the sources for 445.gobmk.
+
+  Copyright (C) 2005-2006 Standard Performance Evaluation Corporation
+
+  $Revision: 6737 $
+  $Date: 2011-08-10 17:19:42 -0400 (Wed, 10 Aug 2011) $
+-->
+<flagsdescription>
+
+<!-- Normal flags file should suggest a name for themselves -->
+<filename>445.gobmk.flags</filename>
+
+<title>445.gobmk Flags</title>
+
+<header>
+<![CDATA[
+<p>These are flags that appear in the benchmark sources, categorized as to
+whether they are portability candidates, mandatory, or forbidden.
+</p>
+]]>
+</header>
+
+<flag name="currdir_inc" class="mandatory" regexp="-I\.\.?(?:/include)?(?:\s+|$)">
+<example>-I., -I.., -I./include, -I../include</example>
+These flags are set for all builds in Spec/object.pm.
+</flag>
+
+<flag name="DCHECK_HASHING" class="forbidden">
+Check hash table to validate board position integrity.
+</flag>
+
+<flag name="DELIDE_CODE" class="forbidden">
+Assert ELIDE code support
+</flag>
+
+<flag name="DFULL_POSITION_IN_HASH" class="forbidden">
+Implement adding full board position into hash table.
+</flag>
+
+<flag name="DGG_GETOPT_H" class="forbidden">
+Prevents the header file gg-getopt.h from being loaded.
+</flag>
+
+<flag name="DGG_TURN_OFF_ASSERTS" class="forbidden">
+Turn off assert handling.
+</flag>
+
+<flag name="DGRID_OPT" class="forbidden">
+Enables an optimization in matching in pattern matching engine.
+</flag>
+
+<flag name="DHAVE_CONFIG_H" class="mandatory">
+Use config.h supplied in src.
+</flag>
+
+<flag name="DHAVE_LIBINTL_H" class="forbidden">
+<![CDATA[
+Set flag to include <tt>libintl.h</tt> when using GNU distributions with internationalized messages, where the _ macro is not defined.
+]]>
+</flag>
+
+<flag name="DHAVE_SYS_TIME_H" class="portability">
+<![CDATA[
+Controls selection of <tt>sys/time.h</tt> or <tt>time.h</tt> .
+]]>
+</flag>
+
+<flag name="DHAVE_VISUAL_C" class="portability">
+Include Visual C header files.
+</flag>
+
+<flag name="DSPEC_CPU_WINDOWS" class="mandatory">
+<![CDATA[
+Define if system is running Windows. This will prevent the inclusion of 
+<tt>unistd.h</tt>. It will also prevent the inclusion of both <tt>sys/time.h</tt> and <tt>time.h</tt>.
+]]>
+</flag>
+
+<flag name="DTEST" class="forbidden">
+Enable test main to validate getopt definitions.
+</flag>
+
+<flag name="DTEST_SGFPARSER" class="forbidden">
+Enable test main to validate sgfnode definitions.
+</flag>
+
+<flag name="DVMS" class="portability">
+Include correct libraries on VMS.
+</flag>
+
+<flag name="D_" class="forbidden">
+Definition of this symbol is forbidden. 
+</flag>
+
+<flag name="D_CACHE_H_" class="forbidden">
+Prevents the header file cache.h from being included more than once.
+</flag>
+
+<flag name="D_CLOCK_H_" class="forbidden">
+Prevents the header file clock.h from being included more than once.
+</flag>
+
+<flag name="D_DFA_H_" class="forbidden">
+Prevents the header file dfa.h from being included more than once.
+</flag>
+
+<flag name="D_GG_UTILS_H_" class="forbidden">
+Prevents the header file gg_utils.h from being included more than once.
+</flag>
+
+<flag name="D_GMP_C_" class="forbidden">
+Prevents the typedef definition of the Gmp structure.
+</flag>
+
+<flag name="D_GMP_H_" class="forbidden">
+Prevents the header file gmp.h from being included more than once.
+</flag>
+
+<flag name="D_GNUGO_H_" class="forbidden">
+Prevents the header file gnugo.h from being included more than once.
+</flag>
+
+<flag name="D_HASH_H_" class="forbidden">
+Prevents the header file hash.h from being included more than once.
+</flag>
+
+<flag name="D_LIBC" class="forbidden">
+Assert the presence of GNU libc to determine validity of arguments.
+</flag>
+
+<flag name="D_LIBERTY_H_" class="forbidden">
+Prevents the header file liberty.h from being included more than once.
+</flag>
+
+<flag name="D_PLAY_INTERFACE_H" class="forbidden">
+Prevents the header file interface.h from being included more than once.
+</flag>
+
+<flag name="D_RANDOM_H_" class="forbidden">
+Prevents the header file random.h from being included more than once.
+</flag>
+
+<flag name="D_SGFTREE_H" class="forbidden">
+Prevents the header file sgftree.h from being included more than once.
+</flag>
+
+<flag name="D__GLIBC__" class="portability">
+Is set to the major version of GNU C libraries.
+</flag>
+
+<flag name="D__GNUC__" class="portability">
+Is set to the major version of gcc.
+</flag>
+
+<flag name="D__GNU_LIBRARY__" class="portability">
+Asserts presence of GNU C libraries.
+</flag>
+
+<flag name="D__MINGW32__" class="portability">
+Is set to major version of MinGW.
+</flag>
+
+<flag name="D__PATTERN_H__" class="forbidden">
+Prevents the header file patterns.h from being included more than once.
+</flag>
+
+<flag name="D__STDC__" class="portability">
+Assert ANSI C standard is used.
+</flag>
+
+<flag name="D__cplusplus" class="forbidden">
+Assert C++ compiler is used.
+</flag>
+
+<flag name="D__need_getopt" class="forbidden">
+Bypass definition of getopt prototypes.
+</flag>
+
+<flag name="Dconst" class="forbidden">
+Deals with different treatment of preprocessor statement 'defined(const)'.
+</flag>
+
+<flag name="Dgetenv" class="forbidden">
+Bypass definition of getenv prototype.
+</flag>
+
+<flag name="Dstrlen" class="compiler">
+Assert strlen function is already defined.
+</flag>
+
+<flag name="Dtext_set_element" class="forbidden">
+Asserts text_set_element macro exists.
+</flag>
+
+
+</flagsdescription>

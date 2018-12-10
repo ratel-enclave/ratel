@@ -1,0 +1,2746 @@
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta name="generator" content="SPEC CPU2006 Tools  (flags v6417)" />
+<meta http-equiv="Content-type" content="text/html;charset=utf-8" />
+<style type="text/css" id="internalScreen" media="screen">
+<!--
+body {
+  margin:  1em;
+  border:  0;
+  padding: 0;
+  background: white;
+  color:      black;
+  font-family: "Times Roman", times, serif;
+}
+
+.tt {
+  font-family: monospace;
+}
+
+div.flagClass > h2 {
+  border-bottom: 1px dotted black;
+  width: 80%;
+  font-family: sans-serif;
+}
+
+div.flagDesc {
+  clear: both;
+  background-color: rgb(255, 245, 220);
+  border: 1px solid blue; /* XXX This is for debugging */ 
+  margin: 0 auto;
+  width: 90%;
+}
+
+li.flagName {
+  font-weight: bold;
+  width: 100%;
+  border-bottom: 1px solid black;
+  display: block;
+  margin: 0.5em 0 0.5em 0;
+  font-size: 125%;
+  white-space: nowrap;
+}
+
+/* (presumably short) informationals all get grouped together near the top
+ * of the flag description block.
+ */
+.flagOrigin, .flagDescClass, .flagDescCompiler, .flagDescRE, .flagDescParallel, .flagVar {
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  float: left;
+  padding: 0.25em;
+  margin: 0 0 0.25em 0;
+}
+
+.flagDescClass::before {
+  content: "Flag Class: ";
+}
+.flagDescCompiler::before {
+  content: "Compilers that recognize this flag: ";
+}
+.flagDescRE::before {
+  content: "Regular Expression: ";
+}
+.flagDescParallel::before {
+  content: "Indicates automatic parallelization: ";
+}
+.flagVar::before {
+  content: "Found In: ";
+}
+
+span.flagDescInc {
+  border-bottom: 1px solid black;
+}
+
+/* The description text stands alone. */
+.descText {
+  clear: both;
+  padding: 0.5em 1em 0.5em 1em;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  margin: 0.5em 0 0.5em 0;
+}
+
+/* This is a separate class so that in the print style sheet it can
+ * be ignored.
+ * Also, 'style="clear:both;"' is longer than 'class="clear"'
+ */
+.clear {
+  clear: both;
+}
+
+/* This is really for the link _to_ the flag report */
+li.unknown > a:link, a:visited { text-decoration: none; }
+
+.monospace {
+  font-family: Courier, "Courier New", monospace;
+}
+
+ul.flagDescList {
+  clear: both;
+  list-style-type: none;
+}
+
+/* Arrange for each flag description to have some headroom. */
+ul.flagDescList > li {
+  margin: 2em 0 0 0;
+}
+
+ul.flagDesc {
+  list-style-type: none;
+}
+
+div.flagTOC {
+  border: 1px solid white;
+  padding: 0.5em 1em;
+  margin: 0 auto;
+  width: 80%;
+}
+
+ul.flagTOC {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.flagTOC > li {
+  border: 1px solid white; /* rgb(211, 211, 211); */
+  margin: 0;
+  padding: 0.25em 0 0.25em 0;
+  float: left;
+  display: inline-block; /* Fix IE bug; compliant browsers will ignore this */
+  width: 24.3%;
+  min-height: 1.5em;
+  overflow: hidden; /* If the table gets squeezed too much, don't let the
+                     * text overlap
+                     */
+  white-space: nowrap;
+}
+
+ul.SubMenu li {
+  border: 1px solid white; /* rgb(211, 211, 211); */
+}
+
+ul.SubMenu {
+  display: none;
+  position: absolute;
+  list-style-type: none;
+  border: 1px solid black;
+  background-color: white;
+  margin: 0 0 0 2em;
+  padding: 0.25em 5em 0.25em 0.5em;
+  white-space: nowrap;
+}
+
+li:hover > ul.SubMenu, ul.SubMenu:hover {
+  display: block;
+}
+
+ul.SubMenu > li:hover, ul.flagTOC > li:hover {
+  background-color: rgb(176, 196, 238); /* lightsteelgray... almost */
+  border: 1px solid rgb(128, 128, 128);
+}
+
+
+.resultpage a:link, .resultpage a:visited {
+  text-decoration: none;
+  border-bottom: 1px dashed black;
+  color: inherit;
+}
+
+.resultpage {
+  margin: auto;
+  padding: 0;
+  width: 800px;
+}
+
+div.logo {
+  float: left;
+  width: 38px;
+  height: 57px;
+}
+
+.titlebarcontainer, .resultstable, .ncsection {
+  border: solid 1px;
+  width: 100%;
+  float: left;
+}
+
+.ncsection {
+  background-color: white;
+  color: black;
+}
+
+.titlebar {
+  float: left;
+  padding: 0em 1em 0em 1em;
+  text-align: center;
+  width: 91%;
+}
+
+div.titlebar > h1, div.titlebar > p {
+  margin: 0 1em 0 1em;
+}
+
+div.ncsection {
+  font-size: 150%;
+  font-weight: bold;
+  text-align: center;
+}
+
+.systembar {
+  float: left;
+  width: 65%;
+  font-size: 150%;
+  margin: 0;
+  padding: 0.1em;
+  border-right: solid 1px black;
+}
+
+.metricbar {
+  padding: 0.1em;
+  margin: 0;
+  float: right;
+  width: 33%;
+  height: 50%;
+  font-size: 120%;
+}
+
+.metricbar#base {
+  background-color: #c8c8c8;
+  color: black;
+}
+
+.metricbar#peak {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+}
+
+.metricbar p {
+  margin: 0;
+  padding: 0.2em;
+}
+
+.datebar p, .systembar p {
+  margin: 0;
+  padding: 0;
+}
+
+/* Datebar stuff for older results */
+.datebar p {
+  float: left;
+  border-left: solid 1px black;
+}
+
+span.item {
+  float: left;
+  margin: 0;
+  padding: 0.1em 0 0.1em 0.5em;
+}
+
+span.value {
+  float: right;
+  padding: 0.1em 0.5em 0.1em 0;
+}
+
+div.datebar {
+  width: 100%;
+  float: left;
+  min-height: 100%;
+  border: solid 1px black;
+}
+
+p#test_sponsor         { width: 48%; }
+p#tester               { width: 48%; }
+p#license_num          { width: 24%; }
+p#test_date            { width: 23%; }
+p#hw_avail, p#sw_avail { width: 25%; }
+
+/* Table-based datebar on newer results */
+table.datebar {
+  float: left;
+  width: 100%;
+  min-height: 100%;
+  border-collapse: collapse;
+  border: solid 1px black;
+  table-layout: fixed;
+}
+
+table.datebar th {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-left: 0.5em;
+  padding: 0 0.5em 0 0.25em;
+}
+
+table.datebar td {
+  text-align: left;
+  padding: 0 0.5em 0 0;
+}
+
+th#license_num          { width: 17%; }
+th#test_sponsor         { width: 17%; }
+th#tester               { width: 17%; }
+th#test_date            { width: 22%; }
+th#hw_avail             { width: 22%; }
+th#sw_avail             { width: 22%; }
+td#license_num_val      { width: 52%; }
+td#test_sponsor_val     { width: 52%; }
+td#tester_val           { width: 52%; }
+td#test_date_val        { width: 13%; white-space: nowrap; }
+td#hw_avail_val         { width: 13%; white-space: nowrap; }
+td#sw_avail_val         { width: 13%; white-space: nowrap; }
+
+
+div.graph {
+  margin: auto;
+}
+
+div.sysdesc > h2 {
+  text-align: center;
+  background-color: #c8c8c8;
+  color: black;
+  padding: 0.5em 0 0.5em 0;
+  margin: 0;
+} 
+  
+div.sysdesc {
+  margin: 0.5em 0 0.5em 0;
+}
+
+div.infobox, div.sysdesc {
+  float: left;
+  width: 100%;
+  padding: 0;
+  border: solid 1px black;
+}
+
+div.infobox table {
+  width: 49%;
+  float: left;
+}
+
+div.infobox table tr {
+  vertical-align: top;
+}
+
+div.infobox table#Hardware,
+div.infobox table#BenchmarkSoftware {
+  width: 50%;
+  border-right: 1px solid black;
+}
+
+div.infobox table#Systems {
+  width: 100%;
+}
+
+div.infobox table#Systems tbody th {
+  width: 20%;
+}
+
+div.infobox thead th {
+  font-size: 200%;
+}
+
+div.infobox tbody th {
+  text-align: left;
+}
+
+.resultstable h2, div.notes h2 {
+  text-align: center;
+  margin: 0.1em;
+}
+
+div.notes h3 {
+  margin: 0.1em;
+}
+
+div.notes table {
+  width: 100%;
+}
+
+div.notes table tr td {
+  text-align: right;
+  vertical-align: top;
+}
+
+/* Alas, IE6... if only you didn't suck so much...
+div.notes table tr td + td {
+*/
+div.notes table td.al {
+  text-align: left;
+  width: 85%;
+}
+
+div.notes table tr td {
+  padding-bottom: 1em;
+}
+
+div.notes table.portability tr td {
+  padding: 0em;
+}
+
+div.notes table.portability {
+  padding: 1em;
+}
+
+.resultstable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resultstable th.basecol, .resultstable th.peakcol {
+  padding: 0.1em;
+  font-size: 90%;
+}
+
+.resultstable th {
+  border: solid 2px black;
+}
+
+.resultstable td {
+  border: solid 1px #b8b8b8;
+}
+
+td.bm, th.bm { 
+  border-right: solid 2px black;
+  border-left: solid 2px black;
+}
+
+td.secs { 
+  border-left: solid 2px black;
+}
+
+td.ratio { 
+  border-right: solid 2px black;
+}
+
+.resultstable tfoot td {
+  text-align: center;
+  border: solid 2px black;
+}
+
+th.basecol {
+  background-color: #c8c8c8;
+  color: black;
+}
+td.basecol {
+  text-align: right;
+  background-color: transparent;
+  color: black;
+}
+
+th.peakcol {
+  text-align: center;
+}
+
+.peakcol {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+  text-align: right;
+}
+
+td.bm {
+  /* Basically, the benchmark name and copies columns */
+  background-color: #c8c8c8;
+  color: black;
+}
+
+span.selected {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.selected a:link, .selected a:visited {
+  border-bottom: 0;
+}
+
+div.notes {
+  width: 100%;
+  float: left;
+  border: solid 1px black;
+}
+
+div.flagfooter {
+  text-align: center;
+}
+
+div.errors {
+  border: solid 2px red;
+}
+div.errors h2 {
+  background-color: transparent;
+  color: red;
+}
+
+div.footer {
+  border: none;
+}
+
+/* People find the "double underline" confusing.  And Safari 1.3 doesn't deal
+ * well with attempting to disable the border for userflag links.  So just
+ * give up and don't decorate user flags specially.
+********************
+span.userflag {
+  text-decoration: underline;
+}
+
+.userflag a:link {
+  border-bottom: 0;
+}
+********************
+*/
+
+/* Keep flags from being wrapped */
+span.userflag, span.flagtext {
+  white-space: nowrap;
+}
+/* Most of the screen-specific CSS is also the common CSS */
+
+/* Style for the non-image W3C marking at the bottom of the page, courtesy of
+ * Marek Prokop (http://www.sovavsiti.cz/css/w3c_buttons.html)
+ */
+.w3cbutton3 {
+  margin: 1em 1em 0 0;
+  width: 9em;
+  border: 1px solid #ccc;
+  font-family: helvetica,arial,sans-serif;
+  font-size: 70%;
+  font-weight: bold;
+  float: left;
+}
+.w3cbutton3 a {
+  display: block;
+  width: 100%;
+}
+.w3cbutton3 a:link,
+.w3cbutton3 a:visited,
+.w3cbutton3 a:hover {
+  background-color: #fc6;
+  color: #000;
+  text-decoration: none;
+  border-bottom: none;
+}
+.w3cbutton3 span.w3c {
+  padding: 0 0.4em;
+  background-color: #fff;
+  color: #0c479d;
+}
+
+-->
+</style>
+<style type="text/css" id="internalPrint" media="print">
+<!--
+body {
+  margin:  1em;
+  border:  0;
+  padding: 0;
+  background: white;
+  color:      black;
+  font-family: "Times Roman", times, serif;
+}
+
+.tt {
+  font-family: monospace;
+}
+
+div.flagClass > h2 {
+  border-bottom: 1px dotted black;
+  width: 80%;
+  font-family: sans-serif;
+}
+
+div.flagDesc {
+  clear: both;
+  background-color: rgb(255, 245, 220);
+  border: 1px solid blue; /* XXX This is for debugging */ 
+  margin: 0 auto;
+  width: 90%;
+}
+
+li.flagName {
+  font-weight: bold;
+  width: 100%;
+  border-bottom: 1px solid black;
+  display: block;
+  margin: 0.5em 0 0.5em 0;
+  font-size: 125%;
+  white-space: nowrap;
+}
+
+/* (presumably short) informationals all get grouped together near the top
+ * of the flag description block.
+ */
+.flagOrigin, .flagDescClass, .flagDescCompiler, .flagDescRE, .flagDescParallel, .flagVar {
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  float: left;
+  padding: 0.25em;
+  margin: 0 0 0.25em 0;
+}
+
+.flagDescClass::before {
+  content: "Flag Class: ";
+}
+.flagDescCompiler::before {
+  content: "Compilers that recognize this flag: ";
+}
+.flagDescRE::before {
+  content: "Regular Expression: ";
+}
+.flagDescParallel::before {
+  content: "Indicates automatic parallelization: ";
+}
+.flagVar::before {
+  content: "Found In: ";
+}
+
+span.flagDescInc {
+  border-bottom: 1px solid black;
+}
+
+/* The description text stands alone. */
+.descText {
+  clear: both;
+  padding: 0.5em 1em 0.5em 1em;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  margin: 0.5em 0 0.5em 0;
+}
+
+/* This is a separate class so that in the print style sheet it can
+ * be ignored.
+ * Also, 'style="clear:both;"' is longer than 'class="clear"'
+ */
+.clear {
+  clear: both;
+}
+
+/* This is really for the link _to_ the flag report */
+li.unknown > a:link, a:visited { text-decoration: none; }
+
+.monospace {
+  font-family: Courier, "Courier New", monospace;
+}
+
+ul.flagDescList {
+  clear: both;
+  list-style-type: none;
+}
+
+/* Arrange for each flag description to have some headroom. */
+ul.flagDescList > li {
+  margin: 2em 0 0 0;
+}
+
+ul.flagDesc {
+  list-style-type: none;
+}
+
+div.flagTOC {
+  border: 1px solid white;
+  padding: 0.5em 1em;
+  margin: 0 auto;
+  width: 80%;
+}
+
+ul.flagTOC {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.flagTOC > li {
+  border: 1px solid white; /* rgb(211, 211, 211); */
+  margin: 0;
+  padding: 0.25em 0 0.25em 0;
+  float: left;
+  display: inline-block; /* Fix IE bug; compliant browsers will ignore this */
+  width: 24.3%;
+  min-height: 1.5em;
+  overflow: hidden; /* If the table gets squeezed too much, don't let the
+                     * text overlap
+                     */
+  white-space: nowrap;
+}
+
+ul.SubMenu li {
+  border: 1px solid white; /* rgb(211, 211, 211); */
+}
+
+ul.SubMenu {
+  display: none;
+  position: absolute;
+  list-style-type: none;
+  border: 1px solid black;
+  background-color: white;
+  margin: 0 0 0 2em;
+  padding: 0.25em 5em 0.25em 0.5em;
+  white-space: nowrap;
+}
+
+li:hover > ul.SubMenu, ul.SubMenu:hover {
+  display: block;
+}
+
+ul.SubMenu > li:hover, ul.flagTOC > li:hover {
+  background-color: rgb(176, 196, 238); /* lightsteelgray... almost */
+  border: 1px solid rgb(128, 128, 128);
+}
+
+
+.resultpage a:link, .resultpage a:visited {
+  text-decoration: none;
+  border-bottom: 1px dashed black;
+  color: inherit;
+}
+
+.resultpage {
+  margin: auto;
+  padding: 0;
+  width: 800px;
+}
+
+div.logo {
+  float: left;
+  width: 38px;
+  height: 57px;
+}
+
+.titlebarcontainer, .resultstable, .ncsection {
+  border: solid 1px;
+  width: 100%;
+  float: left;
+}
+
+.ncsection {
+  background-color: white;
+  color: black;
+}
+
+.titlebar {
+  float: left;
+  padding: 0em 1em 0em 1em;
+  text-align: center;
+  width: 91%;
+}
+
+div.titlebar > h1, div.titlebar > p {
+  margin: 0 1em 0 1em;
+}
+
+div.ncsection {
+  font-size: 150%;
+  font-weight: bold;
+  text-align: center;
+}
+
+.systembar {
+  float: left;
+  width: 65%;
+  font-size: 150%;
+  margin: 0;
+  padding: 0.1em;
+  border-right: solid 1px black;
+}
+
+.metricbar {
+  padding: 0.1em;
+  margin: 0;
+  float: right;
+  width: 33%;
+  height: 50%;
+  font-size: 120%;
+}
+
+.metricbar#base {
+  background-color: #c8c8c8;
+  color: black;
+}
+
+.metricbar#peak {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+}
+
+.metricbar p {
+  margin: 0;
+  padding: 0.2em;
+}
+
+.datebar p, .systembar p {
+  margin: 0;
+  padding: 0;
+}
+
+/* Datebar stuff for older results */
+.datebar p {
+  float: left;
+  border-left: solid 1px black;
+}
+
+span.item {
+  float: left;
+  margin: 0;
+  padding: 0.1em 0 0.1em 0.5em;
+}
+
+span.value {
+  float: right;
+  padding: 0.1em 0.5em 0.1em 0;
+}
+
+div.datebar {
+  width: 100%;
+  float: left;
+  min-height: 100%;
+  border: solid 1px black;
+}
+
+p#test_sponsor         { width: 48%; }
+p#tester               { width: 48%; }
+p#license_num          { width: 24%; }
+p#test_date            { width: 23%; }
+p#hw_avail, p#sw_avail { width: 25%; }
+
+/* Table-based datebar on newer results */
+table.datebar {
+  float: left;
+  width: 100%;
+  min-height: 100%;
+  border-collapse: collapse;
+  border: solid 1px black;
+  table-layout: fixed;
+}
+
+table.datebar th {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-left: 0.5em;
+  padding: 0 0.5em 0 0.25em;
+}
+
+table.datebar td {
+  text-align: left;
+  padding: 0 0.5em 0 0;
+}
+
+th#license_num          { width: 17%; }
+th#test_sponsor         { width: 17%; }
+th#tester               { width: 17%; }
+th#test_date            { width: 22%; }
+th#hw_avail             { width: 22%; }
+th#sw_avail             { width: 22%; }
+td#license_num_val      { width: 52%; }
+td#test_sponsor_val     { width: 52%; }
+td#tester_val           { width: 52%; }
+td#test_date_val        { width: 13%; white-space: nowrap; }
+td#hw_avail_val         { width: 13%; white-space: nowrap; }
+td#sw_avail_val         { width: 13%; white-space: nowrap; }
+
+
+div.graph {
+  margin: auto;
+}
+
+div.sysdesc > h2 {
+  text-align: center;
+  background-color: #c8c8c8;
+  color: black;
+  padding: 0.5em 0 0.5em 0;
+  margin: 0;
+} 
+  
+div.sysdesc {
+  margin: 0.5em 0 0.5em 0;
+}
+
+div.infobox, div.sysdesc {
+  float: left;
+  width: 100%;
+  padding: 0;
+  border: solid 1px black;
+}
+
+div.infobox table {
+  width: 49%;
+  float: left;
+}
+
+div.infobox table tr {
+  vertical-align: top;
+}
+
+div.infobox table#Hardware,
+div.infobox table#BenchmarkSoftware {
+  width: 50%;
+  border-right: 1px solid black;
+}
+
+div.infobox table#Systems {
+  width: 100%;
+}
+
+div.infobox table#Systems tbody th {
+  width: 20%;
+}
+
+div.infobox thead th {
+  font-size: 200%;
+}
+
+div.infobox tbody th {
+  text-align: left;
+}
+
+.resultstable h2, div.notes h2 {
+  text-align: center;
+  margin: 0.1em;
+}
+
+div.notes h3 {
+  margin: 0.1em;
+}
+
+div.notes table {
+  width: 100%;
+}
+
+div.notes table tr td {
+  text-align: right;
+  vertical-align: top;
+}
+
+/* Alas, IE6... if only you didn't suck so much...
+div.notes table tr td + td {
+*/
+div.notes table td.al {
+  text-align: left;
+  width: 85%;
+}
+
+div.notes table tr td {
+  padding-bottom: 1em;
+}
+
+div.notes table.portability tr td {
+  padding: 0em;
+}
+
+div.notes table.portability {
+  padding: 1em;
+}
+
+.resultstable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resultstable th.basecol, .resultstable th.peakcol {
+  padding: 0.1em;
+  font-size: 90%;
+}
+
+.resultstable th {
+  border: solid 2px black;
+}
+
+.resultstable td {
+  border: solid 1px #b8b8b8;
+}
+
+td.bm, th.bm { 
+  border-right: solid 2px black;
+  border-left: solid 2px black;
+}
+
+td.secs { 
+  border-left: solid 2px black;
+}
+
+td.ratio { 
+  border-right: solid 2px black;
+}
+
+.resultstable tfoot td {
+  text-align: center;
+  border: solid 2px black;
+}
+
+th.basecol {
+  background-color: #c8c8c8;
+  color: black;
+}
+td.basecol {
+  text-align: right;
+  background-color: transparent;
+  color: black;
+}
+
+th.peakcol {
+  text-align: center;
+}
+
+.peakcol {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+  text-align: right;
+}
+
+td.bm {
+  /* Basically, the benchmark name and copies columns */
+  background-color: #c8c8c8;
+  color: black;
+}
+
+span.selected {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.selected a:link, .selected a:visited {
+  border-bottom: 0;
+}
+
+div.notes {
+  width: 100%;
+  float: left;
+  border: solid 1px black;
+}
+
+div.flagfooter {
+  text-align: center;
+}
+
+div.errors {
+  border: solid 2px red;
+}
+div.errors h2 {
+  background-color: transparent;
+  color: red;
+}
+
+div.footer {
+  border: none;
+}
+
+/* People find the "double underline" confusing.  And Safari 1.3 doesn't deal
+ * well with attempting to disable the border for userflag links.  So just
+ * give up and don't decorate user flags specially.
+********************
+span.userflag {
+  text-decoration: underline;
+}
+
+.userflag a:link {
+  border-bottom: 0;
+}
+********************
+*/
+
+/* Keep flags from being wrapped */
+span.userflag, span.flagtext {
+  white-space: nowrap;
+}
+/* Classes that contain links - useless on paper */
+.flagTOC, .SubMenu, .NoPrint {
+  display: none;
+}
+
+/* Don't decorate links - they're not clickable */
+a {
+  text-decoration: none;
+  background: inherit;
+  color: inherit;
+}
+
+.resultpage {
+  width: 100%;
+}
+
+.w3cbutton3 {
+  display: none;
+}
+-->
+</style>
+<title>471.omnetpp Flags</title>
+</head><body>
+<h1>471.omnetpp Flags</h1>
+
+
+<p>These are flags that appear in the benchmark sources, categorized as to
+whether they are portability candidates, mandatory, or forbidden.
+</p>
+
+<div class="NoPrint">
+<h3>Sections</h3>
+<p>Selecting one of the following will take you directly to that section:</p>
+<ul>
+<li><a href="#Section_portability">Portability Flags</a></li>
+<li><a href="#Section_mandatory">Mandatory Flags</a></li>
+<li><a href="#Section_forbidden">Forbidden Flags</a></li>
+</ul>
+</div>
+
+<hr />
+
+<div class="flagClass" id="portability">
+<h2><a name="Section_portability" id="Section_portability">Portability Flags</a></h2>
+<div class="flagTOC">
+<ul class="flagTOC">
+ <li><a href="#b471.omnetpp_DSPEC_CPU_NO_NESTED_CLASS_ACCESS">-DSPEC_CPU_NO_NESTED_CLASS_ACCESS</a></li>
+ <li><a href="#b471.omnetpp_DSPEC_CPU_STDLIB_USING_ERROR">-DSPEC_CPU_STDLIB_USING_ERROR</a></li>
+ <li><a href="#b471.omnetpp_DSPEC_CPU_WIN64">-DSPEC_CPU_WIN64</a></li>
+</ul>
+<div class="clear"></div>
+</div>
+
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DSPEC_CPU_NO_NESTED_CLASS_ACCESS" id="b471.omnetpp_DSPEC_CPU_NO_NESTED_CLASS_ACCESS">-DSPEC_CPU_NO_NESTED_CLASS_ACCESS</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DSPEC_CPU_NO_NESTED_CLASS_ACCESS(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+SPEC_CPU_NO_NESTED_CLASS_ACCESS can be used for compilers that do not allow access to the private members of a nested class.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DSPEC_CPU_STDLIB_USING_ERROR" id="b471.omnetpp_DSPEC_CPU_STDLIB_USING_ERROR">-DSPEC_CPU_STDLIB_USING_ERROR</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DSPEC_CPU_STDLIB_USING_ERROR(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+This macro can be used by compilers that need "std::" to access functions in <tt>cmath</tt>.
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DSPEC_CPU_WIN64" id="b471.omnetpp_DSPEC_CPU_WIN64">-DSPEC_CPU_WIN64</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DSPEC_CPU_WIN64(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+This macro indicates that the build is for 64-bit Windows system.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+
+</div>
+<hr />
+<div class="flagClass" id="mandatory">
+<h2><a name="Section_mandatory" id="Section_mandatory">Mandatory Flags</a></h2>
+<div class="flagTOC">
+<ul class="flagTOC">
+ <li><a href="#b471.omnetpp_includes">-I., -Iomnet_include, -Ilibs/envir</a></li>
+</ul>
+<div class="clear"></div>
+</div>
+
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_includes" id="b471.omnetpp_includes">-I., -Iomnet_include, -Ilibs/envir</a></li>
+<li class="flagDescRE"><span class="tt">-I(?:\.|omnet_include|libs/envir)(?:\s+|$)</span></li>
+<li class="descText">
+<p>
+This flag is set for all builds in Spec/object.pm.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+
+</div>
+<hr />
+<div class="flagClass" id="forbidden">
+<h2><a name="Section_forbidden" id="Section_forbidden">Forbidden Flags</a></h2>
+<div class="flagTOC">
+<ul class="flagTOC">
+ <li><a href="#b471.omnetpp_DALLOCTABLE">-DALLOCTABLE</a></li>
+ <li><a href="#b471.omnetpp_DBKPT">-DBKPT</a></li>
+ <li><a href="#b471.omnetpp_DBUILDING_CMDENV">-DBUILDING_CMDENV</a></li>
+ <li><a href="#b471.omnetpp_DBUILDING_ENVIR">-DBUILDING_ENVIR</a></li>
+ <li><a href="#b471.omnetpp_DBUILDING_SIM">-DBUILDING_SIM</a></li>
+ <li><a href="#b471.omnetpp_DCOUNTBLOCKS">-DCOUNTBLOCKS</a></li>
+ <li><a href="#b471.omnetpp_DDISPLAYALL">-DDISPLAYALL</a></li>
+ <li><a href="#b471.omnetpp_DDISPSTRAYS">-DDISPSTRAYS</a></li>
+ <li><a href="#b471.omnetpp_DDISTRIBUTE_ON_CHILD_SPLIT">-DDISTRIBUTE_ON_CHILD_SPLIT</a></li>
+ <li><a href="#b471.omnetpp_DETHERAPP_M_H_">-DETHERAPP_M_H_</a></li>
+ <li><a href="#b471.omnetpp_DETHERCTRL_M_H_">-DETHERCTRL_M_H_</a></li>
+ <li><a href="#b471.omnetpp_DETHERFRAME_M_H_">-DETHERFRAME_M_H_</a></li>
+ <li><a href="#b471.omnetpp_DFSM_DEBUG">-DFSM_DEBUG</a></li>
+ <li><a href="#b471.omnetpp_DHAVE_DLOPEN">-DHAVE_DLOPEN</a></li>
+ <li><a href="#b471.omnetpp_DHEAPCHECK">-DHEAPCHECK</a></li>
+ <li><a href="#b471.omnetpp_DHEAPCHECK_OK">-DHEAPCHECK_OK</a></li>
+ <li><a href="#b471.omnetpp_DINFINITY">-DINFINITY</a></li>
+ <li><a href="#b471.omnetpp_DK">-DK</a></li>
+ <li><a href="#b471.omnetpp_DMACADDRESS_H_">-DMACADDRESS_H_</a></li>
+ <li><a href="#b471.omnetpp_DMACADDRESS_M_H_">-DMACADDRESS_M_H_</a></li>
+ <li><a href="#b471.omnetpp_DM_E">-DM_E</a></li>
+ <li><a href="#b471.omnetpp_DM_PI">-DM_PI</a></li>
+ <li><a href="#b471.omnetpp_DMin">-DMin</a></li>
+ <li><a href="#b471.omnetpp_DNEDC_VERSION">-DNEDC_VERSION</a></li>
+ <li><a href="#b471.omnetpp_DNEW_CODE_FROM_PUPPIS_WITH_FLOATING_POINT_EXCEPTION">-DNEW_CODE_FROM_PUPPIS_WITH_FLOATING_POINT_EXCEPTION</a></li>
+ <li><a href="#b471.omnetpp_DNULL">-DNULL</a></li>
+ <li><a href="#b471.omnetpp_DNUM_STARTINGSEEDS">-DNUM_STARTINGSEEDS</a></li>
+ <li><a href="#b471.omnetpp_DOMNETPP_VERSION">-DOMNETPP_VERSION</a></li>
+ <li><a href="#b471.omnetpp_DOPP3">-DOPP3</a></li>
+ <li><a href="#b471.omnetpp_DPI">-DPI</a></li>
+ <li><a href="#b471.omnetpp_DUSE_PORTABLE_COROUTINES">-DUSE_PORTABLE_COROUTINES</a></li>
+ <li><a href="#b471.omnetpp_DUSE_WIN32_FIBERS">-DUSE_WIN32_FIBERS</a></li>
+ <li><a href="#b471.omnetpp_DWIN32">-DWIN32</a></li>
+ <li><a href="#b471.omnetpp_DWIN32_DLL">-DWIN32_DLL</a></li>
+ <li><a href="#b471.omnetpp_DWITH_AKAROA">-DWITH_AKAROA</a></li>
+ <li><a href="#b471.omnetpp_D_ETHERNETDEFS_H">-D_ETHERNETDEFS_H</a></li>
+ <li><a href="#b471.omnetpp_D_ETH_UTILS_H_">-D_ETH_UTILS_H_</a></li>
+ <li><a href="#b471.omnetpp_D_MACRELAYUNITBASE_H">-D_MACRELAYUNITBASE_H</a></li>
+ <li><a href="#b471.omnetpp_D_MACRELAYUNITNP_H">-D_MACRELAYUNITNP_H</a></li>
+ <li><a href="#b471.omnetpp_D_MACRELAYUNITPP_H">-D_MACRELAYUNITPP_H</a></li>
+ <li><a href="#b471.omnetpp_D_MSC_VER">-D_MSC_VER</a></li>
+ <li><a href="#b471.omnetpp_D_SPECQSORTH_">-D_SPECQSORTH_</a></li>
+ <li><a href="#b471.omnetpp_D_WIN32">-D_WIN32</a></li>
+ <li><a href="#b471.omnetpp_D__AKOUTVECTORMGR_H">-D__AKOUTVECTORMGR_H</a></li>
+ <li><a href="#b471.omnetpp_D__APPREG_H">-D__APPREG_H</a></li>
+ <li><a href="#b471.omnetpp_D__ARGS_H">-D__ARGS_H</a></li>
+ <li><a href="#b471.omnetpp_D__BORLANDC__">-D__BORLANDC__</a></li>
+ <li><a href="#b471.omnetpp_D__CARRAY_H">-D__CARRAY_H</a></li>
+ <li><a href="#b471.omnetpp_D__CCHANNEL_H">-D__CCHANNEL_H</a></li>
+ <li><a href="#b471.omnetpp_D__CCOROUTINE_H">-D__CCOROUTINE_H</a></li>
+ <li><a href="#b471.omnetpp_D__CDENSITY_H">-D__CDENSITY_H</a></li>
+ <li><a href="#b471.omnetpp_D__CDETECT_H">-D__CDETECT_H</a></li>
+ <li><a href="#b471.omnetpp_D__CDISPSTR_H">-D__CDISPSTR_H</a></li>
+ <li><a href="#b471.omnetpp_D__CENUM_H">-D__CENUM_H</a></li>
+ <li><a href="#b471.omnetpp_D__CENVIR_H">-D__CENVIR_H</a></li>
+ <li><a href="#b471.omnetpp_D__CEXCEPTION_H">-D__CEXCEPTION_H</a></li>
+ <li><a href="#b471.omnetpp_D__CFSM_H">-D__CFSM_H</a></li>
+ <li><a href="#b471.omnetpp_D__CGATE_H">-D__CGATE_H</a></li>
+ <li><a href="#b471.omnetpp_D__CHEAD_H">-D__CHEAD_H</a></li>
+ <li><a href="#b471.omnetpp_D__CHIST_H">-D__CHIST_H</a></li>
+ <li><a href="#b471.omnetpp_D__CINIFILE_H">-D__CINIFILE_H</a></li>
+ <li><a href="#b471.omnetpp_D__CKSPLIT_H">-D__CKSPLIT_H</a></li>
+ <li><a href="#b471.omnetpp_D__CLLIST_H">-D__CLLIST_H</a></li>
+ <li><a href="#b471.omnetpp_D__CMDDEFS_H">-D__CMDDEFS_H</a></li>
+ <li><a href="#b471.omnetpp_D__CMDENV_H">-D__CMDENV_H</a></li>
+ <li><a href="#b471.omnetpp_D__CMESSAGE30_H">-D__CMESSAGE30_H</a></li>
+ <li><a href="#b471.omnetpp_D__CMESSAGE_H">-D__CMESSAGE_H</a></li>
+ <li><a href="#b471.omnetpp_D__CMODULE_H">-D__CMODULE_H</a></li>
+ <li><a href="#b471.omnetpp_D__CMSGHEAP_H">-D__CMSGHEAP_H</a></li>
+ <li><a href="#b471.omnetpp_D__CNETMOD_H">-D__CNETMOD_H</a></li>
+ <li><a href="#b471.omnetpp_D__COBJECT_H">-D__COBJECT_H</a></li>
+ <li><a href="#b471.omnetpp_D__CONSOLE__">-D__CONSOLE__</a></li>
+ <li><a href="#b471.omnetpp_D__COUTVECT_H">-D__COUTVECT_H</a></li>
+ <li><a href="#b471.omnetpp_D__CPACKET_H">-D__CPACKET_H</a></li>
+ <li><a href="#b471.omnetpp_D__CPAR_H">-D__CPAR_H</a></li>
+ <li><a href="#b471.omnetpp_D__CPSQUARE_H">-D__CPSQUARE_H</a></li>
+ <li><a href="#b471.omnetpp_D__CQUEUE_H">-D__CQUEUE_H</a></li>
+ <li><a href="#b471.omnetpp_D__CSIMUL_H">-D__CSIMUL_H</a></li>
+ <li><a href="#b471.omnetpp_D__CSTAT_H">-D__CSTAT_H</a></li>
+ <li><a href="#b471.omnetpp_D__CSTRUCT_H">-D__CSTRUCT_H</a></li>
+ <li><a href="#b471.omnetpp_D__CTOPO_H">-D__CTOPO_H</a></li>
+ <li><a href="#b471.omnetpp_D__CTYPES_H">-D__CTYPES_H</a></li>
+ <li><a href="#b471.omnetpp_D__CVARHIST_H">-D__CVARHIST_H</a></li>
+ <li><a href="#b471.omnetpp_D__CWATCH_H">-D__CWATCH_H</a></li>
+ <li><a href="#b471.omnetpp_D__DEFS_H">-D__DEFS_H</a></li>
+ <li><a href="#b471.omnetpp_D__DISTRIB_H_">-D__DISTRIB_H_</a></li>
+ <li><a href="#b471.omnetpp_D__DPMI32__">-D__DPMI32__</a></li>
+ <li><a href="#b471.omnetpp_D__ENUMSTR_H">-D__ENUMSTR_H</a></li>
+ <li><a href="#b471.omnetpp_D__ENVDEFS_H">-D__ENVDEFS_H</a></li>
+ <li><a href="#b471.omnetpp_D__ENVIREXT_H">-D__ENVIREXT_H</a></li>
+ <li><a href="#b471.omnetpp_D__ERRMSG_H">-D__ERRMSG_H</a></li>
+ <li><a href="#b471.omnetpp_D__FILEMGRS_H">-D__FILEMGRS_H</a></li>
+ <li><a href="#b471.omnetpp_D__FLAT__">-D__FLAT__</a></li>
+ <li><a href="#b471.omnetpp_D__LARGE__">-D__LARGE__</a></li>
+ <li><a href="#b471.omnetpp_D__MACROS_H">-D__MACROS_H</a></li>
+ <li><a href="#b471.omnetpp_D__MSDOS__">-D__MSDOS__</a></li>
+ <li><a href="#b471.omnetpp_D__OMNETAPP_H">-D__OMNETAPP_H</a></li>
+ <li><a href="#b471.omnetpp_D__OMNETPP_H">-D__OMNETPP_H</a></li>
+ <li><a href="#b471.omnetpp_D__ONSTARTUP_H">-D__ONSTARTUP_H</a></li>
+ <li><a href="#b471.omnetpp_D__PROTOCOL_H">-D__PROTOCOL_H</a></li>
+ <li><a href="#b471.omnetpp_D__RANDOM_H">-D__RANDOM_H</a></li>
+ <li><a href="#b471.omnetpp_D__SLAVEAPP_H">-D__SLAVEAPP_H</a></li>
+ <li><a href="#b471.omnetpp_D__SPEEDMTR_H">-D__SPEEDMTR_H</a></li>
+ <li><a href="#b471.omnetpp_D__TASK_H">-D__TASK_H</a></li>
+ <li><a href="#b471.omnetpp_D__UTIL_H">-D__UTIL_H</a></li>
+ <li><a href="#b471.omnetpp_D__WIN32__">-D__WIN32__</a></li>
+ <li><a href="#b471.omnetpp_D__cplusplus">-D__cplusplus</a></li>
+ <li><a href="#b471.omnetpp_Dlong">-Dlong</a></li>
+ <li><a href="#b471.omnetpp_Dsizeof">-Dsizeof</a></li>
+ <li><a href="#b471.omnetpp_Dstarting_seeds">-Dstarting_seeds</a></li>
+</ul>
+<div class="clear"></div>
+</div>
+
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DALLOCTABLE" id="b471.omnetpp_DALLOCTABLE">-DALLOCTABLE</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DALLOCTABLE(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DBKPT" id="b471.omnetpp_DBKPT">-DBKPT</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DBKPT(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DBUILDING_CMDENV" id="b471.omnetpp_DBUILDING_CMDENV">-DBUILDING_CMDENV</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DBUILDING_CMDENV(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DBUILDING_ENVIR" id="b471.omnetpp_DBUILDING_ENVIR">-DBUILDING_ENVIR</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DBUILDING_ENVIR(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DBUILDING_SIM" id="b471.omnetpp_DBUILDING_SIM">-DBUILDING_SIM</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DBUILDING_SIM(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DCOUNTBLOCKS" id="b471.omnetpp_DCOUNTBLOCKS">-DCOUNTBLOCKS</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DCOUNTBLOCKS(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DDISPLAYALL" id="b471.omnetpp_DDISPLAYALL">-DDISPLAYALL</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DDISPLAYALL(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DDISPSTRAYS" id="b471.omnetpp_DDISPSTRAYS">-DDISPSTRAYS</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DDISPSTRAYS(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DDISTRIBUTE_ON_CHILD_SPLIT" id="b471.omnetpp_DDISTRIBUTE_ON_CHILD_SPLIT">-DDISTRIBUTE_ON_CHILD_SPLIT</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DDISTRIBUTE_ON_CHILD_SPLIT(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DETHERAPP_M_H_" id="b471.omnetpp_DETHERAPP_M_H_">-DETHERAPP_M_H_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DETHERAPP_M_H_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DETHERCTRL_M_H_" id="b471.omnetpp_DETHERCTRL_M_H_">-DETHERCTRL_M_H_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DETHERCTRL_M_H_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DETHERFRAME_M_H_" id="b471.omnetpp_DETHERFRAME_M_H_">-DETHERFRAME_M_H_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DETHERFRAME_M_H_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DFSM_DEBUG" id="b471.omnetpp_DFSM_DEBUG">-DFSM_DEBUG</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DFSM_DEBUG(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DHAVE_DLOPEN" id="b471.omnetpp_DHAVE_DLOPEN">-DHAVE_DLOPEN</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DHAVE_DLOPEN(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DHEAPCHECK" id="b471.omnetpp_DHEAPCHECK">-DHEAPCHECK</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DHEAPCHECK(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DHEAPCHECK_OK" id="b471.omnetpp_DHEAPCHECK_OK">-DHEAPCHECK_OK</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DHEAPCHECK_OK(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DINFINITY" id="b471.omnetpp_DINFINITY">-DINFINITY</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DINFINITY(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DK" id="b471.omnetpp_DK">-DK</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DK(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DMACADDRESS_H_" id="b471.omnetpp_DMACADDRESS_H_">-DMACADDRESS_H_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DMACADDRESS_H_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DMACADDRESS_M_H_" id="b471.omnetpp_DMACADDRESS_M_H_">-DMACADDRESS_M_H_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DMACADDRESS_M_H_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DM_E" id="b471.omnetpp_DM_E">-DM_E</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DM_E(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DM_PI" id="b471.omnetpp_DM_PI">-DM_PI</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DM_PI(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DMin" id="b471.omnetpp_DMin">-DMin</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DMin(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DNEDC_VERSION" id="b471.omnetpp_DNEDC_VERSION">-DNEDC_VERSION</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DNEDC_VERSION(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DNEW_CODE_FROM_PUPPIS_WITH_FLOATING_POINT_EXCEPTION" id="b471.omnetpp_DNEW_CODE_FROM_PUPPIS_WITH_FLOATING_POINT_EXCEPTION">-DNEW_CODE_FROM_PUPPIS_WITH_FLOATING_POINT_EXCEPTION</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DNEW_CODE_FROM_PUPPIS_WITH_FLOATING_POINT_EXCEPTION(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DNULL" id="b471.omnetpp_DNULL">-DNULL</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DNULL(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DNUM_STARTINGSEEDS" id="b471.omnetpp_DNUM_STARTINGSEEDS">-DNUM_STARTINGSEEDS</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DNUM_STARTINGSEEDS(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DOMNETPP_VERSION" id="b471.omnetpp_DOMNETPP_VERSION">-DOMNETPP_VERSION</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DOMNETPP_VERSION(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DOPP3" id="b471.omnetpp_DOPP3">-DOPP3</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DOPP3(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DPI" id="b471.omnetpp_DPI">-DPI</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DPI(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DUSE_PORTABLE_COROUTINES" id="b471.omnetpp_DUSE_PORTABLE_COROUTINES">-DUSE_PORTABLE_COROUTINES</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DUSE_PORTABLE_COROUTINES(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DUSE_WIN32_FIBERS" id="b471.omnetpp_DUSE_WIN32_FIBERS">-DUSE_WIN32_FIBERS</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DUSE_WIN32_FIBERS(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DWIN32" id="b471.omnetpp_DWIN32">-DWIN32</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DWIN32(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DWIN32_DLL" id="b471.omnetpp_DWIN32_DLL">-DWIN32_DLL</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DWIN32_DLL(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_DWITH_AKAROA" id="b471.omnetpp_DWITH_AKAROA">-DWITH_AKAROA</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]DWITH_AKAROA(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_ETHERNETDEFS_H" id="b471.omnetpp_D_ETHERNETDEFS_H">-D_ETHERNETDEFS_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_ETHERNETDEFS_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_ETH_UTILS_H_" id="b471.omnetpp_D_ETH_UTILS_H_">-D_ETH_UTILS_H_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_ETH_UTILS_H_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_MACRELAYUNITBASE_H" id="b471.omnetpp_D_MACRELAYUNITBASE_H">-D_MACRELAYUNITBASE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_MACRELAYUNITBASE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_MACRELAYUNITNP_H" id="b471.omnetpp_D_MACRELAYUNITNP_H">-D_MACRELAYUNITNP_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_MACRELAYUNITNP_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_MACRELAYUNITPP_H" id="b471.omnetpp_D_MACRELAYUNITPP_H">-D_MACRELAYUNITPP_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_MACRELAYUNITPP_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_MSC_VER" id="b471.omnetpp_D_MSC_VER">-D_MSC_VER</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_MSC_VER(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_SPECQSORTH_" id="b471.omnetpp_D_SPECQSORTH_">-D_SPECQSORTH_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_SPECQSORTH_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D_WIN32" id="b471.omnetpp_D_WIN32">-D_WIN32</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D_WIN32(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__AKOUTVECTORMGR_H" id="b471.omnetpp_D__AKOUTVECTORMGR_H">-D__AKOUTVECTORMGR_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__AKOUTVECTORMGR_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__APPREG_H" id="b471.omnetpp_D__APPREG_H">-D__APPREG_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__APPREG_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__ARGS_H" id="b471.omnetpp_D__ARGS_H">-D__ARGS_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__ARGS_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__BORLANDC__" id="b471.omnetpp_D__BORLANDC__">-D__BORLANDC__</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__BORLANDC__(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CARRAY_H" id="b471.omnetpp_D__CARRAY_H">-D__CARRAY_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CARRAY_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CCHANNEL_H" id="b471.omnetpp_D__CCHANNEL_H">-D__CCHANNEL_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CCHANNEL_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CCOROUTINE_H" id="b471.omnetpp_D__CCOROUTINE_H">-D__CCOROUTINE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CCOROUTINE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CDENSITY_H" id="b471.omnetpp_D__CDENSITY_H">-D__CDENSITY_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CDENSITY_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CDETECT_H" id="b471.omnetpp_D__CDETECT_H">-D__CDETECT_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CDETECT_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CDISPSTR_H" id="b471.omnetpp_D__CDISPSTR_H">-D__CDISPSTR_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CDISPSTR_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CENUM_H" id="b471.omnetpp_D__CENUM_H">-D__CENUM_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CENUM_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CENVIR_H" id="b471.omnetpp_D__CENVIR_H">-D__CENVIR_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CENVIR_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CEXCEPTION_H" id="b471.omnetpp_D__CEXCEPTION_H">-D__CEXCEPTION_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CEXCEPTION_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CFSM_H" id="b471.omnetpp_D__CFSM_H">-D__CFSM_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CFSM_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CGATE_H" id="b471.omnetpp_D__CGATE_H">-D__CGATE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CGATE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CHEAD_H" id="b471.omnetpp_D__CHEAD_H">-D__CHEAD_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CHEAD_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CHIST_H" id="b471.omnetpp_D__CHIST_H">-D__CHIST_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CHIST_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CINIFILE_H" id="b471.omnetpp_D__CINIFILE_H">-D__CINIFILE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CINIFILE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CKSPLIT_H" id="b471.omnetpp_D__CKSPLIT_H">-D__CKSPLIT_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CKSPLIT_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CLLIST_H" id="b471.omnetpp_D__CLLIST_H">-D__CLLIST_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CLLIST_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CMDDEFS_H" id="b471.omnetpp_D__CMDDEFS_H">-D__CMDDEFS_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CMDDEFS_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CMDENV_H" id="b471.omnetpp_D__CMDENV_H">-D__CMDENV_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CMDENV_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CMESSAGE30_H" id="b471.omnetpp_D__CMESSAGE30_H">-D__CMESSAGE30_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CMESSAGE30_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CMESSAGE_H" id="b471.omnetpp_D__CMESSAGE_H">-D__CMESSAGE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CMESSAGE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CMODULE_H" id="b471.omnetpp_D__CMODULE_H">-D__CMODULE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CMODULE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CMSGHEAP_H" id="b471.omnetpp_D__CMSGHEAP_H">-D__CMSGHEAP_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CMSGHEAP_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CNETMOD_H" id="b471.omnetpp_D__CNETMOD_H">-D__CNETMOD_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CNETMOD_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__COBJECT_H" id="b471.omnetpp_D__COBJECT_H">-D__COBJECT_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__COBJECT_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CONSOLE__" id="b471.omnetpp_D__CONSOLE__">-D__CONSOLE__</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CONSOLE__(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__COUTVECT_H" id="b471.omnetpp_D__COUTVECT_H">-D__COUTVECT_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__COUTVECT_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CPACKET_H" id="b471.omnetpp_D__CPACKET_H">-D__CPACKET_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CPACKET_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CPAR_H" id="b471.omnetpp_D__CPAR_H">-D__CPAR_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CPAR_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CPSQUARE_H" id="b471.omnetpp_D__CPSQUARE_H">-D__CPSQUARE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CPSQUARE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CQUEUE_H" id="b471.omnetpp_D__CQUEUE_H">-D__CQUEUE_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CQUEUE_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CSIMUL_H" id="b471.omnetpp_D__CSIMUL_H">-D__CSIMUL_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CSIMUL_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CSTAT_H" id="b471.omnetpp_D__CSTAT_H">-D__CSTAT_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CSTAT_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CSTRUCT_H" id="b471.omnetpp_D__CSTRUCT_H">-D__CSTRUCT_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CSTRUCT_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CTOPO_H" id="b471.omnetpp_D__CTOPO_H">-D__CTOPO_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CTOPO_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CTYPES_H" id="b471.omnetpp_D__CTYPES_H">-D__CTYPES_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CTYPES_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CVARHIST_H" id="b471.omnetpp_D__CVARHIST_H">-D__CVARHIST_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CVARHIST_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__CWATCH_H" id="b471.omnetpp_D__CWATCH_H">-D__CWATCH_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__CWATCH_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__DEFS_H" id="b471.omnetpp_D__DEFS_H">-D__DEFS_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__DEFS_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__DISTRIB_H_" id="b471.omnetpp_D__DISTRIB_H_">-D__DISTRIB_H_</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__DISTRIB_H_(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__DPMI32__" id="b471.omnetpp_D__DPMI32__">-D__DPMI32__</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__DPMI32__(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__ENUMSTR_H" id="b471.omnetpp_D__ENUMSTR_H">-D__ENUMSTR_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__ENUMSTR_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__ENVDEFS_H" id="b471.omnetpp_D__ENVDEFS_H">-D__ENVDEFS_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__ENVDEFS_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__ENVIREXT_H" id="b471.omnetpp_D__ENVIREXT_H">-D__ENVIREXT_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__ENVIREXT_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__ERRMSG_H" id="b471.omnetpp_D__ERRMSG_H">-D__ERRMSG_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__ERRMSG_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__FILEMGRS_H" id="b471.omnetpp_D__FILEMGRS_H">-D__FILEMGRS_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__FILEMGRS_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__FLAT__" id="b471.omnetpp_D__FLAT__">-D__FLAT__</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__FLAT__(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__LARGE__" id="b471.omnetpp_D__LARGE__">-D__LARGE__</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__LARGE__(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__MACROS_H" id="b471.omnetpp_D__MACROS_H">-D__MACROS_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__MACROS_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__MSDOS__" id="b471.omnetpp_D__MSDOS__">-D__MSDOS__</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__MSDOS__(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__OMNETAPP_H" id="b471.omnetpp_D__OMNETAPP_H">-D__OMNETAPP_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__OMNETAPP_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__OMNETPP_H" id="b471.omnetpp_D__OMNETPP_H">-D__OMNETPP_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__OMNETPP_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__ONSTARTUP_H" id="b471.omnetpp_D__ONSTARTUP_H">-D__ONSTARTUP_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__ONSTARTUP_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__PROTOCOL_H" id="b471.omnetpp_D__PROTOCOL_H">-D__PROTOCOL_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__PROTOCOL_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__RANDOM_H" id="b471.omnetpp_D__RANDOM_H">-D__RANDOM_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__RANDOM_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__SLAVEAPP_H" id="b471.omnetpp_D__SLAVEAPP_H">-D__SLAVEAPP_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__SLAVEAPP_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__SPEEDMTR_H" id="b471.omnetpp_D__SPEEDMTR_H">-D__SPEEDMTR_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__SPEEDMTR_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__TASK_H" id="b471.omnetpp_D__TASK_H">-D__TASK_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__TASK_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__UTIL_H" id="b471.omnetpp_D__UTIL_H">-D__UTIL_H</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__UTIL_H(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__WIN32__" id="b471.omnetpp_D__WIN32__">-D__WIN32__</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__WIN32__(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_D__cplusplus" id="b471.omnetpp_D__cplusplus">-D__cplusplus</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]D__cplusplus(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_Dlong" id="b471.omnetpp_Dlong">-Dlong</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]Dlong(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_Dsizeof" id="b471.omnetpp_Dsizeof">-Dsizeof</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]Dsizeof(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b471.omnetpp_Dstarting_seeds" id="b471.omnetpp_Dstarting_seeds">-Dstarting_seeds</a></li>
+<li class="flagDescRE"><span class="tt">(?:^|(?&lt;=\s))[-/]Dstarting_seeds(?:=\S*)?(?=\s|$)</span></li>
+<li class="descText">
+<p>
+Definition of this macro is forbidden.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+
+</div>
+<hr />
+</body>
+</html>

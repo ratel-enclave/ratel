@@ -1,0 +1,102 @@
+                                 462.libquantum
+                       SPEC CPU2006 Benchmark Description
+
+Benchmark Name
+
+   462.libquantum
+
+   --------------------------------------------------------------------------
+
+Benchmark Author
+
+   Bjoern Butscher, Hendrik Weimer <libquantum [at] enyo.de>
+
+   --------------------------------------------------------------------------
+
+Benchmark Program General Category
+
+   Physics / Quantum Computing
+
+   --------------------------------------------------------------------------
+
+Benchmark Description
+
+   libquantum is a library for the simulation of a quantum computer. Quantum
+   computers are based on the principles of quantum mechanics and can solve
+   certain computationally hard tasks in polynomial time. In 1994, Peter Shor
+   discovered a polynomial-time algorithm for the factorization of numbers, a
+   problem of particular interest for cryptanalysis, as the widely used RSA
+   cryptosystem depends on prime factorization being a problem only to be
+   solvable in exponential time. An implementation of Shor's factorization
+   algorithm is included in libquantum.
+
+   libquantum provides a structure for representing a quantum register and
+   some elementary gates. Measurements can be used to extract information
+   from the system. Additionally, libquantum offers the simulation of
+   decoherence, the most important obstacle in building practical quantum
+   computers. It is thus not only possible to simulate any quantum algorithm,
+   but also to develop quantum error correction algorithms. As libquantum
+   allows to add new gates, it can easily be extended to fit the ongoing
+   research, e.g. it has been deployed to analyze quantum cryptography.
+
+   --------------------------------------------------------------------------
+
+Input Description
+
+   The benchmark program expects the number to be factorized as a
+   command-line parameter. An additional parameter can be supplied to specify
+   a base for the modular exponentiation part of Shor's algorithm.
+
+   --------------------------------------------------------------------------
+
+Output Description
+
+   The program gives a brief explanation on what it is doing and the factors
+   of the input number if the factorization was successful.
+
+   --------------------------------------------------------------------------
+
+Programming Language
+
+   ISO/IEC 9899:1999 ("C99")
+
+   --------------------------------------------------------------------------
+
+Known portability issues
+
+     * On Solaris prior to version 10, /usr/include/complex.h is not
+       available, causing error messages such as:
+
+    "config.h", line 19: cannot find include file: <complex.h>
+
+
+       You can work around this by including -I. -lcplxsupp in your
+       compilation flags.
+
+   --------------------------------------------------------------------------
+
+Portability issues fixed subsequent to the release of SPEC CPU2006 V1.0
+
+     * In config.h, there is a list of platforms that have <complex.h>
+       included. As of CPU2006 V1.1, additional platforms can now be
+       accomodated by setting -DSPEC_CPU_NEED_COMPLEX_H.
+
+   --------------------------------------------------------------------------
+
+References
+
+     * [1]libquantum Website
+     * [2]Wikipedia: Quantum Computer
+     * [3]Peter W. Shor: Polynomial-Time Algorithms for Prime Factorization
+       and Discrete Logarithms on a Quantum Computer
+
+   --------------------------------------------------------------------------
+
+   Last updated: $Date: 2008-04-12 08:31:17 -0400 (Sat, 12 Apr 2008) $
+
+References
+
+   Visible links
+   1. http://www.enyo.de/libquantum/
+   2. http://en.wikipedia.org/wiki/Quantum_computer
+   3. http://www.arxiv.org/abs/quant-ph/9508027

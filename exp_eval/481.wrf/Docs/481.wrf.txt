@@ -1,0 +1,111 @@
+                                    481.wrf
+                       SPEC CPU2006 Benchmark Description
+
+Benchmark Name
+
+   481.wrf
+
+   --------------------------------------------------------------------------
+
+Benchmark Author
+
+   National Center for Atmospheric Research (NCAR) in collaboration with
+   multiple government agencies, universities, and others.
+
+   --------------------------------------------------------------------------
+
+Benchmark Program General Category
+
+   Weather Forecasting
+
+   --------------------------------------------------------------------------
+
+Benchmark Description
+
+   481.wrf is based on the Weather Research and Forecasting (WRF) Model,
+   which is a next-generation mesocale numerical weather prediction system
+   designed to serve both operational forecasting and atmospheric research
+   needs.
+
+   WRF features multiple dynamical cores, a 3-dimensional variational (3DVAR)
+   data assimilation system, and a software architecture allowing for
+   computational parallelism and system extensibility. The parallel portions
+   of the code have been turned off for SPEC CPU2006 as the interest here is
+   in single processor performance.
+
+   WRF is suitable for a broad spectrum of applications across scales ranging
+   from meters to thousands of kilometers.
+
+   WRF version 2.0.2 is used in the benchmark version, 481.wrf.
+
+   --------------------------------------------------------------------------
+
+Input Description
+
+   The WRF Standard Initialization (SI) software is used to create the data
+   sets. The June 2001 SI data archived at NCAR is used as data sets. The
+   data is 10 km from 1200 UTC June 11 - 1200 UTC Jun 12 2001 at 3 h
+   interval.
+
+   --------------------------------------------------------------------------
+
+Output Description
+
+   The temperature at a certain grid point is printed for every time step and
+   validated.
+
+   --------------------------------------------------------------------------
+
+Programming Language
+
+   Fortran 90 and C
+
+   --------------------------------------------------------------------------
+
+Known portability issues
+
+   481.wrf requires the netCDF library for I/O. netCDF is packaged as part of
+   the source, but may need to be configured for your system. SPEC_CPU
+   portability options are provided.
+
+   481.wrf uses unformatted I/O to read its data files. By default, files
+   with 4-byte headers will be read. If your system requires 8-byte headers,
+   please set
+
+   wrf_data_header_size = 8
+
+   in the 481.wrf section of your config file.
+
+   --------------------------------------------------------------------------
+
+Portability issues fixed subsequent to the release of SPEC CPU2006 V1.0
+
+     * New with CPU2006 V1.1, added new portability flag -DSPEC_CPU_NEED_IO_H
+       to include the header file io.h on Windows. Previously, io.h was only
+       included if _MSC_VER was defined by the compiler.
+     * New with CPU2006 V1.1, fixed a Fortran 90 standards violation where
+       two associated dummy arguments were defined during the execution of a
+       subprogram. Note that this update used the same fix as WRF version
+       2.2. (481.wrf is based on WRF version 2.1).
+
+       In a bit more detail: There is a subroutine in module_bl_ysu.F90 that
+       is called in violation of the Fortran standard about variable
+       overlapping. The routine tridin has three variables (cu,r1,r2) that
+       are passed in the same parameters as (au,a1,a2) in both calls. The new
+       code has fixed this problem by making copies of the read-only versions
+       of the duplicated parameters before the call.
+
+   --------------------------------------------------------------------------
+
+References
+
+     * [1]http://www.wrf-model.org/index.php
+
+   --------------------------------------------------------------------------
+
+   Last updated: $Date: 2008-04-12 08:31:17 -0400 (Sat, 12 Apr 2008) $
+
+References
+
+   Visible links
+   1. http://www.wrf-model.org/index.php
