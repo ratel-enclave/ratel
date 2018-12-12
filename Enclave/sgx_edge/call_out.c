@@ -324,8 +324,11 @@ long sgx_syscall_1(long sysno, long _rdi)
             ocall_syscall_1_To(&ret, sysno, (void*)_rdi, len_utsname);
             break;
 
-        case SYS_sysinfo:
         case SYS_times:
+            ocall_syscall_1_To(&ret, sysno, (void*)_rdi, len_tms);
+            break;
+
+        case SYS_sysinfo:
             //ocall_syscall_1_sysinfo(&ret, sysno, (struct sysinfo*)_rdi);
             unimplemented_syscall(sysno);
             break;
@@ -442,6 +445,7 @@ long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 
         case SYS_tgkill:
+        case SYS_lseek:
             ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
             break;
 
@@ -488,6 +492,10 @@ long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
         case SYS_chown:
             ocall_syscall_3_SNN(&ret, sysno, (const char*)_rdi, _rsi, _rdx);
+            break;
+
+        case SYS_readlink:
+            ocall_syscall_3_SPoN(&ret, sysno, (const char*)_rdi, (void*)_rsi, _rdx);
             break;
 
         case SYS_fcntl:
@@ -600,6 +608,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_exit_group:
         case SYS_uname:
         case SYS_time:
+        case SYS_times:
             /*case SYS_set_thread_area:*/
             /*case SYS_get_thread_area:*/
             return sgx_syscall_1(sysno, _rdi);
@@ -634,6 +643,8 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_getdents:
         case SYS_setitimer:
         case SYS_chown:
+        case SYS_lseek:
+        case SYS_readlink:
             return sgx_syscall_3(sysno, _rdi, _rsi, _rdx);
             break;
 

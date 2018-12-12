@@ -482,11 +482,8 @@ long ocall_syscall_1_To(long sysno, void *T, int l)
     switch (sysno) {
         case SYS_uname:
         case SYS_get_thread_area:
-            ret = syscall(sysno, T);
-            b = true;
-            break;
-
         case SYS_time:
+        case SYS_times:
             ret = syscall(sysno, T);
             b = true;
             break;
@@ -688,6 +685,7 @@ long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
 
     switch (sysno) {
         case SYS_tgkill:
+        case SYS_lseek:
         case SYS_mprotect:
         case SYS_fcntl:
             ret = syscall(sysno, N1, N2, N3);
@@ -716,6 +714,24 @@ long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
 
         case SYS_chown:
             ret = syscall(sysno, S, N1, N2);
+            b = true;
+            break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+long ocall_syscall_3_SPoN(long sysno, const char *S, void *P, long N)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno) {
+        case SYS_readlink:
+            ret = syscall(sysno, S, P, N);
             b = true;
             break;
     }

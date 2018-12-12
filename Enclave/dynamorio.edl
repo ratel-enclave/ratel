@@ -90,6 +90,7 @@ enclave {
 
         //long uname(long sysno, struct old_utsname* uname);
         //time_t time(time_t *tloc);
+        //clock_t times(struct tms *buf);
         long ocall_syscall_1_To(long sysno, [out, size=l] void *T, int l);
 
         //long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info);
@@ -127,13 +128,15 @@ enclave {
 
         /****************************syscalls with 3 paramters**********************************************/
         //int mprotect(void *addr, size_t len, int prot);
+        //off_t lseek(int fd, off_t offset, int whence);
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
-
 
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
 
+        //ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
+        long ocall_syscall_3_SPoN(long sysno, [in, string] const char *S, [out, size=N] void *P, long N);
 
         //ssize_t read(int fd, void *buf, size_t count);
         //int getdents(unsigned int fd, struct linux_dirent *dirp, unsigned int count);

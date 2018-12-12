@@ -18,6 +18,7 @@
 #define len_timespec 16
 #define len_timer_t 4
 #define len_time_t 8
+#define len_tms 32
 #define len_u32 4
 #define len_u64 8
 #define len_uid_t 4
