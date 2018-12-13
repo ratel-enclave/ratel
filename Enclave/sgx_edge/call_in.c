@@ -42,17 +42,21 @@ void sgxdbi_enclave_entry(long argc, char** argv, char** envp)
     sgx_mm_init();
 
     ulong new_stack_base;   // the start address of new stack
-    ulong *pStack, *t;
+    ulong *pStack, *pt;
+    char *argvs;
     int  nPtr;      // The number of pointers putting on the new stack.
 
     /* reserve space for putting argc, & NULL-pointers & axuv */
     nPtr = argc + 3 + 60;
 
     /* Count the number of env variables */
-    for (t = (ulong*)envp; *t != 0/*NULL*/; t++, nPtr++);
+    for (pt = (ulong*)envp; *pt != 0/*NULL*/; pt++, nPtr++);
 
     /* create a local stack */
     asm volatile ("mov %%rsp, %0": "=rm" (new_stack_base));
+    new_stack_base &= ~(0xf);   // aligned to 16 bytes boundary
+    new_stack_base -= 256;      // space for arguments. fixing-me to defend against buffer-ovfl
+    argvs = (char*)new_stack_base;
     new_stack_base -= nPtr * sizeof(ulong);
     new_stack_base &= ~(0xf);   // aligned to 16 bytes boundary
 
@@ -61,18 +65,29 @@ void sgxdbi_enclave_entry(long argc, char** argv, char** envp)
     pStack = (ulong*)new_stack_base;
     *pStack++ = argc;
 
-    //copy argv[]
-    for (t = (ulong*)argv; *t != 0/*NULL*/; t++) *pStack++ = *t;
+    //copy argv[]; only 256 bytes available, fixing-me to defend against buffer-ovfl
+    char *s, *d;
+    *pStack = (ulong)argvs;
+    for (pt = (ulong*)argv; *pt != 0/*NULL*/; pt++) {
+        //copy an argv
+        d = *(char**)pStack;
+        s = *(char**)pt;
+        while (*s != 0) *d++ = *s++;
+        *d = 0;
+
+        d++, pStack++;
+        *pStack = (ulong)d;
+    }
     *pStack++ = 0/*NULL*/;
 
     //copy envp[]
-    for (t = (ulong*)envp; *t != 0/*NULL*/; t++) *pStack++ = *t;
+    for (pt = (ulong*)envp; *pt != 0/*NULL*/; pt++) *pStack++ = *pt;
     *pStack++ = 0/*NULL*/;
-    t++;
+    pt++;
 
     //copy auxv[]
     Elf64_auxv_t *auxv_n = (Elf64_auxv_t*)pStack;
-    Elf64_auxv_t *auxv_o = (Elf64_auxv_t*)t;
+    Elf64_auxv_t *auxv_o = (Elf64_auxv_t*)pt;
     do {
         *auxv_n = *auxv_o;
 
