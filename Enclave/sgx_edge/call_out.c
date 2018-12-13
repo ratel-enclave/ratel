@@ -329,8 +329,7 @@ long sgx_syscall_1(long sysno, long _rdi)
             break;
 
         case SYS_sysinfo:
-            //ocall_syscall_1_sysinfo(&ret, sysno, (struct sysinfo*)_rdi);
-            unimplemented_syscall(sysno);
+            ocall_syscall_1_To(&ret, sysno, (void*)_rdi, len_sysinfo);
             break;
 
         case SYS_adjtimex:
@@ -355,10 +354,6 @@ long sgx_syscall_2(long sysno, long _rdi, long _rsi)
     byte* addr;
 
     switch (sysno) {
-        case SYS_fstat:
-            ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_stat);
-            break;
-
         case SYS_munmap:
             /* free external block */
             addr = sgx_mm_itn2ext((byte*)_rdi);
@@ -366,40 +361,56 @@ long sgx_syscall_2(long sysno, long _rdi, long _rsi)
             ocall_syscall_2_NN(&ret, sysno, (ulong)addr, _rsi);
             break;
 
-        case SYS_gettimeofday:
-            ocall_syscall_2_ToN(&ret, sysno, (void*)_rdi, 16,  _rsi);
+        case SYS_setrlimit:
+            ocall_syscall_2_NTi(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
+            break;
+
+        case SYS_fstat:
+            ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_stat);
             break;
 
         case SYS_getrlimit:
             ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
             break;
 
-        case SYS_setrlimit:
-            ocall_syscall_2_NTi(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
-            break;
-
-        case SYS_arch_prctl:
-            sgx_syscall_arch_prctl(&ret, sysno, _rdi, _rsi);
-            break;
-
         case SYS_getitimer:
             ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_itimerval);
             break;
 
-        case SYS_utime:
-            ocall_syscall_2_STi(&ret, sysno, (char*)_rdi, (void*)_rsi, len_utimbuf);
+        case SYS_getrusage:
+            ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_rusage);
             break;
 
-        case SYS_stat:
-        case SYS_lstat:
-            ocall_syscall_2_STo(&ret, sysno, (char*)_rdi, (void*)_rsi, len_stat);
+        case SYS_clock_gettime:
+            ocall_syscall_2_NTo(&ret, sysno, _rdi, (void*)_rsi, len_timespec);
             break;
 
         case SYS_mkdir:
         case SYS_access:
         case SYS_creat:
         case SYS_chmod:
-            ocall_syscall_2_SN(&ret, sysno, (char*)_rdi, _rsi);
+            ocall_syscall_2_SN(&ret, sysno, (const char*)_rdi, _rsi);
+            break;
+
+        case SYS_utime:
+            ocall_syscall_2_STi(&ret, sysno, (const char*)_rdi, (void*)_rsi, len_utimbuf);
+            break;
+
+        case SYS_stat:
+        case SYS_lstat:
+            ocall_syscall_2_STo(&ret, sysno, (const char*)_rdi, (void*)_rsi, len_stat);
+            break;
+
+        case SYS_getcwd:
+            ocall_syscall_2_PoN(&ret, sysno, (void*)_rdi, _rsi);
+            break;
+
+        case SYS_gettimeofday:
+            ocall_syscall_2_ToN(&ret, sysno, (void*)_rdi, 16,  _rsi);
+            break;
+
+        case SYS_arch_prctl:
+            sgx_syscall_arch_prctl(&ret, sysno, _rdi, _rsi);
             break;
 
         case SYS_sigaltstack:
@@ -609,6 +620,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_uname:
         case SYS_time:
         case SYS_times:
+        case SYS_sysinfo:
             /*case SYS_set_thread_area:*/
             /*case SYS_get_thread_area:*/
             return sgx_syscall_1(sysno, _rdi);
@@ -629,6 +641,9 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_creat:
         case SYS_chmod:
         case SYS_utime:
+        case SYS_getcwd:
+        case SYS_getrusage:
+        case SYS_clock_gettime:
             return sgx_syscall_2(sysno, _rdi, _rsi);
             break;
 
