@@ -539,6 +539,7 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
 
     switch (sysno) {
         case SYS_munmap:
+        case SYS_ftruncate:
         case SYS_arch_prctl:
             ret = syscall(sysno, N1, N2);
             b = true;
@@ -687,6 +688,7 @@ long ocall_syscall_2_TiN(long sysno, void *V, int len, long N)
 
     return ret;
 }
+
 
 long ocall_syscall_2_ToN(long sysno, void *V, int len, long N)
 {

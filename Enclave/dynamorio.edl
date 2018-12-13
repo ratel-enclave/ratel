@@ -99,7 +99,8 @@ enclave {
 
         /********syscalls with 2 paramters********/
         //long ocall_syscall_2_V0N(long sysno, [user_check] void *V, long N);
-        //SYS_munmap(void *addr, size_t length)
+        //int munmap(void *addr, size_t length);
+        //int ftruncate(int fd, off_t length);
         long ocall_syscall_2_NN(long sysno, long N1, long N2);
 
         //int fstat(int fd, struct stat *buf);

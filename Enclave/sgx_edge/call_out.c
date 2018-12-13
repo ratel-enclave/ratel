@@ -361,6 +361,10 @@ long sgx_syscall_2(long sysno, long _rdi, long _rsi)
             ocall_syscall_2_NN(&ret, sysno, (ulong)addr, _rsi);
             break;
 
+        case SYS_ftruncate:
+            ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
+            break;
+
         case SYS_setrlimit:
             ocall_syscall_2_NTi(&ret, sysno, _rdi, (void*)_rsi, len_rlimit);
             break;
@@ -644,6 +648,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_getcwd:
         case SYS_getrusage:
         case SYS_clock_gettime:
+        case SYS_ftruncate:
             return sgx_syscall_2(sysno, _rdi, _rsi);
             break;
 
