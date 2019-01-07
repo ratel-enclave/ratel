@@ -87,7 +87,8 @@ extern void* g_enclave_image_base;
 #define SGX_PAGE_SIZE 4096
 
 // Ensure the external prog-arena is only with 0x7fffe0000000 ~ 0x7ffff8000000
-#define EXTN_MEM_REGION     (byte*)0x7fffe0000000
+// Ensure the external prog-arena is only with 0x7fff80000000 ~ 0x7fffffffffff  //2G
+#define EXTN_MEM_REGION     (byte*)0x7fff80000000
 
 
 /* exported out for debugging, we have unit-tests */
