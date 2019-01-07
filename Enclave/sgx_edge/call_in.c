@@ -33,11 +33,11 @@ typedef struct
 
 
 /*-----------------sgxdbi_enclave_entry: entry point of our sgxdbi system--------------*/
-unsigned long ORIGINAL_INIT_STACK;
+unsigned long SGXDBI_INIT_STACK;
 
-extern void original_dynamorio_start(int argc, char* argv[], char *envp[]);
+extern void sgxdbi_to_dynamorio_stub(ulong new_stack);
 
-void sgxdbi_enclave_entry(long argc, char** argv, char** envp)
+int sgxdbi_enclave_entry(long argc, char** argv, char** envp)
 {
     sgx_mm_init();
 
@@ -103,25 +103,18 @@ void sgxdbi_enclave_entry(long argc, char** argv, char** envp)
     } while (auxv_o->a_type != AT_NULL);
 
 
+    int ret;
     /* switch to the new stack */
-    asm volatile ("\tmov %%rbp, %0   \n"
-            "\tmov %1, %%rsp   \n"
-            //"\txor %%rdi,%%rdi \n"
-            "\tjmp *%2   \n"
-            :"=rm"(ORIGINAL_INIT_STACK)
-            :"rm"(new_stack_base), "rm"(original_dynamorio_start));
-    /* unexpected_return(); */
-}
+    // sgxdbi_to_dynamorio_stub(new_stack_base);
+    asm volatile (
+        "\tmov  %1, %%rdi\n"
+        "\tcall *%2\n"
+        "\tmov  %%eax, %0"
+        :"=rm"(ret) : "rm"(new_stack_base), "rm"(sgxdbi_to_dynamorio_stub)
+    );
 
-void sgxdbi_enclave_exit(void)
-{
+
     sgx_mm_exit();
 
-    /* switch-back to the initial stack */
-    asm volatile ("\tmov %0, %%rbp \n"
-            "\tpop %%rsp   \n"
-            "jmp *%%rsp   \n\t"
-            ::"rm"(ORIGINAL_INIT_STACK));
-
-    /* unexpected_return(); */
+    return ret;
 }

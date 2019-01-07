@@ -48,9 +48,9 @@ enclave {
          *      the buffer inside the enclave will by copied into outside 'val' again.
          */
 
-        /********public void dyn_enclave_entry(int argc, [in] char *(*p_argv)[], [in] char *(*p_env)[]);********/
-        /* public void sgxdbi_enclave_entry(int argc, [in] char ***p_argv, [in] char ***p_env); */
-        public void sgxdbi_enclave_entry(long argc, [user_check] char** p_argv, [user_check] char** p_env);
+        /********public int dyn_enclave_entry(int argc, [in] char *(*p_argv)[], [in] char *(*p_env)[]);********/
+        /* public int sgxdbi_enclave_entry(int argc, [in] char ***p_argv, [in] char ***p_env); */
+        public int sgxdbi_enclave_entry(long argc, [user_check] char** p_argv, [user_check] char** p_env);
     };
 
     untrusted {

@@ -210,6 +210,7 @@ DECL_EXTERN(syscall_argsz)
 DECL_EXTERN(load_dynamo_failure)
 #endif
 
+DECL_EXTERN(SGXDBI_INIT_STACK)
 
 #ifdef WINDOWS
 /* dynamo_auto_start: used for non-early follow children.
@@ -855,9 +856,9 @@ GLOBAL_LABEL(global_do_syscall_sygate_sysenter:)
 GLOBAL_LABEL(global_do_syscall_syscall:)
         //mov      r10, REG_XCX
         //syscall
-        call sgx_instr_syscall
+        call     sgx_instr_syscall
 #   ifdef DEBUG
-        //jmp      GLOBAL_REF(debug_infinite_loop)
+        jmp      GLOBAL_REF(debug_infinite_loop)
 #   endif
 #   ifdef UNIX
         /* we do come here for SYS_kill which can fail: try again via exit_group */
@@ -1166,7 +1167,7 @@ GLOBAL_LABEL(original_dynamorio_start:)
          */
         cmp     REG_XDI, 0 /* if reloaded, skip for speed + preserve xdi and xsi */
         jne     reloaded_xfer
-        /* Please don't relocation, as SGX-psw readonly a data segment thus otherwise tiggers SEGFAULT */
+        /* Please don't relocation, as SGX-psw readonly a data segment thus otherwise triggers SEGFAULT */
         CALLC3(GLOBAL_REF(relocate_dynamorio), 0, 0, REG_XSP)
         mov     REG_XDI, 0 /* xdi should be callee-saved but is not always: i#2641 */
 
@@ -1191,6 +1192,30 @@ reloaded_xfer:
         jmp     GLOBAL_REF(unexpected_return)
         END_FUNC(original_dynamorio_start)
 #endif /* !STANDALONE_UNIT_TEST && !STATIC_LIBRARY */
+
+
+/*
+ * switch-to the new stack
+ * void sgxdbi_to_dynamorio_stub(ulong new_stack)
+*/
+        DECLARE_EXPORTED_FUNC(sgxdbi_to_dynamorio_stub)
+GLOBAL_LABEL(sgxdbi_to_dynamorio_stub:)
+        push  rbp
+        mov   PTRSZ SYMREF(SGXDBI_INIT_STACK), rsp
+        mov   rsp, rdi
+        jmp   GLOBAL_REF(original_dynamorio_start)
+        END_FUNC(sgxdbi_to_dynamorio_stub)
+/*
+  * switch-back to the initial stack
+  * dynamorio_to_sgxdbi_stub(long ret)
+*/
+        DECLARE_EXPORTED_FUNC(dynamorio_to_sgxdbi_stub)
+GLOBAL_LABEL(dynamorio_to_sgxdbi_stub:)
+        mov   rsp, PTRSZ SYMREF(SGXDBI_INIT_STACK)
+        pop   rbp
+        mov   rax, rdi
+        ret
+        END_FUNC(dynamorio_to_sgxdbi_stub)
 
 
 /* i#1227: on a conflict with the app we reload ourselves.
@@ -1222,13 +1247,9 @@ GLOBAL_LABEL(xfer_to_new_libdr:)
 GLOBAL_LABEL(dynamorio_sigreturn:)
 #ifdef X64
         mov      eax, HEX(f)
-        mov      r10, rcx
-#ifdef DEBUG
-        PUSHGPR
-        //call log_dynamorio_sigreturn
-        POPGPR
-#endif
-        syscall
+        //mov      r10, rcx
+        //syscall
+	call 	 sgx_instr_syscall
 #else
 # ifdef MACOS
         /* we assume we don't need to align the stack (tricky to do so) */
@@ -1295,13 +1316,9 @@ dynamorio_sys_exit_next:
 # ifdef X64
         mov      edi, 0 /* exit code: hardcoded */
         mov      eax, SYS_exit
-        mov      r10, rcx
-#ifdef DEBUG
-        PUSHGPR
-        //call log_dynamorio_sys_exit
-        POPGPR
-#endif
-        syscall
+        //mov      r10, rcx
+        //syscall
+	call 	 sgx_instr_syscall
 # else
         mov      ebx, 0 /* exit code: hardcoded */
         mov      eax, SYS_exit
@@ -1333,13 +1350,9 @@ GLOBAL_LABEL(dynamorio_condvar_wake_and_jmp:)
         mov      ARG2, 1 /* arg2 = FUTEX_WAKE */
         mov      ARG1, rax /* &futex, passed in rax */
         mov      rax, 202 /* SYS_futex */
-        mov      r10, rcx
-#ifdef DEBUG
-        PUSHGPR
-        //call log_dynamorio_condvar_wake_and_jmp
-        POPGPR
-#endif
-        syscall
+        //mov      r10, rcx
+        //syscall
+	call 	 sgx_instr_syscall
         jmp      r12
 #  else
         /* We use the stack, which should be the app stack: see the MacOS args below. */
@@ -1401,9 +1414,10 @@ dynamorio_semaphore_next:
         DECLARE_FUNC(dynamorio_sys_exit_group)
 GLOBAL_LABEL(dynamorio_sys_exit_group:)
         mov      rdx, 0 /* exit code: hardcoded */
-        mov      rsi, 1 /* 1 parameter */
-        mov      rdi, SYS_exit_group
-        jmp sgx_dynamorio_syscall
+        //mov      rsi, 1 /* 1 parameter */
+        //mov      rdi, SYS_exit_group
+        //jmp 	 sgx_dynamorio_syscall
+        jmp      dynamorio_to_sgxdbi_stub
         END_FUNC(dynamorio_sys_exit_group)
 
 
@@ -1592,14 +1606,10 @@ GLOBAL_LABEL(dynamorio_clone:)
         sub      ARG2, ARG_SZ
         mov      [ARG2], ARG6 /* func is now on TOS of newsp */
         /* all args are already in syscall registers */
-        mov      r10, rcx
+        //mov      r10, rcx
         mov      REG_XAX, SYS_clone
-#ifdef DEBUG
-        PUSHGPR
-        //call log_dynamorio_clone
-        POPGPR
-#endif
-        syscall
+        //syscall
+	    call 	 sgx_instr_syscall
 # else
         mov      REG_XAX, ARG6
         mov      REG_XCX, ARG2

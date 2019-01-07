@@ -230,9 +230,10 @@ int SGX_CDECL main(int argc, char* argv[], char* envp[])
         return -1;
     }
 
+    int ret;
     //dynamorio_enclave_entry(dynamo_eid, sp);
     printf("Enter dynamorio enclave\n");
-    sgxdbi_enclave_entry(dynamo_eid, argc, argv, envp);
+    sgxdbi_enclave_entry(dynamo_eid, &ret, argc, argv, envp);
 
     /* Destroy the enclave */
     sgx_destroy_enclave(dynamo_eid);

@@ -604,6 +604,7 @@ long sgx_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long 
 }
 
 
+extern void dynamorio_to_sgxdbi_stub(long ret);
 long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
     /*fixing-up them with a sysno-to-function table*/
@@ -619,8 +620,6 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
             //One paramters
         case SYS_close:
         case SYS_unlink:
-        case SYS_exit:
-        case SYS_exit_group:
         case SYS_uname:
         case SYS_time:
         case SYS_times:
@@ -628,6 +627,13 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
             /*case SYS_set_thread_area:*/
             /*case SYS_get_thread_area:*/
             return sgx_syscall_1(sysno, _rdi);
+            break;
+
+        case SYS_exit:
+        case SYS_exit_group:
+            dynamorio_to_sgxdbi_stub(0);
+            /* unexpected_return(); */
+            return -1;
             break;
 
             //Two paramters
