@@ -1256,15 +1256,6 @@ void global_do_syscall_wow64_index0(void);
 # endif
 #ifdef X64
 void global_do_syscall_syscall(void);
-#ifdef DEBUG
-void log_global_do_syscall_syscall(void);
-void log_dynamorio_sigreturn(void);
-void log_dynamorio_sys_exit(void);
-void log_dynamorio_condvar_wake_and_jmp(void);
-void log_dynamorio_sys_exit_group(void);
-void log_dynamorio_clone(void);
-void log_app_syscall(void);
-#endif
 #endif
 void get_xmm_caller_saved(dr_ymm_t *xmm_caller_saved_buf);
 void get_ymm_caller_saved(dr_ymm_t *ymm_caller_saved_buf);

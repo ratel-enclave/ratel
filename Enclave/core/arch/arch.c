@@ -2671,54 +2671,6 @@ set_fcache_target(dcontext_t *dcontext, cache_pc value)
     get_mcontext(dcontext)->pc = value;
 }
 
-#ifdef DEBUG
-void log_global_do_syscall_syscall(void)
-{
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-}
-
-void log_dynamorio_sigreturn(void)
-{
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-}
-
-
-void log_dynamorio_sys_exit(void)
-{
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-}
-
-
-void log_dynamorio_condvar_wake_and_jmp(void)
-{
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-}
-
-
-void log_dynamorio_sys_exit_group(void)
-{
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-}
-
-void log_dynamorio_clone(void)
-{
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-}
-
-#endif
-
 
 /* For 32-bit linux apps on 64-bit kernels we assume that all syscalls that
  * we use this for are ok w/ int (i.e., we don't need a sys{call,enter} version).
