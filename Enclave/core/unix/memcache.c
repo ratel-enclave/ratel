@@ -219,6 +219,7 @@ static void
 add_all_memory_area(app_pc start, app_pc end, uint prot, int type, bool shareable)
 {
     allmem_info_t *info;
+
     ASSERT(ALIGNED(start, PAGE_SIZE));
     ASSERT_OWN_WRITE_LOCK(true, &all_memory_areas->lock);
     LOG(GLOBAL, LOG_VMAREAS|LOG_SYSCALLS, 3,
@@ -237,32 +238,35 @@ void
 memcache_update(app_pc start, app_pc end_in, uint prot, int type)
 {
     allmem_info_t *info;
-    app_pc end = (app_pc) ALIGN_FORWARD(end_in, PAGE_SIZE);
+    app_pc end;
     bool removed;
+
+    end = (app_pc) ALIGN_FORWARD(end_in, PAGE_SIZE);
     ASSERT(ALIGNED(start, PAGE_SIZE));
     /* all_memory_areas lock is held higher up the call chain to avoid rank
      * order violation with heap_unit_lock */
     ASSERT_OWN_WRITE_LOCK(true, &all_memory_areas->lock);
     sync_all_memory_areas();
     LOG(GLOBAL, LOG_VMAREAS, 4,
-        "update_all_memory_areas "PFX"-"PFX" %d %d\n",
-        start, end_in, prot, type);
+            "update_all_memory_areas "PFX"-"PFX" %d %d\n",
+            start, end_in, prot, type);
     DOLOG(5, LOG_VMAREAS, memcache_print(GLOBAL, ""););
 
     if (type == -1) {
         /* to preserve existing types we must iterate b/c we cannot
          * merge images into data
          */
-        app_pc pc, sub_start, sub_end, next_add = start;
-        pc = start;
+        app_pc pc, sub_start, sub_end, next_add;
+
+        pc = next_add = start;
         /* XXX i#704: pointer overflow is not guaranteed to behave like
          * arithmetic overflow: need better handling here, though most problems
          * we've seen have been on "pc + x < pc" checks where the addition is
          * built into the comparison and the compiler can say "won't happen".
          */
         while (pc < end && pc >= start/*overflow*/ &&
-               vmvector_lookup_data(all_memory_areas, pc, &sub_start, &sub_end,
-                                    (void **) &info)) {
+                vmvector_lookup_data(all_memory_areas, pc, &sub_start, &sub_end,
+                    (void **) &info)) {
             if (info->type == DR_MEMTYPE_IMAGE) {
                 bool shareable = false;
                 app_pc overlap_end;
@@ -306,8 +310,8 @@ memcache_update(app_pc start, app_pc end_in, uint prot, int type)
     } else {
         if (vmvector_overlap(all_memory_areas, start, end)) {
             LOG(THREAD_GET, LOG_VMAREAS|LOG_SYSCALLS, 4,
-                "update_all_memory_areas: overlap found, removing and adding: "
-                PFX"-"PFX" prot=%d\n", start, end, prot);
+                    "update_all_memory_areas: overlap found, removing and adding: "
+                    PFX"-"PFX" prot=%d\n", start, end, prot);
             /* New region to be added overlaps with one or more existing
              * regions.  Split already existing region(s) accordingly and add
              * the new region */
@@ -317,8 +321,8 @@ memcache_update(app_pc start, app_pc end_in, uint prot, int type)
         add_all_memory_area(start, end, prot, type, type == DR_MEMTYPE_IMAGE);
     }
     LOG(GLOBAL, LOG_VMAREAS, 5,
-        "update_all_memory_areas "PFX"-"PFX" %d %d: post:\n",
-        start, end_in, prot, type);
+            "update_all_memory_areas "PFX"-"PFX" %d %d: post:\n",
+            start, end_in, prot, type);
     DOLOG(5, LOG_VMAREAS, memcache_print(GLOBAL, ""););
 }
 
@@ -360,6 +364,7 @@ memcache_query_memory(const byte *pc, OUT dr_mem_info_t *out_info)
     allmem_info_t *info;
     bool found;
     app_pc start, end;
+
     ASSERT(out_info != NULL);
     memcache_lock();
     sync_all_memory_areas();
@@ -371,7 +376,7 @@ memcache_query_memory(const byte *pc, OUT dr_mem_info_t *out_info)
         out_info->prot = info->prot;
         out_info->type = info->type;
 #ifdef HAVE_MEMINFO
-        DOCHECK(2, {
+        // DOCHECK(2, {
             byte *from_os_base_pc;
             size_t from_os_size;
             uint from_os_prot;
@@ -414,7 +419,7 @@ memcache_query_memory(const byte *pc, OUT dr_mem_info_t *out_info)
                          from_os_prot, start, end, info->prot);
                 }
             }
-        });
+        // });
 #endif
     } else {
         app_pc prev, next;

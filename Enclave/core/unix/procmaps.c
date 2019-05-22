@@ -50,7 +50,7 @@ typedef struct _procmaps_t {
 
 
 // for performance, using a static buffer
-#define SGX_PROCMAPS_BUF_LEN   (4096*2)
+#define SGX_PROCMAPS_BUF_LEN   (0x1000*4)
 static char PROCMAPS_BUF[SGX_PROCMAPS_BUF_LEN];
 
 static procmaps_t SGX_PROCMAPS; // just used by DynamoRIO
@@ -112,7 +112,7 @@ bool ensure_buffer_capacity(big_buffer_t *buf, int nLowestWatermark)
         new_size = buf->size * 2;
         /* use sgxsdk's malloc & free */
         // pbuf = (char*)heap_alloc(GLOBAL_DCONTEXT, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
-        YPHPRINT("%x", new_size);
+        YPHPRINT("0x%x", new_size);
         new_buf = (char*)malloc(new_size);
         YPHASSERT(new_buf != NULL);
 

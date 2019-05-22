@@ -735,7 +735,7 @@ long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
     switch (sysno) {
 
         case SYS_open:
-            printf("open file %s, %lx, %lx\n", S, N1, N2);
+            //printf("open file %s, %lx, %lx\n", S, N1, N2);
             ret = syscall(sysno, S, N1, N2);
             b = true;
             break;

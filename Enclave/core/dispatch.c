@@ -131,6 +131,7 @@ exited_due_to_ni_syscall(dcontext_t *dcontext)
  * Having no stack state kept across cache executions avoids
  * self-protection issues with the dstack.
  */
+// static bool logflag = false;
 void
 dispatch(dcontext_t *dcontext)
 {
@@ -239,7 +240,8 @@ dispatch(dcontext_t *dcontext)
         } while (true);
 
         if (targetf != NULL) {
-            YPHPRINT("tag = 0x%lx -> start_pc = 0x%lx", targetf->tag, targetf->start_pc);
+            // if (logflag)
+            // YPHPRINT("tag = 0x%lx -> start_pc = 0x%lx", targetf->tag, targetf->start_pc);
             if (dispatch_enter_fcache(dcontext, targetf)) {
                 /* won't reach here: will re-enter dispatch() with a clean stack */
                 ASSERT_NOT_REACHED();
