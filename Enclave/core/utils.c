@@ -467,8 +467,8 @@ static void
 add_process_lock(mutex_t *lock)
 {
     /* add to global locks circular double linked list */
-    LOG(THREAD_GET, LOG_THREADS, 5, "add_process_lock"
-        DUMP_LOCK_INFO_ARGS(0, lock, lock->prev_process_lock));
+    // LOG(THREAD_GET, LOG_THREADS, 5, "add_process_lock"
+    //     DUMP_LOCK_INFO_ARGS(0, lock, lock->prev_process_lock));
     mutex_lock(&innermost_lock);
     if (lock->prev_process_lock != NULL) {
         /* race: someone already added (can only happen for read locks) */
@@ -498,8 +498,8 @@ add_process_lock(mutex_t *lock)
 static void
 remove_process_lock(mutex_t *lock)
 {
-    LOG(THREAD_GET, LOG_THREADS, 3, "remove_process_lock "
-        DUMP_LOCK_INFO_ARGS(0, lock, lock->prev_process_lock));
+    // LOG(THREAD_GET, LOG_THREADS, 3, "remove_process_lock "
+    //     DUMP_LOCK_INFO_ARGS(0, lock, lock->prev_process_lock));
     STATS_ADD(total_acquired, lock->count_times_acquired);
     STATS_ADD(total_contended, lock->count_times_contended);
     if (lock->count_times_acquired == 0) {
@@ -564,15 +564,15 @@ deadlock_avoidance_lock(mutex_t *lock, bool acquired, bool ownable)
     if (acquired) {
         lock->count_times_acquired++;
         /* CHECK: everything here works without mutex_trylock's */
-        LOG(GLOBAL, LOG_THREADS, 6,
-            "acquired lock "PFX" %s rank=%d, %s dcontext, tid:%d, %d time\n",
-            lock, lock->name, lock->rank,
-            get_thread_private_dcontext() ? "valid" : "not valid",
-            get_thread_id(),
-            lock->count_times_acquired
-            );
-        LOG(THREAD_GET, LOG_THREADS, 6, "acquired lock "PFX" %s rank=%d\n",
-            lock, lock->name, lock->rank);
+        // LOG(GLOBAL, LOG_THREADS, 6,
+        //     "acquired lock "PFX" %s rank=%d, %s dcontext, tid:%d, %d time\n",
+        //     lock, lock->name, lock->rank,
+        //     get_thread_private_dcontext() ? "valid" : "not valid",
+        //     get_thread_id(),
+        //     lock->count_times_acquired
+        //     );
+        // LOG(THREAD_GET, LOG_THREADS, 6, "acquired lock "PFX" %s rank=%d\n",
+        //     lock, lock->name, lock->rank);
         ASSERT(lock->rank > 0 && "initialize with INIT_LOCK_FREE");
         if (ownable) {
             ASSERT(!lock->owner);
@@ -656,12 +656,12 @@ deadlock_avoidance_unlock(mutex_t *lock, bool ownable)
         os_thread_yield();
     }
 
-    LOG(GLOBAL, LOG_THREADS, 6, "released lock "PFX" %s rank=%d, %s dcontext, tid:%d \n",
-        lock, lock->name, lock->rank,
-        get_thread_private_dcontext() ? "valid" : "not valid",
-        get_thread_id());
-    LOG(THREAD_GET, LOG_THREADS, 6, "released lock "PFX" %s rank=%d\n",
-        lock, lock->name, lock->rank);
+    // LOG(GLOBAL, LOG_THREADS, 6, "released lock "PFX" %s rank=%d, %s dcontext, tid:%d \n",
+    //     lock, lock->name, lock->rank,
+    //     get_thread_private_dcontext() ? "valid" : "not valid",
+    //     get_thread_id());
+    // LOG(THREAD_GET, LOG_THREADS, 6, "released lock "PFX" %s rank=%d\n",
+    //     lock, lock->name, lock->rank);
     if (!ownable)
         return;
 

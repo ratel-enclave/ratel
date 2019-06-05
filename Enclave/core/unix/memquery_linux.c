@@ -263,9 +263,9 @@ memquery_iterator_next(memquery_iter_t *iter)
             line = mi->buf;
         }
     }
-    LOG(GLOBAL, LOG_VMAREAS, 6,
-        "\nget_memory_info_from_os: newline=[%s]\n",
-        mi->newline ? mi->newline : "(null)");
+    // LOG(GLOBAL, LOG_VMAREAS, 6,
+    //     "\nget_memory_info_from_os: newline=[%s]\n",
+    //     mi->newline ? mi->newline : "(null)");
 
     /* Buffer is big enough to hold at least one line: if not, the file changed
      * underneath us after we hit the end.  Just bail.
@@ -273,8 +273,8 @@ memquery_iterator_next(memquery_iter_t *iter)
     if (mi->newline == NULL)
         return false;
     *mi->newline = '\0';
-    LOG(GLOBAL, LOG_VMAREAS, 6,
-        "\nget_memory_info_from_os: line=[%s]\n", line);
+    // LOG(GLOBAL, LOG_VMAREAS, 6,
+    //     "\nget_memory_info_from_os: line=[%s]\n", line);
     mi->comment_buffer[0]='\0';
     len = sscanf(line,
 #ifdef IA32_ON_IA64

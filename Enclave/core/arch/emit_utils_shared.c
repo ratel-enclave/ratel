@@ -4873,6 +4873,10 @@ update_syscall(dcontext_t *dcontext, byte *pc)
                 OPND_CREATE_INTPTR(dcontext));
 
             instrlist_remove(&ilist, &instr);
+
+            // instr_t *o_call = XINST_CREATE_call(dcontext, opnd_create_pc((app_pc)sgx_instr_syscall));
+            // instrlist_replace(&ilist, &instr, o_call);
+
             break;
         }
         else {

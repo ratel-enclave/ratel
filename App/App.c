@@ -42,6 +42,8 @@
 #include "App.h"
 #include "dynamorio_u.h"
 
+#include <time.h>
+
 /* Global EID shared by multiple threads */
 sgx_enclave_id_t dynamo_eid = 0;
 
@@ -230,13 +232,22 @@ int SGX_CDECL main(int argc, char* argv[], char* envp[])
         return -1;
     }
 
+    struct timespec t1, t2;
     int ret;
-    //dynamorio_enclave_entry(dynamo_eid, sp);
-    printf("Enter dynamorio enclave\n");
+
+    clock_gettime(CLOCK_REALTIME, &t1);
+
+    // Enter dynamorio enclave
     sgxdbi_enclave_entry(dynamo_eid, &ret, argc, argv, envp);
+
+    clock_gettime(CLOCK_REALTIME, &t2);
 
     /* Destroy the enclave */
     sgx_destroy_enclave(dynamo_eid);
-    return 0;
+
+    float t = (t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec) * 1.0/1000000000;
+    printf("Enclave-code real-time: %fs\n", t);
+
+    return ret;
 }
 

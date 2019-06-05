@@ -910,7 +910,7 @@ static void
 add_vm_area(vm_area_vector_t *v, app_pc start, app_pc end,
             uint vm_flags, uint frag_flags, void *data _IF_DEBUG(const char *comment))
 {
-    YPHPRINT("Begin: add a vm_area in %s", v->name);
+    // YPHPRINT("Begin: add a vm_area in %s", v->name);
     int i, j, diff;
     /* if we have overlap, we extend an existing area -- else we add a new area */
     int overlap_start = -1, overlap_end = -1;
@@ -1247,7 +1247,7 @@ add_vm_area(vm_area_vector_t *v, app_pc start, app_pc end,
         }
     }
     DOLOG(5, LOG_VMAREAS, { print_vm_areas(v, GLOBAL); });
-    YPHPRINT("End: add a vm_area in %s", v->name);
+    // YPHPRINT("End: add a vm_area in %s", v->name);
 }
 
 static void
@@ -1480,8 +1480,10 @@ remove_vm_area(vm_area_vector_t *v, app_pc start, app_pc end, bool restore_prot)
  * or by being its owning thread if it has no lock.
  */
 static bool
-binary_search(vm_area_vector_t *v, app_pc start, app_pc end, vm_area_t **area/*OUT*/,
-              int *index/*OUT*/, bool first)
+binary_search(vm_area_vector_t *v, app_pc start, app_pc end,
+        vm_area_t **area/*OUT*/,
+        int *index/*OUT*/,
+        bool first)
 {
     /* BINARY SEARCH -- assumes the vector is kept sorted by add & remove! */
     int min = 0;
@@ -1491,7 +1493,7 @@ binary_search(vm_area_vector_t *v, app_pc start, app_pc end, vm_area_t **area/*O
 
     ASSERT_VMAREA_VECTOR_PROTECTED(v, READWRITE);
     LOG(GLOBAL, LOG_VMAREAS, 7, "Binary search for "PFX"-"PFX" on this vector:\n",
-        start, end);
+            start, end);
     DOLOG(7, LOG_VMAREAS, { print_vm_areas(v, GLOBAL); });
     /* binary search */
     while (max >= min) {
@@ -1514,7 +1516,7 @@ binary_search(vm_area_vector_t *v, app_pc start, app_pc end, vm_area_t **area/*O
                     *index = i;
             }
             LOG(GLOBAL, LOG_VMAREAS, 7, "\tfound "PFX"-"PFX" in area "PFX"-"PFX"\n",
-                start, end, v->buf[i].start, v->buf[i].end);
+                    start, end, v->buf[i].start, v->buf[i].end);
             return true;
         }
     }
@@ -1522,7 +1524,7 @@ binary_search(vm_area_vector_t *v, app_pc start, app_pc end, vm_area_t **area/*O
     LOG(GLOBAL, LOG_VMAREAS, 7, "\tdid not find "PFX"-"PFX"!\n", start, end);
     if (index != NULL) {
         ASSERT((max < 0 || v->buf[max].end <= start) &&
-               (min > v->length - 1 || v->buf[min].start >= end));
+                (min > v->length - 1 || v->buf[min].start >= end));
         *index = max;
     }
     return false;
@@ -1997,12 +1999,13 @@ vmvector_lookup(vm_area_vector_t *v, app_pc pc)
  */
 bool
 vmvector_lookup_data(vm_area_vector_t *v, app_pc pc,
-                     app_pc *start /* OUT */, app_pc *end /* OUT */,
-                     void **data /* OUT */)
+        app_pc *start  /* OUT */,
+        app_pc *end    /* OUT */,
+        void **data    /* OUT */)
 {
-    bool overlap;
     vm_area_t *area = NULL;
-    bool release_lock; /* 'true' means this routine needs to unlock */
+    bool release_lock;  /* 'true' means this routine needs to unlock */
+    bool overlap;
 
     LOCK_VECTOR(v, release_lock, read);
     ASSERT_OWN_READWRITE_LOCK(SHOULD_LOCK_VECTOR(v), &v->lock);
@@ -2027,7 +2030,8 @@ vmvector_lookup_data(vm_area_vector_t *v, app_pc pc,
  */
 bool
 vmvector_lookup_prev_next(vm_area_vector_t *v, app_pc pc,
-                          OUT app_pc *prev, OUT app_pc *next)
+        OUT app_pc *prev,
+        OUT app_pc *next)
 {
     bool success;
     int index;
@@ -3835,9 +3839,11 @@ bool
 dynamo_vm_area_overlap(app_pc start, app_pc end)
 {
     bool overlap;
+
     /* case 3045: areas inside the vmheap reservation are not added to the list */
     if (is_vmm_reserved_address(start, end - start))
         return true;
+
     dynamo_vm_areas_start_reading();
     overlap = vm_area_overlap(dynamo_areas, start, end);
     dynamo_vm_areas_done_reading();

@@ -282,8 +282,9 @@ os_loader_init_prologue(void)
         /* libdynamorio isn't visible to gdb so add to the cmd list */
         byte *dr_base = get_dynamorio_dll_start(), *pref_base;
         elf_loader_t dr_ld;
-        IF_DEBUG(bool success = )
-            elf_loader_read_headers(&dr_ld, get_dynamorio_library_path());
+        //IF_DEBUG(bool success = )
+        //    elf_loader_read_headers(&dr_ld, get_dynamorio_library_path());
+        bool success =  elf_loader_read_headers(&dr_ld, get_dynamorio_library_path());
         ASSERT(success);
         module_walk_program_headers(dr_base, get_dynamorio_dll_end() - dr_base,
                                     false, false, (byte **)&pref_base,
