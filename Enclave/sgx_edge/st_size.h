@@ -1,6 +1,8 @@
 #ifndef _ST_SIZE_H__
 #define _ST_SIZE_H__
 
+#define len_flock 32
+#define len_ioctl 512
 #define len_sigevent 64
 #define len_siginfo 128
 #define len_sockaddr 16
@@ -51,7 +53,7 @@
 #define len_getcpu_cache 128
 #define len_iocb 64
 #define len_io_event 32
-#define len_iovec 16
+#define len_iovec 128
 #define len_itimerspec 32
 #define len_itimerval 32
 #define len_kexec_segment 32

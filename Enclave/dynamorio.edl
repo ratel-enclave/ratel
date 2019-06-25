@@ -125,7 +125,9 @@ enclave {
 
         //char *getcwd(char *buf, size_t size);
         long ocall_syscall_2_PoN(long sysno, [out, size=l] void *T, int l);
-
+        
+        long ocall_syscall_2_VoN(long sysno,[out, size=l] void *T, int l);
+	
         //long ocall_syscall_2_TiN(long sysno, [in, size=l] void *T, int l, long N);
 
         //int gettimeofday(struct timeval *tv, struct timezone *tz=NULL);
@@ -136,7 +138,9 @@ enclave {
         //int mprotect(void *addr, size_t len, int prot);
         //off_t lseek(int fd, off_t offset, int whence);
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
-
+	
+	
+	long ocall_syscall_3_NNVio(long sysno,long N1,long N2,[out,size=l] void *T,int l);
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
@@ -163,7 +167,8 @@ enclave {
 
         //int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
         long ocall_syscall_3_NTiTo(long sysno, long N1, [in, size=dumb1] void *T1, long dumb1, [out, size=dumb2] void *T2, long dumb2);
-
+        long ocall_syscall_3_NNTi(long sysno, long N1,long N2, [in, size=dumb1] void *T1, long dumb1);
+	long ocall_syscall_3_NNTo(long sysno, long N1,long N2, [out, size=dumb1] void *T1, long dumb1);
 
         /********syscalls with 4 paramters********/
         //void *mremap(void *old_address, size_t old_size, size_t new_size, int flags);
@@ -181,6 +186,9 @@ enclave {
 
         //int futex(int *uaddr, int futex_op, int val, const struct timespec *timeout, int *uaddr2, int val3);
         long ocall_syscall_6_PoNNTiPoN(long sysno, [out] int* V1, long N1, long N2, [in, size=l] void *T, long l, [out] int *V2, long N3);
+
+	long ocall_syscall_6_NVoNNToN(long sysno,long N1,[out,size=N2] void* V1,long N2,long N3,[out,size=N4] void* T1, int N4);	
+
 
         void sgxapp_reg_sighandler(int signum);
     };

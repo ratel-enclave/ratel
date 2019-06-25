@@ -513,7 +513,7 @@ static byte* _sgx_mm_buffer_alloc(byte *ext_addr, size_t len)
 static sgx_vm_area_t* _sgx_vma_alloc(list_t* llp, list_t* lln)
 {
     YPHASSERT(llp != NULL && lln != NULL);
-    YPHASSERT(SGX_MM.nun > 0);
+   YPHASSERT(SGX_MM.nun > 0);
 
     sgx_vm_area_t* vma = NULL;
     list_t* ll = NULL;

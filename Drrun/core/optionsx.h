@@ -628,28 +628,28 @@
 #ifdef UNIX
     /* Xref PR 258731 - options to duplicate stdout/stderr for our or client logging if
      * application tries to close them. */
-    OPTION_DEFAULT(bool, dup_stdout_on_close, true, "Duplicate stdout for DynamoRIO "
+   // OPTION_DEFAULT(bool, dup_stdout_on_close, true, "Duplicate stdout for DynamoRIO "
                    "or client usage if app tries to close it.")
-    OPTION_DEFAULT(bool, dup_stderr_on_close, true, "Duplicate stderr for DynamoRIO "
+   // OPTION_DEFAULT(bool, dup_stderr_on_close, true, "Duplicate stderr for DynamoRIO "
                    "or client usage if app tries to close it.")
-    OPTION_DEFAULT(bool, dup_stdin_on_close, true, "Duplicate stdin for DynamoRIO "
+   // OPTION_DEFAULT(bool, dup_stdin_on_close, true, "Duplicate stdin for DynamoRIO "
                    "or client usage if app tries to close it.")
     /* Clients using drsyms can easily load dozens of files (i#879).
      * No downside to raising since we'll let the app have ours if it
      * runs out.
      */
-    OPTION_DEFAULT(uint, steal_fds, IF_CLIENT_INTERFACE_ELSE(96, 12),
+   // OPTION_DEFAULT(uint, steal_fds, IF_CLIENT_INTERFACE_ELSE(96, 12),
                    "number of fds to steal from the app outside the app's reach")
-    OPTION_DEFAULT(bool, fail_on_stolen_fds, true,
+   // OPTION_DEFAULT(bool, fail_on_stolen_fds, true,
                    "return failure on app operations on fds preserved for DR's usage")
 
     /* Xref PR 308654 where calling dlclose on the client lib at exit time can lead
      * to an app crash. */
-    OPTION_DEFAULT(bool, avoid_dlclose, true, "Avoid calling dlclose from DynamoRIO.")
+   // OPTION_DEFAULT(bool, avoid_dlclose, true, "Avoid calling dlclose from DynamoRIO.")
 
     /* PR 304708: we intercept all signals for a better client interface */
-    OPTION_DEFAULT(bool, intercept_all_signals, true, "intercept all signals")
-    OPTION_DEFAULT(uint, max_pending_signals, 8,
+  //  OPTION_DEFAULT(bool, intercept_all_signals, true, "intercept all signals")
+  //  OPTION_DEFAULT(uint, max_pending_signals, 8,
                    "maximum count of pending signals per thread")
 
     /* i#2080: we have had some problems using sigreturn to set a thread's
@@ -657,7 +657,7 @@
      * mechanism that will set only the GPR's and will assume the target stack
      * is valid and its beyond-TOS slot can be clobbered.  X86-only.
      */
-    OPTION_DEFAULT_INTERNAL(bool, use_sigreturn_setcontext, true,
+   // OPTION_DEFAULT_INTERNAL(bool, use_sigreturn_setcontext, true,
                             "use sigreturn to set a thread's context")
 
     /* i#853: Use our all_memory_areas address space cache when possible.  This
@@ -666,7 +666,7 @@
      * This option has no effect on platforms with a direct memory query, such
      * as MacOS.
      */
-    OPTION_DEFAULT(bool, use_all_memory_areas, true, "Use all_memory_areas "
+   // OPTION_DEFAULT(bool, use_all_memory_areas, true, "Use all_memory_areas "
                    "address space cache to query page protections.")
 #endif /* UNIX */
 
