@@ -54,7 +54,7 @@ typedef struct _sgx_vm_area_t {
 
 
 /*------------------------- program-arena in sgx-enclave --------------------*/
-#define SGX_VMA_MAX_CNT 200
+#define SGX_VMA_MAX_CNT 2048
 typedef struct _sgx_mm_t {
     /* The start address of heap reserved by sgxsdk */
     byte*   heap_offset;
