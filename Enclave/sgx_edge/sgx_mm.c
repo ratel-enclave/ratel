@@ -161,7 +161,8 @@ sgx_mm_t* sgx_mm_getmm(void)
 #define XTA_TDCXT_END   (XTA_TDCXT_START + XTA_TDCXT_SZ)
 
 
-#define DR_PATH "/home/sgx/project/sgx/sgx-dbi/libdynamorio.so"
+// #define DR_PATH "/home/sgx/project/sgx/sgx-dbi/libdynamorio.so"
+#define DR_PATH "/home/privado/SGX-DBI/github/SGX-DBI/libdynamorio.so"
 
 
 /* from sys/mman.h */

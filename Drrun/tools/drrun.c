@@ -1005,9 +1005,9 @@ _tmain(int argc, TCHAR *targv[])
             }
         }
 # endif
-        else if (strcmp(argv[i], "-client") == 0) {
-            usage(false, "not support -client");
-        }
+        // else if (strcmp(argv[i], "-client") == 0) {
+        //     usage(false, "not support -client");
+        // }
         else if (strcmp(argv[i], "-ops") == 0) {
             /* support repeating the option (i#477) */
             add_extra_option(extra_ops, BUFFER_SIZE_ELEMENTS(extra_ops),
@@ -1063,11 +1063,11 @@ _tmain(int argc, TCHAR *targv[])
                                  &extra_ops_sofar, "\"%s\"", argv[i]);
                 i++;
             }
-            if (i < argc &&
-                (strcmp(argv[i], "-t") == 0 ||
-                 strcmp(argv[i], "-c") == 0)) {
-                usage(false, "not support -t and -c");
-            }
+            // if (i < argc &&
+            //     (strcmp(argv[i], "-t") == 0 ||
+            //      strcmp(argv[i], "-c") == 0)) {
+            //     usage(false, "not support -t and -c");
+            // }
             if (i < argc && strcmp(argv[i], "--") == 0) {
                 i++;
                 goto done_with_options;
