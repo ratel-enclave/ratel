@@ -15,9 +15,9 @@ STRIP	:= /usr/bin/strip
 
 
 BLD_DIR	?= build
-INC_DIR	:= core core/arch core/arch/x86 core/unix  core/lib libutil extra extra/include/annotations
+INC_DIR	:= ext/drcontainers core core/arch core/arch/x86 core/unix core/lib core/utils libutil extra extra/include/annotations include ext ext/drmgr ext/droption ext/drreg ext/drsyms ext/drsyms/libelftc/include ext/drutil ext/drwrap ext/drx  ext/drcovlib 
 INCLUDES	:= $(addprefix -I./,$(INC_DIR))
-MODULES := core core/unix core/lib core/arch core/arch/x86 libutil tools
+MODULES := core core/unix core/lib core/arch core/arch/x86 libutil tools ext/drmgr ext/droption ext/drreg ext/drsyms ext/drutil ext/drwrap ext/drx ext/drcontainers ext/drcovlib
 BUILD_DIR   := $(addprefix $(BLD_DIR)/,$(MODULES))
 
 
@@ -98,6 +98,122 @@ $(BLD_DIR)/libdrconfiglib.a: $(DRCONFIGLIB_CC_OBJ)
 	$(AR) qc $@ $^
 	$(RANDLIB) $@
 
+#Built target drcontainers
+DRCONTAINERSLIB_CC_SRC	:= ext/drcontainers/*.c
+DRCONTAINERSLIB_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.2.o,$(DRCONTRAINERSLIB_CC_SRC))
+DRCONTAINERSLIB_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+
+$(DRCONTAINERSLIB_CC_OBJ): $(BLD_DIR)/%.2.o: %.c
+	$(CC) $(INCLUDES) $(DRCONTAINERSLIB_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrcontainers.a: $(DRCONTAINERSLIB_CC_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
+#Built target drcovlib
+DRCOVLIB_CC_SRC	:= ext/drcovlib/drcovlib.c ext/drcovlib/modules.c
+DRCOVLIB_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRCOVLIB_CC_SRC))
+DRCOVLIB_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+
+$(DRCOVLIB_CC_OBJ): $(BLD_DIR)/%.o: %.c
+	$(CC) $(INCLUDES) $(DRCOVLIB_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrcovlib.a: $(DRCOVLIB_CC_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
+#Built target drmgr
+DRMGRLIB_CC_SRC	:= ext/drmgr/drmgr.c 
+DRMGRLIB_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRMGRLIB_CC_SRC))
+DRMGRLIB_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+
+$(DRMGRLIB_CC_OBJ): $(BLD_DIR)/%.o: %.c
+	$(CC) $(INCLUDES) $(DRMGRLIB_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrmgr.a: $(DRMGRLIB_CC_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
+
+#Built target drreg
+DRREGLIB_CC_SRC	:= ext/drreg/drreg.c 
+DRREGLIB_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRREGLIB_CC_SRC))
+DRREGLIB_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+
+$(DRREGLIB_CC_OBJ): $(BLD_DIR)/%.o: %.c
+	$(CC) $(INCLUDES) $(DRREGLIB_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrreg.a: $(DRREGLIB_CC_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
+
+#Built target drsyms
+DRSYMSLIB_CC_SRC	:= ext/drsyms/demangle.cc ext/drsyms/drsyms_bench.c ext/drsyms/drsyms_common.c ext/drsyms/drsyms_dwarf.c ext/drsyms/drsyms_elf.c ext/drsyms/drsyms_unix_common.c ext/drsyms/drsyms_unix_frontend.c
+DRSYMSLIB_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRSYMSLIB_CC_SRC))
+DRSYNSLIB_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+
+$(DRSYMSLIB_CC_OBJ): $(BLD_DIR)/%.o: %.c
+	$(CC) $(INCLUDES) $(DRSYMSLIB_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrsyms.a: $(DRSYMSLIB_CC_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
+
+#Built target drutil
+DRUTILLIB_CC_SRC	:= ext/drutil/drutil.c
+DRUTILLIB_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRUTILLIB_CC_SRC))
+DRUTILLIB_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+
+$(DRUTILLIB_CC_OBJ): $(BLD_DIR)/%.o: %.c
+	$(CC) $(INCLUDES) $(DRUTILLIB_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrutil.a: $(DRUTILLIB_CC_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
+
+#Built target drwrap
+# DRWRAP_AS_SRC	:= ext/drwrap/drwrap_asm_aarch64.asm 
+# DRWRAP_AS_OBJ	:= $(patsubst %,$(BLD_DIR)/%.o,$(DRWRAP_AS_SRC))
+# DRWRAP_AS_FLAGS := $(BASIC_AS_FLAGS)
+DRWRAP_CC_SRC := ext/drwrap/drwrap.c
+DRWRAP_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRWRAP_CC_SRC))
+DRWRAP_CC_FLAGS := $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+# $(DRWRAP_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
+# 	${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
+# 	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
+# 	$(AS) $(DRWRAP_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
+
+$(DRWRAP_CC_OBJ): $(BLD_DIR)/%.o: %.c
+	$(CC) $(INCLUDES) $(DRWRAP_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrwrap.a:  $(DRWRAP_CC_OBJ) #$(DRWRAP_AS_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
+
+#Built target drx
+DRXLIB_CC_SRC	:= ext/drx/drx.c ext/drx/drx_buf.c
+DRXLIB_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRXLIB_CC_SRC))
+DRXLIB_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DNOT_DYNAMORIO_CORE_PROPER
+
+
+$(DRXLIB_CC_OBJ): $(BLD_DIR)/%.o: %.c
+	$(CC) $(INCLUDES) $(DRXLIB_CC_FLAGS) -c $< -o $@
+
+$(BLD_DIR)/libdrx.a: $(DRXLIB_CC_OBJ)
+	$(AR) qc $@ $^
+	$(RANDLIB) $@
+
 
 #Built target drrun
 DRRUN_CC_SRC	:= tools/drrun.c
@@ -105,7 +221,7 @@ DRRUN_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRRUN_CC_SRC))
 DRRUN_CC_FLAGS	:= $(BASIC_CC_FLAGS) -DRC_IS_drrun -DDRRUN
 DRRUN_LD_FLAGS	:= $(BASIC_CC_FLAGS) -Wl,--hash-style=both
 DRRUN_EXTRA_LD_FLAGS		:= -Wl,--section-start=.text=0x8048000
-DRLIBS_A	:= libdrconfiglib.a libdrfrontendlib.a libdrinjectlib.a libdrdecode.a libdrhelper.a
+DRLIBS_A	:= libdrconfiglib.a libdrfrontendlib.a libdrinjectlib.a libdrdecode.a libdrhelper.a libdrcontainers.a libdrcovlib.a libdrmgr.a libdrreg.a libdrsyms.a libdrutil.a libdrwrap.a libdrx.a  
 DRLIBS		:= $(addprefix $(BLD_DIR)/,$(DRLIBS_A))
 
 $(DRRUN_CC_OBJ): $(BLD_DIR)/%.o: %.c

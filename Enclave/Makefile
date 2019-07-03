@@ -85,9 +85,9 @@ dynamorio_t.o: dynamorio_t.c
 
 ######## Dynamorio Settings ########
 BLD_DIR		?= build
-INC_DIR		:= core/arch/x86 core/unix core/arch core/lib extra extra/include/annotations sgx_edge
+INC_DIR		:= core/arch/x86 core/unix core/arch core/lib extra extra/include/annotations sgx_edge include ext ext/drmgr ext/droption ext/drreg ext/drsyms ext/drsyms/libelftc/include ext/drutil ext/drwrap ext/drx ext/drcontainers ext/drcovlib 
 INCLUDES	:= $(addprefix -I./,$(INC_DIR))
-MODULES 	:= core core/unix core/lib core/arch core/arch/x86 third_party/libgcc
+MODULES 	:= core core/unix core/lib core/arch core/arch/x86 third_party/libgcc ext/drmgr ext/droption ext/drreg ext/drsyms ext/drutil ext/drwrap ext/drx ext/drcontainers ext/drcovlib 
 BUILD_DIR   := $(addprefix $(BLD_DIR)/,$(MODULES))
 
 ifeq ($(SGX_ARCH), x86)
@@ -100,7 +100,7 @@ BASIC_CC_FLAGS	:= -fno-strict-aliasing -fno-stack-protector -fvisibility=interna
 
 DYNAMORIO_AS_FLAGS 	:= $(BASIC_AS_FLAGS)
 
-DYNAMORIO_CC_FLAGS	:= $(BASIC_CC_FLAGS) -fPIC -Ddynamorio_EXPORTS $(INCLUDES)
+DYNAMORIO_CC_FLAGS	:= $(BASIC_CC_FLAGS) -fPIC -Ddynamorio_EXPORTS $(INCLUDES) 
 DYNAMORIO_LDSCRIPT	:= core/dynamorio.ldscript
 DYNAMORIO_LD_FLAGS	:= $(BASIC_CC_FLAGS) -fPIC -Xlinker -z -Xlinker now -Xlinker -Bsymbolic -nostdlib -Wl,-dT,$(DYNAMORIO_LDSCRIPT) -Wl,--hash-style=both -shared -Wl,-soname,libdynamorio.so
 
@@ -113,7 +113,7 @@ DYNAMORIO_AS_OBJ	:= $(patsubst %,$(BLD_DIR)/%.o,$(DYNAMORIO_AS_SRC))
 
 
 DYNAMORIO_SRC_DIR	:= $(MODULES)
-DYNAMORIO_CC_SRC	:= $(foreach sdir,$(DYNAMORIO_SRC_DIR),$(wildcard $(sdir)/*.c))
+DYNAMORIO_CC_SRC	:= $(foreach sdir,$(DYNAMORIO_SRC_DIR),$(wildcard $(sdir)/*.c)) api/samples/empty.c
 DYNAMORIO_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DYNAMORIO_CC_SRC))
 
 
@@ -158,6 +158,10 @@ $(ENCLAVE_NAME): dynamorio_t.o $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) $(EDGE_OB
 	#$(OBJCOPY) --add-gnu-debuglink=$@.debug $@
 	#$(STRIP) -g -x $@
 
+######## building empty.so ########
+
+$(EMPTY_PLUGIN): $(DYNAMORIO_CC_OBJ) $(EDGE_OBJS) ${DYNAMORIO_LDSCRIPT}
+	$(LD) $(PLATFORM_DEBUG_FLAGS) $(SGX_ENCLAVE_LD_FLAGS) $(DYNAMORIO_LD_FLAGS) $(SGX_DYNAMORIO_LD_FLAGS) -o $@ $(EDGE_OBJS) $(DYNAMORIO_AS_OBJ) $(DYNAMORIO_CC_OBJ) dynamorio_t.o $(SGX_ENCLAVE_LD_LIBS)
 
 
 $(SIGNED_ENCLAVE_NAME): $(ENCLAVE_NAME)
