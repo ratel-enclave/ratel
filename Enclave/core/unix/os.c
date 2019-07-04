@@ -7462,18 +7462,31 @@ pre_system_call(dcontext_t *dcontext)
 #ifdef SYS_dup2
     case SYS_dup2:
     IF_LINUX(case SYS_dup3:) {
-        file_t newfd = (file_t) sys_param(dcontext, 1);
-        if (fd_is_dr_owned(newfd) || fd_is_in_private_range(newfd)) {
-            SYSLOG_INTERNAL_WARNING_ONCE("app trying to dup-close DR file(s)");
-            LOG(THREAD, LOG_TOP|LOG_SYSCALLS, 1,
-                "WARNING: app trying to dup2/dup3 to %d.  Disallowing.\n", newfd);
-            if (DYNAMO_OPTION(fail_on_stolen_fds)) {
-                set_failure_return_val(dcontext, EBADF);
-                DODEBUG({ dcontext->expect_last_syscall_to_fail = true; });
-            } else
-                set_success_return_val(dcontext, 0);
-            execute_syscall = false;
-        }
+        /* vanilla DR does not make the dup2 call, instead it mimics it.
+         * in sgx, we have to tunnel the call outside the enclave,
+         * because we need to let the OS know about this change in fd statuses
+         * so, for now we are commenting out the checks and the syscall simulation done by DR 
+         * and replacing it will real syscall.
+         * This may break the DR and application semantics
+         * e.g., if the app does dup2 on stdout, all the DR stdout prints will go to the app's file
+         * --Shweta
+         */
+        dcontext->sys_param0 = sys_param(dcontext, 0);
+        dcontext->sys_param1 = sys_param(dcontext, 1);
+
+        /* below is the original DR code that we are commenting out for SGX support*/
+        // file_t newfd = (file_t) sys_param(dcontext, 1);
+        // if (fd_is_dr_owned(newfd) || fd_is_in_private_range(newfd)) {
+        //     SYSLOG_INTERNAL_WARNING_ONCE("app trying to dup-close DR file(s)");
+        //     LOG(THREAD, LOG_TOP|LOG_SYSCALLS, 1,
+        //         "WARNING: app trying to dup2/dup3 to %d.  Disallowing.\n", newfd);
+        //     if (DYNAMO_OPTION(fail_on_stolen_fds)) {
+        //         set_failure_return_val(dcontext, EBADF);
+        //         DODEBUG({ dcontext->expect_last_syscall_to_fail = true; });
+        //     } else
+        //         set_success_return_val(dcontext, 0);
+        //     execute_syscall = false;
+        // }
         break;
     }
 #endif
