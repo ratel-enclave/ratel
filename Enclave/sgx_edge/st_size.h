@@ -1,6 +1,9 @@
 #ifndef _ST_SIZE_H__
 #define _ST_SIZE_H__
 
+#define len_mmsghdr 64
+#define len_addrlen 512
+#define len_optlen 128
 #define len_flock 32
 #define len_ioctl 512
 #define len_sigevent 64
@@ -66,7 +69,6 @@
 #define len_msqid_ds 104
 #define len_utsname 390
 #define len_perf_event_attr 112
-#define len_pollfd 8
 #define len_pollfd 8
 #define len_pt_regs 168
 #define len_rlimit 16

@@ -374,6 +374,7 @@ long sgx_syscall_2(long sysno, long _rdi, long _rsi)
 
         case SYS_ftruncate:
 	case SYS_dup2:
+	case SYS_listen:
             ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
             break;
         
@@ -502,11 +503,16 @@ long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         case SYS_readv:
             ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, len_iovec, _rdx);
             break;
-
+	case SYS_bind:
+    case SYS_connect:
+	    ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, len_addrlen, _rdx);
+            break;
         case SYS_writev:
             ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void*)_rsi, len_iovec, _rdx);
             break;
-
+        case SYS_poll:
+		ocall_syscall_3_ToNN(&ret, sysno,(void*)_rdi, len_pollfd, _rsi, _rdx);
+                break;
         case SYS_mprotect:
             addr = sgx_mm_itn2ext((byte*)_rdi);
 
@@ -517,15 +523,17 @@ long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
                 ret = sgx_mm_mprotect(addr, _rsi, _rdx);
             }
             break;
-        case SYS_connect:
+		case SYS_getdents:
+		case SYS_getdents64:
+      //  case SYS_connect:
             ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
             break;
-        case SYS_getdents:
-            ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
-            break;
-        case SYS_getdents64:
-            ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void*)_rsi, _rdx);
-            break;
+       // case SYS_getdents:
+       //     ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, len_linux_dirent, _rdx);
+       //     break;
+       // case SYS_getdents64:
+       //     ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, len_linux_dirent64, _rdx);
+       //     break;
 
         case SYS_setitimer:
             ocall_syscall_3_NTiTo(&ret, sysno, _rdi, (void*)_rsi, len_itimerval, (void*)_rdx, len_itimerval);
@@ -583,7 +591,10 @@ long sgx_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
                 ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
             }
             break;
-
+		case SYS_sendmmsg:
+		ocall_syscall_4_NToNN(&ret, sysno, _rdi, (void*)_rsi, len_mmsghdr, _rdx, _r10);
+                break;
+     
         default:
             unimplemented_syscall(sysno);
             break;
@@ -595,9 +606,19 @@ long sgx_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 long sgx_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
 {
     long ret = -1;
-
-    if (sysno == SYS_prctl) {
+    switch(sysno) {
+	
+    case SYS_prctl: 
         ocall_syscall_5_NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8);
+	break;
+    case SYS_setsockopt:
+	case SYS_getsockopt:
+	ocall_syscall_5_NNNVioN(&ret, sysno, _rdi, _rsi, _rdx, (void*)_r10,_r8);
+	break;
+    default:
+            unimplemented_syscall(sysno);
+            break;
+
     }
 
     return ret;
@@ -659,6 +680,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_uname:
         case SYS_time:
         case SYS_times:
+		case SYS_dup:
 	case SYS_set_tid_address:
         case SYS_sysinfo:
 	case SYS_alarm:
@@ -697,6 +719,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_ftruncate:
 	case SYS_kill:
 	case SYS_dup2:
+	case SYS_listen:
             return sgx_syscall_2(sysno, _rdi, _rsi);
             break;
 
@@ -708,8 +731,8 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_readv:
         case SYS_writev:
         case SYS_mprotect:
-        case SYS_getdents:
-        case SYS_getdents64:
+       // case SYS_getdents:
+       // case SYS_getdents64:
         case SYS_setitimer:
         case SYS_chown:
         case SYS_lseek:
@@ -717,6 +740,8 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
 	case SYS_connect:
         case SYS_readlink:
 	case SYS_ioctl:
+	case SYS_bind:
+        case SYS_poll:
             return sgx_syscall_3(sysno, _rdi, _rsi, _rdx);
             break;
 
@@ -724,11 +749,14 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_rt_sigaction:
         case SYS_rt_sigprocmask:
         case SYS_mremap:
+		case SYS_sendmmsg:
             return sgx_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
             break;
 
             //Five parameters
         case SYS_prctl:
+    	case SYS_setsockopt:
+	    case SYS_getsockopt:
             return sgx_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
             break;
 

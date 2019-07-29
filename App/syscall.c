@@ -559,6 +559,7 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
         case SYS_arch_prctl:
 	case SYS_dup2:
         case SYS_kill:
+	case SYS_listen:
             ret = syscall(sysno, N1, N2);
             b = true;
             break;
@@ -850,9 +851,9 @@ long ocall_syscall_3_NPoN(long sysno, long N1, void *V, long N2)
 
     switch (sysno) {
         case SYS_read:
-        case SYS_getdents:
-        case SYS_getdents64:
-	case SYS_connect:
+	//	case SYS_connect:
+		case SYS_getdents:
+		case SYS_getdents64:
             ret = syscall(sysno, N1, V, N2);
             b = true;
             break;
@@ -890,6 +891,10 @@ long ocall_syscall_3_NToN(long sysno, long N1, void *V, long dumb, long N2)
 
     switch (sysno) {
         case SYS_readv:
+	    case SYS_bind:
+       // case SYS_getdents:
+       // case SYS_getdents64:
+	    case SYS_connect:
             ret = syscall(sysno, N1, V, N2);
             b = true;
             break;
@@ -917,6 +922,28 @@ long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long dumb, long N2)
 
     return ret;
 }
+
+long ocall_syscall_3_ToNN(long sysno, void *V, long dumb, long N1, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno) {
+        case SYS_poll:
+            ret = syscall(sysno,V,N1,N2);
+            b = true;
+            break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+
+
+
 
 long ocall_syscall_3_NNTo(long sysno, long N1, long N2, void *V, long dumb)
 {
@@ -984,6 +1011,23 @@ long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
 
     return ret;
 }
+long ocall_syscall_4_NToNN(long sysno, long N1, void *V, long dumb, long N2, long N3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno) {
+        case SYS_sendmmsg:
+            ret = syscall(sysno,N1,V,N2,N3);
+            b = true;
+            break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 
 long ocall_syscall_4_NTiToN(long sysno, long N1, void *T1, long l1, void *T2, long l2, long N2)
 {
@@ -1020,6 +1064,23 @@ long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long 
     return ret;
 }
 
+long ocall_syscall_5_NNNVioN(long sysno, long N1, long N2, long N3, void* V1, long N5)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch(sysno) {
+		case SYS_setsockopt:
+		case SYS_getsockopt:
+        ret = syscall(sysno, N1, N2, N3, V1, N5);
+        b = true;
+		break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 
 long ocall_syscall_6_NNNNNN(long sysno, long N1, long N2, long N3, long N4, long N5, long N6)
 {

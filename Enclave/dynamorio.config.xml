@@ -1,8 +1,8 @@
 <EnclaveConfiguration>
   <ProdID>0</ProdID>
   <ISVSVN>0</ISVSVN>
-  <StackMaxSize>0x80000</StackMaxSize>
-  <HeapMaxSize>0x100000</HeapMaxSize>
+  <StackMaxSize>0x90000</StackMaxSize>
+  <HeapMaxSize>0x200000</HeapMaxSize>
   <DynamorioCodeCacheSize>0x10000000</DynamorioCodeCacheSize>
   <TargetProgramArenaSize>0x80000000</TargetProgramArenaSize>
   <TCSNum>1</TCSNum>
