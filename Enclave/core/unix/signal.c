@@ -215,7 +215,7 @@ os_cxt_ptr_t osc_empty;
 
 /* Begin: Modified by Pinghai */
 // master_signal_handler(int sig, siginfo_t *siginfo, kernel_ucontext_t *ucxt);
-void master_signal_handler(sigcxt_pkg_t *ext_pkg);
+int master_signal_handler(sgx_exception_info_t *ext_pkg);
 /* End: Modified by Pinghai */
 
 static void
@@ -5002,7 +5002,7 @@ int master_signal_handler(sgx_exception_info_t *ext_pkg)
 
 #ifdef HAVE_SIGALTSTACK
     /* swith to the stack set by sigaltstack */
-    call_switch_stack((void *)ext_pkg,
+    call_switch_stack((void *)ext_pkg->sigcxt_pkg,
             (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
             _master_signal_handler, NULL, true/*return*/);
 #else

@@ -207,6 +207,7 @@ typedef enum _sgx_exception_type_t
 } sgx_exception_type_t;
 
 #if defined (_M_X64) || defined (__x86_64__)
+typedef unsigned long uint64_t;
 typedef struct _cpu_context_t
 {
     uint64_t rax;
@@ -229,6 +230,7 @@ typedef struct _cpu_context_t
     uint64_t rip;
 } sgx_cpu_context_t;
 #else
+typedef unsigned int uint32_t;
 typedef struct _cpu_context_t
 {
     uint32_t eax;

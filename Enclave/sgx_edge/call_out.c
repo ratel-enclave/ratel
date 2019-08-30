@@ -144,7 +144,10 @@ typedef struct loc_kernel_sigaction_t {
 
 loc_kernel_sigaction_t app_sigaction[SIGARRAY_SIZE];    // Current signal-actions
 
+typedef struct sgx_exception_info_t sgx_exception_info_t;
 typedef int (*sgx_exception_handler_t)(sgx_exception_info_t *info);
+extern void *sgx_register_exception_handler(int is_first_handler, sgx_exception_handler_t exception_handler);
+extern int master_signal_handler(sgx_exception_info_t *ext_pkg);
 
 long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10)
 {
