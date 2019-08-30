@@ -188,21 +188,21 @@ typedef struct _sigcxt_pkg_t {
 }sigcxt_pkg_t;
 
 /* Begin: Added by Pinghai */
-typedef struct _exception_info_t
+typedef struct _intelsdi_exception_info_t
 {
 #if defined (_M_X64) || defined (__x86_64__)
-    typedef unsigned long uint64_t;
-    uint64_t cpu_context[18];
+    //typedef unsigned long uint64_t;
+    long    cpu_context[18];
 #else
-    typedef unsigned int uint32_t;
-    uint32_t cpu_context[10];
+    //typedef unsigned int uint32_t;
+    long    cpu_context[10];
 #endif
     int     exception_vector;
     int     exception_type;
-	/* Begin: Added by Pinghai */
+    /* Begin: Added by Pinghai */
     void*   sigcxt_pkg;  /* pointing to external structure that keeps all informaiton */
 	/* End: Added by Pinghai */
-} sgx_exception_info_t;
+} intelsdk_exception_info_t;
 
 typedef struct _intelsdk_sigcxt_pkg_t {
     int                 signum;
