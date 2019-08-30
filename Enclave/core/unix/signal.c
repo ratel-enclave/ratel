@@ -215,7 +215,7 @@ os_cxt_ptr_t osc_empty;
 
 /* Begin: Modified by Pinghai */
 // master_signal_handler(int sig, siginfo_t *siginfo, kernel_ucontext_t *ucxt);
-int master_signal_handler(sgx_exception_info_t *ext_pkg);
+int master_signal_handler(intelsdk_exception_info_t *ext_pkg);
 /* End: Modified by Pinghai */
 
 static void
@@ -4995,18 +4995,28 @@ _master_signal_handler(void * arg)
 }
 
 
-int master_signal_handler(sgx_exception_info_t *ext_pkg)
+int master_signal_handler(void *extra_info)
 {
     dcontext_t* ctx = get_thread_private_dcontext();
     thread_sig_info_t *info = ctx->signal_field;
 
+    /* intelsdk_sigcxt_pkg_t => sigcxt_pkg_t */
+    sgx_exception_info_t *sgx_info = (sgx_exception_info_t*)extra_info;
+    intelsdk_sigcxt_pkg_t *ext_pkg = (intelsdk_sigcxt_pkg_t*)sgx_info->sigcxt_pkg;
+
+    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)malloc(sizeof(sigcxt_pkg_t));
+
+    pkg->signum = ext_pkg->signum;
+    memcpy(pkg->ctx, pkg->ctx, sizeof(sigctx_knl_t));
+    memcpy(pkg->info, ext_pkg->info, sizeof(siginfo_t));
+
+
 #ifdef HAVE_SIGALTSTACK
     /* swith to the stack set by sigaltstack */
-    call_switch_stack((void *)ext_pkg->sigcxt_pkg,
-            (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
+    call_switch_stack(pkg, (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
             _master_signal_handler, NULL, true/*return*/);
 #else
-    _master_signal_handler(ext_pkg->sigcxt_pkg);
+    _master_signal_handler(pkg);
 #endif
 	return 0;
 }

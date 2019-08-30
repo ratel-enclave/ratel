@@ -144,10 +144,9 @@ typedef struct loc_kernel_sigaction_t {
 
 loc_kernel_sigaction_t app_sigaction[SIGARRAY_SIZE];    // Current signal-actions
 
-typedef struct sgx_exception_info_t sgx_exception_info_t;
-typedef int (*sgx_exception_handler_t)(sgx_exception_info_t *info);
-extern void *sgx_register_exception_handler(int is_first_handler, sgx_exception_handler_t exception_handler);
-extern int master_signal_handler(sgx_exception_info_t *ext_pkg);
+typedef int (*sgx_exception_handler_t)(void *info);
+extern void *sgx_register_exception_handler(int is_first_handler, sgx_exception_handler_t h);
+extern int master_signal_handler(void *info);
 
 long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10)
 {
@@ -159,7 +158,7 @@ long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _
     if (act != NULL)
         memcpy(&app_sigaction[signum], act, sizeof(loc_kernel_sigaction_t));
 
-    sgx_register_exception_handler(0, (sgx_exception_handler_t)master_signal_handler);
+    sgx_register_exception_handler(0, (intelsdk_exception_handler_t)master_signal_handler);
     sgxapp_reg_sighandler(signum);
 
     // returns 0 on success
