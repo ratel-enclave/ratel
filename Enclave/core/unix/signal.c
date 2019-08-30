@@ -213,9 +213,10 @@ os_cxt_ptr_t osc_empty;
 
 /* in x86.asm */
 
-// void
+/* Begin: Modified by Pinghai */
 // master_signal_handler(int sig, siginfo_t *siginfo, kernel_ucontext_t *ucxt);
 void master_signal_handler(sigcxt_pkg_t *ext_pkg);
+/* End: Modified by Pinghai */
 
 static void
 set_handler_and_record_app(dcontext_t *dcontext, thread_sig_info_t *info, int sig,
@@ -4982,6 +4983,7 @@ master_signal_handler_C(byte *xsp)
     EXITING_DR();
 }
 
+/* Begin: Modified by Pinghai */
 static void
 _master_signal_handler(void * arg)
 {
@@ -4993,7 +4995,7 @@ _master_signal_handler(void * arg)
 }
 
 
-void master_signal_handler(sigcxt_pkg_t *ext_pkg)
+int master_signal_handler(sgx_exception_info_t *ext_pkg)
 {
     dcontext_t* ctx = get_thread_private_dcontext();
     thread_sig_info_t *info = ctx->signal_field;
@@ -5004,10 +5006,11 @@ void master_signal_handler(sigcxt_pkg_t *ext_pkg)
             (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
             _master_signal_handler, NULL, true/*return*/);
 #else
-    _master_signal_handler(ext_pkg);
+    _master_signal_handler(ext_pkg->sigcxt_pkg);
 #endif
+	return 0;
 }
-
+/* End: Modified by Pinghai */
 
 static bool
 execute_handler_from_cache(dcontext_t *dcontext, int sig, sigframe_rt_t *our_frame,

@@ -144,6 +144,8 @@ typedef struct loc_kernel_sigaction_t {
 
 loc_kernel_sigaction_t app_sigaction[SIGARRAY_SIZE];    // Current signal-actions
 
+typedef int (*sgx_exception_handler_t)(sgx_exception_info_t *info);
+
 long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10)
 {
     loc_kernel_sigaction_t *act = (loc_kernel_sigaction_t*)act_ptr;
@@ -153,6 +155,8 @@ long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _
         memcpy(oldact, &app_sigaction[signum], sizeof(loc_kernel_sigaction_t));
     if (act != NULL)
         memcpy(&app_sigaction[signum], act, sizeof(loc_kernel_sigaction_t));
+
+    sgx_register_exception_handler(0, (sgx_exception_handler_t)master_signal_handler);
     sgxapp_reg_sighandler(signum);
 
     // returns 0 on success
@@ -624,6 +628,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_time:
         case SYS_times:
         case SYS_sysinfo:
+        case SYS_alarm:
             /*case SYS_set_thread_area:*/
             /*case SYS_get_thread_area:*/
             return sgx_syscall_1(sysno, _rdi);

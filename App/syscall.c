@@ -444,6 +444,7 @@ long ocall_syscall_1_N(long sysno, long N1)
 
     switch (sysno) {
         case SYS_close:
+        case SYS_alarm:
         case SYS_exit_group: /* fix-me: allow out-encalve code to do cleanup */
         case SYS_exit:
             ret = syscall(sysno, N1);
