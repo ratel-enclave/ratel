@@ -507,6 +507,11 @@ long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     case SYS_connect:
 	    ocall_syscall_3_NToN(&ret, sysno, _rdi, (void*)_rsi, len_addrlen, _rdx);
             break;
+	case SYS_getpeername:
+	case SYS_getsockname:
+	    ocall_syscall_3_NToPo(&ret, sysno, _rdi, (void*)_rsi, len_addrlen, (int*)_rdx);
+            break;
+
         case SYS_writev:
             ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void*)_rsi, len_iovec, _rdx);
             break;
@@ -552,6 +557,7 @@ long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
 	case SYS_ioctl:
 	    ocall_syscall_3_NNVio(&ret,sysno,_rdi,_rsi,(void*)_rdx,len_ioctl);
+	   // ocall_syscall_3_NNVo(&ret,sysno,_rdi,_rsi,(void*)_rdx);
 	    break;
 
         default:
@@ -612,9 +618,13 @@ long sgx_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long 
         ocall_syscall_5_NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8);
 	break;
     case SYS_setsockopt:
-	case SYS_getsockopt:
 	ocall_syscall_5_NNNVioN(&ret, sysno, _rdi, _rsi, _rdx, (void*)_r10,_r8);
 	break;
+	case SYS_getsockopt:
+	//printf("in getsockopt call_out\n");
+	ocall_syscall_5_NNNVioPio(&ret, sysno, _rdi, _rsi, _rdx, (void*)_r10,(int*)_r8);
+	break;
+
     default:
             unimplemented_syscall(sysno);
             break;
@@ -647,7 +657,9 @@ long sgx_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long 
 	case SYS_sendto:
 	ocall_syscall_6_NVoNNToN(&ret, sysno, _rdi,(void*)_rsi,_rdx,_r10,(void*)_r8,_r9);
 	break;
-
+	case SYS_recvfrom:
+	ocall_syscall_6_NVoNNToPo(&ret, sysno, _rdi,(void*)_rsi,_rdx,_r10,(void*)_r8, (int*) _r9);
+	break;
         default:
             unimplemented_syscall(sysno);
             break;
@@ -685,6 +697,8 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_sysinfo:
 	case SYS_alarm:
 	case SYS_fdatasync:
+	case SYS_fsync:
+	case SYS_umask:
             /*case SYS_set_thread_area:*/
             /*case SYS_get_thread_area:*/
             return sgx_syscall_1(sysno, _rdi);
@@ -742,6 +756,8 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
 	case SYS_ioctl:
 	case SYS_bind:
         case SYS_poll:
+		case SYS_getpeername:
+		case SYS_getsockname:
             return sgx_syscall_3(sysno, _rdi, _rsi, _rdx);
             break;
 
@@ -764,6 +780,7 @@ long sgx_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r
         case SYS_mmap:
         case SYS_futex:
 	case SYS_sendto:
+	case SYS_recvfrom:
             return sgx_syscall_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
             break;
 

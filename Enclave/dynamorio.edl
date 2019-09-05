@@ -140,7 +140,7 @@ enclave {
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
 	
 	
-	long ocall_syscall_3_NNVio(long sysno,long N1,long N2,[out,size=l] void *T,int l);
+	long ocall_syscall_3_NNVio(long sysno,long N1,long N2,[in, out, size=l] void *T,long l);
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S, long N1, long N2);
@@ -159,6 +159,8 @@ enclave {
 
         //ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
         long ocall_syscall_3_NToN(long sysno, long N1, [in, out, size=dumb] void *T, long dumb, long N2);
+        long ocall_syscall_3_NToPo(long sysno, long N1, [in, out, size=dumb] void *T, long dumb,[in,out] int* N2);
+
 
 
         //ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
@@ -183,6 +185,9 @@ enclave {
         /********syscalls with 5 paramters********/
         long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5);
 	long ocall_syscall_5_NNNVioN(long sysno, long N1, long N2, long N3, [in, out, size=N5] void* V1, long N5);
+	long ocall_syscall_5_NNNVioPio(long sysno, long N1, long N2, long N3, [in, out, size=128] void* V1, [in,out] int* N5);
+
+
         /********syscalls with 6 paramters********/
         //void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
         long ocall_syscall_6_NNNNNN(long sysno, long N1, long N2, long N3, long N4, long N5, long N6);
@@ -190,7 +195,9 @@ enclave {
         //int futex(int *uaddr, int futex_op, int val, const struct timespec *timeout, int *uaddr2, int val3);
         long ocall_syscall_6_PoNNTiPoN(long sysno, [out] int* V1, long N1, long N2, [in, size=l] void *T, long l, [out] int *V2, long N3);
 
-	long ocall_syscall_6_NVoNNToN(long sysno,long N1,[out,size=N2] void* V1,long N2,long N3,[out,size=N4] void* T1, int N4);	
+	long ocall_syscall_6_NVoNNToN(long sysno,long N1,[in,out,size=N2] void* V1,long N2,long N3,[in,out,size=N4] void* T1, int N4);	
+	long ocall_syscall_6_NVoNNToPo(long sysno,long N1,[in,out,size=N2] void* V1,long N2,long N3,[in, out, size=128] void* T1, [in,out] int* N4);	
+
 
 
         void sgxapp_reg_sighandler(int signum);

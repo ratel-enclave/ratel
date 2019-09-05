@@ -576,7 +576,7 @@ dynamorio_app_init(void)
             char initial_options[MAX_OPTIONS_STRING];
             get_dynamo_options_string(&dynamo_options,
                                       initial_options, sizeof(initial_options), true);
-            SYSLOG_INTERNAL_INFO("Initial options = %s", initial_options);
+           // SYSLOG_INTERNAL_INFO("Initial options = %s", initial_options);
             DOLOG(1, LOG_TOP, {
                 get_pcache_dynamo_options_string(&dynamo_options, initial_options,
                                                  sizeof(initial_options),
