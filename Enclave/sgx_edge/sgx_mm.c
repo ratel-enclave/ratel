@@ -657,6 +657,7 @@ static sgx_vm_area_t* _sgx_find_vma(byte *ext_start)
             case OVERLAP_HEAD_ALN:
             case OVERLAP_ALL_OVFT:
             case OVERLAP_SAME:
+	    case OVERLAP_MID:	/* missing a switch-case constant parameter to break out while loop. */
                 return vma;
                 break;
 
