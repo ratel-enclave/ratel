@@ -6,6 +6,8 @@
 #include "../dynamorio_t.h"
 
 #include "sgx_mm.h"
+#include "sgx_signal.h"
+
 #include "call_out.h"
 
 extern void load_fsbase(unsigned long base);
@@ -166,20 +168,6 @@ long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _
 }
 
 
-long sgx_syscall_rt_sigprocmask(long how, long set_ptr, long oldset_ptr, long _r10)
-{
-    return 0;
-}
-
-
-/* fix-me: set a flag to indirect this syscall execute successfully,
-   and allow master_signal_handler checks this flag. */
-long sgx_syscall_sigaltstack(long ss_ptr, long oldss_ptr)
-{
-    return 0;
-}
-
-
 /* fcntl has variable parameters */
 long sgx_syscall_fcntl(long fd, long cmd, long arg1)
 {
@@ -280,8 +268,11 @@ long sgx_syscall_1(long sysno, long _rdi)
         case SYS_setfsuid:
         case SYS_setuid:
         case SYS_unshare:
-        case SYS_rt_sigreturn:
             ocall_syscall_1_N(&ret, sysno, _rdi);
+            break;
+        
+        case SYS_rt_sigreturn:
+            ocall_sigreturn_simulation(_rdi);
             break;
 
         case SYS_close:

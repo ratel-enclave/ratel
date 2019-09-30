@@ -1,5 +1,5 @@
-#ifndef _DEFINE_H__
-#define _DEFINE_H__
+#ifndef _SGX_EDGE_DEFINE_H__
+#define _SGX_EDGE_DEFINE_H__
 
 
 /* from fs.h */
@@ -59,4 +59,4 @@ typedef struct _global_data_t
     // layout_t       layout_table[LAYOUT_ENTRY_NUM];
 } global_data_t;
 
-#endif // _DEFINE_H__
+#endif // _SGX_EDGE_DEFINE_H__
