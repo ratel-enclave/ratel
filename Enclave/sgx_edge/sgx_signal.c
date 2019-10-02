@@ -1,6 +1,8 @@
+#include <string.h>
+
+#include "struct_size.h"
 #include "sgx_signal.h"
-#include "ucontext.h"
-#include "os_public.h"
+
 
 /* fix-me: set a flag to indirect this syscall execute successfully,
    and allow master_signal_handler checks this flag. */
@@ -14,42 +16,56 @@ long ocall_rt_sigprocmask(long how, long set_ptr, long oldset_ptr, long _r10)
     return 0;
 }
 
-/* GPR context for recovering machine state from signal handling */
-struct simu_pt_regs
+/* Keep the data of returned back by sigaction syscall for simulating kernel activity */
+typedef struct _sigaction_data_keepper_t
 {
-    unsigned long r8;
-    unsigned long r9;
-    unsigned long r10;
-    unsigned long r11;
-    unsigned long r12;
-    unsigned long r13;
-    unsigned long r14;
-    unsigned long r15;
+    unsigned char cnt[len_kernel_sigaction];
+} sigaction_data_keepper_t;
+#define SA_KEEPPER_SIZE 65
 
-    unsigned long rdi;
-    unsigned long rsi;
-    unsigned long rbp;
-    unsigned long rbx;
-    unsigned long rdx;
-    unsigned long rax;
-    unsigned long rcx;
+static sigaction_data_keepper_t sigaction_data[SA_KEEPPER_SIZE];
 
-    unsigned long eflags;
-    unsigned long rsp;
-    unsigned long rip;
-};
+typedef int (*sgx_exception_handler_t)(void *sgx_info);
+extern void *sgx_register_exception_handler(int is_first_handler, sgx_exception_handler_t h);
+extern int master_signal_handler(void *sgx_info);
+extern void sgxapp_reg_sighandler(int signum);
+
+long ocall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10)
+{
+    static int dynamoRIO_registered_master_handler = 0; // false
+    sigaction_data_keepper_t *newact, *oldact;
+
+    if (dynamoRIO_registered_master_handler == 0)
+    {
+        dynamoRIO_registered_master_handler = 1; // true
+        sgx_register_exception_handler(0, (sgx_exception_handler_t)master_signal_handler);
+    }
+    sgxapp_reg_sighandler(signum);
+
+    /* simulate the kernel to set old_act */
+    newact = (sigaction_data_keepper_t *)act_ptr;
+    oldact = (sigaction_data_keepper_t *)oldact_ptr;
+
+    if (oldact != SGX_NULL)
+        memcpy(oldact, &sigaction_data[signum], sizeof(sigaction_data_keepper_t));
+    if (newact != SGX_NULL)
+        memcpy(&sigaction_data[signum], newact, sizeof(sigaction_data_keepper_t));
+
+    // returns 0 on success
+    return 0;
+}
 
 /* simulate syscall sigreturn */
 void ocall_sigreturn_simulation(long prt)
 {
-    struct simu_pt_regs regs;
-    ucontext_t *thisUCP;
-    sigcontext_t *sc;
+    simu_ucontext_t *thisUCP;
+    simu_sigcontext_t *sc;
+    simu_pt_regs regs;
 
     /* 1. retrive sigcontext */
-    thisUCP = (ucontext_t *)prt;
-    // ASSERT(thisUCP != NULL);
-    sc = SIGCXT_FROM_UCXT(thisUCP);
+    thisUCP = (simu_ucontext_t *)prt;
+    // ASSERT(thisUCP != SGX_NULL);
+    sc = &thisUCP->uc_mcontext;
     regs.r8 = sc->r8;
     regs.r9 = sc->r9;
     regs.r10 = sc->r10;
@@ -101,5 +117,5 @@ void ocall_sigreturn_simulation(long prt)
                      : [RIP] "r"(regs.rip), [REG] "r"(&regs)
                      :);
 
-    ASSERT_NOT_REACHED();
+    // ASSERT_NOT_REACHED();
 }

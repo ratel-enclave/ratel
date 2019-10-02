@@ -1,8 +1,22 @@
-#include "unistd_64.h"
-#include "syscall.h"
-#include "st_size.h"
+/* **********************************************************
+ * Designed by pinghai@gmail.com
+ * **********************************************************/
+
+/*
+ Summary: ocalls issued by DynamoRIO and SGX-app come to this file only through two entry functions, 
+ i.e. sgx_dynamorio_syscall and sgx_syscall. These two functions then dispatch the ocall to the bridge 
+ functions according to the syscall_no and parameters_count.
+ */
+
+/*
+ * call_out.c - provide ocall interfaces for the entire SGX-DBI system
+ */
 #include "sgx_trts.h"
 #include "string.h"
+
+#include "syscall_no.h"
+#include "struct_size.h"
+
 #include "../dynamorio_t.h"
 
 #include "sgx_mm.h"
@@ -137,35 +151,6 @@ void sgx_syscall_arch_prctl(long *ret, long sysno, long code, unsigned long addr
     *ret = 0;
 }
 
-
-#define SIGARRAY_SIZE   65
-
-typedef struct loc_kernel_sigaction_t {
-    unsigned char cnt[len_kernel_sigaction];
-}loc_kernel_sigaction_t;
-
-loc_kernel_sigaction_t app_sigaction[SIGARRAY_SIZE];    // Current signal-actions
-
-typedef int (*sgx_exception_handler_t)(void *sgx_info);
-extern void *sgx_register_exception_handler(int is_first_handler, sgx_exception_handler_t h);
-extern int master_signal_handler(void *sgx_info);
-
-long sgx_syscall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10)
-{
-    loc_kernel_sigaction_t *act = (loc_kernel_sigaction_t*)act_ptr;
-    loc_kernel_sigaction_t *oldact = (loc_kernel_sigaction_t*)oldact_ptr;
-
-    if (oldact != NULL)
-        memcpy(oldact, &app_sigaction[signum], sizeof(loc_kernel_sigaction_t));
-    if (act != NULL)
-        memcpy(&app_sigaction[signum], act, sizeof(loc_kernel_sigaction_t));
-
-    sgx_register_exception_handler(0, (sgx_exception_handler_t)master_signal_handler);
-    sgxapp_reg_sighandler(signum);
-
-    // returns 0 on success
-    return 0;
-}
 
 
 /* fcntl has variable parameters */
@@ -415,7 +400,7 @@ long sgx_syscall_2(long sysno, long _rdi, long _rsi)
             break;
 
         case SYS_sigaltstack:
-            ret = sgx_syscall_sigaltstack(_rdi, _rsi);
+            ret = ocall_sigaltstack(_rdi, _rsi);
             break;
 
         default:
@@ -533,12 +518,12 @@ long sgx_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
         case SYS_rt_sigaction:
             // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
-            ret = sgx_syscall_rt_sigaction(_rdi, _rsi, _rdx, _r10);
+            ret = ocall_rt_sigaction(_rdi, _rsi, _rdx, _r10);
             break;
 
         case SYS_rt_sigprocmask:
             // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
-            ret = sgx_syscall_rt_sigprocmask(_rdi, _rsi, _rdx, _r10);
+            ret = ocall_rt_sigprocmask(_rdi, _rsi, _rdx, _r10);
             break;
 
         case SYS_mremap:

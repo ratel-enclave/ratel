@@ -215,6 +215,7 @@ os_cxt_ptr_t osc_empty;
 
 /* Begin: Modified by Pinghai */
 // master_signal_handler(int sig, siginfo_t *siginfo, kernel_ucontext_t *ucxt);
+#define EXCEPTION_CONTINUE_EXECUTION    -1
 int master_signal_handler(void *sgx_info);
 /* End: Modified by Pinghai */
 
@@ -4987,9 +4988,7 @@ master_signal_handler_C(byte *xsp)
 static void
 _master_signal_handler(void * arg)
 {
-    sigcxt_pkg_t *ext_pkg = (sigcxt_pkg_t*)arg;
-    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)malloc(sizeof(sigcxt_pkg_t));
-    memcpy(pkg, ext_pkg, sizeof(sigcxt_pkg_t));
+    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)arg;
     master_signal_handler_C(pkg->signum, &pkg->info, &pkg->ctx, (byte*)pkg);
     /* switch back to the original stack */
 }
@@ -5007,7 +5006,7 @@ int master_signal_handler(void *sgx_info)
     sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)malloc(sizeof(sigcxt_pkg_t));
 
     pkg->signum = ext_pkg->signum;
-    memcpy(&pkg->ctx, &pkg->ctx, sizeof(sigctx_knl_t));
+    memcpy(&pkg->ctx, &ext_pkg->ctx, sizeof(sigctx_knl_t));
     memcpy(&pkg->info, &ext_pkg->info, sizeof(siginfo_t));
 
 
@@ -5018,7 +5017,12 @@ int master_signal_handler(void *sgx_info)
 #else
     _master_signal_handler(pkg);
 #endif
-	return 0;
+
+    ASSERT(pkg != NULL);
+    free(pkg);
+
+    /* Always return EXCEPTION_CONTINUE_EXECUTION if success*/
+    return EXCEPTION_CONTINUE_EXECUTION;
 }
 /* End: Modified by Pinghai */
 
@@ -5149,7 +5153,8 @@ execute_handler_from_cache(dcontext_t *dcontext, int sig, sigframe_rt_t *our_fra
 
     LOG(THREAD, LOG_ASYNCH, 3, "\tset next_tag to handler "PFX", xsp to "PFX"\n",
         SIGACT_PRIMARY_HANDLER(info->app_sigaction[sig]), xsp);
-    return true;
+
+    return 0;
 }
 
 static bool

@@ -1,6 +1,7 @@
-#ifndef _SGX_EDGE_DEFINE_H__
-#define _SGX_EDGE_DEFINE_H__
+#ifndef _SGX_EDGE_IO_H__
+#define _SGX_EDGE_IO_H__
 
+#include "sgx_defines.h"
 
 /* from fs.h */
 #define O_RDONLY     0x0000
@@ -39,24 +40,4 @@ struct stat {
 };
 
 
-/*----------------sgx_mm_init() initialized by referring external procmaps----------------*/
-typedef unsigned long    sys_word_t;
-
-typedef struct _global_data_t
-{
-    sys_word_t     enclave_size;
-    sys_word_t     heap_offset;
-    sys_word_t     heap_size;
-    sys_word_t     thread_policy;
-    sys_word_t     dyRIO_cache_offset;  // dynamoRIO's code-cache
-    sys_word_t     dyRIO_cache_size;
-    sys_word_t     prog_arena_offset;   // target program's modules
-    sys_word_t     prog_arena_size;
-    // thread_data_t  td_template;
-    // uint8_t        tcs_template[TCS_TEMPLATE_SIZE];
-    // uint32_t       layout_entry_num;
-    // uint32_t       reserved;
-    // layout_t       layout_table[LAYOUT_ENTRY_NUM];
-} global_data_t;
-
-#endif // _SGX_EDGE_DEFINE_H__
+#endif  // _SGX_EDGE_IO_H__

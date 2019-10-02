@@ -379,6 +379,7 @@
 #define SYS_writev __NR_writev
 #endif
 #if defined __x86_64__ && defined __LP64__
+#include "syscall_no64.h"
 #define SYS__sysctl __NR__sysctl
 #define SYS_accept __NR_accept
 #define SYS_accept4 __NR_accept4
