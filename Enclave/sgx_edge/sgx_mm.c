@@ -209,9 +209,9 @@ static void _sgx_vma_initialize(sgx_vm_area_t* vma, byte* ext_addr,
         size_t len, ulong prot, int fd, ulong offs);
 
 
-extern long sgx_syscall_1(long sysno, long _rdi);
-extern long sgx_syscall_2(long sysno, long _rdi, long _rsi);
-extern long sgx_syscall_3(long sysno, long _rdi, long _rsi, long _rdx);
+extern long sgx_ocall_syscall_1(long sysno, long _rdi);
+extern long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi);
+extern long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx);
 
 void sgx_mm_init_static(void)
 {
@@ -259,7 +259,7 @@ void sgx_mm_init_static(void)
             if (vma->comment[0] != '[') {
                 int fd;
 
-                fd = sgx_syscall_2(SYS_stat, (ulong)vma->comment, (ulong)&s);
+                fd = sgx_ocall_syscall_2(SYS_stat, (ulong)vma->comment, (ulong)&s);
                 YPHASSERT(fd == 0);
 
                 add->dev = s.st_dev;
@@ -328,7 +328,7 @@ static int _sgx_mm_init_byreffing_external_procmaps(void)
 
     /* open && read external procmaps */
     // int fd = dynamorio_syscall(SYS_open, 2, PROCMAPS, O_RDONLY);
-    int fd = sgx_syscall_3(SYS_open, (ulong)PROCMAPS_FILE, O_RDONLY, O_RDONLY);
+    int fd = sgx_ocall_syscall_3(SYS_open, (ulong)PROCMAPS_FILE, O_RDONLY, O_RDONLY);
     if (fd == -1)
         return -1;
 
@@ -336,7 +336,7 @@ static int _sgx_mm_init_byreffing_external_procmaps(void)
     char szBuf[READ_BUF_SZ];
     ssize_t nRead;
     // nread = dynamorio_syscall(SYS_read, 3, fd, szBuf, READ_BUF_SZ);
-    nRead = sgx_syscall_3(SYS_read, fd, (ulong)szBuf, READ_BUF_SZ);
+    nRead = sgx_ocall_syscall_3(SYS_read, fd, (ulong)szBuf, READ_BUF_SZ);
     if (nRead == -1)
         return -1;
 
@@ -431,7 +431,7 @@ static int _sgx_mm_init_byreffing_external_procmaps(void)
 
     /* close external procmaps */
     // dynamorio_syscall(SYS_close, 1, fd);
-    sgx_syscall_1(SYS_close, fd);
+    sgx_ocall_syscall_1(SYS_close, fd);
 
 
     YPHASSERT(nSGXVMARgn == 22);
@@ -571,7 +571,7 @@ static void _sgx_vma_initialize(sgx_vm_area_t* vma, byte* vm_start, size_t len, 
         *(long*)vma->comment = 0;
     }
     else {
-        res = sgx_syscall_2(SYS_fstat, fd, (ulong)&s);
+        res = sgx_ocall_syscall_2(SYS_fstat, fd, (ulong)&s);
         YPHASSERT(res == 0);
 
         vma->dev = s.st_dev;

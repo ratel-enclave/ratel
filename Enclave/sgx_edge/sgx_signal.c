@@ -55,8 +55,9 @@ long ocall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10)
     return 0;
 }
 
+static long sc_ip;
 /* simulate syscall sigreturn */
-void ocall_sigreturn_simulation(long prt)
+long ocall_sigreturn_simulation(long prt)
 {
     simu_ucontext_t *thisUCP;
     simu_sigcontext_t *sc;
@@ -88,34 +89,35 @@ void ocall_sigreturn_simulation(long prt)
     regs.rip = sc->rip;
 
     /* return back by modifying registers */
-    __asm__ volatile("gs\n\t"
-                     "mov %[RIP], 0\n\t"
-                     "mov %[REG], %%rsp\n\t"
+    __asm__ volatile( // mov %[RIP], gs:[0]
+        "mov %[RIP], %[SC_PC]\n\t"
+        "mov %[REG], %%rsp\n\t"
 
-                     "pop %%r8\n\t"
-                     "pop %%r9\n\t"
-                     "pop %%r10\n\t"
-                     "pop %%r11\n\t"
-                     "pop %%r12\n\t"
-                     "pop %%r13\n\t"
-                     "pop %%r14\n\t"
-                     "pop %%r15\n\t"
+        "pop %%r8\n\t"
+        "pop %%r9\n\t"
+        "pop %%r10\n\t"
+        "pop %%r11\n\t"
+        "pop %%r12\n\t"
+        "pop %%r13\n\t"
+        "pop %%r14\n\t"
+        "pop %%r15\n\t"
 
-                     "pop %%rdi\n\t"
-                     "pop %%rsi\n\t"
-                     "pop %%rbp\n\t"
-                     "pop %%rbx\n\t"
-                     "pop %%rdx\n\t"
-                     "pop %%rax\n\t"
-                     "pop %%rcx\n\t"
+        "pop %%rdi\n\t"
+        "pop %%rsi\n\t"
+        "pop %%rbp\n\t"
+        "pop %%rbx\n\t"
+        "pop %%rdx\n\t"
+        "pop %%rax\n\t"
+        "pop %%rcx\n\t"
 
-                     "add $8, %%rsp\n\t" // "popf\n\t"
-                     "pop %%rsp\n\t"
-                     "gs\n\t"
-                     "jmp *0\n\t" // jmp *gs:[0]
-                     :
-                     : [RIP] "r"(regs.rip), [REG] "r"(&regs)
-                     :);
+        "add $8, %%rsp\n\t" // "popf\n\t"
+        "pop %%rsp\n\t"
+        //  jmp *gs:[0]
+        "jmp *%[SC_PC]\n\t" //
+        : [SC_PC] "=m" (sc_ip)
+        : [RIP] "r"(regs.rip), [REG] "r"(&regs)
+        );
 
     // ASSERT_NOT_REACHED();
+    return 0;
 }

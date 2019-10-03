@@ -77,6 +77,6 @@ long ocall_rt_sigprocmask(long how, long set_ptr, long oldset_ptr, long _r10);
 long ocall_rt_sigaction(long signum, long act_ptr, long oldact_ptr, long _r10);
 
 /* simulate sigreturn */
-void ocall_sigreturn_simulation(long prt);
+long ocall_sigreturn_simulation(long prt);
 
 #endif //_SGX_EDGE_SIGNAL_H__
