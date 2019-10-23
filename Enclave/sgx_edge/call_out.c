@@ -3,10 +3,10 @@
  * **********************************************************/
 
 /*
- Summary: ocalls issued by DynamoRIO and SGX-app come to this file only through two entry functions, 
- i.e. sgx_dynamorio_syscall and sgx_syscall. These two functions then dispatch the ocall to the bridge 
- functions according to the syscall_no and parameters_count.
- */
+Summary: ocalls issued by DynamoRIO and SGX-app come to this file only through two entry functions,
+i.e. sgx_dynamorio_syscall and sgx_syscall. These two functions then dispatch the ocall to the bridge
+functions according to the syscall_no and parameters_count.
+*/
 
 /*
  * call_out.c - provide ocall interfaces for the entire SGX-DBI system
@@ -552,15 +552,14 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     /*fixing-up them with a sysno-to-function table*/
     switch (sysno)
     {
-
-    //No parameters
+        //No parameter
     case SYS_getpid:
     case SYS_gettid:
     case SYS_sync:
         return sgx_ocall_syscall_0(sysno);
         break;
 
-        //One paramters
+        //One paramter
     case SYS_close:
     case SYS_unlink:
     case SYS_uname:

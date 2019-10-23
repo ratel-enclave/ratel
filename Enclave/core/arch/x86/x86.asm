@@ -211,6 +211,8 @@ DECL_EXTERN(load_dynamo_failure)
 #endif
 
 DECL_EXTERN(SGXDBI_INIT_STACK)
+DECL_EXTERN(sgx_instr_syscall_dr_individual)
+
 
 #ifdef WINDOWS
 /* dynamo_auto_start: used for non-early follow children.
@@ -313,6 +315,61 @@ call_dispatch_alt_stack_no_free:
 #endif
         ret
         END_FUNC(call_switch_stack)
+
+
+/* void call_dr_master_signal_handler(void *func_arg, // 1*ARG_SZ+XAX
+ *                        byte *stack,                // 2*ARG_SZ+XAX
+ *                        void (*func)(void *arg)）   // 3*ARG_SZ+XAX
+ */
+        DECLARE_FUNC(call_dr_master_signal_handler)
+GLOBAL_LABEL(call_dr_master_signal_handler:)
+        /* get all args with same offset(xax) regardless of plaform */
+#ifdef X64
+# ifdef WINDOWS
+        mov      REG_XAX, REG_XSP
+        /* stack alignment doesn't really matter (b/c we're swapping) but in case
+         * we add a call we keep this here
+         */
+        lea      REG_XSP, [-ARG_SZ + REG_XSP] /* maintain align-16: offset retaddr */
+# else
+        /* no padding so we make our own space. odd #slots keeps align-16 w/ retaddr */
+        lea      REG_XSP, [-3*ARG_SZ + REG_XSP]
+        /* xax points one beyond TOS to get same offset as having retaddr there */
+        lea      REG_XAX, [-ARG_SZ + REG_XSP]
+# endif
+        mov      [1*ARG_SZ + REG_XAX], ARG1
+        mov      [2*ARG_SZ + REG_XAX], ARG2
+        mov      [3*ARG_SZ + REG_XAX], ARG3
+#else
+        /* stack alignment doesn't matter */
+        mov      REG_XAX, REG_XSP
+#endif
+        /* we need a callee-saved reg across our call so save it onto stack */
+        push     REG_XBX
+        mov      REG_XBX, REG_XAX
+        /* alignment doesn't matter: swapping stacks */
+        push     IF_X64_ELSE(r12, REG_XDI) /* xdi is used for func param in X64 */
+        mov      IF_X64_ELSE(r12, REG_XDI), REG_XSP
+        /* set up for call */
+        mov      REG_XDX, [3*ARG_SZ + REG_XAX] /* func */
+        mov      REG_XCX, [1*ARG_SZ + REG_XAX] /* func_arg */
+        mov      REG_XSP, [2*ARG_SZ + REG_XAX] /* stack */
+        CALLC1(REG_XDX, REG_XCX)
+        mov      REG_XSP, IF_X64_ELSE(r12, REG_XDI)
+        mov      REG_XAX, REG_XBX
+        pop      IF_X64_ELSE(r12, REG_XDI)
+        pop      REG_XBX
+#ifdef X64
+# ifdef WINDOWS
+        mov      REG_XSP, REG_XAX
+# else
+        lea      REG_XSP, [3*ARG_SZ + REG_XSP]
+# endif
+#else
+        mov      REG_XSP, REG_XAX
+#endif
+        ret
+        END_FUNC(call_dr_master_signal_handler)
 
 #ifdef CLIENT_INTERFACE
 /*
@@ -850,13 +907,11 @@ GLOBAL_LABEL(global_do_syscall_sygate_sysenter:)
  * that we don't expect to return, so for debug builds we go into an infinite
  * loop if syscall returns.
   */
-
-
        DECLARE_FUNC(global_do_syscall_syscall)
 GLOBAL_LABEL(global_do_syscall_syscall:)
-        //mov      r10, REG_XCX
+        //mov    r10, REG_XCX
         //syscall
-        call     sgx_instr_syscall
+        call     sgx_instr_syscall_dr_individual
 #   ifdef DEBUG
         jmp      GLOBAL_REF(debug_infinite_loop)
 #   endif
@@ -1247,9 +1302,10 @@ GLOBAL_LABEL(xfer_to_new_libdr:)
 GLOBAL_LABEL(dynamorio_sigreturn:)
 #ifdef X64
         mov      eax, HEX(f)
-        //mov      r10, rcx
+        //mov    r10, rcx
         //syscall
-	call 	 sgx_instr_syscall
+        mov      rdi, rsp
+	call 	 sgx_instr_syscall_dr_individual
 #else
 # ifdef MACOS
         /* we assume we don't need to align the stack (tricky to do so) */
@@ -1316,9 +1372,9 @@ dynamorio_sys_exit_next:
 # ifdef X64
         mov      edi, 0 /* exit code: hardcoded */
         mov      eax, SYS_exit
-        //mov      r10, rcx
+        //mov    r10, rcx
         //syscall
-	call 	 sgx_instr_syscall
+	call 	 sgx_instr_syscall_dr_individual
 # else
         mov      ebx, 0 /* exit code: hardcoded */
         mov      eax, SYS_exit
@@ -1350,9 +1406,9 @@ GLOBAL_LABEL(dynamorio_condvar_wake_and_jmp:)
         mov      ARG2, 1 /* arg2 = FUTEX_WAKE */
         mov      ARG1, rax /* &futex, passed in rax */
         mov      rax, 202 /* SYS_futex */
-        //mov      r10, rcx
+        //mov    r10, rcx
         //syscall
-	call 	 sgx_instr_syscall
+	call 	 sgx_instr_syscall_dr_individual
         jmp      r12
 #  else
         /* We use the stack, which should be the app stack: see the MacOS args below. */
@@ -1413,10 +1469,9 @@ dynamorio_semaphore_next:
  /* fix-me: allow out-encalve code to do cleanup */
         DECLARE_FUNC(dynamorio_sys_exit_group)
 GLOBAL_LABEL(dynamorio_sys_exit_group:)
-        mov      rdx, 0 /* exit code: hardcoded */
-        //mov      rsi, 1 /* 1 parameter */
-        //mov      rdi, SYS_exit_group
-        //jmp 	 sgx_dynamorio_syscall
+        mov      edi, 0 /* exit code: hardcoded */
+        //mov    eax, SYS_exit_group
+        //call 	 sgx_instr_syscall_dr_individual
         jmp      dynamorio_to_sgxdbi_stub
         END_FUNC(dynamorio_sys_exit_group)
 
@@ -1606,10 +1661,11 @@ GLOBAL_LABEL(dynamorio_clone:)
         sub      ARG2, ARG_SZ
         mov      [ARG2], ARG6 /* func is now on TOS of newsp */
         /* all args are already in syscall registers */
-        //mov      r10, rcx
+
         mov      REG_XAX, SYS_clone
+        //mov    r10, rcx
         //syscall
-	    call 	 sgx_instr_syscall
+	call 	 sgx_instr_syscall_dr_individual
 # else
         mov      REG_XAX, ARG6
         mov      REG_XCX, ARG2

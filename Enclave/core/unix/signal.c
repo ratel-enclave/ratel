@@ -4993,33 +4993,34 @@ _master_signal_handler(void * arg)
     /* switch back to the original stack */
 }
 
-
 int master_signal_handler(void *sgx_info)
 {
-    dcontext_t* ctx = get_thread_private_dcontext();
+    dcontext_t *ctx = get_thread_private_dcontext();
     thread_sig_info_t *info = ctx->signal_field;
 
     /* intelsdk_sigcxt_pkg_t => sigcxt_pkg_t */
-    intelsdk_exception_info_t *cur_sgx_info = (intelsdk_exception_info_t*)sgx_info;
-    intelsdk_sigcxt_pkg_t *ext_pkg = (intelsdk_sigcxt_pkg_t*)cur_sgx_info->sigcxt_pkg;
+    intelsdk_exception_info_t *cur_sgx_info = (intelsdk_exception_info_t *)sgx_info;
+    intelsdk_sigcxt_pkg_t *ext_pkg = (intelsdk_sigcxt_pkg_t *)cur_sgx_info->sigcxt_pkg;
+    sigcxt_pkg_t *pkg;
 
-    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)malloc(sizeof(sigcxt_pkg_t));
+#ifdef HAVE_SIGALTSTACK
+    unsigned long tmp;
+    tmp = (unsigned long)info->sigstack.ss_sp + info->sigstack.ss_size - sizeof(sigcxt_pkg_t);
+    pkg = (sigcxt_pkg_t *)(tmp & (unsigned long)(-0xf));
+#else
+    pkg = (sigcxt_pkg_t *)calloc(sizeof(sigcxt_pkg_t));
+#endif
 
     pkg->signum = ext_pkg->signum;
     memcpy(&pkg->ctx, &ext_pkg->ctx, sizeof(sigctx_knl_t));
     memcpy(&pkg->info, &ext_pkg->info, sizeof(siginfo_t));
 
-
 #ifdef HAVE_SIGALTSTACK
     /* swith to the stack set by sigaltstack */
-    call_switch_stack(pkg, (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
-            _master_signal_handler, NULL, true/*return*/);
+    call_dr_master_signal_handler(pkg, (byte *)pkg, _master_signal_handler);
 #else
     _master_signal_handler(pkg);
 #endif
-
-    ASSERT(pkg != NULL);
-    free(pkg);
 
     /* Always return EXCEPTION_CONTINUE_EXECUTION if success*/
     return EXCEPTION_CONTINUE_EXECUTION;

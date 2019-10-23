@@ -45,31 +45,6 @@ internal_error(const char *file, int line, const char *expr)
     /* do nothing by default */
 }
 
-#ifdef X64
-#ifdef DEBUG
-void log_syscall_ready(void)
-{
-    static int sig = 0;
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    if (sig == 0) {
-        sig = 1;
-        print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-    }
-    else
-        sig = 0;
-}
-
-void log_app_syscall(void)
-{
-    int sysnum;
-    __asm__("mov %%eax, %0":"=rm"(sysnum)::);
-    print_file(STDOUT, "sysnum:%-2d, %s\n", sysnum, __FUNCTION__);
-}
-
-#endif
-#endif
-
 #ifdef AARCH64
 void
 clear_icache(void *beg, void *end)
@@ -228,9 +203,10 @@ find_script_interpreter(OUT script_interpreter_t *result,
     return true;
 }
 
-
+/* Begin: Added by Pinghai */
+#include "instrument.h"
 #include "instrument_api.h"
-#include "call_out.h"
+#include "sgx_instr.h"
 void sgx_helper_cpuid(void* drctx)
 {
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
@@ -268,10 +244,12 @@ void sgx_helper_rdtsc(void* drctx)
 void sgx_helper_syscall(void* drctx)
 {
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
+    priv_mcontext_t *prictx = (priv_mcontext_t*)&mctx.rdi;
     unsigned long sysno, arg1, arg2, arg3, arg4, arg5, arg6;
     unsigned long res;
 
-    dr_get_mcontext(drctx, &mctx);
+    // dr_get_mcontext(drctx, &mctx);
+    dr_get_mcontext_priv(drctx, NULL, prictx);
     sysno = mctx.rax;
     arg1 = mctx.rdi;
     arg2 = mctx.rsi;
@@ -280,10 +258,17 @@ void sgx_helper_syscall(void* drctx)
     arg5 = mctx.r8;
     arg6 = mctx.r9;
 
-    res = sgx_syscall(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
+#define SYS_rt_sigreturn 15
+    if (sysno == SYS_rt_sigreturn)
+    {
+        arg1 = mctx.rsp;
+    }
+
+    res = sgx_instr_syscall_codecache(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
 
     mctx.rax = res;
     dr_set_mcontext(drctx, &mctx);
 }
 
+/* End: Added by Pinghai */
 #endif

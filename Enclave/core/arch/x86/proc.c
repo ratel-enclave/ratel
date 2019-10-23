@@ -45,7 +45,7 @@
 #include "instrument.h" /* for dr_insert_{save,restore}_fpstate */
 #include "instr_create.h" /* for dr_insert_{save,restore}_fpstate */
 #include "decode.h" /* for dr_insert_{save,restore}_fpstate */
-#include "call_out.h"
+#include "sgx_instr.h"
 
 #ifdef DEBUG
 /* case 10450: give messages to clients */
