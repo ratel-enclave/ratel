@@ -562,6 +562,7 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
     switch (sysno) {
         case SYS_munmap:
         case SYS_ftruncate:
+        case SYS_kill:
         case SYS_arch_prctl:
             ret = syscall(sysno, N1, N2);
             b = true;

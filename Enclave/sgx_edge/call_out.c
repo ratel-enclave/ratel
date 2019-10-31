@@ -297,6 +297,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         break;
 
     case SYS_ftruncate:
+    case SYS_kill:
         ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
         break;
 
@@ -599,6 +600,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_getrusage:
     case SYS_clock_gettime:
     case SYS_ftruncate:
+    case SYS_kill:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
