@@ -198,7 +198,7 @@ int initialize_enclave(void)
 
     /* Step 2: call sgx_create_enclave to initialize an enclave instance */
     /* Debug Support: set 2nd parameter to 1 */
-    ret = sgx_create_enclave(ENCLAVE_FILENAME, SGX_DEBUG_FLAG, &token, &updated, &dynamo_eid, NULL);
+    ret = sgx_create_DBI_enclave(ENCLAVE_FILENAME, SGX_DEBUG_FLAG, &token, &updated, &dynamo_eid, NULL);
     if (ret != SGX_SUCCESS) {
         print_error_message(ret);
         if (fp != NULL) fclose(fp);
@@ -243,7 +243,7 @@ int SGX_CDECL main(int argc, char* argv[], char* envp[])
     clock_gettime(CLOCK_REALTIME, &t2);
 
     /* Destroy the enclave */
-    sgx_destroy_enclave(dynamo_eid);
+    sgx_destroy_DBI_enclave(dynamo_eid);
 
     float t = (t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec) * 1.0/1000000000;
     printf("Enclave-code real-time: %fs\n", t);

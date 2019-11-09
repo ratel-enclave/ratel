@@ -76,7 +76,8 @@ APP_CXX_FLAGS := $(APP_CC_FLAGS)
 
 
 #APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -Wl,-eapp_start -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
-APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
+#APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
+APP_LINK_FLAGS := $(PLATFORM_DEBUG_FLAGS) -l$(Urts_Library_Name) -lpthread
 
 ifneq ($(SGX_MODE), HW)
 	APP_LINK_FLAGS += -lsgx_uae_service_sim
