@@ -142,9 +142,7 @@ typedef struct _sgxsdk_thread_data_t
     unsigned long  stack_limit_addr;   /* set by urts, relative to TCS */
     unsigned long  first_ssa_gpr;      /* set by urts, relative to TCS */
     unsigned long  ul1[15];
-    unsigned long  master_tls_segment;      /* is master fs/gs segment or not? */
-    struct _sgxsdk_thread_data_t *fsbase;   /* Store the latest value of fsbase and gsbase */
-    struct _sgxsdk_thread_data_t *gsbase;   /* Load them when EENTER */
+    void    *master_tls;        /* alwasy point to the tls bound to TCS */
 } sgxsdk_thread_data_t;
 #endif
 

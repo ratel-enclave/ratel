@@ -1979,7 +1979,7 @@ os_tls_init(void)
     /* MUST zero out dcontext slot so uninit access gets NULL */
     dynamo_memset(segment, 0, PAGE_SIZE);
 #ifdef X86
-    init_slave_thread_data((sgxsdk_thread_data_t*)segment);  //gs <-- segment
+    init_slave_tls(segment);  //gs <-- segment
 #endif
 
     /* store key data in the tls itself */

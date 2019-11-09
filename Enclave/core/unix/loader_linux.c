@@ -336,7 +336,7 @@ privload_tls_init(void *app_tp)
         dynamo_memset(dest + opd->tls_image_size, 0, opd->tls_block_size - opd->tls_image_size);
     }
 
-    init_slave_thread_data((sgxsdk_thread_data_t *)dr_tcb);    // fs <-- dr_tcb
+    init_slave_tls(dr_tcb);    // fs <-- dr_tcb
     return dr_tp;
 }
 

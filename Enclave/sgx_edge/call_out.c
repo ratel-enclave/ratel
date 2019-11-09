@@ -25,8 +25,8 @@ functions according to the syscall_no and parameters_count.
 
 #include "call_out.h"
 
-extern void load_fsbase(unsigned long base);
-extern void load_gsbase(unsigned long base);
+extern void load_segment_fs(void *tls_segment);
+extern void load_segment_gs(void *tls_segment);
 
 /* export for external use */
 int open_procmaps_file(void);
@@ -77,12 +77,12 @@ void sgx_ocall_syscall_arch_prctl(long *ret, long sysno, long code, unsigned lon
     {
     case ARCH_SET_GS:
         // Fix-me
-        // load_gsbase(addr);
+        // load_segment_gs(addr);
         break;
 
     case ARCH_SET_FS:
         // Fix-me
-        // load_fsbase(addr);
+        // load_segment_fs(addr);
         break;
 
     case ARCH_GET_FS:

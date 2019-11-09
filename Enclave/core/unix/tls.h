@@ -273,9 +273,9 @@ get_dr_tls_base_addr(void);
 
 
 typedef struct _sgxsdk_thread_data_t sgxsdk_thread_data_t;
-extern void init_slave_thread_data(sgxsdk_thread_data_t *td);
-extern void load_fsbase(unsigned long base);
-extern void load_gsbase(unsigned long base);
+extern void init_slave_tls(void *tls_segment);
+extern void load_segment_fs(void *tls_segment);
+extern void load_segment_gs(void *tls_segment);
 
 unsigned long read_fsbase(void);
 unsigned long read_gsbase(void);
