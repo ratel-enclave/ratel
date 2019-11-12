@@ -4993,15 +4993,17 @@ _master_signal_handler(void * arg)
     /* switch back to the original stack */
 }
 
+#define INTELSDK_EXCEPTION_INFO_RIP 17
 int master_signal_handler(void *sgx_info)
 {
-    dcontext_t *ctx = get_thread_private_dcontext();
-    thread_sig_info_t *info = ctx->signal_field;
-
     /* intelsdk_sigcxt_pkg_t => sigcxt_pkg_t */
     intelsdk_exception_info_t *cur_sgx_info = (intelsdk_exception_info_t *)sgx_info;
     intelsdk_sigcxt_pkg_t *ext_pkg = (intelsdk_sigcxt_pkg_t *)cur_sgx_info->sigcxt_pkg;
     sigcxt_pkg_t *pkg;
+    sigcontext_t *sc;
+
+    dcontext_t *ctx = get_thread_private_dcontext();
+    thread_sig_info_t *info = ctx->signal_field;
 
 #ifdef HAVE_SIGALTSTACK
     unsigned long tmp;
@@ -5017,10 +5019,14 @@ int master_signal_handler(void *sgx_info)
 
 #ifdef HAVE_SIGALTSTACK
     /* swith to the stack set by sigaltstack */
-    call_dr_master_signal_handler(pkg, (byte *)pkg, _master_signal_handler);
+    call_switch_stack2(pkg, (byte *)pkg, _master_signal_handler);
 #else
     _master_signal_handler(pkg);
 #endif
+
+    /* execute_handler_from_cache set sc->SC_XIP to fcache_return */
+    sc = SIGCXT_FROM_UCXT(&pkg->ctx);
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_RIP] = sc->SC_XIP;
 
     /* Always return EXCEPTION_CONTINUE_EXECUTION if success*/
     return EXCEPTION_CONTINUE_EXECUTION;

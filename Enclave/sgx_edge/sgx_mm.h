@@ -42,7 +42,7 @@ typedef struct _sgx_vm_area_t {
 /*------------------------- program-arena in sgx-enclave --------------------*/
 #define SGX_VMA_MAX_CNT 200
 typedef struct _sgx_mm_t {
-    /* The start address of heap reserved by sgxsdk */
+    /* The start address of heap reserved by intelsdk */
     byte*   heap_offset;
 
     /* The start address of dynamoRIO's heap, used for creating code-cache...*/

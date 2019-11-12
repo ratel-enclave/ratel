@@ -86,7 +86,7 @@ void sgx_procmaps_exit(void)
     char *buf = SGX_PROCMAPS.big_buf.data;
 
     if (buf != NULL && buf != PROCMAPS_BUF) {
-        /* use sgxsdk's malloc & free */
+        /* use intelsdk's malloc & free */
         // heap_free(GLOBAL_DCONTEXT, SGX_PROCMAPS.data_buf, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
         free(buf);
     }
@@ -110,7 +110,7 @@ bool ensure_buffer_capacity(big_buffer_t *buf, int nLowestWatermark)
         uint new_size;
 
         new_size = buf->size * 2;
-        /* use sgxsdk's malloc & free */
+        /* use intelsdk's malloc & free */
         // pbuf = (char*)heap_alloc(GLOBAL_DCONTEXT, SGX_PROCMAPS.buf_size HEAPACCT(ACCT_OTHER));
         YPHPRINT("0x%x", new_size);
         new_buf = (char*)malloc(new_size);

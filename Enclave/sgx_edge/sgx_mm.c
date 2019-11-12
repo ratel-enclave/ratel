@@ -77,7 +77,7 @@ void sgx_vma_get_cmt(ulong fd, char *buffer)
 sgx_mm_t    SGX_MM;
 BOOL sgx_mm_initialized = FALSE;
 
-extern sgxsdk_global_data_t g_global_data;
+extern intelsdk_global_data_t g_global_data;
 extern void* g_enclave_image_base;
 
 

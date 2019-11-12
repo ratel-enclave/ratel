@@ -134,16 +134,16 @@ typedef struct _ibl_entry_pc_t {
 
 #ifdef X86
 
-typedef struct _sgxsdk_thread_data_t
+typedef struct _intelsdk_thread_data_t
 {
     unsigned long  self_addr;
     unsigned long  last_sp;
-    unsigned long  stack_base_addr;    /* set by urts, relative to TCS */
-    unsigned long  stack_limit_addr;   /* set by urts, relative to TCS */
-    unsigned long  first_ssa_gpr;      /* set by urts, relative to TCS */
+    unsigned long  stack_base_addr;     /* set by urts, relative to TCS */
+    unsigned long  stack_limit_addr;    /* set by urts, relative to TCS */
+    unsigned long  first_ssa_gpr;       /* set by urts, relative to TCS */
     unsigned long  ul1[15];
-    void    *master_tls;        /* alwasy point to the tls bound to TCS */
-} sgxsdk_thread_data_t;
+    void    *master_tls;                /* alwasy point to the tls bound to TCS */
+} intelsdk_thread_data_t;
 #endif
 
 /* All spill slots are grouped in a separate struct because with
@@ -178,14 +178,14 @@ typedef struct _spill_state_t {
 
 typedef struct _local_state_t {
 #ifdef X86
-    sgxsdk_thread_data_t td_space;
+    intelsdk_thread_data_t td_space;
 #endif
     spill_state_t spill_space;
 } local_state_t;
 
 typedef struct _local_state_extended_t {
 #ifdef X86
-    sgxsdk_thread_data_t td_space;
+    intelsdk_thread_data_t td_space;
 #endif
     spill_state_t spill_space;
     table_stat_state_t table_space;
@@ -1133,7 +1133,7 @@ byte *get_app_sysenter_addr(void);
  */
 void call_switch_stack(void *func_arg, byte *stack, void (*func) (void *arg),
                        void *mutex_to_free, bool return_on_return);
-void call_dr_master_signal_handler(void *func_arg, byte *stack, void (*func) (void *arg));
+void call_switch_stack2(void *func_arg, byte *stack, void (*func) (void *arg));
 #if defined (WINDOWS) && !defined(X64)
 DYNAMORIO_EXPORT int64
 dr_invoke_x64_routine(dr_auxlib64_routine_ptr_t func64, uint num_params, ...);

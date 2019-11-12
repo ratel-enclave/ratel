@@ -207,13 +207,16 @@ find_script_interpreter(OUT script_interpreter_t *result,
 #include "instrument.h"
 #include "instrument_api.h"
 #include "sgx_instr.h"
-void sgx_helper_cpuid(void* drctx)
+void sgx_helper_cpuid(void)
 {
+    dcontext_t *drctx = get_thread_private_dcontext();
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
+    priv_mcontext_t *prictx = (priv_mcontext_t*)&mctx.rdi;
     uint cpuid_res_local[4]; /* eax, ebx, ecx, and edx registers (in that order) */
     uint eax, ecx;
 
-    dr_get_mcontext(drctx, &mctx);
+    // dr_get_mcontext(drctx, &mctx);
+    dr_get_mcontext_priv(drctx, NULL, prictx);
     eax = (uint)mctx.rax;
     ecx = (uint)mctx.rcx;
 
@@ -227,22 +230,26 @@ void sgx_helper_cpuid(void* drctx)
 }
 
 
-void sgx_helper_rdtsc(void* drctx)
+void sgx_helper_rdtsc(void)
 {
+    dcontext_t *drctx = get_thread_private_dcontext();
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
+    priv_mcontext_t *prictx = (priv_mcontext_t*)&mctx.rdi;
     uint64 res;
 
     sgx_instr_rdtsc(&res);
 
-    dr_get_mcontext(drctx, &mctx);
+    // dr_get_mcontext(drctx, &mctx);
+    dr_get_mcontext_priv(drctx, NULL, prictx);
     mctx.rax = res & 0xFFFFFFFF;
     mctx.rdx = (res << 32) & 0xFFFFFFFF;
     dr_set_mcontext(drctx, &mctx);
 }
 
 
-void sgx_helper_syscall(void* drctx)
+void sgx_helper_syscall(void)
 {
+    dcontext_t *drctx = get_thread_private_dcontext();
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
     priv_mcontext_t *prictx = (priv_mcontext_t*)&mctx.rdi;
     unsigned long sysno, arg1, arg2, arg3, arg4, arg5, arg6;

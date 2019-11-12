@@ -166,7 +166,7 @@ void os_tls_pre_init(int gdt_index);
 ushort os_get_app_tls_base_offset(ushort/*reg_id_t*/ seg);
 ushort os_get_app_tls_reg_offset(ushort/*reg_id_t*/ seg);
 void *os_get_app_tls_base(dcontext_t *dcontext, ushort/*reg_id_t*/ seg);
-void *os_get_sgxsdk_tls_base(dcontext_t *dcontext, ushort/*reg_id_t*/ seg);
+void *os_get_intelsdk_tls_base(dcontext_t *dcontext, ushort/*reg_id_t*/ seg);
 void os_swap_context_go_native(dcontext_t *dcontext, dr_state_flags_t flags);
 
 #ifdef DEBUG

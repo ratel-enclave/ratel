@@ -60,9 +60,9 @@ long sgx_instr_syscall_dr_individual(long, long, long, long, long, long);
 
 // long sgx_instr_syscall(long arg1, long arg2, long arg3, long arg4, long arg5, long arg6);
 
-void sgx_helper_cpuid(void* drctx);
-void sgx_helper_rdtsc(void* drctx);
-void sgx_helper_syscall(void* drctx);
+void sgx_helper_cpuid(void);
+void sgx_helper_rdtsc(void);
+void sgx_helper_syscall(void);
 # endif
 #endif
 

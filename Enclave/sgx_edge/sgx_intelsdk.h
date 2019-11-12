@@ -4,7 +4,7 @@
 #include "sgx_defines.h"
 
 /*----------------sgx_mm_init() initialized by referring external procmaps----------------*/
-typedef struct _sgxsdk_global_data_t
+typedef struct _intelsdk_global_data_t
 {
     ulong     enclave_size;
     ulong     heap_offset;
@@ -19,7 +19,7 @@ typedef struct _sgxsdk_global_data_t
     // uint32_t       layout_entry_num;
     // uint32_t       reserved;
     // layout_t       layout_table[LAYOUT_ENTRY_NUM];
-} sgxsdk_global_data_t;
+} intelsdk_global_data_t;
 
 
 

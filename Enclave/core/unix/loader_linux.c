@@ -143,7 +143,7 @@ static size_t tcb_size = IF_X86_ELSE(IF_X64_ELSE(0x900, 0x490), 0x40);
  */
 typedef struct _tcb_head_t {
 #ifdef X86
-    sgxsdk_thread_data_t td_space;
+    intelsdk_thread_data_t td_space;
     void *tcb;
     void *dtv;
     void *self;

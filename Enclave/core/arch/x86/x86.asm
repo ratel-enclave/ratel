@@ -317,12 +317,12 @@ call_dispatch_alt_stack_no_free:
         END_FUNC(call_switch_stack)
 
 
-/* void call_dr_master_signal_handler(void *func_arg, // 1*ARG_SZ+XAX
+/* void call_switch_stack(void *func_arg, // 1*ARG_SZ+XAX
  *                        byte *stack,                // 2*ARG_SZ+XAX
  *                        void (*func)(void *arg)）   // 3*ARG_SZ+XAX
  */
-        DECLARE_FUNC(call_dr_master_signal_handler)
-GLOBAL_LABEL(call_dr_master_signal_handler:)
+        DECLARE_FUNC(call_switch_stack2)
+GLOBAL_LABEL(call_switch_stack2:)
         /* get all args with same offset(xax) regardless of plaform */
 #ifdef X64
 # ifdef WINDOWS
@@ -369,7 +369,8 @@ GLOBAL_LABEL(call_dr_master_signal_handler:)
         mov      REG_XSP, REG_XAX
 #endif
         ret
-        END_FUNC(call_dr_master_signal_handler)
+        END_FUNC(call_switch_stack2)
+
 
 #ifdef CLIENT_INTERFACE
 /*

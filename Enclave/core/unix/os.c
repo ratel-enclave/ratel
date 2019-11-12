@@ -1692,7 +1692,7 @@ os_get_app_tls_base(dcontext_t *dcontext, reg_id_t reg)
     return NULL;
 }
 
-void *os_get_sgxsdk_tls_base(dcontext_t *dcontext, ushort reg)
+void *os_get_intelsdk_tls_base(dcontext_t *dcontext, ushort reg)
 {
     os_local_state_t *os_tls;
     IF_NOT_HAVE_TLS(ASSERT_NOT_REACHED());
@@ -1707,7 +1707,7 @@ void *os_get_sgxsdk_tls_base(dcontext_t *dcontext, ushort reg)
         return get_segment_base(reg);
     }
     os_tls = get_os_tls_from_dc(dcontext);
-    return os_tls->os_seg_info.sgxsdk_tls_base;
+    return os_tls->os_seg_info.intelsdk_tls_base;
 
     ASSERT_NOT_REACHED();
     return NULL;
@@ -1935,7 +1935,7 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
         os_tls->os_seg_info.priv_lib_tls_base =
             IF_UNIT_TEST_ELSE(os_tls->app_lib_tls_base, privload_tls_init(os_tls->app_lib_tls_base));
     }
-    os_tls->os_seg_info.sgxsdk_tls_base = get_segment_base(TLS_REG_LIB);
+    os_tls->os_seg_info.intelsdk_tls_base = get_segment_base(TLS_REG_LIB);
 
 #ifdef X86
     LOG(THREAD_GET, LOG_THREADS, 1,
@@ -1948,12 +1948,12 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
 
     LOG(THREAD_GET, LOG_THREADS, 1,
         "thread "TIDFMT" priv lib tls base: "PFX", alt tls base: "PFX", "
-        "DR's tls base: "PFX", sgxsdk tls base: "PFX"\n",
+        "DR's tls base: "PFX", intelsdk tls base: "PFX"\n",
         get_thread_id(),
         os_tls->os_seg_info.priv_lib_tls_base,
         os_tls->os_seg_info.priv_alt_tls_base,
         os_tls->os_seg_info.dr_tls_base,
-        os_tls->os_seg_info.sgxsdk_tls_base);
+        os_tls->os_seg_info.intelsdk_tls_base);
 }
 
 void
@@ -2245,7 +2245,7 @@ os_thread_init(dcontext_t *dcontext)
      */
     ostd->priv_lib_tls_base = os_tls->os_seg_info.priv_lib_tls_base;
     ostd->priv_alt_tls_base = os_tls->os_seg_info.priv_alt_tls_base;
-    ostd->sgxsdk_tls_base = os_tls->os_seg_info.sgxsdk_tls_base;
+    ostd->intelsdk_tls_base = os_tls->os_seg_info.intelsdk_tls_base;
     ostd->dr_tls_base = os_tls->os_seg_info.dr_tls_base;
 
     LOG(THREAD, LOG_THREADS, 1, "TLS app lib base  ="PFX"\n", os_tls->app_lib_tls_base);
@@ -6606,7 +6606,7 @@ os_switch_seg_to_context(dcontext_t *dcontext, reg_id_t seg, bool to_app)
                    dcontext->owning_thread == get_sys_thread_id());
     if (to_app) {
         // base = os_get_app_tls_base(dcontext, seg);
-        base = os_get_sgxsdk_tls_base(dcontext, seg);
+        base = os_get_intelsdk_tls_base(dcontext, seg);
     }
     else {
         base = os_get_priv_tls_base(dcontext, seg);
