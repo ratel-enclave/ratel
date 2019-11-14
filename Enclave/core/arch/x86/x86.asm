@@ -318,56 +318,30 @@ call_dispatch_alt_stack_no_free:
 
 
 /* void call_switch_stack(void *func_arg, // 1*ARG_SZ+XAX
- *                        byte *stack,                // 2*ARG_SZ+XAX
- *                        void (*func)(void *arg)）   // 3*ARG_SZ+XAX
+ *                        void (*func)(void *arg)）     // 2*ARG_SZ+XAX
+ *                        byte *stack,                  // 3*ARG_SZ+XAX
+ * only for x86-64
  */
         DECLARE_FUNC(call_switch_stack2)
 GLOBAL_LABEL(call_switch_stack2:)
-        /* get all args with same offset(xax) regardless of plaform */
-#ifdef X64
-# ifdef WINDOWS
-        mov      REG_XAX, REG_XSP
-        /* stack alignment doesn't really matter (b/c we're swapping) but in case
-         * we add a call we keep this here
-         */
-        lea      REG_XSP, [-ARG_SZ + REG_XSP] /* maintain align-16: offset retaddr */
-# else
-        /* no padding so we make our own space. odd #slots keeps align-16 w/ retaddr */
-        lea      REG_XSP, [-3*ARG_SZ + REG_XSP]
-        /* xax points one beyond TOS to get same offset as having retaddr there */
-        lea      REG_XAX, [-ARG_SZ + REG_XSP]
-# endif
-        mov      [1*ARG_SZ + REG_XAX], ARG1
-        mov      [2*ARG_SZ + REG_XAX], ARG2
-        mov      [3*ARG_SZ + REG_XAX], ARG3
-#else
-        /* stack alignment doesn't matter */
-        mov      REG_XAX, REG_XSP
-#endif
-        /* we need a callee-saved reg across our call so save it onto stack */
+        push     REG_XBP        /* for debugger to unfolding stack */
+        /* Use XBX as temporary register */
         push     REG_XBX
-        mov      REG_XBX, REG_XAX
-        /* alignment doesn't matter: swapping stacks */
-        push     IF_X64_ELSE(r12, REG_XDI) /* xdi is used for func param in X64 */
-        mov      IF_X64_ELSE(r12, REG_XDI), REG_XSP
+
+        /* Switch stack */
+        mov     REG_XBX, REG_XDX
+        xchg    REG_XBX, REG_XSP
+        push    REG_XBX         /* Save old rsp on new stack */
+
         /* set up for call */
-        mov      REG_XDX, [3*ARG_SZ + REG_XAX] /* func */
-        mov      REG_XCX, [1*ARG_SZ + REG_XAX] /* func_arg */
-        mov      REG_XSP, [2*ARG_SZ + REG_XAX] /* stack */
-        CALLC1(REG_XDX, REG_XCX)
-        mov      REG_XSP, IF_X64_ELSE(r12, REG_XDI)
-        mov      REG_XAX, REG_XBX
-        pop      IF_X64_ELSE(r12, REG_XDI)
-        pop      REG_XBX
-#ifdef X64
-# ifdef WINDOWS
-        mov      REG_XSP, REG_XAX
-# else
-        lea      REG_XSP, [3*ARG_SZ + REG_XSP]
-# endif
-#else
-        mov      REG_XSP, REG_XAX
-#endif
+        call    REG_XSI         /* func */
+        pop     REG_XSP         /* Restore old RSP value */
+
+        /* restore machine context */
+        pop     REG_XBX
+
+        /* return */
+        pop     REG_XBP
         ret
         END_FUNC(call_switch_stack2)
 

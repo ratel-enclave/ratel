@@ -4993,7 +4993,16 @@ _master_signal_handler(void * arg)
     /* switch back to the original stack */
 }
 
-#define INTELSDK_EXCEPTION_INFO_RIP 17
+#define    INTELSDK_EXCEPTION_INFO_rax	0
+#define    INTELSDK_EXCEPTION_INFO_rcx	1
+#define    INTELSDK_EXCEPTION_INFO_rdx	2
+#define    INTELSDK_EXCEPTION_INFO_rbx	3
+#define    INTELSDK_EXCEPTION_INFO_rsp	4
+#define    INTELSDK_EXCEPTION_INFO_rbp	5
+#define    INTELSDK_EXCEPTION_INFO_rsi	6
+#define    INTELSDK_EXCEPTION_INFO_rdi	7
+#define    INTELSDK_EXCEPTION_INFO_rip	17
+
 int master_signal_handler(void *sgx_info)
 {
     /* intelsdk_sigcxt_pkg_t => sigcxt_pkg_t */
@@ -5019,14 +5028,24 @@ int master_signal_handler(void *sgx_info)
 
 #ifdef HAVE_SIGALTSTACK
     /* swith to the stack set by sigaltstack */
-    call_switch_stack2(pkg, (byte *)pkg, _master_signal_handler);
+    call_switch_stack2(pkg, _master_signal_handler, (byte *)pkg);
 #else
     _master_signal_handler(pkg);
 #endif
 
-    /* execute_handler_from_cache set sc->SC_XIP to fcache_return */
+    /* execute_handler_from_cache sets sc->SC_XIP to fcache_return, update it to sgx_info */
     sc = SIGCXT_FROM_UCXT(&pkg->ctx);
-    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_RIP] = sc->SC_XIP;
+
+    /* just need to update the registers modifed by signal handler */
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rax] = sc->SC_XAX;    /* dcontext->last_exit */
+    // cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rcx] = sc->SC_XCX;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rdx] = sc->SC_XDX;
+    // cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rbx] = sc->SC_XBX;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rsp] = sc->SC_XSP;
+    // cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rbp] = sc->SC_XBP;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rsi] = sc->SC_XSI;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rdi] = sc->SC_XDI;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rip] = sc->SC_XIP;
 
     /* Always return EXCEPTION_CONTINUE_EXECUTION if success*/
     return EXCEPTION_CONTINUE_EXECUTION;

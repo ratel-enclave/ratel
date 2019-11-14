@@ -1133,7 +1133,7 @@ byte *get_app_sysenter_addr(void);
  */
 void call_switch_stack(void *func_arg, byte *stack, void (*func) (void *arg),
                        void *mutex_to_free, bool return_on_return);
-void call_switch_stack2(void *func_arg, byte *stack, void (*func) (void *arg));
+void call_switch_stack2(void *func_arg, void (*func) (void *arg), byte *stack);
 #if defined (WINDOWS) && !defined(X64)
 DYNAMORIO_EXPORT int64
 dr_invoke_x64_routine(dr_auxlib64_routine_ptr_t func64, uint num_params, ...);
