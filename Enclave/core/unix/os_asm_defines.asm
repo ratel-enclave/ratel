@@ -43,13 +43,13 @@
 #if defined(UNIX) && defined(X86)
 # ifdef X64
 #  ifdef HASHTABLE_STATISTICS
-#   define TLS_MAGIC_OFFSET_ASM  (104 + 184)
-#   define TLS_SELF_OFFSET_ASM    (96 + 184)
+#   define TLS_MAGIC_OFFSET_ASM  (104 + 168)
+#   define TLS_SELF_OFFSET_ASM    (96 + 168)
 #  else
-#   define TLS_MAGIC_OFFSET_ASM   (96 + 184)
-#   define TLS_SELF_OFFSET_ASM    (88 + 184)
+#   define TLS_MAGIC_OFFSET_ASM   (96 + 168)
+#   define TLS_SELF_OFFSET_ASM    (88 + 168)
 #  endif
-#  define TLS_APP_SELF_OFFSET_ASM (16 + 184)
+#  define TLS_APP_SELF_OFFSET_ASM (16 + 168)
 # else
 #  ifdef HASHTABLE_STATISTICS
 #   define TLS_MAGIC_OFFSET_ASM   (52 + 96)

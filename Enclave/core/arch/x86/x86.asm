@@ -211,6 +211,8 @@ DECL_EXTERN(load_dynamo_failure)
 #endif
 
 DECL_EXTERN(SGXDBI_INIT_STACK)
+DECL_EXTERN(sgx_instr_syscall_dr_individual)
+
 
 #ifdef WINDOWS
 /* dynamo_auto_start: used for non-early follow children.
@@ -313,6 +315,36 @@ call_dispatch_alt_stack_no_free:
 #endif
         ret
         END_FUNC(call_switch_stack)
+
+
+/* void call_switch_stack(void *func_arg, // 1*ARG_SZ+XAX
+ *                        void (*func)(void *arg)）     // 2*ARG_SZ+XAX
+ *                        byte *stack,                  // 3*ARG_SZ+XAX
+ * only for x86-64
+ */
+        DECLARE_FUNC(call_switch_stack2)
+GLOBAL_LABEL(call_switch_stack2:)
+        push     REG_XBP        /* for debugger to unfolding stack */
+        /* Use XBX as temporary register */
+        push     REG_XBX
+
+        /* Switch stack */
+        mov     REG_XBX, REG_XDX
+        xchg    REG_XBX, REG_XSP
+        push    REG_XBX         /* Save old rsp on new stack */
+
+        /* set up for call */
+        call    REG_XSI         /* func */
+        pop     REG_XSP         /* Restore old RSP value */
+
+        /* restore machine context */
+        pop     REG_XBX
+
+        /* return */
+        pop     REG_XBP
+        ret
+        END_FUNC(call_switch_stack2)
+
 
 #ifdef CLIENT_INTERFACE
 /*
@@ -850,13 +882,11 @@ GLOBAL_LABEL(global_do_syscall_sygate_sysenter:)
  * that we don't expect to return, so for debug builds we go into an infinite
  * loop if syscall returns.
   */
-
-
        DECLARE_FUNC(global_do_syscall_syscall)
 GLOBAL_LABEL(global_do_syscall_syscall:)
-        //mov      r10, REG_XCX
+        //mov    r10, REG_XCX
         //syscall
-        call     sgx_instr_syscall
+        call     sgx_instr_syscall_dr_individual
 #   ifdef DEBUG
         jmp      GLOBAL_REF(debug_infinite_loop)
 #   endif
@@ -1247,9 +1277,10 @@ GLOBAL_LABEL(xfer_to_new_libdr:)
 GLOBAL_LABEL(dynamorio_sigreturn:)
 #ifdef X64
         mov      eax, HEX(f)
-        //mov      r10, rcx
+        //mov    r10, rcx
         //syscall
-	call 	 sgx_instr_syscall
+        mov      rdi, rsp
+	call 	 sgx_instr_syscall_dr_individual
 #else
 # ifdef MACOS
         /* we assume we don't need to align the stack (tricky to do so) */
@@ -1316,9 +1347,9 @@ dynamorio_sys_exit_next:
 # ifdef X64
         mov      edi, 0 /* exit code: hardcoded */
         mov      eax, SYS_exit
-        //mov      r10, rcx
+        //mov    r10, rcx
         //syscall
-	call 	 sgx_instr_syscall
+	call 	 sgx_instr_syscall_dr_individual
 # else
         mov      ebx, 0 /* exit code: hardcoded */
         mov      eax, SYS_exit
@@ -1350,9 +1381,9 @@ GLOBAL_LABEL(dynamorio_condvar_wake_and_jmp:)
         mov      ARG2, 1 /* arg2 = FUTEX_WAKE */
         mov      ARG1, rax /* &futex, passed in rax */
         mov      rax, 202 /* SYS_futex */
-        //mov      r10, rcx
+        //mov    r10, rcx
         //syscall
-	call 	 sgx_instr_syscall
+	call 	 sgx_instr_syscall_dr_individual
         jmp      r12
 #  else
         /* We use the stack, which should be the app stack: see the MacOS args below. */
@@ -1413,10 +1444,9 @@ dynamorio_semaphore_next:
  /* fix-me: allow out-encalve code to do cleanup */
         DECLARE_FUNC(dynamorio_sys_exit_group)
 GLOBAL_LABEL(dynamorio_sys_exit_group:)
-        mov      rdx, 0 /* exit code: hardcoded */
-        //mov      rsi, 1 /* 1 parameter */
-        //mov      rdi, SYS_exit_group
-        //jmp 	 sgx_dynamorio_syscall
+        mov      edi, 0 /* exit code: hardcoded */
+        //mov    eax, SYS_exit_group
+        //call 	 sgx_instr_syscall_dr_individual
         jmp      dynamorio_to_sgxdbi_stub
         END_FUNC(dynamorio_sys_exit_group)
 
@@ -1606,10 +1636,11 @@ GLOBAL_LABEL(dynamorio_clone:)
         sub      ARG2, ARG_SZ
         mov      [ARG2], ARG6 /* func is now on TOS of newsp */
         /* all args are already in syscall registers */
-        //mov      r10, rcx
+
         mov      REG_XAX, SYS_clone
+        //mov    r10, rcx
         //syscall
-	    call 	 sgx_instr_syscall
+	call 	 sgx_instr_syscall_dr_individual
 # else
         mov      REG_XAX, ARG6
         mov      REG_XCX, ARG2

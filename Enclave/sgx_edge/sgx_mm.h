@@ -1,21 +1,7 @@
-#ifndef _SGX_VMA_H__
-#define _SGX_VMA_H__
+#ifndef _SGX_EDGE_MM_H__
+#define _SGX_EDGE_MM_H__
 
-#ifndef ulong
-typedef unsigned char   byte;
-typedef unsigned char   uchar;
-typedef unsigned short  ushort;
-typedef unsigned int    uint;
-typedef unsigned long   ulong;
-typedef long    ssize_t;
-typedef unsigned long   size_t;
-#endif
-
-#ifndef bool
-typedef _Bool   bool;
-#define false        (0)
-#define true         (1)
-#endif
+#include "sgx_defines.h"
 
 /*-------------------- Used for managing vmas in program-arena --------------*/
 typedef struct _list_t {
@@ -26,7 +12,7 @@ typedef struct _list_t {
 
 #ifndef offsetof
 #define offsetof(type,member)   \
-    (unsigned long)(&((type *)0)->member)
+    (ulong)(&((type *)0)->member)
 #endif
 
 #define container_of(ptr, type, member) ({                  \
@@ -44,19 +30,19 @@ typedef struct _sgx_vm_area_t {
     byte*   vm_end;      /* used for tracking & sorting */
     byte*   vm_sgx;      /* start address in sgx-buffer */
     uint    perm;        /* permission of current vma */
-    ulong   dev;         /* typedef unsigned long int __dev_t */
-    ulong   inode;       /* typedef unsigned long int __ino_t */
+    ulong   dev;         /* typedef ulong int __dev_t */
+    ulong   inode;       /* typedef ulong int __ino_t */
     ulong   size;        /* total size of a mmaped file, in bytes */
     ulong   offset;
     list_t  ll;
-    char comment[VMA_CMT_MAXLEN];
+    char    comment[VMA_CMT_MAXLEN];
 }sgx_vm_area_t;
 
 
 /*------------------------- program-arena in sgx-enclave --------------------*/
 #define SGX_VMA_MAX_CNT 200
 typedef struct _sgx_mm_t {
-    /* The start address of heap reserved by sgxsdk */
+    /* The start address of heap reserved by intelsdk */
     byte*   heap_offset;
 
     /* The start address of dynamoRIO's heap, used for creating code-cache...*/
@@ -73,7 +59,7 @@ typedef struct _sgx_mm_t {
     /* Used for managing vm areas */
     uint    nin;
     uint    nun;
-    bool    updated;
+    BOOL    updated;
 
     list_t  *un;
     list_t  in;
@@ -82,7 +68,7 @@ typedef struct _sgx_mm_t {
 } sgx_mm_t;
 
 
-extern bool sgx_mm_initialized;
+extern BOOL sgx_mm_initialized;
 
 /*------------- export function for dynamoRIO && dyRIO-sgx-adapter ----------*/
 
@@ -96,14 +82,14 @@ void sgx_mm_init(void);
 void sgx_mm_exit(void);
 
 /* start means starting a region */
-bool    sgx_mm_within_sgxbuf(byte *addr, size_t len);
-byte*   sgx_mm_itn2ext(byte *itn_addr);
-byte*   sgx_mm_ext2itn(byte *ext_addr);
+BOOL    sgx_mm_within_sgxbuf(byte* addr, size_t len);
+byte*   sgx_mm_itn2ext(byte* itn_addr);
+byte*   sgx_mm_ext2itn(byte* ext_addr);
 
 
-byte*   sgx_mm_mmap(byte *ext_addr, size_t len, ulong prot, ulong flags, int fd, ulong offs);
-void    sgx_mm_munmap(byte *ext_addr, size_t len);
-int     sgx_mm_mprotect(byte *ext_addr, size_t len, uint prot);
-byte*   sgx_mm_mremap(byte *ext_old_addr, size_t old_sz, byte* ext_new_addr, size_t new_sz, uint new_flags);
+byte*   sgx_mm_mmap(byte* ext_addr, size_t len, ulong prot, ulong flags, int fd, ulong offs);
+void    sgx_mm_munmap(byte* ext_addr, size_t len);
+int     sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot);
+byte*   sgx_mm_mremap(byte* ext_old_addr, size_t old_sz, byte* ext_new_addr, size_t new_sz, uint new_flags);
 
-#endif //_SGX_VMA_H__
+#endif //_SGX_EDGE_MM_H__

@@ -45,8 +45,7 @@
 START_FILE
 
 DECL_EXTERN(unexpected_return)
-DECL_EXTERN(sgx_dynamorio_syscall)
-DECL_EXTERN(sgx_instr_syscall)
+DECL_EXTERN(sgx_instr_syscall_dr_generic)
 
 /* we share dynamorio_syscall w/ preload */
 #ifdef UNIX
@@ -57,12 +56,6 @@ DECL_EXTERN(sgx_instr_syscall)
  * For Linux, the argument max is 6.
  * For MacOS, the argument max is 6 for x64 and 7 for x86.
  */
-
-        DECLARE_FUNC(dynamorio_syscall)
-GLOBAL_LABEL(dynamorio_syscall:)
-        jmp sgx_dynamorio_syscall
-        END_FUNC(dynamorio_syscall)
-
 
         DECLARE_FUNC(dynamorio_syscall_org)
 GLOBAL_LABEL(dynamorio_syscall_org:)
@@ -198,6 +191,13 @@ syscall_success:
 # endif
         ret
         END_FUNC(dynamorio_syscall_org)
+
+/* Begin: Added by Pinghai */
+        DECLARE_FUNC(dynamorio_syscall)
+GLOBAL_LABEL(dynamorio_syscall:)
+        jmp     sgx_instr_syscall_dr_generic
+        END_FUNC(dynamorio_syscall)
+/* End: Added by Pinghai */
 
 
 # ifdef MACOS

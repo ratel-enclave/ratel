@@ -143,7 +143,7 @@ static size_t tcb_size = IF_X86_ELSE(IF_X64_ELSE(0x900, 0x490), 0x40);
  */
 typedef struct _tcb_head_t {
 #ifdef X86
-    sgxsdk_thread_data_t td_space;
+    intelsdk_thread_data_t td_space;
     void *tcb;
     void *dtv;
     void *self;
@@ -336,7 +336,7 @@ privload_tls_init(void *app_tp)
         dynamo_memset(dest + opd->tls_image_size, 0, opd->tls_block_size - opd->tls_image_size);
     }
 
-    init_slave_thread_data((sgxsdk_thread_data_t *)dr_tcb);    // fs <-- dr_tcb
+    init_slave_tls(dr_tcb);    // fs <-- dr_tcb
     return dr_tp;
 }
 

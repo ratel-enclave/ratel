@@ -713,10 +713,9 @@ mangle_syscall(dcontext_t *dcontext, instrlist_t *ilist, uint flags,
 
     /* replace syscall with a help function */
     dr_insert_clean_call(dcontext, ilist, instr,
-        (void*)sgx_helper_syscall,
-        false,  // don't save float regs
-        1,      // 1 args
-        OPND_CREATE_INTPTR(dcontext));
+                         (void *)sgx_helper_syscall,
+                         false, // don't save float regs
+                         0);    // 1 args
 
     instrlist_remove(ilist, instr);
 }

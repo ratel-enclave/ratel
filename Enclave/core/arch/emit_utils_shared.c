@@ -4563,7 +4563,7 @@ emit_patch_syscall(dcontext_t *dcontext, byte *target _IF_X64(gencode_mode_t mod
 }
 #endif /* WINDOWS */
 
-#define DR_CLEAN_CALL_SIZE 114
+#define DR_CLEAN_CALL_SIZE 104
 /* this routine performs a single system call instruction and then returns
  * to dynamo via fcache_return
  */
@@ -4864,13 +4864,13 @@ update_syscall(dcontext_t *dcontext, byte *pc)
         ASSERT(pc != NULL); /* this our own code we're decoding, should be valid */
         /* the tail of do-syscall trampoline is filled with NOPs */
 
-        if (instr_is_syscall(&instr)) {
+        if (instr_is_syscall(&instr))
+        {
             /* replace syscall with a help function */
             dr_insert_clean_call(dcontext, &ilist, &instr,
-                (void*)sgx_helper_syscall,
-                false,  // don't save float regs
-                1,      // 1 args
-                OPND_CREATE_INTPTR(dcontext));
+                                 (void *)sgx_helper_syscall,
+                                 false, // don't save float regs
+                                 0);    // 0 args
 
             instrlist_remove(&ilist, &instr);
 
@@ -4879,7 +4879,8 @@ update_syscall(dcontext_t *dcontext, byte *pc)
 
             break;
         }
-        else {
+        else
+        {
             APP(&ilist, &instr);
         }
 

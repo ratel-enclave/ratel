@@ -1,21 +1,42 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
-#include <stdbool.h>
 
-# include <unistd.h>
-# include <pwd.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <pwd.h>
+
+#include <sys/types.h>
+#include <sys/syscall.h>
 
 #include "sgx_urts.h"
 #include "App.h"
 #include "dynamorio_u.h"
 
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/syscall.h>
-#include <fcntl.h>
-#include <unistd.h>
 
+/* -------------------------Begin: define SYSCALL stub -------------------------*/
+void syscall_stub(void)
+{
+    __asm__ volatile (
+            "local_syscall:\n\t"
+            "mov    %rdi,%rax\n\t"
+            "mov    %rsi,%rdi\n\t"
+            "mov    %rdx,%rsi\n\t"
+            "mov    %rcx,%rdx\n\t"
+            "mov    %r8,%r10\n\t"
+            "mov    %r9,%r8\n\t"
+            "mov    0x8(%rsp),%r9\n\t"
+            "syscall \n\t"
+            "retq"
+            );
+
+}
+long local_syscall();
+
+#define syscall local_syscall
+/* -------------------------End: define SYSCALL stub -------------------------*/
 
 //Please make me beautiful
 void ocall_cpuid_ToNN(void *T, int l, int eax, int ecx)
@@ -541,6 +562,7 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
     switch (sysno) {
         case SYS_munmap:
         case SYS_ftruncate:
+        case SYS_kill:
         case SYS_arch_prctl:
             ret = syscall(sysno, N1, N2);
             b = true;
@@ -797,9 +819,9 @@ long ocall_syscall_3_NPiN(long sysno, long N1, void *V, long N2)
 
     switch (sysno) {
         case  SYS_write:
-        ret = syscall(sysno, N1, V, N2);
-        b = true;
-        /*sync();*/
+            ret = syscall(sysno, N1, V, N2);
+            b = true;
+            /*sync();*/
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);

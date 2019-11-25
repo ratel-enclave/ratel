@@ -474,7 +474,7 @@ tls_thread_init(os_local_state_t *os_tls, byte *segment)
             /* By resolving i#107, we can handle gs conflicts between app and dr. */
             INTERNAL_OPTION(mangle_app_seg)) {
             //res = dynamorio_syscall(SYS_arch_prctl, 2, ARCH_SET_GS, segment);
-            load_gsbase((unsigned long)segment);
+            load_segment_gs(segment);
             if (res >= 0) {
                 os_tls->tls_type = TLS_TYPE_ARCH_PRCTL;
                 LOG(GLOBAL, LOG_THREADS, 1, "os_tls_init: arch_prctl successful for base "PFX"\n", segment);
@@ -512,7 +512,7 @@ tls_thread_init(os_local_state_t *os_tls, byte *segment)
                 }
                 if (IF_CLIENT_INTERFACE_ELSE(INTERNAL_OPTION(private_loader), false)) {
                     /*res = dynamorio_syscall(SYS_arch_prctl, 2, ARCH_SET_FS, os_tls->os_seg_info.priv_lib_tls_base);*/
-                    load_fsbase((unsigned long)os_tls->os_seg_info.priv_lib_tls_base);
+                    load_segment_fs(os_tls->os_seg_info.priv_lib_tls_base);
                     /* Assuming set fs must be successful if set gs succeeded. */
                     ASSERT(res >= 0);
                 }
@@ -743,7 +743,7 @@ tls_set_fs_gs_segment_base(tls_type_t tls_type, uint seg,
         //int prctl_code = (seg == SEG_FS ? ARCH_SET_FS : ARCH_SET_GS);
         //res = dynamorio_syscall(SYS_arch_prctl, 2, prctl_code, base);
         /*ASSERT(res >= 0);*/
-        (seg == SEG_FS) ? load_fsbase((unsigned long)base) : load_gsbase((unsigned long)base);
+        (seg == SEG_FS) ? load_segment_fs(base) : load_segment_gs(base);
         res = 0;
         break;
     }
@@ -870,9 +870,9 @@ os_set_dr_seg(dcontext_t *dcontext, reg_id_t seg)
             /*seg == SEG_GS ? ostd->priv_alt_tls_base : ostd->priv_lib_tls_base);*/
     /*ASSERT(res >= 0);*/
     if (seg == SEG_GS)
-        load_gsbase((unsigned long)ostd->priv_alt_tls_base);
+        load_segment_gs(ostd->priv_alt_tls_base);
     else
-        load_fsbase((unsigned long)ostd->priv_lib_tls_base);
+        load_segment_fs(ostd->priv_lib_tls_base);
 }
 
 void

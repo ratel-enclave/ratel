@@ -215,6 +215,7 @@ os_cxt_ptr_t osc_empty;
 
 /* Begin: Modified by Pinghai */
 // master_signal_handler(int sig, siginfo_t *siginfo, kernel_ucontext_t *ucxt);
+#define EXCEPTION_CONTINUE_EXECUTION    -1
 int master_signal_handler(void *sgx_info);
 /* End: Modified by Pinghai */
 
@@ -4987,38 +4988,67 @@ master_signal_handler_C(byte *xsp)
 static void
 _master_signal_handler(void * arg)
 {
-    sigcxt_pkg_t *ext_pkg = (sigcxt_pkg_t*)arg;
-    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)malloc(sizeof(sigcxt_pkg_t));
-    memcpy(pkg, ext_pkg, sizeof(sigcxt_pkg_t));
+    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)arg;
     master_signal_handler_C(pkg->signum, &pkg->info, &pkg->ctx, (byte*)pkg);
     /* switch back to the original stack */
 }
 
+#define    INTELSDK_EXCEPTION_INFO_rax	0
+#define    INTELSDK_EXCEPTION_INFO_rcx	1
+#define    INTELSDK_EXCEPTION_INFO_rdx	2
+#define    INTELSDK_EXCEPTION_INFO_rbx	3
+#define    INTELSDK_EXCEPTION_INFO_rsp	4
+#define    INTELSDK_EXCEPTION_INFO_rbp	5
+#define    INTELSDK_EXCEPTION_INFO_rsi	6
+#define    INTELSDK_EXCEPTION_INFO_rdi	7
+#define    INTELSDK_EXCEPTION_INFO_rip	17
 
 int master_signal_handler(void *sgx_info)
 {
-    dcontext_t* ctx = get_thread_private_dcontext();
+    /* intelsdk_sigcxt_pkg_t => sigcxt_pkg_t */
+    intelsdk_exception_info_t *cur_sgx_info = (intelsdk_exception_info_t *)sgx_info;
+    intelsdk_sigcxt_pkg_t *ext_pkg = (intelsdk_sigcxt_pkg_t *)cur_sgx_info->sigcxt_pkg;
+    sigcxt_pkg_t *pkg;
+    sigcontext_t *sc;
+
+    dcontext_t *ctx = get_thread_private_dcontext();
     thread_sig_info_t *info = ctx->signal_field;
 
-    /* intelsdk_sigcxt_pkg_t => sigcxt_pkg_t */
-    intelsdk_exception_info_t *cur_sgx_info = (intelsdk_exception_info_t*)sgx_info;
-    intelsdk_sigcxt_pkg_t *ext_pkg = (intelsdk_sigcxt_pkg_t*)cur_sgx_info->sigcxt_pkg;
-
-    sigcxt_pkg_t *pkg = (sigcxt_pkg_t*)malloc(sizeof(sigcxt_pkg_t));
+#ifdef HAVE_SIGALTSTACK
+    unsigned long tmp;
+    tmp = (unsigned long)info->sigstack.ss_sp + info->sigstack.ss_size - sizeof(sigcxt_pkg_t);
+    pkg = (sigcxt_pkg_t *)(tmp & (unsigned long)(-0xf));
+#else
+    pkg = (sigcxt_pkg_t *)calloc(sizeof(sigcxt_pkg_t));
+#endif
 
     pkg->signum = ext_pkg->signum;
-    memcpy(&pkg->ctx, &pkg->ctx, sizeof(sigctx_knl_t));
+    memcpy(&pkg->ctx, &ext_pkg->ctx, sizeof(sigctx_knl_t));
     memcpy(&pkg->info, &ext_pkg->info, sizeof(siginfo_t));
-
 
 #ifdef HAVE_SIGALTSTACK
     /* swith to the stack set by sigaltstack */
-    call_switch_stack(pkg, (byte *)info->sigstack.ss_sp + info->sigstack.ss_size,
-            _master_signal_handler, NULL, true/*return*/);
+    call_switch_stack2(pkg, _master_signal_handler, (byte *)pkg);
 #else
     _master_signal_handler(pkg);
 #endif
-	return 0;
+
+    /* execute_handler_from_cache sets sc->SC_XIP to fcache_return, update it to sgx_info */
+    sc = SIGCXT_FROM_UCXT(&pkg->ctx);
+
+    /* just need to update the registers modifed by signal handler */
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rax] = sc->SC_XAX;    /* dcontext->last_exit */
+    // cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rcx] = sc->SC_XCX;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rdx] = sc->SC_XDX;
+    // cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rbx] = sc->SC_XBX;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rsp] = sc->SC_XSP;
+    // cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rbp] = sc->SC_XBP;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rsi] = sc->SC_XSI;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rdi] = sc->SC_XDI;
+    cur_sgx_info->cpu_context[INTELSDK_EXCEPTION_INFO_rip] = sc->SC_XIP;
+
+    /* Always return EXCEPTION_CONTINUE_EXECUTION if success*/
+    return EXCEPTION_CONTINUE_EXECUTION;
 }
 /* End: Modified by Pinghai */
 
@@ -5149,7 +5179,8 @@ execute_handler_from_cache(dcontext_t *dcontext, int sig, sigframe_rt_t *our_fra
 
     LOG(THREAD, LOG_ASYNCH, 3, "\tset next_tag to handler "PFX", xsp to "PFX"\n",
         SIGACT_PRIMARY_HANDLER(info->app_sigaction[sig]), xsp);
-    return true;
+
+    return 0;
 }
 
 static bool
