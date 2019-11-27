@@ -21,4 +21,8 @@ typedef unsigned char   BOOL;
 
 void crash_me();
 
+/* defines from executables */
+typedef unsigned int    socklen_t;
+
+
 #endif // _SGX_EDGE_DEFINE_H__

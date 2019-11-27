@@ -113,7 +113,7 @@ long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
 #define F_SETFL 4 /* set file status flags, F_SETFL (int) */
 #define F_GETLK 5
 #define F_SETLK 6
-
+#define len_flock 64
     long ret = -1;
 
     switch (cmd)
@@ -142,6 +142,16 @@ long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
         break;
     }
 
+    return ret;
+}
+
+/* fcntl has variable parameters */
+long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
+{
+    long ret = -1;
+
+    unimplemented_syscall(SYS_ioctl);
+    // ocall_syscall_3_NNTio(&ret, sysno, _rdi, _rsi, (void *)_rdx, len_ioctl);
     return ret;
 }
 
@@ -370,7 +380,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         break;
 
     case SYS_set_robust_list:
-        ocall_syscall_2_VoN(&ret, sysno, (void *)_rdi, _rsi);
+        ocall_syscall_2_PoN(&ret, sysno, (void *)_rdi, _rsi);
         break;
 
     default:
@@ -387,6 +397,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     long ret = -1;
     char *s, *t;
     byte *addr;
+    int sz;
 
     switch (sysno)
     {
@@ -440,12 +451,13 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
     case SYS_bind:
     case SYS_connect:
-        ocall_syscall_3_NToN(&ret, sysno, _rdi, (void *)_rsi, len_addrlen, _rdx);
+        ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
         break;
 
     case SYS_getpeername:
     case SYS_getsockname:
-        ocall_syscall_3_NToPo(&ret, sysno, _rdi, (void *)_rsi, len_addrlen, (int *)_rdx);
+        sz = *(int *)_rdx;
+        ocall_syscall_3_NToTio(&ret, sysno, _rdi, (void *)_rsi, sz, (int *)_rdx, len_socklen_t);
         break;
 
     case SYS_writev:
@@ -490,7 +502,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         break;
 
     case SYS_ioctl:
-        ocall_syscall_3_NNVio(&ret, sysno, _rdi, _rsi, (void *)_rdx, len_ioctl);
+        ret = sgx_ocall_syscall_ioctl(_rdi, _rsi, _rdx);
         break;
 
     default:
@@ -545,6 +557,7 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 long sgx_ocall_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
 {
     long ret = -1;
+    int sz;
     switch (sysno)
     {
     case SYS_prctl:
@@ -552,12 +565,12 @@ long sgx_ocall_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         break;
 
     case SYS_setsockopt:
-        ocall_syscall_5_NNNVioN(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, _r8);
+        ocall_syscall_5_NNNPiN(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, _r8);
         break;
 
     case SYS_getsockopt:
-        //printf("in getsockopt call_out\n");
-        ocall_syscall_5_NNNVioPio(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, (int *)_r8);
+        sz = *(int *)_r8;
+        ocall_syscall_5_NNNToTio(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, sz, (socklen_t *)_r8, len_socklen_t);
         break;
 
     default:
@@ -572,6 +585,7 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
 {
     long ret = -1;
     byte *addr;
+    int sz;
 
     switch (sysno)
     {
@@ -588,15 +602,16 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         break;
 
     case SYS_futex:
-        ocall_syscall_6_PoNNTiPoN(&ret, sysno, (int *)_rdi, _rsi, _rdx, (void *)_r10, len_timespec, (int *)_r8, _r9);
+        ocall_syscall_6_TioNNTiNN(&ret, sysno, (int *)_rdi, 4, _rsi, _rdx, (void *)_r10, len_timespec, (int *)_r8, 4, _r9);
         break;
 
     case SYS_sendto:
-        ocall_syscall_6_NVoNNToN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, _r9);
+        ocall_syscall_6_NPiNNPiN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, _r9);
         break;
 
     case SYS_recvfrom:
-        ocall_syscall_6_NVoNNToPo(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, (int *)_r9);
+        sz = *(int *)_r9;
+        ocall_syscall_6_NPoNNToTo(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, sz, (int *)_r9, len_socklen_t);
         break;
 
     default:

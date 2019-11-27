@@ -101,5 +101,7 @@
 #define len_unsigned_char 1
 #define len_unsigned_int 4
 #define len_unsigned_long 8
+#define len_sockaddr  16
+#define len_socklen_t 4
 
 #endif  //#define _ST_SIZE_H__
