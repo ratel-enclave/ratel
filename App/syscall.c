@@ -15,23 +15,20 @@
 #include "App.h"
 #include "dynamorio_u.h"
 
-
 /* -------------------------Begin: define SYSCALL stub -------------------------*/
 void syscall_stub(void)
 {
-    __asm__ volatile (
-            "local_syscall:\n\t"
-            "mov    %rdi,%rax\n\t"
-            "mov    %rsi,%rdi\n\t"
-            "mov    %rdx,%rsi\n\t"
-            "mov    %rcx,%rdx\n\t"
-            "mov    %r8,%r10\n\t"
-            "mov    %r9,%r8\n\t"
-            "mov    0x8(%rsp),%r9\n\t"
-            "syscall \n\t"
-            "retq"
-            );
-
+    __asm__ volatile(
+        "local_syscall:\n\t"
+        "mov    %rdi,%rax\n\t"
+        "mov    %rsi,%rdi\n\t"
+        "mov    %rdx,%rsi\n\t"
+        "mov    %rcx,%rdx\n\t"
+        "mov    %r8,%r10\n\t"
+        "mov    %r9,%r8\n\t"
+        "mov    0x8(%rsp),%r9\n\t"
+        "syscall \n\t"
+        "retq");
 }
 long local_syscall();
 
@@ -41,21 +38,22 @@ long local_syscall();
 //Please make me beautiful
 void ocall_cpuid_ToNN(void *T, int l, int eax, int ecx)
 {
-    int a, b, c,d;
+    int a, b, c, d;
 
-    asm volatile (
-            "\tmov %4, %%eax\n" \
-            "\tmov %5, %%ecx\n" \
-            "\tcpuid\n" \
-            "\tmov %%eax, %0\n" \
-            "\tmov %%ebx, %1\n" \
-            "\tmov %%ecx, %2\n" \
-            "\tmov %%edx, %3\n" \
-            :"=m"(a), "=m"(b),"=m"(c),"=m"(d): "rm"(eax), "rm"(ecx));
-    ((int*)T)[0] = a;
-    ((int*)T)[1] = b;
-    ((int*)T)[2] = c;
-    ((int*)T)[3] = d;
+    asm volatile(
+        "\tmov %4, %%eax\n"
+        "\tmov %5, %%ecx\n"
+        "\tcpuid\n"
+        "\tmov %%eax, %0\n"
+        "\tmov %%ebx, %1\n"
+        "\tmov %%ecx, %2\n"
+        "\tmov %%edx, %3\n"
+        : "=m"(a), "=m"(b), "=m"(c), "=m"(d)
+        : "rm"(eax), "rm"(ecx));
+    ((int *)T)[0] = a;
+    ((int *)T)[1] = b;
+    ((int *)T)[2] = c;
+    ((int *)T)[3] = d;
     printf("%s\n", __FUNCTION__);
 }
 
@@ -65,10 +63,10 @@ void ocall_rdtsc_To(void *T, int l)
     unsigned hi, lo;
 
     // *t = __rdtsc();
-    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    *t = ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+    __asm__ __volatile__("rdtsc"
+                         : "=a"(lo), "=d"(hi));
+    *t = ((unsigned long long)lo) | (((unsigned long long)hi) << 32);
 }
-
 
 char *syscall_name[] = {
     "read",
@@ -382,8 +380,7 @@ char *syscall_name[] = {
     "setns",
     "getcpu",
     "process_vm_readv",
-    "process_vm_writev"
-};
+    "process_vm_writev"};
 
 /* These two functions are used for debugging. */
 void ocall_print_str(const char *str)
@@ -393,7 +390,7 @@ void ocall_print_str(const char *str)
 
 void ocall_print_syscallname(long sysno)
 {
-    if (sysno < 0 || sysno >= sizeof(syscall_name)/sizeof(char*))
+    if (sysno < 0 || sysno >= sizeof(syscall_name) / sizeof(char *))
         printf("Invalid syscall No.: %d\n", (int)sysno);
     else
         printf("%s, %d\n", syscall_name[sysno], (int)sysno);
@@ -402,16 +399,17 @@ void ocall_print_syscallname(long sysno)
 /* system calls */
 void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
 {
-    if (implemented) {
+    if (implemented)
+    {
         //ocall_print_syscallname(sysno);
         //printf("%s: return 0x%lx\n", fname, ret);
     }
-    else {
+    else
+    {
         printf("sysno: %-4d not implemented!\n", (int)sysno);
     }
     //fflush(stdout);
 }
-
 
 //void _syscall_exit(void)
 //{
@@ -425,31 +423,36 @@ long ocall_syscall_0(long sysno)
     long ret;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_getpid:
-        case SYS_gettid:
-        case SYS_sync:
-            ret = syscall(sysno);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_getpid:
+    case SYS_gettid:
+    case SYS_geteuid:
+    case SYS_getuid:
+    case SYS_getegid:
+    case SYS_getgid:
+    case SYS_sync:
+        ret = syscall(sysno);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
 
 long ocall_syscall_1_S(long sysno, char *S)
 {
     long ret;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_unlink:
-            ret = syscall(sysno, S);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_unlink:
+        ret = syscall(sysno, S);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -457,20 +460,25 @@ long ocall_syscall_1_S(long sysno, char *S)
     return ret;
 }
 
-
 long ocall_syscall_1_N(long sysno, long N1)
 {
     long ret;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_close:
-        case SYS_alarm:
-        case SYS_exit_group: /* fix-me: allow out-encalve code to do cleanup */
-        case SYS_exit:
-            ret = syscall(sysno, N1);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_close:
+
+    case SYS_exit_group: /* fix-me: allow out-encalve code to do cleanup */
+    case SYS_exit:
+    case SYS_alarm:
+    case SYS_fdatasync:
+    case SYS_fsync:
+    case SYS_umask:
+    case SYS_dup:
+        ret = syscall(sysno, N1);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -483,12 +491,13 @@ long ocall_syscall_1_Ti(long sysno, void *T, int l)
     long ret;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_uname:
-        case SYS_set_thread_area:
-            ret = syscall(sysno, T);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_uname:
+    case SYS_set_thread_area:
+        ret = syscall(sysno, T);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -501,16 +510,17 @@ long ocall_syscall_1_To(long sysno, void *T, int l)
     long ret;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_uname:
-        case SYS_get_thread_area:
-        case SYS_time:
-        case SYS_times:
-        case SYS_sysinfo:
-            ret = syscall(sysno, T);
-            b = true;
-            break;
-
+    switch (sysno)
+    {
+    case SYS_uname:
+    case SYS_get_thread_area:
+    case SYS_time:
+    case SYS_times:
+    case SYS_sysinfo:
+    case SYS_set_tid_address:
+        ret = syscall(sysno, T);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -543,7 +553,6 @@ long ocall_syscall_1_To(long sysno, void *T, int l)
 /*return syscall(sysno, time);*/
 /*}*/
 
-
 /*[> OCall functions <]*/
 /*void ocall_all_syscalls(const char *str)*/
 /*{*/
@@ -553,20 +562,22 @@ long ocall_syscall_1_To(long sysno, void *T, int l)
 /*printf("%s", str);*/
 /*}*/
 
-
 long ocall_syscall_2_NN(long sysno, long N1, long N2)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_munmap:
-        case SYS_ftruncate:
-        case SYS_kill:
-        case SYS_arch_prctl:
-            ret = syscall(sysno, N1, N2);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_munmap:
+    case SYS_ftruncate:
+    case SYS_arch_prctl:
+    case SYS_dup2:
+    case SYS_kill:
+    case SYS_listen:
+        ret = syscall(sysno, N1, N2);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -579,7 +590,8 @@ long ocall_syscall_2_NTi(long sysno, long N, void *V, int len)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_setrlimit) {
+    if (sysno == SYS_setrlimit)
+    {
         ret = syscall(sysno, N, V);
         b = true;
     }
@@ -594,80 +606,80 @@ long ocall_syscall_2_NTo(long sysno, long N, void *V, int len)
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_getrlimit:
-        case SYS_fstat:
-        case SYS_getitimer:
-        case SYS_getrusage:
-        case SYS_clock_gettime:
-            ret = syscall(sysno, N, V);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_getrlimit:
+    case SYS_fstat:
+    case SYS_getitimer:
+    case SYS_getrusage:
+    case SYS_clock_gettime:
+        ret = syscall(sysno, N, V);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
-
 
 long ocall_syscall_2_SN(long sysno, const char *S, long N)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_mkdir:
-        case SYS_access:
-        case SYS_creat:
-        case SYS_chmod:
-            ret = syscall(sysno, S, N);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_mkdir:
+    case SYS_access:
+    case SYS_creat:
+    case SYS_chmod:
+        ret = syscall(sysno, S, N);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
 
 long ocall_syscall_2_STi(long sysno, const char *S, void *T, int l)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_utime:
-            ret = syscall(sysno, S, T);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_utime:
+        ret = syscall(sysno, S, T);
+        b = true;
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
 
 long ocall_syscall_2_STo(long sysno, const char *S, void *T, int l)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_stat:
-        case SYS_lstat:
-            ret = syscall(sysno, S, T);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_stat:
+    case SYS_lstat:
+        ret = syscall(sysno, S, T);
+        b = true;
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -675,20 +687,40 @@ long ocall_syscall_2_STo(long sysno, const char *S, void *T, int l)
     return ret;
 }
 
+long ocall_syscall_2_VoN(long sysno, void *T, int l)
+{
+    long ret = 0;
+    bool b = false;
 
+    switch (sysno)
+    {
+    case SYS_set_robust_list:
+        ret = syscall(sysno, T, l);
+        b = true;
+        break;
+
+    default:
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 long ocall_syscall_2_PoN(long sysno, void *T, int l)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_getcwd:
-            ret = syscall(sysno, T, l);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_getcwd:
+        ret = syscall(sysno, T, l);
+        b = true;
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -696,14 +728,35 @@ long ocall_syscall_2_PoN(long sysno, void *T, int l)
     return ret;
 }
 
+long ocall_syscall_2_ViN(long sysno, void *T, int l)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_set_robust_list:
+        ret = syscall(sysno, T, l);
+        b = true;
+        break;
+
+    default:
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 
 long ocall_syscall_2_TiN(long sysno, void *V, int len, long N)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_open) {
-        ret = syscall(sysno, (char*)V, N);
+    if (sysno == SYS_open)
+    {
+        ret = syscall(sysno, (char *)V, N);
         b = true;
     }
 
@@ -712,13 +765,13 @@ long ocall_syscall_2_TiN(long sysno, void *V, int len, long N)
     return ret;
 }
 
-
 long ocall_syscall_2_ToN(long sysno, void *V, int len, long N)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_gettimeofday) {
+    if (sysno == SYS_gettimeofday)
+    {
         ret = syscall(sysno, V, N);
         b = true;
     }
@@ -728,20 +781,21 @@ long ocall_syscall_2_ToN(long sysno, void *V, int len, long N)
     return ret;
 }
 
-
 long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_tgkill:
-        case SYS_lseek:
-        case SYS_mprotect:
-        case SYS_fcntl:
-            ret = syscall(sysno, N1, N2, N3);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_tgkill:
+    case SYS_lseek:
+    case SYS_socket:
+    case SYS_mprotect:
+    case SYS_fcntl:
+        ret = syscall(sysno, N1, N2, N3);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -749,116 +803,152 @@ long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
     return ret;
 }
 
+long ocall_syscall_3_NNPio(long sysno, long N1, long N2, void *P, long len)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_ioctl:
+        ret = syscall(sysno, N1, N2, T);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 
 long ocall_syscall_3_SNN(long sysno, const char *S, long N1, long N2)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
+    switch (sysno)
+    {
+    case SYS_open:
+        //printf("open file %s, %lx, %lx\n", S, N1, N2);
+        ret = syscall(sysno, S, N1, N2);
+        b = true;
+        break;
 
-        case SYS_open:
-            //printf("open file %s, %lx, %lx\n", S, N1, N2);
-            ret = syscall(sysno, S, N1, N2);
-            b = true;
-            break;
-
-        case SYS_chown:
-            ret = syscall(sysno, S, N1, N2);
-            b = true;
-            break;
+    case SYS_chown:
+        ret = syscall(sysno, S, N1, N2);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
 
 long ocall_syscall_3_SPoN(long sysno, const char *S, void *P, long N)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_readlink:
-            ret = syscall(sysno, S, P, N);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_readlink:
+        ret = syscall(sysno, S, P, N);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
 
 long ocall_syscall_3_NPoN(long sysno, long N1, void *V, long N2)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_read:
-        case SYS_getdents:
-            ret = syscall(sysno, N1, V, N2);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_read:
+    case SYS_getdents:
+    case SYS_getdents64:
+        ret = syscall(sysno, N1, V, N2);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
 
 long ocall_syscall_3_NPiN(long sysno, long N1, void *V, long N2)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case  SYS_write:
-            ret = syscall(sysno, N1, V, N2);
-            b = true;
-            /*sync();*/
+    switch (sysno)
+    {
+    case SYS_write:
+        ret = syscall(sysno, N1, V, N2);
+        b = true;
+        /*sync();*/
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
-
-
 
 long ocall_syscall_3_NToN(long sysno, long N1, void *V, long dumb, long N2)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_readv:
-            ret = syscall(sysno, N1, V, N2);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_readv:
+    case SYS_bind:
+    case SYS_connect:
+        ret = syscall(sysno, N1, V, N2);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
+long ocall_syscall_3_NToPo(long sysno, long N1, void *V, long dumb, int *N2)
+{
+    long ret = 0;
+    bool b = false;
 
+    switch (sysno)
+    {
+    case SYS_getpeername:
+    case SYS_getsockname:
+        ret = syscall(sysno, N1, V, N2);
+        b = true;
+        break;
+    }
 
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long dumb, long N2)
 {
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_writev:
-            ret = syscall(sysno, N1, V, N2);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_writev:
+        ret = syscall(sysno, N1, V, N2);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -866,13 +956,66 @@ long ocall_syscall_3_NTiN(long sysno, long N1, void *V, long dumb, long N2)
     return ret;
 }
 
+long ocall_syscall_3_ToNN(long sysno, void *V, long dumb, long N1, long N2)
+{
+    long ret = 0;
+    bool b = false;
 
+    switch (sysno)
+    {
+    case SYS_poll:
+        ret = syscall(sysno, V, N1, N2);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+long ocall_syscall_3_NNTo(long sysno, long N1, long N2, void *V, long dumb)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_fcntl:
+        ret = syscall(sysno, N1, N2, V);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_NNTi(long sysno, long N1, long N2, void *V, long dumb)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_fcntl:
+        ret = syscall(sysno, N1, N2, V);
+
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 long ocall_syscall_3_NTiTo(long sysno, long N0, void *V1, long dumb1, void *V2, long dumb2)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_setitimer) {
+    if (sysno == SYS_setitimer)
+    {
         ret = syscall(sysno, N0, V1, V2);
         b = true;
     }
@@ -882,16 +1025,33 @@ long ocall_syscall_3_NTiTo(long sysno, long N0, void *V1, long dumb1, void *V2, 
     return ret;
 }
 
-
 /*syscalls with 4 paramters*/
 long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_mremap) {
+    if (sysno == SYS_mremap)
+    {
         ret = syscall(sysno, N1, N2, N3, N4);
         b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+long ocall_syscall_4_NToNN(long sysno, long N1, void *V, long dumb, long N2, long N3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_sendmmsg:
+        ret = syscall(sysno, N1, V, N2, N3);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -904,12 +1064,13 @@ long ocall_syscall_4_NTiToN(long sysno, long N1, void *T1, long l1, void *T2, lo
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
-        case SYS_rt_sigaction:
-        case SYS_rt_sigprocmask:
-            ret = syscall(sysno, N1, T1, T2, N2);
-            b = true;
-            break;
+    switch (sysno)
+    {
+    case SYS_rt_sigaction:
+    case SYS_rt_sigprocmask:
+        ret = syscall(sysno, N1, T1, T2, N2);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -917,14 +1078,14 @@ long ocall_syscall_4_NTiToN(long sysno, long N1, void *T1, long l1, void *T2, lo
     return ret;
 }
 
-
 /*syscalls with 5 paramters*/
 long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_prctl) {
+    if (sysno == SYS_prctl)
+    {
         ret = syscall(sysno, N1, N2, N3, N4, N5);
         b = true;
     }
@@ -934,13 +1095,47 @@ long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long 
     return ret;
 }
 
+long ocall_syscall_5_NNNVioN(long sysno, long N1, long N2, long N3, void *V1, long N5)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_setsockopt:
+        ret = syscall(sysno, N1, N2, N3, V1, N5);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+long ocall_syscall_5_NNNVioPio(long sysno, long N1, long N2, long N3, void *V1, int *N5)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_getsockopt:
+        ret = syscall(sysno, N1, N2, N3, V1, N5);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 
 long ocall_syscall_6_NNNNNN(long sysno, long N1, long N2, long N3, long N4, long N5, long N6)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_mmap) {
+    if (sysno == SYS_mmap)
+    {
         ret = syscall(sysno, N1, N2, N3, N4, N5, N6);
         b = true;
     }
@@ -950,16 +1145,46 @@ long ocall_syscall_6_NNNNNN(long sysno, long N1, long N2, long N3, long N4, long
     return ret;
 }
 
-long ocall_syscall_6_PoNNTiPoN(long sysno, int* V1, long N1, long N2, void *T, long l, int *V2, long N3)
+long ocall_syscall_6_NNNTiNN(long sysno, long N1, long N2, long N3, void *T, long l, long N4, long N5)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_futex) {
-        ret = syscall(sysno, V1, N1, N2, T, V2, N3);
+    if (sysno == SYS_futex)
+    {
+        ret = syscall(sysno, N1, N2, N3, T, N4, N5);
         b = true;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
 }
 
+long ocall_syscall_6_NPiNPiNN(long sysno, long N1, void *P1, long N2, long N3, void *P2, long N4);
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_sendto)
+    {
+        ret = syscall(sysno, N1, P1, N2, N3, P2, N4);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+    return ret;
+}
+
+long ocall_syscall_6_NPoNPiNN(long sysno, long N1, void *V1, long N2, long N3, void *T, int *N4)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_recvfrom)
+    {
+        ret = syscall(sysno, N1, V1, N2, N3, T, N4);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+    return ret;
+}
