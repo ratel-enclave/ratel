@@ -2894,7 +2894,7 @@ create_log_dir(int dir_type)
         && !sharing_logdir
 # endif
         )
-        SYSLOG_INTERNAL_INFO("log dir=%s", logdir);
+        ;// SYSLOG_INTERNAL_INFO("log dir=%s", logdir);  //cdd --
 #endif /* DEBUG */
 }
 

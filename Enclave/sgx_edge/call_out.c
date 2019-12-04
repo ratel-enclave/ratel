@@ -656,15 +656,22 @@ long sgx_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
             break;
 
         case SYS_mremap:
-            addr = sgx_mm_itn2ext((byte*)_rdi);
+            {
+                #define EAGAIN      11
+                #define ENOMEM      12
+                #define EFAULT      14
+                #define EINVAL      22
+                
+                addr = sgx_mm_itn2ext((byte*)_rdi);
 
-            ocall_syscall_4_NNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10);
+                ocall_syscall_4_NNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10);
 
-            if (ret != -1) {
-                // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
-                ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
+                if (ret != -1 && ret != -ENOMEM) {
+                    // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
+                    ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
+                }
+                break;
             }
-            break;
         case SYS_epoll_ctl:
             {
                 ocall_syscall_4_NNNTio(&ret, sysno, _rdi, _rsi, _rdx, (void*)_r10, len_epoll_event);
