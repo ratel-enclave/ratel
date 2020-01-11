@@ -1,0 +1,3 @@
+Like the original design of dynamorio pursuit, We want to give libdynamorio-enclave.so a clean address-space.
+Therefore, differnent with the ordinary App compiled under the SGX-sdk, which have many dynamicallyed linked libraries including libc.so, libm.so, libz.so
+We should link it in a statically linking manner.

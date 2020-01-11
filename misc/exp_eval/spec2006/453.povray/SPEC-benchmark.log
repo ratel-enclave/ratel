@@ -1,0 +1,1268 @@
+Redirecting Options
+  All Streams to console..........On   and file SPEC-benchmark.log
+  Debug Stream to console.........Off
+  Fatal Stream to console.........On 
+  Render Stream to console........On 
+  Statistics Stream to console....On 
+  Warning Stream to console.......Off
+Parsing Options
+  Input file: SPEC-benchmark-test.pov (compatible to version 3.50)
+  Remove bounds........Off
+  Split unions.........Off
+  Library paths:
+Output Options
+  Image resolution 50 by 50 (rows 1 to 50, columns 1 to 50).
+  Graphic display......Off
+  Mosaic preview.......Off
+  CPU usage histogram..Off
+  Continued trace......Off
+Tracing Options
+  Quality:  9
+  Bounding boxes.......On   Bounding threshold: 1
+  Light Buffer.........On 
+  Vista Buffer.........On   Draw Vista Buffer....Off
+  Antialiasing.........On  (Method 1, Threshold 0.300, Depth 3, Jitter Off)
+  Clock value:    0.000  (Animation off)
+
+High Quality focal blur used...
+Cleanup Parse Warning: Focal blur is used. Standard antialiasing is switched
+ off.
+Scene Statistics
+  Finite objects:          190
+  Infinite objects:         10
+  Light sources:             1
+  Total:                   201
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:                0   Samples:               0
+Rays:                  0   Saved:                 0   Max Level: 0/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Calls to Noise:                   0   Calls to DNoise:              10
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:               50   Samples:             350
+Rays:                350   Saved:                 0   Max Level: 1/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                  9100               0
+Plane                            21000           19902
+Quadric                           3500             673
+Sphere                           33600               0
+Bounding Box                      2800               0
+Light Buffer                      5803            4067
+----------------------------------------------------------------------------
+Calls to Noise:                   0   Calls to DNoise:              10
+----------------------------------------------------------------------------
+Shadow Ray Tests:               350   Succeeded:                     0
+Bounding Queues:               7700
+Queue Resets:                   700   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              100   Samples:             700
+Rays:                700   Saved:                 0   Max Level: 1/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                 18200               0
+Plane                            42000           39700
+Quadric                           7000            1328
+Sphere                           67200               0
+Bounding Box                      5600               0
+Light Buffer                     11804            8156
+----------------------------------------------------------------------------
+Calls to Noise:                   0   Calls to DNoise:              10
+----------------------------------------------------------------------------
+Shadow Ray Tests:               700   Succeeded:                     0
+Bounding Queues:              15400
+Queue Resets:                  1400   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              150   Samples:            1050
+Rays:               1050   Saved:                 0   Max Level: 1/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                 27300               0
+Plane                            63000           59414
+Quadric                          10500            1965
+Sphere                          100800               0
+Bounding Box                      8400               0
+Light Buffer                     18012           12268
+----------------------------------------------------------------------------
+Calls to Noise:                   0   Calls to DNoise:              10
+----------------------------------------------------------------------------
+Shadow Ray Tests:              1050   Succeeded:                     0
+Bounding Queues:              23100
+Queue Resets:                  2100   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              200   Samples:            1400
+Rays:               1400   Saved:                 0   Max Level: 1/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                 36400               0
+Plane                            84000           79036
+Quadric                          14000            2588
+Sphere                          134400               0
+Bounding Box                     11200               0
+Light Buffer                     24409           16401
+----------------------------------------------------------------------------
+Calls to Noise:                   0   Calls to DNoise:              10
+----------------------------------------------------------------------------
+Shadow Ray Tests:              1400   Succeeded:                     0
+Bounding Queues:              30800
+Queue Resets:                  2800   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              250   Samples:            1750
+Rays:               1750   Saved:                 0   Max Level: 1/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                 45500               0
+Plane                           105000           98574
+Quadric                          17500            3200
+Sphere                          168000               0
+Bounding Box                     14000               0
+Light Buffer                     30995           20555
+----------------------------------------------------------------------------
+Calls to Noise:                   0   Calls to DNoise:              10
+----------------------------------------------------------------------------
+Shadow Ray Tests:              1750   Succeeded:                     0
+Bounding Queues:              38500
+Queue Resets:                  3500   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              300   Samples:            2100
+Rays:               2100   Saved:                 0   Max Level: 1/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                 54600               0
+Plane                           126000          118008
+Quadric                          21000            3797
+Sphere                          201600               0
+Bounding Box                     17292              41
+Light Buffer                     37797           24733
+----------------------------------------------------------------------------
+Calls to Noise:                   0   Calls to DNoise:              10
+----------------------------------------------------------------------------
+Shadow Ray Tests:              2100   Succeeded:                     0
+Bounding Queues:              46241
+Queue Resets:                  4200   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              350   Samples:            2472
+Rays:               2485   Saved:                 0   Max Level: 2/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                 64577              72
+CSG Union                           15              14
+Plane                           149070          138804
+Quadric                          24820            4478
+Sphere                          238297             144
+Bounding Box                     24034             515
+Light Buffer                     45705           29413
+----------------------------------------------------------------------------
+Calls to Noise:                  36   Calls to DNoise:              64
+----------------------------------------------------------------------------
+Shadow Ray Tests:              2479   Succeeded:                     0
+Reflected Rays:                  13
+Bounding Queues:              55125
+Queue Resets:                  4964   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              400   Samples:            2930
+Rays:               3002   Saved:                 0   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+CSG Intersection                 77883             531
+CSG Union                          219             214
+Plane                           180296          165476
+Quadric                          29878            5528
+Sphere                          286099             941
+Bounding Box                     36625            1894
+Light Buffer                     56723           35653
+----------------------------------------------------------------------------
+Calls to Noise:                 231   Calls to DNoise:             352
+----------------------------------------------------------------------------
+Shadow Ray Tests:              3047   Succeeded:                     2
+Reflected Rays:                  72
+Bounding Queues:              67458
+Queue Resets:                  5956   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              450   Samples:            3484
+Rays:               3853   Saved:                 0   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                 21              21
+Cone/Cylinder                        7               4
+CSG Intersection                 98897            1437
+CSG Union                         2024            1693
+Plane                           232419          204739
+Quadric                          39205            7980
+Sphere                          359006            1926
+Bounding Box                     59702            5349
+Light Buffer                     75470           45782
+----------------------------------------------------------------------------
+Calls to Noise:                1093   Calls to DNoise:            1366
+----------------------------------------------------------------------------
+Shadow Ray Tests:              4378   Succeeded:                    32
+Reflected Rays:                 369
+Bounding Queues:              87593
+Queue Resets:                  7456   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              500   Samples:            4066
+Rays:               4899   Saved:                 0   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                 82              82
+Cone/Cylinder                       32               8
+CSG Intersection                123347            2031
+CSG Union                         3460            2924
+Plane                           290505          246475
+Quadric                          49806           10567
+Sphere                          446284            2862
+Bounding Box                     89434           10363
+Light Buffer                     99152           58488
+----------------------------------------------------------------------------
+Calls to Noise:                2608   Calls to DNoise:            2824
+----------------------------------------------------------------------------
+Shadow Ray Tests:              5902   Succeeded:                    80
+Reflected Rays:                 833
+Bounding Queues:             112485
+Queue Resets:                  9239   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              550   Samples:            4720
+Rays:               6109   Saved:                 0   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                147             147
+Cone/Cylinder                       52              11
+CSG Intersection                151865            2747
+CSG Union                         4387            3694
+Plane                           356984          293547
+Quadric                          61137           13273
+Sphere                          548432            4111
+Bounding Box                    125043           16622
+Light Buffer                    127721           73881
+----------------------------------------------------------------------------
+Calls to Noise:                4445   Calls to DNoise:            4594
+----------------------------------------------------------------------------
+Shadow Ray Tests:              7677   Succeeded:                   114
+Reflected Rays:                1389
+Bounding Queues:             141878
+Queue Resets:                 11314   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              600   Samples:            5370
+Rays:               7284   Saved:                 0   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                195             195
+Cone/Cylinder                       60              14
+CSG Intersection                179132            3298
+CSG Union                         5295            4500
+Plane                           420804          338447
+Quadric                          71906           15393
+Sphere                          647458            5393
+Bounding Box                    160904           22936
+Light Buffer                    155755           88614
+----------------------------------------------------------------------------
+Calls to Noise:                6600   Calls to DNoise:            6754
+----------------------------------------------------------------------------
+Shadow Ray Tests:              9323   Succeeded:                   144
+Reflected Rays:                1914
+Bounding Queues:             170392
+Queue Resets:                 13301   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              650   Samples:            6084
+Rays:               8602   Saved:                 3   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                272             272
+Cone/Cylinder                       67              18
+CSG Intersection                209467            4242
+CSG Union                         6185            5212
+Plane                           492026          388862
+Quadric                          84028           17947
+Sphere                          755889            7050
+Bounding Box                    201472           30583
+Light Buffer                    186509          104762
+----------------------------------------------------------------------------
+Calls to Noise:                9065   Calls to DNoise:            9124
+----------------------------------------------------------------------------
+Shadow Ray Tests:             11162   Succeeded:                   218
+Reflected Rays:                2518
+Bounding Queues:             202735
+Queue Resets:                 15510   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              700   Samples:            6818
+Rays:               9979   Saved:                 5   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                332             332
+Cone/Cylinder                       80              20
+CSG Intersection                240455            5011
+CSG Union                         7309            6223
+Plane                           564714          439430
+Quadric                          97053           21059
+Sphere                          866648            8962
+Bounding Box                    243039           39009
+Light Buffer                    217577          121121
+----------------------------------------------------------------------------
+Calls to Noise:               12068   Calls to DNoise:           12184
+----------------------------------------------------------------------------
+Shadow Ray Tests:             12963   Succeeded:                   283
+Reflected Rays:                3161
+Bounding Queues:             236419
+Queue Resets:                 17763   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              750   Samples:            7670
+Rays:              11669   Saved:                 6   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                416             416
+Cone/Cylinder                      103              23
+CSG Intersection                277528            6021
+CSG Union                         8519            7285
+Plane                           650651          497557
+Quadric                         113031           25096
+Sphere                          998765           11286
+Bounding Box                    292671           49596
+Light Buffer                    253914          140003
+----------------------------------------------------------------------------
+Calls to Noise:               16280   Calls to DNoise:           16450
+----------------------------------------------------------------------------
+Shadow Ray Tests:             15031   Succeeded:                   430
+Reflected Rays:                3999
+Bounding Queues:             277064
+Queue Resets:                 20434   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              800   Samples:            8446
+Rays:              13286   Saved:                 9   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                501             501
+Cone/Cylinder                      135              29
+CSG Intersection                313520            6911
+CSG Union                         9067            7688
+Plane                           732583          551788
+Quadric                         127693           28582
+Sphere                         1125646           13071
+Bounding Box                    343064           60167
+Light Buffer                    290427          158812
+----------------------------------------------------------------------------
+Calls to Noise:               20563   Calls to DNoise:           20836
+----------------------------------------------------------------------------
+Shadow Ray Tests:             17012   Succeeded:                   539
+Reflected Rays:                4840
+Bounding Queues:             316593
+Queue Resets:                 23009   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              850   Samples:            9396
+Rays:              15225   Saved:                 9   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                594             594
+Cone/Cylinder                      215              57
+CSG Intersection                355624            8141
+CSG Union                         9382            7974
+Plane                           828090          615414
+Quadric                         144428           32519
+Sphere                         1275112           15244
+Bounding Box                    407369           73443
+Light Buffer                    333193          180423
+----------------------------------------------------------------------------
+Calls to Noise:               25770   Calls to DNoise:           26278
+----------------------------------------------------------------------------
+Shadow Ray Tests:             19273   Succeeded:                   675
+Reflected Rays:                5829
+Bounding Queues:             363991
+Queue Resets:                 26036   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              900   Samples:           10476
+Rays:              17662   Saved:                14   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                                862             862
+Cone/Cylinder                      560             150
+CSG Intersection                407984            9911
+CSG Union                        10041            8590
+Plane                           946911          690775
+Quadric                         164904           37203
+Sphere                         1460766           18042
+Bounding Box                    486898           90135
+Light Buffer                    388369          207355
+----------------------------------------------------------------------------
+Calls to Noise:               34663   Calls to DNoise:           33622
+----------------------------------------------------------------------------
+Shadow Ray Tests:             22023   Succeeded:                   870
+Reflected Rays:                7186
+Bounding Queues:             422981
+Queue Resets:                 29784   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:              950   Samples:           11322
+Rays:              19789   Saved:                20   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               1175            1175
+Cone/Cylinder                      916             236
+CSG Intersection                453650           11616
+CSG Union                        10939            9387
+Plane                          1050880          752780
+Quadric                         182989           41654
+Sphere                         1622679           20752
+Bounding Box                    553024          104916
+Light Buffer                    438671          231909
+----------------------------------------------------------------------------
+Calls to Noise:               42166   Calls to DNoise:           39808
+----------------------------------------------------------------------------
+Shadow Ray Tests:             24428   Succeeded:                  1029
+Reflected Rays:                8467
+Bounding Queues:             474682
+Queue Resets:                 33057   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1000   Samples:           12222
+Rays:              22090   Saved:                27   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               1584            1584
+Cone/Cylinder                     1146             325
+CSG Intersection                502902           13511
+CSG Union                        12590           10715
+Plane                          1163846          818300
+Quadric                         203250           46599
+Sphere                         1797147           23681
+Bounding Box                    622839          120415
+Light Buffer                    491649          257893
+----------------------------------------------------------------------------
+Calls to Noise:               51609   Calls to DNoise:           47224
+----------------------------------------------------------------------------
+Shadow Ray Tests:             26998   Succeeded:                  1170
+Reflected Rays:                9868
+Bounding Queues:             529909
+Queue Resets:                 36577   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1050   Samples:           13080
+Rays:              24237   Saved:                35   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               2025            2025
+Cone/Cylinder                     1489             449
+CSG Intersection                549367           15382
+CSG Union                        13657           11654
+Plane                          1269955          879801
+Quadric                         221695           50996
+Sphere                         1961536           26481
+Bounding Box                    686444          134866
+Light Buffer                    540650          282617
+----------------------------------------------------------------------------
+Calls to Noise:               60331   Calls to DNoise:           53950
+----------------------------------------------------------------------------
+Shadow Ray Tests:             29459   Succeeded:                  1281
+Reflected Rays:               11157
+Bounding Queues:             581932
+Queue Resets:                 39909   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1100   Samples:           13952
+Rays:              26477   Saved:                48   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               2490            2490
+Cone/Cylinder                     1800             562
+CSG Intersection                597589           17304
+CSG Union                        15024           12830
+Plane                          1380616          944815
+Quadric                         241124           55588
+Sphere                         2132465           29306
+Bounding Box                    750787          149785
+Light Buffer                    588734          307809
+----------------------------------------------------------------------------
+Calls to Noise:               68583   Calls to DNoise:           59722
+----------------------------------------------------------------------------
+Shadow Ray Tests:             32051   Succeeded:                  1427
+Reflected Rays:               12525
+Bounding Queues:             635851
+Queue Resets:                 43369   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1150   Samples:           14702
+Rays:              28512   Saved:                57   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               2909            2909
+Cone/Cylinder                     2039             639
+CSG Intersection                641756           19036
+CSG Union                        16968           14344
+Plane                          1483329         1004541
+Quadric                         259857           60051
+Sphere                         2288909           31647
+Bounding Box                    804819          162703
+Light Buffer                    630654          330446
+----------------------------------------------------------------------------
+Calls to Noise:               76970   Calls to DNoise:           66016
+----------------------------------------------------------------------------
+Shadow Ray Tests:             34425   Succeeded:                  1557
+Reflected Rays:               13810
+Bounding Queues:             684233
+Queue Resets:                 46516   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1200   Samples:           15468
+Rays:              30610   Saved:                75   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               3400            3400
+Cone/Cylinder                     2256             711
+CSG Intersection                687329           20836
+CSG Union                        19213           16348
+Plane                          1591127         1066973
+Quadric                         279563           65323
+Sphere                         2449712           33569
+Bounding Box                    861918          175982
+Light Buffer                    675183          354322
+----------------------------------------------------------------------------
+Calls to Noise:               85625   Calls to DNoise:           71722
+----------------------------------------------------------------------------
+Shadow Ray Tests:             36926   Succeeded:                  1697
+Reflected Rays:               15142
+Bounding Queues:             734322
+Queue Resets:                 49786   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1250   Samples:           16272
+Rays:              32823   Saved:               105   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               3832            3832
+Cone/Cylinder                     2404             759
+CSG Intersection                735189           23326
+CSG Union                        21721           18494
+Plane                          1705255         1132101
+Quadric                         300507           70913
+Sphere                         2617943           35621
+Bounding Box                    921429          189916
+Light Buffer                    722857          379872
+----------------------------------------------------------------------------
+Calls to Noise:               94013   Calls to DNoise:           77842
+----------------------------------------------------------------------------
+Shadow Ray Tests:             39522   Succeeded:                  1824
+Reflected Rays:               16551
+Bounding Queues:             786830
+Queue Resets:                 53212   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1300   Samples:           16990
+Rays:              34791   Saved:               138   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               4210            4210
+Cone/Cylinder                     2516             776
+CSG Intersection                777196           25717
+CSG Union                        24349           20752
+Plane                          1806397         1190859
+Quadric                         319379           76025
+Sphere                         2765054           37242
+Bounding Box                    974330          201866
+Light Buffer                    762703          401273
+----------------------------------------------------------------------------
+Calls to Noise:              102410   Calls to DNoise:           84850
+----------------------------------------------------------------------------
+Shadow Ray Tests:             41790   Succeeded:                  1962
+Reflected Rays:               17801
+Bounding Queues:             832658
+Queue Resets:                 56216   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1350   Samples:           17636
+Rays:              36455   Saved:               151   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               4507            4507
+Cone/Cylinder                     2560             782
+CSG Intersection                813615           27744
+CSG Union                        26661           22792
+Plane                          1893943         1242368
+Quadric                         336168           80900
+Sphere                         2893927           38417
+Bounding Box                   1018179          211678
+Light Buffer                    796082          419768
+----------------------------------------------------------------------------
+Calls to Noise:              110130   Calls to DNoise:           91516
+----------------------------------------------------------------------------
+Shadow Ray Tests:             43714   Succeeded:                  2029
+Reflected Rays:               18819
+Bounding Queues:             871634
+Queue Resets:                 58803   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1400   Samples:           18360
+Rays:              38445   Saved:               171   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               4899            4899
+Cone/Cylinder                     2593             788
+CSG Intersection                856633           29817
+CSG Union                        28922           24557
+Plane                          1995918         1301509
+Quadric                         355546           86203
+Sphere                         3046019           40050
+Bounding Box                   1070089          223939
+Light Buffer                    834772          441558
+----------------------------------------------------------------------------
+Calls to Noise:              119065   Calls to DNoise:           98410
+----------------------------------------------------------------------------
+Shadow Ray Tests:             46049   Succeeded:                  2133
+Reflected Rays:               20085
+Bounding Queues:             918825
+Queue Resets:                 61904   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1450   Samples:           19090
+Rays:              40506   Saved:               196   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               5306            5306
+Cone/Cylinder                     2661             795
+CSG Intersection                900707           31575
+CSG Union                        30526           26004
+Plane                          2099194         1361438
+Quadric                         374799           91740
+Sphere                         3203307           41956
+Bounding Box                   1124051          236936
+Light Buffer                    874678          464221
+----------------------------------------------------------------------------
+Calls to Noise:              127448   Calls to DNoise:          105112
+----------------------------------------------------------------------------
+Shadow Ray Tests:             48462   Succeeded:                  2263
+Reflected Rays:               21416
+Bounding Queues:             967816
+Queue Resets:                 65099   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1500   Samples:           19758
+Rays:              42388   Saved:               234   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               5676            5676
+Cone/Cylinder                     2704             803
+CSG Intersection                940812           33328
+CSG Union                        32982           28223
+Plane                          2195016         1417647
+Quadric                         392989           97429
+Sphere                         3345660           44150
+Bounding Box                   1172161          248475
+Light Buffer                    909967          484426
+----------------------------------------------------------------------------
+Calls to Noise:              134731   Calls to DNoise:          111382
+----------------------------------------------------------------------------
+Shadow Ray Tests:             50670   Succeeded:                  2401
+Reflected Rays:               22630
+Bounding Queues:            1011983
+Queue Resets:                 67995   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1550   Samples:           20368
+Rays:              44044   Saved:               261   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               5992            5992
+Cone/Cylinder                     2729             808
+CSG Intersection                975788           35044
+CSG Union                        34840           29893
+Plane                          2277676         1466258
+Quadric                         408553          102063
+Sphere                         3469760           45998
+Bounding Box                   1214002          258353
+Light Buffer                    939249          501505
+----------------------------------------------------------------------------
+Calls to Noise:              141663   Calls to DNoise:          117592
+----------------------------------------------------------------------------
+Shadow Ray Tests:             52543   Succeeded:                  2531
+Reflected Rays:               23676
+Bounding Queues:            1050315
+Queue Resets:                 70516   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1600   Samples:           21078
+Rays:              45801   Saved:               275   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               6373            6373
+Cone/Cylinder                     2745             812
+CSG Intersection               1013108           36992
+CSG Union                        36658           31635
+Plane                          2365754         1518977
+Quadric                         424898          107032
+Sphere                         3601413           47780
+Bounding Box                   1257924          268335
+Light Buffer                    969604          519089
+----------------------------------------------------------------------------
+Calls to Noise:              149265   Calls to DNoise:          124450
+----------------------------------------------------------------------------
+Shadow Ray Tests:             54558   Succeeded:                  2674
+Reflected Rays:               24723
+Bounding Queues:            1090623
+Queue Resets:                 73202   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1650   Samples:           21772
+Rays:              47444   Saved:               298   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               6713            6713
+Cone/Cylinder                     2783             820
+CSG Intersection               1047484           38834
+CSG Union                        38090           33015
+Plane                          2445802         1567391
+Quadric                         439701          111285
+Sphere                         3722881           49424
+Bounding Box                   1297508          277466
+Light Buffer                    995740          534437
+----------------------------------------------------------------------------
+Calls to Noise:              156865   Calls to DNoise:          130714
+----------------------------------------------------------------------------
+Shadow Ray Tests:             56386   Succeeded:                  2824
+Reflected Rays:               25672
+Bounding Queues:            1127724
+Queue Resets:                 75675   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1700   Samples:           22458
+Rays:              48985   Saved:               311   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               6984            6984
+Cone/Cylinder                     2956             907
+CSG Intersection               1080176           40638
+CSG Union                        39344           34223
+Plane                          2521195         1613339
+Quadric                         453605          115323
+Sphere                         3837619           50961
+Bounding Box                   1334814          286220
+Light Buffer                   1020336          548978
+----------------------------------------------------------------------------
+Calls to Noise:              163275   Calls to DNoise:          135898
+----------------------------------------------------------------------------
+Shadow Ray Tests:             58128   Succeeded:                  2990
+Reflected Rays:               26527
+Bounding Queues:            1162824
+Queue Resets:                 78004   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1750   Samples:           23132
+Rays:              50504   Saved:               324   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               7311            7311
+Cone/Cylinder                     3092             960
+CSG Intersection               1111858           42331
+CSG Union                        41029           35846
+Plane                          2595270         1658538
+Quadric                         467801          119784
+Sphere                         3948309           52245
+Bounding Box                   1370571          294496
+Light Buffer                   1043569          562631
+----------------------------------------------------------------------------
+Calls to Noise:              170524   Calls to DNoise:          141988
+----------------------------------------------------------------------------
+Shadow Ray Tests:             59783   Succeeded:                  3180
+Reflected Rays:               27372
+Bounding Queues:            1196640
+Queue Resets:                 80257   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1800   Samples:           23832
+Rays:              52240   Saved:               359   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               7620            7620
+Cone/Cylinder                     3232             966
+CSG Intersection               1147900           44201
+CSG Union                        42352           37101
+Plane                          2678177         1707752
+Quadric                         483138          124406
+Sphere                         4074794           53994
+Bounding Box                   1410862          304203
+Light Buffer                   1071700          578995
+----------------------------------------------------------------------------
+Calls to Noise:              177789   Calls to DNoise:          148738
+----------------------------------------------------------------------------
+Shadow Ray Tests:             61654   Succeeded:                  3361
+Reflected Rays:               28408
+Bounding Queues:            1235399
+Queue Resets:                 82822   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1850   Samples:           24560
+Rays:              53948   Saved:               394   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               7912            7912
+Cone/Cylinder                     3469            1012
+CSG Intersection               1184502           46181
+CSG Union                        43007           37725
+Plane                          2760924         1756724
+Quadric                         497818          128576
+Sphere                         4203591           56125
+Bounding Box                   1450151          314099
+Light Buffer                   1101714          596557
+----------------------------------------------------------------------------
+Calls to Noise:              184491   Calls to DNoise:          155230
+----------------------------------------------------------------------------
+Shadow Ray Tests:             63605   Succeeded:                  3522
+Reflected Rays:               29388
+Bounding Queues:            1274595
+Queue Resets:                 85418   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1900   Samples:           25390
+Rays:              55788   Saved:               451   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               8214            8214
+Cone/Cylinder                     3810            1165
+CSG Intersection               1223514           48427
+CSG Union                        43619           38222
+Plane                          2849030         1809152
+Quadric                         513175          132807
+Sphere                         4341305           58313
+Bounding Box                   1490888          324560
+Light Buffer                   1133806          615220
+----------------------------------------------------------------------------
+Calls to Noise:              191087   Calls to DNoise:          161716
+----------------------------------------------------------------------------
+Shadow Ray Tests:             65771   Succeeded:                  3734
+Reflected Rays:               30398
+Bounding Queues:            1316470
+Queue Resets:                 88203   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             1950   Samples:           26176
+Rays:              57427   Saved:               469   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               8500            8500
+Cone/Cylinder                     4028            1231
+CSG Intersection               1259096           50245
+CSG Union                        43959           38546
+Plane                          2929322         1856556
+Quadric                         526962          136550
+Sphere                         4467082           59902
+Bounding Box                   1527460          333697
+Light Buffer                   1163529          632374
+----------------------------------------------------------------------------
+Calls to Noise:              197999   Calls to DNoise:          168946
+----------------------------------------------------------------------------
+Shadow Ray Tests:             67729   Succeeded:                  3866
+Reflected Rays:               31251
+Bounding Queues:            1354339
+Queue Resets:                 90752   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2000   Samples:           26918
+Rays:              58932   Saved:               484   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               8742            8742
+Cone/Cylinder                     4168            1242
+CSG Intersection               1292359           51869
+CSG Union                        44957           39523
+Plane                          3005886         1901499
+Quadric                         540609          140840
+Sphere                         4584421           61269
+Bounding Box                   1558979          341209
+Light Buffer                   1191904          648702
+----------------------------------------------------------------------------
+Calls to Noise:              203924   Calls to DNoise:          175690
+----------------------------------------------------------------------------
+Shadow Ray Tests:             69557   Succeeded:                  3937
+Reflected Rays:               32014
+Bounding Queues:            1388741
+Queue Resets:                 93143   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2050   Samples:           27618
+Rays:              60302   Saved:               507   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               8911            8911
+Cone/Cylinder                     4430            1271
+CSG Intersection               1322688           53444
+CSG Union                        45217           39780
+Plane                          3074378         1941916
+Quadric                         552266          144146
+Sphere                         4692499           62824
+Bounding Box                   1587461          348003
+Light Buffer                   1217696          663720
+----------------------------------------------------------------------------
+Calls to Noise:              208215   Calls to DNoise:          180754
+----------------------------------------------------------------------------
+Shadow Ray Tests:             71309   Succeeded:                  4013
+Reflected Rays:               32684
+Bounding Queues:            1420199
+Queue Resets:                 95340   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2100   Samples:           28490
+Rays:              61887   Saved:               536   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               9069            9069
+Cone/Cylinder                     5313            1448
+CSG Intersection               1358702           55582
+CSG Union                        45790           40352
+Plane                          3155766         1991223
+Quadric                         566199          147849
+Sphere                         4820410           64926
+Bounding Box                   1620636          356092
+Light Buffer                   1248586          681825
+----------------------------------------------------------------------------
+Calls to Noise:              211898   Calls to DNoise:          185170
+----------------------------------------------------------------------------
+Shadow Ray Tests:             73517   Succeeded:                  4152
+Reflected Rays:               33397
+Bounding Queues:            1457410
+Queue Resets:                 97941   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2150   Samples:           29226
+Rays:              63150   Saved:               548   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               9298            9298
+Cone/Cylinder                     5849            1618
+CSG Intersection               1388140           57112
+CSG Union                        46359           40918
+Plane                          3222710         2031359
+Quadric                         577770          151022
+Sphere                         4925887           66236
+Bounding Box                   1646321          362498
+Light Buffer                   1274912          697125
+----------------------------------------------------------------------------
+Calls to Noise:              215031   Calls to DNoise:          188968
+----------------------------------------------------------------------------
+Shadow Ray Tests:             75407   Succeeded:                  4263
+Reflected Rays:               33924
+Bounding Queues:            1487758
+Queue Resets:                100085   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2200   Samples:           29898
+Rays:              64373   Saved:               556   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               9522            9522
+Cone/Cylinder                     6029            1654
+CSG Intersection               1417116           58415
+CSG Union                        47614           41708
+Plane                          3289556         2069637
+Quadric                         590017          154045
+Sphere                         5028896           67277
+Bounding Box                   1670791          368210
+Light Buffer                   1301287          712348
+----------------------------------------------------------------------------
+Calls to Noise:              218212   Calls to DNoise:          193354
+----------------------------------------------------------------------------
+Shadow Ray Tests:             77198   Succeeded:                  4293
+Reflected Rays:               34475
+Bounding Queues:            1516870
+Queue Resets:                102182   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2250   Samples:           30602
+Rays:              65667   Saved:               580   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               9733            9733
+Cone/Cylinder                     6154            1659
+CSG Intersection               1447797           59810
+CSG Union                        48520           42608
+Plane                          3359793         2111273
+Quadric                         602453          157779
+Sphere                         5138208           68452
+Bounding Box                   1694958          373795
+Light Buffer                   1329060          728428
+----------------------------------------------------------------------------
+Calls to Noise:              221611   Calls to DNoise:          198220
+----------------------------------------------------------------------------
+Shadow Ray Tests:             79134   Succeeded:                  4331
+Reflected Rays:               35065
+Bounding Queues:            1547295
+Queue Resets:                104412   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2300   Samples:           31288
+Rays:              66940   Saved:               637   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                               9908            9908
+Cone/Cylinder                     6373            1680
+CSG Intersection               1476626           61292
+CSG Union                        48533           42621
+Plane                          3424986         2150826
+Quadric                         613188          160553
+Sphere                         5242736           69515
+Bounding Box                   1717579          379265
+Light Buffer                   1354831          743462
+----------------------------------------------------------------------------
+Calls to Noise:              225467   Calls to DNoise:          203002
+----------------------------------------------------------------------------
+Shadow Ray Tests:             81000   Succeeded:                  4397
+Reflected Rays:               35652
+Bounding Queues:            1576497
+Queue Resets:                106542   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2350   Samples:           32006
+Rays:              68113   Saved:               666   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                              10039           10039
+Cone/Cylinder                     6819            1724
+CSG Intersection               1504750           62755
+CSG Union                        48560           42647
+Plane                          3488870         2190618
+Quadric                         623757          163172
+Sphere                         5344705           70359
+Bounding Box                   1737574          383842
+Light Buffer                   1379844          758432
+----------------------------------------------------------------------------
+Calls to Noise:              228662   Calls to DNoise:          207490
+----------------------------------------------------------------------------
+Shadow Ray Tests:             82912   Succeeded:                  4427
+Reflected Rays:               36107
+Bounding Queues:            1604262
+Queue Resets:                108632   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2400   Samples:           32856
+Rays:              69338   Saved:               669   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                              10174           10174
+Cone/Cylinder                     7152            1874
+CSG Intersection               1536933           64492
+CSG Union                        50450           44537
+Plane                          3567362         2240536
+Quadric                         637415          166854
+Sphere                         5458219           71156
+Bounding Box                   1758109          388496
+Light Buffer                   1409538          776122
+----------------------------------------------------------------------------
+Calls to Noise:              231821   Calls to DNoise:          212326
+----------------------------------------------------------------------------
+Shadow Ray Tests:             85167   Succeeded:                  4447
+Reflected Rays:               36482
+Bounding Queues:            1634770
+Queue Resets:                110973   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics (Partial Image Rendered)
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2450   Samples:           33598
+Rays:              70449   Saved:               670   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                              10354           10354
+Cone/Cylinder                     7575            2023
+CSG Intersection               1566407           65949
+CSG Union                        52593           46680
+Plane                          3640537         2286706
+Quadric                         650245          170277
+Sphere                         5561251           71877
+Bounding Box                   1776110          392864
+Light Buffer                   1437302          792458
+----------------------------------------------------------------------------
+Calls to Noise:              235356   Calls to DNoise:          217012
+----------------------------------------------------------------------------
+Shadow Ray Tests:             87215   Succeeded:                  4453
+Reflected Rays:               36851
+Bounding Queues:            1662668
+Queue Resets:                113104   Queue Resizes:                 0
+----------------------------------------------------------------------------
+Render Statistics
+Image Resolution 50 x 50
+----------------------------------------------------------------------------
+Pixels:             2500   Samples:           34276
+Rays:              71466   Saved:               670   Max Level: 5/5
+----------------------------------------------------------------------------
+Ray->Shape Intersection          Tests       Succeeded
+----------------------------------------------------------------------------
+Box                              10464           10464
+Cone/Cylinder                     7648            2032
+CSG Intersection               1592790           67152
+CSG Union                        54411           48498
+Plane                          3706171         2328339
+Quadric                         661693          173326
+Sphere                         5654139           72316
+Bounding Box                   1790587          396063
+Light Buffer                   1460383          806458
+----------------------------------------------------------------------------
+Calls to Noise:              238235   Calls to DNoise:          221596
+----------------------------------------------------------------------------
+Shadow Ray Tests:             89033   Succeeded:                  4453
+Reflected Rays:               37190
+Bounding Queues:            1687161
+Queue Resets:                115030   Queue Resizes:                 0
+----------------------------------------------------------------------------
