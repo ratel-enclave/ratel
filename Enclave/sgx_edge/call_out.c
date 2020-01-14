@@ -1,1449 +1,887 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <assert.h>
+/* **********************************************************
+ * Designed by pinghai@gmail.com
+ * **********************************************************/
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <pwd.h>
+/*
+Summary: ocalls issued by DynamoRIO and SGX-app come to this file only through two entry functions,
+i.e. sgx_dynamorio_syscall and sgx_syscall. These two functions then dispatch the ocall to the bridge
+functions according to the syscall_no and parameters_count.
+*/
 
-#include <sys/types.h>
-#include <sys/syscall.h>
+/*
+ * call_out.c - provide ocall interfaces for the entire SGX-DBI system
+ */
+#include "sgx_trts.h"
+#include "string.h"
 
-#include "sgx_urts.h"
-#include "App.h"
-#include "dynamorio_u.h"
+#include "syscall_no.h"
+#include "struct_size.h"
 
-#include "thread_helper.h"
-#include <sys/mman.h>
+#include "../dynamorio_t.h"
 
-/* -------------------------Begin: define SYSCALL stub -------------------------*/
-void syscall_stub(void)
+#include "sgx_instr.h"
+#include "sgx_mm.h"
+#include "sgx_signal.h"
+
+#include "call_out.h"
+
+extern void load_segment_fs(void *tls_segment);
+extern void load_segment_gs(void *tls_segment);
+
+/* export for external use */
+int open_procmaps_file(void);
+int read_procmaps_file(char buf[], size_t len);
+void close_procmaps_file(void);
+
+/* the file descpritor of sgx-procmaps: GX_PROCMAPS_MAX_FILE */
+#define SGX_PROCMAPS_FD 40
+
+//Generate a copy within the enclave.
+void *gen_enclave_copy(void *org, int len)
 {
-    __asm__ volatile(
-        "local_syscall:\n\t"
-        "mov    %rdi,%rax\n\t"
-        "mov    %rsi,%rdi\n\t"
-        "mov    %rdx,%rsi\n\t"
-        "mov    %rcx,%rdx\n\t"
-        "mov    %r8,%r10\n\t"
-        "mov    %r9,%r8\n\t"
-        "mov    0x8(%rsp),%r9\n\t"
-        "syscall \n\t"
-        "retq");
-}
-long local_syscall();
+    void *obj = org;
 
-#define syscall local_syscall
-/* -------------------------End: define SYSCALL stub -------------------------*/
-
-//Please make me beautiful
-void ocall_cpuid_ToNN(void *T, int l, int eax, int ecx)
-{
-    int a, b, c, d;
-
-    asm volatile(
-        "\tmov %4, %%eax\n"
-        "\tmov %5, %%ecx\n"
-        "\tcpuid\n"
-        "\tmov %%eax, %0\n"
-        "\tmov %%ebx, %1\n"
-        "\tmov %%ecx, %2\n"
-        "\tmov %%edx, %3\n"
-        : "=m"(a), "=m"(b), "=m"(c), "=m"(d)
-        : "rm"(eax), "rm"(ecx));
-    ((int *)T)[0] = a;
-    ((int *)T)[1] = b;
-    ((int *)T)[2] = c;
-    ((int *)T)[3] = d;
-    printf("%s\n", __FUNCTION__);
-}
-
-void ocall_rdtsc_To(void *T, int l)
-{
-    unsigned long long *t = T;
-    unsigned hi, lo;
-
-    // *t = __rdtsc();
-    __asm__ __volatile__("rdtsc"
-                         : "=a"(lo), "=d"(hi));
-    *t = ((unsigned long long)lo) | (((unsigned long long)hi) << 32);
-}
-
-char *syscall_name[] = {
-    "read",
-    "write",
-    "open",
-    "close",
-    "stat",
-    "fstat",
-    "lstat",
-    "poll",
-    "lseek",
-    "mmap",
-    "mprotect",
-    "munmap",
-    "brk",
-    "rt_sigaction",
-    "rt_sigprocmask",
-    "rt_sigreturn",
-    "ioctl",
-    "pread64",
-    "pwrite64",
-    "readv",
-    "writev",
-    "access",
-    "pipe",
-    "select",
-    "sched_yield",
-    "mremap",
-    "msync",
-    "mincore",
-    "madvise",
-    "shmget",
-    "shmat",
-    "shmctl",
-    "dup",
-    "dup2",
-    "pause",
-    "nanosleep",
-    "getitimer",
-    "alarm",
-    "setitimer",
-    "getpid",
-    "sendfile",
-    "socket",
-    "connect",
-    "accept",
-    "sendto",
-    "recvfrom",
-    "sendmsg",
-    "recvmsg",
-    "shutdown",
-    "bind",
-    "listen",
-    "getsockname",
-    "getpeername",
-    "socketpair",
-    "setsockopt",
-    "getsockopt",
-    "clone",
-    "fork",
-    "vfork",
-    "execve",
-    "exit",
-    "wait4",
-    "kill",
-    "uname",
-    "semget",
-    "semop",
-    "semctl",
-    "shmdt",
-    "msgget",
-    "msgsnd",
-    "msgrcv",
-    "msgctl",
-    "fcntl",
-    "flock",
-    "fsync",
-    "fdatasync",
-    "truncate",
-    "ftruncate",
-    "getdents",
-    "getcwd",
-    "chdir",
-    "fchdir",
-    "rename",
-    "mkdir",
-    "rmdir",
-    "creat",
-    "link",
-    "unlink",
-    "symlink",
-    "readlink",
-    "chmod",
-    "fchmod",
-    "chown",
-    "fchown",
-    "lchown",
-    "umask",
-    "gettimeofday",
-    "getrlimit",
-    "getrusage",
-    "sysinfo",
-    "times",
-    "ptrace",
-    "getuid",
-    "syslog",
-    "getgid",
-    "setuid",
-    "setgid",
-    "geteuid",
-    "getegid",
-    "setpgid",
-    "getppid",
-    "getpgrp",
-    "setsid",
-    "setreuid",
-    "setregid",
-    "getgroups",
-    "setgroups",
-    "setresuid",
-    "getresuid",
-    "setresgid",
-    "getresgid",
-    "getpgid",
-    "setfsuid",
-    "setfsgid",
-    "getsid",
-    "capget",
-    "capset",
-    "rt_sigpending",
-    "rt_sigtimedwait",
-    "rt_sigqueueinfo",
-    "rt_sigsuspend",
-    "sigaltstack",
-    "utime",
-    "mknod",
-    "uselib",
-    "personality",
-    "ustat",
-    "statfs",
-    "fstatfs",
-    "sysfs",
-    "getpriority",
-    "setpriority",
-    "sched_setparam",
-    "sched_getparam",
-    "sched_setscheduler",
-    "sched_getscheduler",
-    "sched_get_priority_max",
-    "sched_get_priority_min",
-    "sched_rr_get_interval",
-    "mlock",
-    "munlock",
-    "mlockall",
-    "munlockall",
-    "vhangup",
-    "modify_ldt",
-    "pivot_root",
-    "_sysctl",
-    "prctl",
-    "arch_prctl",
-    "adjtimex",
-    "setrlimit",
-    "chroot",
-    "sync",
-    "acct",
-    "settimeofday",
-    "mount",
-    "umount2",
-    "swapon",
-    "swapoff",
-    "reboot",
-    "sethostname",
-    "setdomainname",
-    "iopl",
-    "ioperm",
-    "create_module",
-    "init_module",
-    "delete_module",
-    "get_kernel_syms",
-    "query_module",
-    "quotactl",
-    "nfsservctl",
-    "getpmsg",
-    "putpmsg",
-    "afs_syscall",
-    "tuxcall",
-    "security",
-    "gettid",
-    "readahead",
-    "setxattr",
-    "lsetxattr",
-    "fsetxattr",
-    "getxattr",
-    "lgetxattr",
-    "fgetxattr",
-    "listxattr",
-    "llistxattr",
-    "flistxattr",
-    "removexattr",
-    "lremovexattr",
-    "fremovexattr",
-    "tkill",
-    "time",
-    "futex",
-    "sched_setaffinity",
-    "sched_getaffinity",
-    "set_thread_area",
-    "io_setup",
-    "io_destroy",
-    "io_getevents",
-    "io_submit",
-    "io_cancel",
-    "get_thread_area",
-    "lookup_dcookie",
-    "epoll_create",
-    "epoll_ctl_old",
-    "epoll_wait_old",
-    "remap_file_pages",
-    "getdents64",
-    "set_tid_address",
-    "restart_syscall",
-    "semtimedop",
-    "fadvise64",
-    "timer_create",
-    "timer_settime",
-    "timer_gettime",
-    "timer_getoverrun",
-    "timer_delete",
-    "clock_settime",
-    "clock_gettime",
-    "clock_getres",
-    "clock_nanosleep",
-    "exit_group",
-    "epoll_wait",
-    "epoll_ctl",
-    "tgkill",
-    "utimes",
-    "vserver",
-    "mbind",
-    "set_mempolicy",
-    "get_mempolicy",
-    "mq_open",
-    "mq_unlink",
-    "mq_timedsend",
-    "mq_timedreceive",
-    "mq_notify",
-    "mq_getsetattr",
-    "kexec_load",
-    "waitid",
-    "add_key",
-    "request_key",
-    "keyctl",
-    "ioprio_set",
-    "ioprio_get",
-    "inotify_init",
-    "inotify_add_watch",
-    "inotify_rm_watch",
-    "migrate_pages",
-    "openat",
-    "mkdirat",
-    "mknodat",
-    "fchownat",
-    "futimesat",
-    "newfstatat",
-    "unlinkat",
-    "renameat",
-    "linkat",
-    "symlinkat",
-    "readlinkat",
-    "fchmodat",
-    "faccessat",
-    "pselect6",
-    "ppoll",
-    "unshare",
-    "set_robust_list",
-    "get_robust_list",
-    "splice",
-    "tee",
-    "sync_file_range",
-    "vmsplice",
-    "move_pages",
-    "utimensat",
-    "epoll_pwait",
-    "signalfd",
-    "timerfd_create",
-    "eventfd",
-    "fallocate",
-    "timerfd_settime",
-    "timerfd_gettime",
-    "accept4",
-    "signalfd4",
-    "eventfd2",
-    "epoll_create1",
-    "dup3",
-    "pipe2",
-    "inotify_init1",
-    "preadv",
-    "pwritev",
-    "rt_tgsigqueueinfo",
-    "perf_event_open",
-    "recvmmsg",
-    "fanotify_init",
-    "fanotify_mark",
-    "prlimit64",
-    "name_to_handle_at",
-    "open_by_handle_at",
-    "clock_adjtime",
-    "syncfs",
-    "sendmmsg",
-    "setns",
-    "getcpu",
-    "process_vm_readv",
-    "process_vm_writev"};
-
-/* These two functions are used for debugging. */
-void ocall_print_str(const char *str)
-{
-    printf("%s\n", str);
-}
-
-void ocall_print_syscallname(long sysno)
-{
-    if (sysno < 0 || sysno >= sizeof(syscall_name) / sizeof(char *))
-        printf("Invalid syscall No.: %d\n", (int)sysno);
-    else
-        printf("%s, %d\n", syscall_name[sysno], (int)sysno);
-}
-
-/* system calls */
-void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
-{
-    if (implemented)
+    if (!sgx_is_within_enclave(obj, len))
     {
-        //ocall_print_syscallname(sysno);
-        //printf("%s: return 0x%lx\n", fname, ret);
+        obj = malloc(len);
+        memcpy(obj, org, len);
     }
-    else
-    {
-        printf("sysno: %-4d not implemented!\n", (int)sysno);
-    }
-    //fflush(stdout);
+    return obj;
 }
 
-//void _syscall_exit(void)
-//{
-/* Destroy the enclave */
-//sgx_destroy_enclave(dynamo_eid);
-//}
-
-/*-----------------------------------syscalls with 0 parameters--------------------------*/
-long ocall_syscall_0(long sysno)
+/*--------------------------------------special syscalls-------------------------------------------*/
+void dumb(void)
 {
-    long ret;
-    bool b = false;
+}
 
-    switch (sysno)
+void ASSERT(int b)
+{
+    if (!b)
+        __asm__ __volatile__ ("int3");
+}
+
+void unimplemented_syscall(int sysno)
+{
+    ocall_print_syscallname(sysno);
+    ocall_print_str("The above syscall is not implemented, crash me!");
+
+    __asm__ __volatile__("int3"); // ASSERT(false);
+}
+
+#define MAX_SYSCALL_NO 330
+void (*syscalls[MAX_SYSCALL_NO])(void) = {dumb};
+
+/* sycall: arch_prctl */
+void sgx_ocall_syscall_arch_prctl(long *ret, long sysno, long code, unsigned long addr)
+{
+#define ARCH_SET_GS 0x1001
+#define ARCH_SET_FS 0x1002
+#define ARCH_GET_FS 0x1003
+#define ARCH_GET_GS 0x1004
+
+    switch (code)
     {
-    case SYS_getpid:
-    case SYS_gettid:
-    case SYS_geteuid:
-    case SYS_getuid:
-    case SYS_getegid:
-    case SYS_getgid:
-    case SYS_sched_yield:
-    case SYS_sync:
-        ret = syscall(sysno);
-        b = true;
+    case ARCH_SET_GS:
+        // Fix-me
+        // load_segment_gs(addr);
+        break;
+
+    case ARCH_SET_FS:
+        // Fix-me
+        // load_segment_fs(addr);
+        break;
+
+    case ARCH_GET_FS:
+        // Fix-me
+        // *(unsigned long*)addr = read_fsbase();
+        break;
+
+    case ARCH_GET_GS:
+        // Fix-me
+        // *(unsigned long*)addr = read_gsbase();
+        break;
+
+    default:
+        *ret = -1;
+        return;
         break;
     }
+    *ret = 0;
+}
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
+/* fcntl has variable parameters */
+long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
+{
+#define F_DUPFD 0 /* duplicate file descriptor, F_DUPFD (int) */
+#define F_GETFD 1 /* get file descriptor flags, F_GETFD (void) */
+#define F_SETFD 2 /* set file descriptor flags, F_SETFD (int) */
+#define F_GETFL 3 /* get file status flags, F_GETFL (void) */
+#define F_SETFL 4 /* set file status flags, F_SETFL (int) */
+#define F_GETLK 5
+#define F_SETLK 6
+#define len_flock 64
+    long ret = -1;
+
+    switch (cmd)
+    {
+    case F_DUPFD:
+    case F_SETFD:
+    case F_SETFL:
+        ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, arg1);
+        break;
+
+    case F_GETFD:
+    case F_GETFL:
+        ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, 0); /* tricky */
+        break;
+
+    case F_SETLK:
+        ocall_syscall_3_NNTi(&ret, SYS_fcntl, fd, cmd, (void *)arg1, len_flock);
+        break;
+
+    case F_GETLK:
+        ocall_syscall_3_NNTo(&ret, SYS_fcntl, fd, cmd, (void *)arg1, len_flock);
+        break;
+
+    default:
+        unimplemented_syscall(SYS_fcntl);
+        break;
+    }
 
     return ret;
 }
 
-/*-----------------------------------syscalls with 1 parameters--------------------------*/
-#include "rwlock.h"
-long ocall_syscall_1_N(long sysno, long N1)
+/* ioctl has variable parameters */
+long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
 {
-    long ret;
-    bool b = false;
+    long ret = -1;
+    
+    switch (cmd)
+    {
+    case FIONREAD:
+        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_fionread);
+        break;
+
+    default:
+        unimplemented_syscall(SYS_fcntl);
+        break;
+    }
+
+    return ret;
+}
+
+static inline void cleanup_exited_thread_inside_trace()
+{
+    extern unsigned long g_td_hctx_base_addr;
+
+    thread_helper_context_shadow *td_hctx_shdw = (thread_helper_context_shadow *)g_td_hctx_base_addr;
+    ASSERT((NULL != td_hctx_shdw ? 1 : 0));
+
+    int hcn = 0;
+    int tid = sgx_ocall_syscall_0(SYS_gettid);
+    int found = 0;
+    while (hcn < MAX_THREAD_NUM_EACH_ENCLAVE) 
+    {
+        /* the argument clone_child_stack as an index to find out which td_hctx_shdw[x] belongs to ECALL thread */
+        if (td_hctx_shdw[hcn].thread_id == tid && 0 != td_hctx_shdw[hcn].td_hctx_self)
+        {
+            unsigned long *pctid = (unsigned long *)td_hctx_shdw[hcn].clone_ctid;
+            *pctid = ( *pctid & (((unsigned long long)0xFFFFFFFF) << 32) ); 
+
+            found = 1;
+            break;
+        }
+        hcn++;
+    }
+
+    int pid = sgx_ocall_syscall_0(SYS_getpid);
+    if(tid != pid)
+        ASSERT(found && "Cleanup failed!");
+}
+
+/*--------------------------------------General syscalls-------------------------------------------*/
+
+//All syscalls with 0 parameters
+long sgx_ocall_syscall_0(long sysno)
+{
+    long ret = -1;
+
+    //ocall_print_syscallname(sysno);
+    ocall_syscall_0(&ret, sysno);
+
+    return ret;
+}
+
+//All syscalls with 1 parameters
+long sgx_ocall_syscall_1(long sysno, long _rdi)
+{
+    long ret = -1;
 
     switch (sysno)
     {
-    case SYS_close:
+    case SYS_chdir:
+    case SYS_chroot:
+    case SYS_acct:
+    case SYS_rmdir:
+    case SYS_unlink:
+    case SYS_shmdt:
+    case SYS_swapoff:
+    case SYS_mq_unlink:
+        ocall_syscall_1_S(&ret, sysno, (char *)_rdi);
+        break;
 
-    case SYS_exit_group: /* fix-me: allow out-encalve code to do cleanup */
-        if (SYS_exit_group == sysno)
-        {
-            extern rwlock_t lock_t;
-            fini_rwlock(&lock_t);
-        }
+    case SYS_pipe:
+        // unimplemented_syscall(sysno);
+        ocall_syscall_1_To(&ret, sysno, (long *)_rdi, len_pipefd);
+        break;
+
+    case SYS_set_tid_address:
+        ocall_syscall_1_Tio(&ret, sysno, (long*)_rdi, sizeof(int*));
+        break;
+
+    case SYS_time:
+        ocall_syscall_1_To(&ret, sysno, (long *)_rdi, len_time_t);
+        break;
+
+    case SYS_setgid:
+    case SYS_timer_getoverrun:
+    case SYS_brk:
+    case SYS_eventfd:
+    case SYS_io_destroy:
     case SYS_exit:
+        /* clean up occupying global inside and outside resources once one thread exited */
+        if (SYS_exit == sysno)
         {
-            int tid = syscall(SYS_gettid);
-            int pid = syscall(SYS_getpid);
+            /* start cleaning up thread inside trace */
+            int tid = sgx_ocall_syscall_0(SYS_gettid);
+            int pid = sgx_ocall_syscall_0(SYS_getpid);
             if(tid != pid)
-            {
-                if (SYS_exit == sysno)   
-                {
-                    #define MAX_THREAD_NUM_EACH_ENCLAVE 10
-                    extern sgx_thread_priv_params trd_priv_params[MAX_THREAD_NUM_EACH_ENCLAVE];
-                    extern volatile int g_trd_num;
-                    extern rwlock_t lock_t;
+                cleanup_exited_thread_inside_trace();
+            /* start cleaning up thread outside trace */
+            ocall_syscall_1_N(&ret, sysno, _rdi);
 
-                    int trd_num = 0;
-                    unsigned long tid = syscall(SYS_gettid);
-                    while (trd_num < MAX_THREAD_NUM_EACH_ENCLAVE) 
-                    {
-                        /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
-                        if (trd_priv_params[trd_num].thread_id == tid)
-                        {
-                            wtlock(&lock_t);
-                            memset(&trd_priv_params[trd_num], 0, sizeof(sgx_thread_priv_params));
-                            wtunlock(&lock_t);
-
-                            break;
-                        }
-                        trd_num++;
-                    }
-                }
-            }
+            break;
         }
-    case SYS_alarm:
+    case SYS_exit_group:
+    case SYS_fchdir:
     case SYS_fdatasync:
     case SYS_fsync:
-    case SYS_umask:
+    case SYS_syncfs:
     case SYS_dup:
+    case SYS_epoll_create1:
+    case SYS_inotify_init1:
+    case SYS_mlockall:
+    case SYS_setfsgid:
+    case SYS_umask:
+    case SYS_personality:
+    case SYS_getpgid:
+    case SYS_getsid:
+    case SYS_sched_getscheduler:
+    case SYS_sched_get_priority_max:
+    case SYS_sched_get_priority_min:
+    case SYS_alarm:
     case SYS_epoll_create:
-        ret = syscall(sysno, N1);
-        b = true;
+    case SYS_timer_delete:
+    case SYS_setfsuid:
+    case SYS_setuid:
+    case SYS_unshare:
+        ocall_syscall_1_N(&ret, sysno, _rdi);
         break;
-    }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_1_S(long sysno, char *S1)
-{
-    long ret;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_unlink:
-        ret = syscall(sysno, S1);
-        b = true;
+    case SYS_rt_sigreturn:
+        ret = ocall_sigreturn_simulation(_rdi);
         break;
-    }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_1_Ti(long sysno, void *T1, int l1)
-{
-    long ret;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_uname:
-    case SYS_set_thread_area:
-        ret = syscall(sysno, T1);
-        b = true;
+    case SYS_close:
+        if (sgx_mm_initialized && _rdi == SGX_PROCMAPS_FD)
+        {
+            close_procmaps_file();
+            ret = 0;
+        }
+        else
+        {
+            ocall_syscall_1_N(&ret, sysno, _rdi);
+        }
         break;
-    }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_1_To(long sysno, void *T1, int l1)
-{
-    long ret;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_uname:
     case SYS_get_thread_area:
-    case SYS_time:
+        /*int get_thread_area(struct user_desc *u_info);*/
+        ocall_syscall_1_To(&ret, sysno, (void *)_rdi, 16);
+        break;
+
+    case SYS_set_thread_area:
+        /*int set_thread_area(struct user_desc *u_info);*/
+        ocall_syscall_1_Ti(&ret, sysno, (void *)_rdi, 16);
+        break;
+
+    case SYS_afs_syscall:
+    case SYS_epoll_ctl_old:
+    case SYS_epoll_wait_old:
+    case SYS_getpmsg:
+    case SYS_nfsservctl:
+    case SYS_putpmsg:
+    case SYS_security:
+    case SYS_tuxcall:
+    case SYS_uselib:
+    case SYS_vserver:
+    case SYS_create_module:
+    case SYS_get_kernel_syms:
+    case SYS_query_module:
+        //ocall_syscall_1_not(&ret, sysno, _rdi);
+        unimplemented_syscall(sysno);
+        break;
+
+    case SYS__sysctl:
+        //ocall_syscall_1_sysctl(&ret, sysno, (struct __sysctl_args*)_rdi);
+        unimplemented_syscall(sysno);
+        break;
+
+    case SYS_uname:
+        ocall_syscall_1_To(&ret, sysno, (void *)_rdi, len_utsname);
+        break;
+
     case SYS_times:
+        ocall_syscall_1_To(&ret, sysno, (void *)_rdi, len_tms);
+        break;
+
     case SYS_sysinfo:
-    case SYS_pipe:
-        ret = syscall(sysno, T1);
-        b = true;
+        ocall_syscall_1_To(&ret, sysno, (void *)_rdi, len_sysinfo);
+        break;
+
+    case SYS_adjtimex:
+        //ocall_syscall_1_timex(&ret, sysno, (struct timex*)_rdi);
+        unimplemented_syscall(sysno);
+        break;
+
+    default:
+        unimplemented_syscall(sysno);
         break;
     }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
 
-long ocall_syscall_1_Tio(long sysno, void *T1, int l1)
+#include <string.h>
+//All syscalls with 2 parameters
+long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
 {
-    long ret;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_set_tid_address:
-        ret = syscall(sysno, T1);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-/*long ocall_syscall_1_not(long sysno, long unimplemented)*/
-/*{*/
-/*return syscall(sysno, unimplemented);*/
-/*}*/
-
-/*long ocall_syscall_1_sysctl(long sysno, struct __sysctl_args* args)*/
-/*{*/
-/*return syscall(sysno, args);*/
-/*}*/
-
-/*long ocall_syscall_1_uname(long sysno, struct old_utsname* uname)*/
-/*{*/
-/*return syscall(sysno, uname);*/
-/*}*/
-
-/*long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info)*/
-/*{*/
-/*return syscall(sysno, info);*/
-/*}*/
-
-/*long ocall_syscall_1_timex(long sysno, struct timex* time)*/
-/*{*/
-/*return syscall(sysno, time);*/
-/*}*/
-
-/*[> OCall functions <]*/
-/*void ocall_all_syscalls(const char *str)*/
-/*{*/
-/* Proxy/Bridge will check the length and null-terminate
- * the input string to prevent buffer overflow.
- */
-/*printf("%s", str);*/
-/*}*/
-
-/*-----------------------------------syscalls with 2 parameters--------------------------*/
-long ocall_syscall_2_NN(long sysno, long N1, long N2)
-{
-    long ret = 0;
-    bool b = false;
+    long ret = -1;
+    byte *addr;
 
     switch (sysno)
     {
     case SYS_munmap:
+        /* free external block */
+        addr = sgx_mm_itn2ext((byte *)_rdi);
+        sgx_mm_munmap(addr, _rsi);
+        ocall_syscall_2_NN(&ret, sysno, (ulong)addr, _rsi);
+        break;
+
     case SYS_ftruncate:
-    case SYS_arch_prctl:
     case SYS_dup2:
-    case SYS_kill:
     case SYS_listen:
-        ret = syscall(sysno, N1, N2);
-        b = true;
+    case SYS_kill:
+        ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
         break;
-    }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
+    case SYS_setrlimit:
+        ocall_syscall_2_NTi(&ret, sysno, _rdi, (void *)_rsi, len_rlimit);
+        break;
 
-    return ret;
-}
-
-long ocall_syscall_2_NTi(long sysno, long N1, void *T2, int l2)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_setrlimit)
-    {
-        ret = syscall(sysno, N1, T2);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_NTo(long sysno, long N1, void *T2, int l2)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_getrlimit:
     case SYS_fstat:
+        ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_stat);
+        break;
+
+    case SYS_getrlimit:
+        ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_rlimit);
+        break;
+
     case SYS_getitimer:
+        ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_itimerval);
+        break;
+
     case SYS_getrusage:
+        ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_rusage);
+        break;
+
     case SYS_clock_gettime:
-        ret = syscall(sysno, N1, T2);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_PiN(long sysno, void *P1, long N2)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_set_robust_list:
-        ret = syscall(sysno, P1, N2);
-        b = true;
+        ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_timespec);
         break;
 
-    default:
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_PoN(long sysno, void *P1, long N2)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_getcwd:
-    case SYS_set_robust_list:
-        ret = syscall(sysno, P1, N2);
-        b = true;
-        break;
-
-    default:
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_SN(long sysno, const char *S1, long N2)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
     case SYS_mkdir:
     case SYS_access:
     case SYS_creat:
     case SYS_chmod:
-        ret = syscall(sysno, S1, N2);
-        b = true;
+        ocall_syscall_2_SN(&ret, sysno, (const char *)_rdi, _rsi);
         break;
-    }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_STi(long sysno, const char *S1, void *T2, int l2)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
     case SYS_utime:
-        ret = syscall(sysno, S1, T2);
-        b = true;
+        ocall_syscall_2_STi(&ret, sysno, (const char *)_rdi, (void *)_rsi, len_utimbuf);
         break;
 
-    default:
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_STo(long sysno, const char *S1, void *T2, int l2)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
     case SYS_stat:
     case SYS_lstat:
-        ret = syscall(sysno, S1, T2);
-        b = true;
+        ocall_syscall_2_STo(&ret, sysno, (const char *)_rdi, (void *)_rsi, len_stat);
+        break;
+
+    case SYS_getcwd:
+        ocall_syscall_2_PoN(&ret, sysno, (void *)_rdi, _rsi);
+        break;
+
+    case SYS_gettimeofday:
+        ocall_syscall_2_ToN(&ret, sysno, (void *)_rdi, 16, _rsi);
+        break;
+
+    case SYS_arch_prctl:
+        sgx_ocall_syscall_arch_prctl(&ret, sysno, _rdi, _rsi);
+        break;
+
+    case SYS_sigaltstack:
+        ret = ocall_sigaltstack(_rdi, _rsi);
+        break;
+
+    case SYS_set_robust_list:
+        ocall_syscall_2_PoN(&ret, sysno, (void *)_rdi, _rsi);
+        break;
+
+    case SYS_nanosleep:
+        ocall_syscall_2_TiTo(&ret, sysno, (void*)_rdi, (void*)_rsi, len_timespec);
         break;
 
     default:
+        unimplemented_syscall(sysno);
         break;
     }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
     return ret;
 }
 
-long ocall_syscall_2_TiN(long sysno, void *T1, int l1, long N2)
+//All syscalls with 3 parameters
+long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 {
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_open)
-    {
-        ret = syscall(sysno, T1, N2);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_ToN(long sysno, void *T1, int l1, long N2)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_gettimeofday)
-    {
-        ret = syscall(sysno, T1, N2);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_2_TiTo(long sysno, void *Ti, void *To, int len)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_nanosleep) {
-        ret = syscall(sysno, Ti, To);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-/*-----------------------------------syscalls with 3 parameters--------------------------*/
-long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_tgkill:
-    case SYS_lseek:
-    case SYS_socket:
-    case SYS_mprotect:
-    case SYS_fcntl:
-        ret = syscall(sysno, N1, N2, N3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NNPi(long sysno, long N1, long N2, void *P3, int l3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_ioctl:
-        ret = syscall(sysno, N1, N2, P3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NNPo(long sysno, long N1, long N2, void *P3, int l3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_ioctl:
-        ret = syscall(sysno, N1, N2, P3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NNPio(long sysno, long N1, long N2, void *P3, int l3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_ioctl:
-        ret = syscall(sysno, N1, N2, P3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NNTi(long sysno, long N1, long N2, void *T3, int l3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_fcntl:
-        ret = syscall(sysno, N1, N2, T3);
-
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NNTo(long sysno, long N1, long N2, void *T3, int l3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_fcntl:
-        ret = syscall(sysno, N1, N2, T3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NPiN(long sysno, long N1, void *P2, long N3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_write:
-        ret = syscall(sysno, N1, P2, N3);
-        b = true;
-        /*sync();*/
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NPoN(long sysno, long N1, void *P2, long N3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_read:
-    case SYS_getdents:
-    case SYS_getdents64:
-    case SYS_connect:
-    case SYS_bind:
-        ret = syscall(sysno, N1, P2, N3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NTiNP(long sysno, long N1, void *Ti, int bsize, long N2, void *pi, int len)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno) 
-    {
-    case SYS_writev:
-        {   
-            #define len_factor              2
-            #define len_step                1
-            #define sizeof_struct_iovec     sizeof(long) * 2
-            int size = N2 * sizeof_struct_iovec;
-            char *Ti_bank = (char *)malloc(size + 1);
-            memset(Ti_bank, 0, size + 1);
-            memcpy(Ti_bank, Ti, size);
-            
-            unsigned long *p = (unsigned long *)Ti;
-            char *p1 = (char *)pi;
-            for (int i = 0; i < N2; i++)
-            {
-                int idx_iov = i * len_factor;
-                int idx_size = idx_iov + len_step;
-
-                char *iov_shadow = (char *)malloc(p[idx_size] + 1);
-                memset(iov_shadow, 0, p[idx_size] + 1);
-                memcpy(iov_shadow, p1, p[idx_size]);
-
-                p1 += p[idx_size];
-                p[idx_iov] = (unsigned long)iov_shadow;
-            }
-
-            ret = syscall(sysno, N1, Ti, N2);
-            memcpy(Ti, Ti_bank, size);
-
-            free(Ti_bank);
-            Ti_bank = NULL;
-
-            b = true;
-            break;
-        }
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NToN(long sysno, long N1, void *T2, int l2, long N3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_readv:
-        ret = syscall(sysno, N1, T2, N3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NTiTo(long sysno, long N1, void *T2, int l2, void *T3, int l3)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_setitimer)
-    {
-        ret = syscall(sysno, N1, T2, T3);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_NToTio(long sysno, long N1, void *T2, int l2, void *T3, int l3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_getpeername:
-    case SYS_getsockname:
-        ret = syscall(sysno, N1, T2, T3);
-
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_SNN(long sysno, const char *S1, long N2, long N3)
-{
-    long ret = 0;
-    bool b = false;
+    long ret = -1;
+    char *s, *t;
+    byte *addr;
+    int sz;
 
     switch (sysno)
     {
     case SYS_open:
-        ret = syscall(sysno, S1, N2, N3);
-        b = true;
+        s = (char *)_rdi;
+        t = gen_enclave_copy(s, strlen(s) + 1);
+
+        if (sgx_mm_initialized && strcmp(t, "/proc/self/maps") == 0 /*|| strcmp(t, "/proc//tid//maps") == 0*/)
+        {
+            open_procmaps_file();
+            ret = SGX_PROCMAPS_FD;
+        }
+        else
+        {
+            ocall_syscall_3_SNN(&ret, sysno, t, _rsi, _rdx);
+
+            /* bind the fid with filename */
+            if (ret != -1)
+                sgx_vma_set_cmt(ret, t);
+        }
+
+        /* free the enclave copy */
+        if (t != s)
+            free(t);
+        break;
+
+    case SYS_tgkill:
+    case SYS_lseek:
+    case SYS_socket:
+    case SYS_fchown:
+    case SYS_shmget:
+        ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
+        break;
+
+    case SYS_read:
+        if (sgx_mm_initialized && _rdi == SGX_PROCMAPS_FD)
+        {
+            ret = read_procmaps_file((char *)_rsi, _rdx);
+        }
+        else
+        {
+            ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
+        }
+        break;
+
+    case SYS_write:
+        ocall_syscall_3_NPiN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
+        break;
+
+    case SYS_readv:
+        ocall_syscall_3_NToN(&ret, sysno, _rdi, (void *)_rsi, len_iovec, _rdx);
+        break;
+
+    case SYS_bind:
+    case SYS_connect:
+        ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
+        break;
+
+    case SYS_getpeername:
+    case SYS_getsockname:
+        sz = *(int *)_rdx;
+        ocall_syscall_3_NToTio(&ret, sysno, _rdi, (void *)_rsi, sz, (int *)_rdx, len_socklen_t);
+        break;
+
+    case SYS_writev:
+        {
+            int size = 0;
+            unsigned long *p = (unsigned long *)_rsi;
+            for (int i = 0; i < _rdx; i++)
+                size += p[i * len_factor + len_step];
+            char *iov_addr = (char *)malloc(size + 1);
+            memset(iov_addr, 0, size + 1);
+            unsigned long iovp = (unsigned long)iov_addr;
+
+            for (int i = 0; i < _rdx; i++)
+            {
+                int idx_iov = i * len_factor;
+                int idx_size = idx_iov + len_step;
+                memcpy((void*)iov_addr, (void*)p[idx_iov], p[idx_size]);
+
+                iov_addr += p[idx_size];
+            }
+
+            ocall_syscall_3_NTiNP(&ret, sysno, _rdi, (void*)_rsi, _rdx * len_iovec, _rdx, (void*)iovp, size + 1);
+
+            // free(iov_addr);
+            // iov_addr = NULL;
+            break;
+        }
+
+    case SYS_poll:
+        ocall_syscall_3_ToNN(&ret, sysno, (void *)_rdi, len_pollfd, _rsi, _rdx);
+        break;
+
+    case SYS_mprotect:
+        {
+            addr = sgx_mm_itn2ext((byte *)_rdi);
+
+            ocall_syscall_3_NNN(&ret, sysno, (ulong)addr, _rsi, _rdx);
+
+            if (ret == 0)
+            {
+                // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
+                ret = sgx_mm_mprotect(addr, _rsi, _rdx);
+            }
+            break;
+        }
+
+    case SYS_getdents:
+    case SYS_getdents64:
+        ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
+        break;
+
+    case SYS_setitimer:
+        ocall_syscall_3_NTiTo(&ret, sysno, _rdi, (void *)_rsi, len_itimerval, (void *)_rdx, len_itimerval);
         break;
 
     case SYS_chown:
-        ret = syscall(sysno, S1, N2, N3);
-        b = true;
+        ocall_syscall_3_SNN(&ret, sysno, (const char *)_rdi, _rsi, _rdx);
         break;
-    }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_3_SPoN(long sysno, const char *S1, void *P2, long N3)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
     case SYS_readlink:
-        ret = syscall(sysno, S1, P2, N3);
-        b = true;
+        ocall_syscall_3_SPoN(&ret, sysno, (const char *)_rdi, (void *)_rsi, _rdx);
+        break;
+
+    case SYS_fcntl:
+        ret = sgx_ocall_syscall_fcntl(_rdi, _rsi, _rdx);
+        break;
+
+    case SYS_ioctl:
+        ret = sgx_ocall_syscall_ioctl(_rdi, _rsi, _rdx);
+        break;
+
+    default:
+        unimplemented_syscall(sysno);
         break;
     }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
     return ret;
 }
 
-long ocall_syscall_3_ToNN(long sysno, void *T1, int l1, long N2, long N3)
+long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 {
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_poll:
-        ret = syscall(sysno, T1, N2, N3);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-/*-----------------------------------syscalls with 4 parameters--------------------------*/
-long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_mremap)
-    {
-        ret = syscall(sysno, N1, N2, N3, N4);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_4_NNNTo(long sysno, long N1, long N2, long N3, void *T4, int l4)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_socketpair)
-    {
-        ret = syscall(sysno, N1, N2, N3, T4);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_4_NToNN(long sysno, long N1, void *T2, int l2, long N3, long N4)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno)
-    {
-    case SYS_sendmmsg:
-        ret = syscall(sysno, N1, T2, N3, N4);
-        b = true;
-        break;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_4_NTiToN(long sysno, long N1, void *T2, int l2, void *T3, int l3, long N4)
-{
-    long ret = 0;
-    bool b = false;
+    long ret = -1;
+    byte *addr;
 
     switch (sysno)
     {
     case SYS_rt_sigaction:
+        // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
+        ret = ocall_rt_sigaction(_rdi, _rsi, _rdx, _r10);
+        break;
+
     case SYS_rt_sigprocmask:
+        // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
+        ret = ocall_rt_sigprocmask(_rdi, _rsi, _rdx, _r10);
+        break;
+
+    case SYS_epoll_ctl:
+        ocall_syscall_4_NNNTio(&ret, sysno, _rdi, _rsi, _rdx, (void*)_r10, len_epoll_event);
+        break;
+
+    case SYS_epoll_wait:
+        ocall_syscall_4_NTioNN(&ret, sysno, _rdi, (void*)_rsi, _rdx, _r10, len_epoll_event * MAX_EPOLL_EVENTS);
+        break;
+
     case SYS_accept4:
-        ret = syscall(sysno, N1, T2, T3, N4);
-        b = true;
+        ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_sockaddr, (void*)_rdx, len_socklen_t, _r10);
+        break;
+
+    case SYS_mremap:
+        {
+            #define EAGAIN      11
+            #define ENOMEM      12
+            #define EFAULT      14
+            #define EINVAL      22
+            
+            addr = sgx_mm_itn2ext((byte*)_rdi);
+
+            ocall_syscall_4_NNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10);
+
+            if (ret != -1 && ret != -ENOMEM) {
+                // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
+                ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
+            }
+            break;
+        }
+
+    case SYS_sendmmsg:
+        ocall_syscall_4_NToNN(&ret, sysno, _rdi, (void *)_rsi, len_mmsghdr, _rdx, _r10);
+        break;
+
+    case SYS_socketpair:
+        ocall_syscall_4_NNNTo(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, len_socketpair);
+        break;
+
+    default:
+        unimplemented_syscall(sysno);
         break;
     }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
     return ret;
 }
 
-long ocall_syscall_4_NNNTio(long sysno, long N1, long N2, long N3, void* Tio, long l1)
+long sgx_ocall_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8)
 {
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno) {
-    case SYS_epoll_ctl:
-        {
-            ret = syscall(sysno, N1, N2, N3, Tio);
-            b = true;
-            break;
-        }
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-/* epoll_wait() */
-static volatile int epoll_wait_flag = 0;
-static unsigned long epoll_wait_event = 0;
-long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, long l1)
-{
-    long ret = 0;
-    bool b = false;
-
-    switch (sysno) {
-    case SYS_epoll_wait:
-        {
-            #define sizeof_epoll_event       12
-            int size = N3 * sizeof_epoll_event;
-            char *pevents = NULL;
-            if (!epoll_wait_flag)
-            {
-                epoll_wait_flag = 1;
-
-                pevents = (char *)mmap(NULL, size + 1, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-                memset(pevents, 0, size + 1);
-                epoll_wait_event = (unsigned long)pevents;
-            }
-            else
-                pevents = (char *)epoll_wait_event;
-            
-            assert(MAP_FAILED != pevents && NULL != pevents);
-            memcpy(pevents, Tio, l1);
-
-            ret = syscall(sysno, N1, (void*)pevents, N3, N4);
-
-            if (ret > 0)
-            {
-                if (ret > 10)   ret = 10;
-                memcpy(Tio, pevents, ret * sizeof_epoll_event);
-            }
-            b = true;
-            break;
-        }
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-/*-----------------------------------syscalls with 5 parameters--------------------------*/
-long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5)
-{
-    long ret = 0;
-    bool b = false;
-
+    long ret = -1;
+    int sz;
     switch (sysno)
     {
     case SYS_prctl:
-        ret = syscall(sysno, N1, N2, N3, N4, N5);
-        b = true;
+        ocall_syscall_5_NNNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10, _r8);
         break;
-    }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-long ocall_syscall_5_NNNPiN(long sysno, long N1, long N2, long N3, void *P4, long N5)
-{
-    long ret = 0;
-    bool b = false;
-    switch (sysno)
-    {
     case SYS_setsockopt:
-        ret = syscall(sysno, N1, N2, N3, P4, N5);
-        b = true;
+        ocall_syscall_5_NNNPiN(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, _r8);
+        break;
+
+    case SYS_getsockopt:
+        sz = *(int *)_r8;
+        ocall_syscall_5_NNNToTio(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, sz, (socklen_t *)_r8, len_socklen_t);
+        break;
+
+    case SYS_clone:
+        ocall_syscall_5_NPiNPoPoN(&ret, sysno, (ulong)_rdi, (void *)_rsi, _rsi, len_child_stack, (int *)_rdx, (int *)_r10, _r10, (ulong)_r8); 
+        break;
+
+    default:
+        unimplemented_syscall(sysno);
         break;
     }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
 
     return ret;
 }
 
-long ocall_syscall_5_NNNToTio(long sysno, long N1, long N2, long N3, void *T4, int l4, void *T5, int l5)
+long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
-    long ret = 0;
-    bool b = false;
+    long ret = -1;
+    byte *addr;
+    int sz;
+
     switch (sysno)
     {
-    case SYS_getsockopt:
-        ret = syscall(sysno, N1, N2, N3, T4, T5);
-        b = true;
+    case SYS_mmap:
+        addr = sgx_mm_itn2ext((byte *)_rdi);
+
+        ocall_syscall_6_NNNNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10, _r8, _r9);
+        /* return internal address */
+        if (ret != -1)
+        {
+            // byte* sgx_mm_mmap(byte* ext_addr, size_t len, ulong prot, ulong flags, int fd, ulong offs)
+            ret = (ulong)sgx_mm_mmap((byte *)ret, _rsi, _rdx, _r10, (int)_r8, _r9);
+        }
+        break;
+
+    case SYS_futex:
+        ocall_syscall_6_TioNNTiNN(&ret, sysno, (int *)_rdi, 4, _rsi, _rdx, (void *)_r10, len_timespec, (int *)_r8, 4, _r9);
+        break;
+
+    case SYS_sendto:
+        ocall_syscall_6_NPiNNPiN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, _r9);
+        break;
+
+    case SYS_recvfrom:
+        sz = *(int *)_r9;
+        ocall_syscall_6_NPoNNToTo(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, sz, (int *)_r9, len_socklen_t);
+        break;
+
+    default:
+        unimplemented_syscall(sysno);
         break;
     }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
     return ret;
 }
 
-#include "thread_helper.h"
-long ocall_syscall_5_NPiNPoPoN(long sysno, unsigned long N1, void *Pi, unsigned long N2, size_t child_stack, int *Po1, int *Po2, unsigned long po12, unsigned long N3)
+extern void dynamorio_to_sgxdbi_stub(long ret);
+long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9)
 {
-    long ret = 0;
-    bool b = false;
-
-    sgx_thread_priv_params trd_params;
-
-    if (sysno == SYS_clone) {
-
-        trd_params.flags = N1;
-        trd_params.child_stack = N2;
-        trd_params.ptid = (unsigned long)Po1;
-        trd_params.ctid = (unsigned long)Po2;
-        trd_params.pcid_inaddr = po12;
-        trd_params.newtls = N3;
-
-        extern sgx_enclave_id_t dynamo_eid;
-        trd_params.current_eid = dynamo_eid;
-
-        ret = thread_setup_agent(&trd_params);
-        if (ret == -1)
-            printf("thread setup failed!\n");
-        
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
-}
-
-/*-----------------------------------syscalls with 5 parameters--------------------------*/
-long ocall_syscall_6_NNNNNN(long sysno, long N1, long N2, long N3, long N4, long N5, long N6)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_mmap)
+    /*fixing-up them with a sysno-to-function table*/
+    switch (sysno)
     {
-        ret = syscall(sysno, N1, N2, N3, N4, N5, N6);
-        b = true;
+        //No parameter
+    case SYS_getpid:
+    case SYS_gettid:
+    case SYS_geteuid:
+    case SYS_getuid:
+    case SYS_getgid:
+    case SYS_getegid:
+    case SYS_sched_yield:
+    case SYS_sync:
+        return sgx_ocall_syscall_0(sysno);
+        break;
+
+        //One paramter
+    case SYS_close:
+    case SYS_unlink:
+    case SYS_uname:
+    case SYS_time:
+    case SYS_times:
+    case SYS_dup:
+    case SYS_set_tid_address:
+    case SYS_sysinfo:
+    case SYS_alarm:
+    case SYS_fdatasync:
+    case SYS_fsync:
+    case SYS_umask:
+    case SYS_rt_sigreturn:
+    case SYS_pipe:
+        /*case SYS_set_thread_area:*/
+        /*case SYS_get_thread_area:*/
+        return sgx_ocall_syscall_1(sysno, _rdi);
+        break;
+
+    case SYS_epoll_create:
+        return sgx_ocall_syscall_1(sysno, _rdi);
+        break;
+    case SYS_exit:
+        return sgx_ocall_syscall_1(sysno, _rdi);
+        break;
+    case SYS_exit_group:
+        dynamorio_to_sgxdbi_stub(0);
+        /* unexpected_return(); */
+        return -1;
+        break;
+
+        //Two paramters
+    case SYS_fstat:
+    case SYS_munmap:
+    case SYS_gettimeofday:
+    case SYS_getrlimit:
+    case SYS_setrlimit:
+    case SYS_arch_prctl:
+    case SYS_getitimer:
+    case SYS_stat:
+    case SYS_lstat:
+    case SYS_mkdir:
+    case SYS_access:
+    case SYS_creat:
+    case SYS_chmod:
+    case SYS_utime:
+    case SYS_getcwd:
+    case SYS_getrusage:
+    case SYS_set_robust_list:
+    case SYS_clock_gettime:
+    case SYS_ftruncate:
+    case SYS_kill:
+    case SYS_dup2:
+    case SYS_listen:
+    case SYS_nanosleep:
+        return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
+        break;
+
+        //Three paramters
+    /* FIXME: //cdd here we simply ignore giving advice to kernel as they are different world */
+    // off: signals, on: pthread
+    // case SYS_madvise:
+    case SYS_tgkill:
+    case SYS_open:
+    case SYS_read:
+    case SYS_write:
+    case SYS_readv:
+    case SYS_writev:
+    case SYS_mprotect:
+    case SYS_getdents:
+    case SYS_getdents64:
+    case SYS_setitimer:
+    case SYS_chown:
+    case SYS_lseek:
+    case SYS_socket:
+    case SYS_fchown:
+    case SYS_shmget:
+    case SYS_connect:
+    case SYS_readlink:
+    case SYS_ioctl:
+    case SYS_bind:
+    case SYS_poll:
+    case SYS_getpeername:
+    case SYS_getsockname:
+        return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
+        break;
+
+        //Four parameters
+    case SYS_rt_sigaction:
+    case SYS_rt_sigprocmask:
+    case SYS_epoll_ctl:
+    case SYS_epoll_wait:
+    case SYS_accept4:
+    case SYS_mremap:
+    case SYS_sendmmsg:
+    case SYS_socketpair:
+        return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
+        break;
+
+        //Five parameters
+    case SYS_prctl:
+    case SYS_setsockopt:
+    case SYS_getsockopt:
+    case SYS_clone:
+        return sgx_ocall_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
+        break;
+
+        //Six parameters
+    case SYS_mmap:
+    case SYS_futex:
+    case SYS_sendto:
+    case SYS_recvfrom:
+        return sgx_ocall_syscall_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
+        break;
+
+        //variable parameters
+    case SYS_fcntl:
+        return sgx_ocall_syscall_fcntl(_rdi, _rsi, _rdx);
+        break;
+
+    default:
+        unimplemented_syscall(sysno);
+        return -1;
+        break;
     }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-
-    return ret;
 }
 
-long ocall_syscall_6_NPiNNPiN(long sysno, long N1, void *P2, long N3, long N4, void *P5, long N6)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_sendto)
-    {
-        ret = syscall(sysno, N1, P2, N3, N4, P5, N6);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-    return ret;
-}
-
-long ocall_syscall_6_NPoNNToTo(long sysno, long N1, void *P2, long N3, long N4, void *T5, int l5, void *T6, int l6)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_recvfrom)
-    {
-        ret = syscall(sysno, N1, P2, N3, N4, T5, T6);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-    return ret;
-}
-
-long ocall_syscall_6_TioNNTiNN(long sysno, void *T1, int l1, long N2, long N3, void *T4, int l4, void *T5, int l5, long N6)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_futex)
-    {
-        ret = syscall(sysno, T1, N2, N3, T4, T5, N6);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-}
-
-long set_tid_ntrd(long sysno)
-{
-    long ret = 0;
-    bool b = false;
-
-    if (sysno == SYS_gettid) {
-        ret = syscall(sysno);
-        b = true;
-    }
-
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-    return ret;
-}
