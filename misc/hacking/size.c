@@ -44,7 +44,7 @@
 #define len_sigset_t 8
 #define len_size_t 8
 #define len_stack_t 24
-#define len_epoll_event 16
+#define len_epoll_event 12
 #define len_file_handle 8
 #define len_getcpu_cache 128
 #define len_iocb 64

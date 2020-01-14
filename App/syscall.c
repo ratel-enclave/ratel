@@ -559,6 +559,7 @@ long ocall_syscall_1_To(long sysno, void *T1, int l1)
     case SYS_time:
     case SYS_times:
     case SYS_sysinfo:
+    case SYS_pipe:
         ret = syscall(sysno, T1);
         b = true;
         break;
@@ -1168,6 +1169,23 @@ long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
 
     return ret;
 }
+
+long ocall_syscall_4_NNNTo(long sysno, long N1, long N2, long N3, void *T4, int l4)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_socketpair)
+    {
+        ret = syscall(sysno, N1, N2, N3, T4);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_4_NToNN(long sysno, long N1, void *T2, int l2, long N3, long N4)
 {
     long ret = 0;
@@ -1255,8 +1273,11 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
 
             ret = syscall(sysno, N1, (void*)pevents, N3, N4);
 
-            if (ret > 10)   ret = 10;
-            memcpy(Tio, pevents, ret * sizeof_epoll_event);
+            if (ret > 0)
+            {
+                if (ret > 10)   ret = 10;
+                memcpy(Tio, pevents, ret * sizeof_epoll_event);
+            }
             b = true;
             break;
         }

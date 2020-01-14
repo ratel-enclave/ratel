@@ -46,7 +46,7 @@
 #define len_kernel_sigset 8
 #define len_size_t 8
 #define len_stack_t 24
-#define len_epoll_event 16
+#define len_epoll_event 12
 #define len_file_handle 8
 #define len_getcpu_cache 128
 #define len_iocb 64
@@ -92,7 +92,6 @@
 #define len_utimbuf 16
 #define len_timespec 16
 #define len_timer_t 4
-#define len_time_t 8
 #define len_u32 4
 #define len_u64 8
 #define len_uid_t 4
@@ -110,5 +109,7 @@
 #define len_fionread 4
 #define len_factor 2
 #define len_step 1
+#define len_socketpair sizeof(int)*2
+#define len_pipefd sizeof(int)*2
 
 #endif  //#define _ST_SIZE_H__
