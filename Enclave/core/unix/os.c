@@ -2683,9 +2683,10 @@ detach_finalize_cleanup(void)
 }
 
 static pid_t
-get_process_group_id()
+get_process_group_id(pid_t pid)
 {
-    return dynamorio_syscall(SYS_getpgid, 0);
+    // return dynamorio_syscall(SYS_getpgid, 0);  //cdd -- buggy
+    return dynamorio_syscall(SYS_getpgid, 1, pid);
 }
 
 #endif /* !NOT_DYNAMORIO_CORE_PROPER: around most of file, to exclude preload */
@@ -7351,7 +7352,7 @@ pre_system_call(dcontext_t *dcontext)
             "thread "TIDFMT" sending signal %d to pid "PIDFMT"\n",
             get_thread_id(), sig, pid);
         /* We check whether targeting this process or this process group */
-        if (pid == get_process_id() || pid == 0 || pid == -get_process_group_id()) {
+        if (pid == get_process_id() || pid == 0 || pid == -get_process_group_id(pid)) {
             handle_self_signal(dcontext, sig);
         }
         break;

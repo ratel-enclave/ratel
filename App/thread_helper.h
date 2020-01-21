@@ -1,4 +1,4 @@
- /* file: test_extern_c.h */
+ /* added in 10/2019 */
  
 #ifndef __THREAD_EXTERN_C_H__
 #define __THREAD_EXTERN_C_H__

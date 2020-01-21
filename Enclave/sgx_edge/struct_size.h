@@ -15,7 +15,6 @@
 #define len_timezone 8
 #define len_ustat 32
 #define len_utimbuf 16
-#define len_timespec 16
 #define len_timer_t 4
 #define len_time_t 8
 #define len_tms 32
@@ -61,6 +60,7 @@
 #define len_mq_attr 32
 #define len_msgbuf 16
 #define len_msghdr 88
+// #define len_msghdr 56
 #define len_msqid_ds 104
 #define len_utsname 390
 #define len_perf_event_attr 112
@@ -84,13 +84,11 @@
 #define len___sysctl_args 80
 #define len_sysinfo 112
 #define len_task_struct 6848
-#define len_timespec 16
 #define len_timeval 16
 #define len_timex 208
 #define len_timezone 8
 #define len_ustat 32
 #define len_utimbuf 16
-#define len_timespec 16
 #define len_timer_t 4
 #define len_u32 4
 #define len_u64 8
@@ -107,9 +105,8 @@
 #define FIONREAD 0x541B
 #define len_ioctl 512
 #define len_fionread 4
-#define len_factor 2
-#define len_step 1
 #define len_socketpair sizeof(int)*2
 #define len_pipefd sizeof(int)*2
+#define len_name 80
 
 #endif  //#define _ST_SIZE_H__

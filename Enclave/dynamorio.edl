@@ -138,7 +138,10 @@ enclave {
         long ocall_syscall_2_ToN(long sysno, [out, size=l1] void *T1, int l1, long N2);
 
         /* int nanosleep(const struct timespec *req, struct timespec *rem); */
-        long ocall_syscall_2_TiTo(long sysno, [in, size=l] void *Ti, [out, size=l] void *To, int l);
+        long ocall_syscall_2_TiTo(long sysno, [in, size=l] void *T1, [out, size=l] void *T2, int l);
+
+        /* int rename(const char *oldpath, const char *newpath); */
+        long ocall_syscall_2_TiTi(long sysno, [in, size=l] void *T1, [in, size=l] void *T2, int l);
 
 
         /****************************syscalls with 3 paramters**********************************************/
@@ -190,6 +193,11 @@ enclave {
         //int poll(struct pollfd *fds, nfds_t nfds, int timeout);
         long ocall_syscall_3_ToNN(long sysno, [out, size=l1] void *T1, int l1,long N2, long N3);
 
+        /* ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags); */
+        long ocall_syscall_3_NTiNPTi(long sysno, long N1, [in, size=l2] void *T2, int l2, long N3, [in, size=l4] void *P4, int l4, [in, size=l5] void *T5, int l5);
+
+        /* ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags); */
+        long ocall_syscall_3_NTiNPP(long sysno, long N1, [in, size=l2] void *T2, int l2, long N3, [out, size=l4] void *P4, int l4, [out, size=l5] void *P5, int l5);
 
         /****************************syscalls with 4 paramters**********************************************/
         //void *mremap(void *old_address, size_t old_size, size_t new_size, int flags);

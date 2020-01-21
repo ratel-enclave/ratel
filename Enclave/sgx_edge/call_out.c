@@ -24,6 +24,7 @@ functions according to the syscall_no and parameters_count.
 #include "sgx_signal.h"
 
 #include "call_out.h"
+#include "complex.h"
 
 extern void load_segment_fs(void *tls_segment);
 extern void load_segment_gs(void *tls_segment);
@@ -52,12 +53,6 @@ void *gen_enclave_copy(void *org, int len)
 /*--------------------------------------special syscalls-------------------------------------------*/
 void dumb(void)
 {
-}
-
-void ASSERT(int b)
-{
-    if (!b)
-        __asm__ __volatile__ ("int3");
 }
 
 void unimplemented_syscall(int sysno)
@@ -448,6 +443,10 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         ocall_syscall_2_TiTo(&ret, sysno, (void*)_rdi, (void*)_rsi, len_timespec);
         break;
 
+    case SYS_rename:
+        ocall_syscall_2_TiTi(&ret, sysno, (void*)_rdi, (void*)_rsi, len_name);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -529,24 +528,22 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
     case SYS_writev:
         {
-            int size = 0;
-            unsigned long *p = (unsigned long *)_rsi;
-            for (int i = 0; i < _rdx; i++)
-                size += p[i * len_factor + len_step];
-            char *iov_addr = (char *)malloc(size + 1);
-            memset(iov_addr, 0, size + 1);
-            unsigned long iovp = (unsigned long)iov_addr;
+            iovec *iov = (iovec *)_rsi;
+            int c_msg = _rdx;
+            int size = count_iovlen(iov, c_msg);
 
-            for (int i = 0; i < _rdx; i++)
+            if (size <= 0)
             {
-                int idx_iov = i * len_factor;
-                int idx_size = idx_iov + len_step;
-                memcpy((void*)iov_addr, (void*)p[idx_iov], p[idx_size]);
-
-                iov_addr += p[idx_size];
+                ret = 0;
+                break;
             }
+            
+            iov = (iovec *)_rsi;
 
-            ocall_syscall_3_NTiNP(&ret, sysno, _rdi, (void*)_rsi, _rdx * len_iovec, _rdx, (void*)iovp, size + 1);
+            unsigned long iovb = scattering_shadow_iov(iov, size, c_msg);
+            ASSERT(0 != iovb);
+
+            ocall_syscall_3_NTiNP(&ret, sysno, _rdi, (void*)_rsi, _rdx * len_iovec, _rdx, (void*)iovb, size + 1);
 
             // free(iov_addr);
             // iov_addr = NULL;
@@ -595,6 +592,56 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     case SYS_ioctl:
         ret = sgx_ocall_syscall_ioctl(_rdi, _rsi, _rdx);
         break;
+
+    case SYS_sendmsg:
+        {
+            msghdr *msg = (msghdr*)_rsi;
+            iovec *iov = msg->msg_iov;
+            int c_msg = msg->msg_iovlen;
+            int size = count_iovlen(iov, c_msg);
+
+            if (size <= 0)
+            {
+                ret = 0;
+                break;
+            }
+            
+            iov = msg->msg_iov;
+            unsigned long iovb = scattering_shadow_iov(iov, size, c_msg);
+            ASSERT(0 != iovb);
+
+            iov = msg->msg_iov;
+
+            ocall_syscall_3_NTiNPTi(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, (void*)iovb, size + 1, iov, msg->msg_iovlen * len_iovec);
+
+            // free(iov_addr);
+            // iov_addr = NULL;
+            break;
+        }
+
+    case SYS_recvmsg:
+        {
+            msghdr *msg = (msghdr*)_rsi;
+            void *msg_name = msg->msg_name;
+            int msg_namelen = msg->msg_namelen;
+
+            iovec *iov = msg->msg_iov;
+            int msg_iovlen = msg->msg_iovlen;
+            ASSERT((msg_iovlen <= 1) && "oversize msg!");
+
+            int size = count_iovlen(iov, msg_iovlen);
+            if (size <= 0)
+            {
+                ret = 0;
+                break;
+            }
+            
+            ocall_syscall_3_NTiNPP(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, msg_name, msg_namelen, iov->iov_base, iov->iov_len);
+
+            // free(iov_addr);
+            // iov_addr = NULL;
+            break;
+        }
 
     default:
         unimplemented_syscall(sysno);
@@ -772,6 +819,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_umask:
     case SYS_rt_sigreturn:
     case SYS_pipe:
+    case SYS_getpgid:
         /*case SYS_set_thread_area:*/
         /*case SYS_get_thread_area:*/
         return sgx_ocall_syscall_1(sysno, _rdi);
@@ -813,12 +861,13 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_dup2:
     case SYS_listen:
     case SYS_nanosleep:
+    case SYS_rename:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
         //Three paramters
     /* FIXME: //cdd here we simply ignore giving advice to kernel as they are different world */
-    // off: signals, on: pthread
+    // off: signals, on: pthread //the root cause lies in out of stack space
     // case SYS_madvise:
     case SYS_tgkill:
     case SYS_open:
@@ -842,6 +891,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_poll:
     case SYS_getpeername:
     case SYS_getsockname:
+    case SYS_sendmsg:
+    case SYS_recvmsg:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 

@@ -46,12 +46,9 @@ long sgx_instr_syscall_dr_generic(long sysnum, long num_args,
         return sgx_ocall_syscall_4(sysnum, arg1, arg2, arg3, arg4);
 
     case 5:
-        // arg5 = *((long*)_rbp + 2);
         return sgx_ocall_syscall_5(sysnum, arg1, arg2, arg3, arg4, arg5);
 
     case 6:
-        // arg5 = *((long*)_rbp + 2);
-        // arg6 = *((long*)_rbp + 3);
         return sgx_ocall_syscall_6(sysnum, arg1, arg2, arg3, arg4, arg5, arg6);
 
     default:

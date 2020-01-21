@@ -12,7 +12,6 @@
 #define len_timezone 8
 #define len_ustat 32
 #define len_utimbuf 16
-#define len_timespec 16
 #define len_timer_t 4
 #define len_time_t 8
 #define len_u32 4
@@ -81,13 +80,11 @@
 #define len___sysctl_args 80
 #define len_sysinfo 112
 #define len_task_struct 6848
-#define len_timespec 16
 #define len_timeval 16
 #define len_timex 208
 #define len_timezone 8
 #define len_ustat 32
 #define len_utimbuf 16
-#define len_timespec 16
 #define len_timer_t 4
 #define len_time_t 8
 #define len_u32 4

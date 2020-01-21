@@ -17,6 +17,8 @@
 
 #include "thread_helper.h"
 #include <sys/mman.h>
+#include <sys/socket.h>
+#include "iovec_helper.h"
 
 /* -------------------------Begin: define SYSCALL stub -------------------------*/
 void syscall_stub(void)
@@ -499,6 +501,7 @@ long ocall_syscall_1_N(long sysno, long N1)
     case SYS_fsync:
     case SYS_umask:
     case SYS_dup:
+    case SYS_getpgid:
     case SYS_epoll_create:
         ret = syscall(sysno, N1);
         b = true;
@@ -823,13 +826,28 @@ long ocall_syscall_2_ToN(long sysno, void *T1, int l1, long N2)
     return ret;
 }
 
-long ocall_syscall_2_TiTo(long sysno, void *Ti, void *To, int len)
+long ocall_syscall_2_TiTo(long sysno, void *T1, void *T2, int l)
 {
     long ret = 0;
     bool b = false;
 
     if (sysno == SYS_nanosleep) {
-        ret = syscall(sysno, Ti, To);
+        ret = syscall(sysno, T1, T2);
+        b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_2_TiTi(long sysno, void *T1, void *T2, int l)
+{
+    long ret = 0;
+    bool b = false;
+
+    if (sysno == SYS_rename) {
+        ret = syscall(sysno, T1, T2);
         b = true;
     }
 
@@ -992,7 +1010,7 @@ long ocall_syscall_3_NPoN(long sysno, long N1, void *P2, long N3)
     return ret;
 }
 
-long ocall_syscall_3_NTiNP(long sysno, long N1, void *Ti, int bsize, long N2, void *pi, int len)
+long ocall_syscall_3_NTiNP(long sysno, long N1, void *T2, int bsize, long N3, void *iovb, int len)
 {
     long ret = 0;
     bool b = false;
@@ -1001,34 +1019,110 @@ long ocall_syscall_3_NTiNP(long sysno, long N1, void *Ti, int bsize, long N2, vo
     {
     case SYS_writev:
         {   
-            #define len_factor              2
-            #define len_step                1
-            #define sizeof_struct_iovec     sizeof(long) * 2
-            int size = N2 * sizeof_struct_iovec;
-            char *Ti_bank = (char *)malloc(size + 1);
-            memset(Ti_bank, 0, size + 1);
-            memcpy(Ti_bank, Ti, size);
-            
-            unsigned long *p = (unsigned long *)Ti;
-            char *p1 = (char *)pi;
-            for (int i = 0; i < N2; i++)
-            {
-                int idx_iov = i * len_factor;
-                int idx_size = idx_iov + len_step;
+            struct iovec *iov = (struct iovec*)T2;
+            int s_iov = sizeof(struct iovec);
+            int c_iov = N3;
+            unsigned long iov_bank = (unsigned long)iov;
 
-                char *iov_shadow = (char *)malloc(p[idx_size] + 1);
-                memset(iov_shadow, 0, p[idx_size] + 1);
-                memcpy(iov_shadow, p1, p[idx_size]);
+            unsigned long iov_shd_addr = shadowing_iovec(iov, (char *)iovb, c_iov);
+            assert(0 != iov_shd_addr);
 
-                p1 += p[idx_size];
-                p[idx_iov] = (unsigned long)iov_shadow;
-            }
+            T2 = (void *)iov_shd_addr;
+            ret = syscall(sysno, N1, T2, N3);
+            T2 = (void *)iov_bank;
 
-            ret = syscall(sysno, N1, Ti, N2);
-            memcpy(Ti, Ti_bank, size);
+            // free(iov_shd);
+            // iov_shd = NULL;
 
-            free(Ti_bank);
-            Ti_bank = NULL;
+            b = true;
+            break;
+        }
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_NTiNPP(long sysno, long N1, void *T2, int l2, long N3, void *P4, int l4, void *P5, int l5)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_recvmsg:
+        {
+            /* do bank for struct msghdr to retrieve later on */
+            struct msghdr *msg = (struct msghdr*)T2;
+            unsigned long msg_name_bank = (unsigned long)msg->msg_name;
+            unsigned long msg_iov_bank = (unsigned long)msg->msg_iov;
+
+            /* substitute buffer addresses from the inside with the outside one */
+            msg->msg_name = P4;
+            msg->msg_namelen = l4;
+
+            /* shadowing a nested struct iovec */
+            int s_iov = sizeof(struct iovec);
+            int c_iov = msg->msg_iovlen;
+            struct iovec *iov_shd = (struct iovec*)malloc(c_iov * s_iov + 1);
+            assert(NULL != iov_shd);
+            memset(iov_shd, 0, c_iov * s_iov + 1);
+            unsigned long iov_shd_addr = (unsigned long)iov_shd;
+
+            /* use the outside addresses to receive msg */
+            iov_shd->iov_base = P5;
+            iov_shd->iov_len = l5;
+
+            /* do a substitution using shadowing iovec */
+            msg->msg_iov = (struct _iovec *)iov_shd_addr;
+
+            /* do the syscall */
+            ret = syscall(sysno, N1, T2, N3);
+
+            /* retrieve the inside buffer */
+            msg->msg_name = msg_name_bank;
+            msg->msg_iov = msg_iov_bank;
+
+            // free(msg_iov_shd);
+            // msg_iov_shd = NULL;
+
+            b = true;
+            break;
+        }
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_NTiNPTi(long sysno, long N1, void *T2, int bsize, long N3, void *iovb, int l1, void *iovec, int l2)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_sendmsg:
+        {
+            struct msghdr *msg = (struct msghdr*)T2;
+            struct iovec *iov = (struct iovec*)iovec;
+            int s_msg = sizeof(struct msghdr);
+            int s_iov = sizeof(struct iovec);
+            int c_iov = msg->msg_iovlen;
+
+            unsigned long msg_iov_bank = (unsigned long)msg->msg_iov;
+
+            unsigned long msg_iov_shd_addr = shadowing_iovec(iov, (char *)iovb, c_iov);
+            assert(0 != msg_iov_shd_addr);
+
+            msg->msg_iov = (struct _iovec *)msg_iov_shd_addr;
+            ret = syscall(sysno, N1, T2, N3);
+            msg->msg_iov = msg_iov_bank;
+
+            // free(msg_iov_shd);
+            // msg_iov_shd = NULL;
 
             b = true;
             break;
@@ -1278,6 +1372,8 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
                 if (ret > 10)   ret = 10;
                 memcpy(Tio, pevents, ret * sizeof_epoll_event);
             }
+            else
+                ret = 0;
             b = true;
             break;
         }
