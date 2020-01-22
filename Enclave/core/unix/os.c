@@ -8868,7 +8868,7 @@ get_dynamo_library_bounds(void)
         /* do NOT place the NULL */
         strncpy(libdir, newdir, strlen(newdir));
     } else {
-        SYSLOG_INTERNAL_WARNING("unable to determine lib path for cross-arch execve");
+        // SYSLOG_INTERNAL_WARNING("unable to determine lib path for cross-arch execve");   //cdd --
     }
     NULL_TERMINATE_BUFFER(dynamorio_alt_arch_path);
     LOG(GLOBAL, LOG_VMAREAS, 1, PRODUCT_NAME" alt arch path: %s\n",

@@ -491,11 +491,11 @@ dynamorio_app_init(void)
          * process_control_int() because the former initializes event logging
          * and the latter can kill the process if a violation occurs.
          */
-        SYSLOG(SYSLOG_INFORMATION,
-               IF_CLIENT_INTERFACE_ELSE(INFO_PROCESS_START_CLIENT, INFO_PROCESS_START),
-               IF_CLIENT_INTERFACE_ELSE(2, 3),
-               get_application_name(), get_application_pid()
-               _IF_NOT_CLIENT_INTERFACE(get_application_md5()));
+        // SYSLOG(SYSLOG_INFORMATION,                                   //cdd --
+        //        IF_CLIENT_INTERFACE_ELSE(INFO_PROCESS_START_CLIENT, INFO_PROCESS_START),
+        //        IF_CLIENT_INTERFACE_ELSE(2, 3),
+        //        get_application_name(), get_application_pid()
+        //        _IF_NOT_CLIENT_INTERFACE(get_application_md5()));     //cdd --
 
 #ifdef PROCESS_CONTROL
         if (IS_PROCESS_CONTROL_ON())    /* Case 8594. */
@@ -576,7 +576,7 @@ dynamorio_app_init(void)
             char initial_options[MAX_OPTIONS_STRING];
             get_dynamo_options_string(&dynamo_options,
                                       initial_options, sizeof(initial_options), true);
-            SYSLOG_INTERNAL_INFO("Initial options = %s", initial_options);
+            // SYSLOG_INTERNAL_INFO("Initial options = %s", initial_options);   //cdd --
             DOLOG(1, LOG_TOP, {
                 get_pcache_dynamo_options_string(&dynamo_options, initial_options,
                                                  sizeof(initial_options),
@@ -890,8 +890,8 @@ standalone_init(void)
         print_file(main_logfile, "Log file for standalone unit test\n");
         get_dynamo_options_string(&dynamo_options,
                                   initial_options, sizeof(initial_options), true);
-        SYSLOG_INTERNAL_INFO("Initial options = %s", initial_options);
-        print_file(main_logfile, "\n");
+        // SYSLOG_INTERNAL_INFO("Initial options = %s", initial_options);
+        // print_file(main_logfile, "\n");      //cdd --
     }
 # endif /* DEBUG */
 #else
@@ -1347,8 +1347,8 @@ dynamo_process_exit(void)
 #endif
     SELF_UNPROTECT_DATASEC(DATASEC_RARELY_PROT);
     synchronize_dynamic_options();
-    SYSLOG(SYSLOG_INFORMATION, INFO_PROCESS_STOP,
-           2, get_application_name(), get_application_pid());
+    // SYSLOG(SYSLOG_INFORMATION, INFO_PROCESS_STOP,                //cdd --
+    //        2, get_application_name(), get_application_pid());
 #ifdef DEBUG
     if (!dynamo_exited) {
         if (INTERNAL_OPTION(nullcalls)) {

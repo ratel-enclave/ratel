@@ -2825,9 +2825,9 @@ create_log_dir(int dir_type)
                 /* skip creating dir basedir if is empty */
                 if (basedir[0] == '\0') {
 #ifndef STATIC_LIBRARY
-                    SYSLOG(SYSLOG_WARNING,
-                           WARNING_EMPTY_OR_NONEXISTENT_LOGDIR_KEY, 2,
-                           get_application_name(), get_application_pid());
+                    ;// SYSLOG(SYSLOG_WARNING,                                  //cdd --
+                    //        WARNING_EMPTY_OR_NONEXISTENT_LOGDIR_KEY, 2,
+                    //        get_application_name(), get_application_pid());   //cdd --
 #endif
                 } else {
                     if (!os_create_dir(basedir, CREATE_DIR_ALLOW_EXISTING)) {
@@ -2895,7 +2895,7 @@ create_log_dir(int dir_type)
         && !sharing_logdir
 # endif
         )
-        SYSLOG_INTERNAL_INFO("log dir=%s", logdir);
+        ;// SYSLOG_INTERNAL_INFO("log dir=%s", logdir);     //cdd --
 #endif /* DEBUG */
 }
 

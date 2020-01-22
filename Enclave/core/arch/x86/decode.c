@@ -1123,8 +1123,8 @@ read_instruction(byte *pc, byte *orig_pc,
             for (i=0; i<sz; i++)
                 snprintf(&bytes[i*3], 3, "%02x ", *(di->start_pc+i));
             bytes[sz*3-1] = '\0'; /* -1 to kill trailing space */
-            SYSLOG_INTERNAL_WARNING_ONCE("spurious rep/repne prefix @"PFX" (%s): ",
-                                         di->start_pc, bytes);
+            // SYSLOG_INTERNAL_WARNING_ONCE("spurious rep/repne prefix @"PFX" (%s): ",      //cdd --
+            //                              di->start_pc, bytes);
         }
     });
 #endif

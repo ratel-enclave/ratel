@@ -212,15 +212,15 @@ privload_add_gdb_cmd(elf_loader_t *loader, const char *filename, bool reachable)
                         &gdb_priv_cmds_sofar, "add-symbol-file '%s' %p\n",
                         filename, text_addr);
         /* Add debugging comment about how to get symbol information in gdb. */
-        if (printed_gdb_commands) {
+        // if (printed_gdb_commands) {          //cdd --
             /* This is a dynamically loaded auxlib, so we print here.
              * The client and its direct dependencies are batched up and
              * printed in os_loader_init_epilogue.
              */
-            SYSLOG_INTERNAL_INFO("Paste into GDB to debug DynamoRIO clients:\n"
-                                 "add-symbol-file '%s' %p\n",
-                                 filename, text_addr);
-        }
+        //     SYSLOG_INTERNAL_INFO("Paste into GDB to debug DynamoRIO clients:\n"
+        //                          "add-symbol-file '%s' %p\n",
+        //                          filename, text_addr);
+        // }                                    //cdd --
         LOG(GLOBAL, LOG_LOADER, 1,
             "for debugger: add-symbol-file %s %p\n", filename, text_addr);
         if (IF_CLIENT_INTERFACE_ELSE(INTERNAL_OPTION(privload_register_gdb), false)) {
@@ -310,12 +310,12 @@ os_loader_init_epilogue(void)
      */
     ASSERT(!printed_gdb_commands);
     printed_gdb_commands = true;
-    if (gdb_priv_cmds_sofar > 0) {
-        SYSLOG_INTERNAL_INFO("Paste into GDB to debug DynamoRIO clients:\n"
+    // if (gdb_priv_cmds_sofar > 0) {           //cdd --
+    //     SYSLOG_INTERNAL_INFO("Paste into GDB to debug DynamoRIO clients:\n"
                              /* Need to turn off confirm for paste to work. */
-                             "set confirm off\n"
-                             "%s", gdb_priv_cmds);
-    }
+    //                          "set confirm off\n"
+    //                          "%s", gdb_priv_cmds);
+    // }                                        //cdd --
 # endif /* INTERNAL || CLIENT_INTERFACE */
 #endif
 }

@@ -224,7 +224,7 @@ kstat_exit()
 
     /* report merged process statistics */
     mutex_lock(&process_kstats_lock);
-    print_file(process_kstats_outfile, "Process KSTATS:\n");
+    // print_file(process_kstats_outfile, "Process KSTATS:\n");     //cdd --
     kstat_report(process_kstats_outfile, &process_kstats);
     mutex_unlock(&process_kstats_lock);
 
