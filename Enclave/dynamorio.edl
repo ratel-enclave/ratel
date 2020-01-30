@@ -207,6 +207,7 @@ enclave {
         long ocall_syscall_4_NNNTo(long sysno, long N1, long N2, long N3, [out, size=l4] void *T4, int l4);
 
         //int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, int flags);
+        /* ssize_t pread(int fd, void *buf, size_t count, off_t offset); */
         long ocall_syscall_4_NToNN(long sysno, long N1, [out, size=l2] void *T2, int l2, long N3, long N4);
 
         // int rt_sigaction(int signum, const struct sigaction *act, struct sigaction *oact, size_t sigsetsize)

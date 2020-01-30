@@ -815,10 +815,13 @@ long ocall_syscall_2_ToN(long sysno, void *T1, int l1, long N2)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_gettimeofday)
+    switch (sysno)
     {
+    case SYS_gettimeofday:
+    case SYS_pipe2:
         ret = syscall(sysno, T1, N2);
         b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -1288,6 +1291,7 @@ long ocall_syscall_4_NToNN(long sysno, long N1, void *T2, int l2, long N3, long 
     switch (sysno)
     {
     case SYS_sendmmsg:
+    case SYS_pread64:
         ret = syscall(sysno, N1, T2, N3, N4);
         b = true;
         break;

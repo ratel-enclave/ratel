@@ -427,6 +427,10 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         ocall_syscall_2_ToN(&ret, sysno, (void *)_rdi, 16, _rsi);
         break;
 
+    case SYS_pipe2:
+        ocall_syscall_2_ToN(&ret, sysno, (void *)_rdi, len_pipefd, _rsi);
+        break;
+
     case SYS_arch_prctl:
         sgx_ocall_syscall_arch_prctl(&ret, sysno, _rdi, _rsi);
         break;
@@ -702,6 +706,10 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         ocall_syscall_4_NToNN(&ret, sysno, _rdi, (void *)_rsi, len_mmsghdr, _rdx, _r10);
         break;
 
+    case SYS_pread64:
+        ocall_syscall_4_NToNN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _rdx, _r10);
+        break;
+
     case SYS_socketpair:
         ocall_syscall_4_NNNTo(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, len_socketpair);
         break;
@@ -862,6 +870,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_listen:
     case SYS_nanosleep:
     case SYS_rename:
+    case SYS_pipe2:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
@@ -905,6 +914,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_mremap:
     case SYS_sendmmsg:
     case SYS_socketpair:
+    case SYS_pread64:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
