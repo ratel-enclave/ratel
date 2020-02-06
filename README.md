@@ -1,2 +1,2 @@
-# Carbyne-SGX
+# Pangolin
 Dynamic Binary Interpreter with SGX Enclaves

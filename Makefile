@@ -36,7 +36,7 @@ include buildenv.mk
 
 
 all: drrun app enclave
-	@cp Drrun/carbyne-sgx .
+	@cp Drrun/pangolin .
 	@cp App/libapp.so .
 	@cp Enclave/libdynamorio.signed.so libdynamorio.so
 
@@ -57,4 +57,4 @@ clean:
 	make -C Drrun clean
 	make -C App clean
 	make -C Enclave clean
-	@rm -rf carbyne-sgx libapp.so libdynamorio.so
+	@rm -rf pangolin libapp.so libdynamorio.so

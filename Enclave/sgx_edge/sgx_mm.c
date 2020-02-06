@@ -531,7 +531,7 @@ static byte* _sgx_mm_buffer_alloc(byte *ext_addr, size_t len)
 static sgx_vm_area_t* _sgx_vma_alloc(list_t* llp, list_t* lln)
 {
     YPHASSERT(llp != NULL && lln != NULL);
-    YPHASSERT(SGX_MM.nun > 0);
+    YPHASSERT(SGX_MM.nun > 0 && "NO allocable vma!");
 
     sgx_vm_area_t* vma = NULL;
     list_t* ll = NULL;
@@ -541,7 +541,7 @@ static sgx_vm_area_t* _sgx_vma_alloc(list_t* llp, list_t* lln)
     SGX_MM.nin ++, SGX_MM.nun --;
 
     vma = list_entry(ll, sgx_vm_area_t, ll);
-    YPHASSERT(vma != NULL);
+    YPHASSERT(vma != NULL && "NULL vma!");
 
     list_add(llp, lln, ll);
 
@@ -705,7 +705,7 @@ static sgx_vm_area_t* _sgx_vma_merge(sgx_vm_area_t* vma)
     lln = ll->next;
     cursz = vma->vm_end - vma->vm_start;
 
-    if (llp != &SGX_MM.in) {
+    if (llp != &SGX_MM.in && NULL != llp /* cdd */) {
         /* adjacent? */
         prev = list_entry(llp, sgx_vm_area_t, ll);
         YPHASSERT(prev->vm_sgx != NULL);
@@ -730,7 +730,7 @@ static sgx_vm_area_t* _sgx_vma_merge(sgx_vm_area_t* vma)
         }
     }
 
-    if (lln != &SGX_MM.in) {
+    if (lln != &SGX_MM.in && NULL != lln /* cdd */) {
         /* adjacent? */
         next = list_entry(lln, sgx_vm_area_t, ll);
         YPHASSERT(next->vm_sgx != NULL);

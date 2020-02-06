@@ -309,28 +309,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
         ocall_syscall_1_Ti(&ret, sysno, (void *)_rdi, 16);
         break;
 
-    case SYS_afs_syscall:
-    case SYS_epoll_ctl_old:
-    case SYS_epoll_wait_old:
-    case SYS_getpmsg:
-    case SYS_nfsservctl:
-    case SYS_putpmsg:
-    case SYS_security:
-    case SYS_tuxcall:
-    case SYS_uselib:
-    case SYS_vserver:
-    case SYS_create_module:
-    case SYS_get_kernel_syms:
-    case SYS_query_module:
-        //ocall_syscall_1_not(&ret, sysno, _rdi);
-        unimplemented_syscall(sysno);
-        break;
-
-    case SYS__sysctl:
-        //ocall_syscall_1_sysctl(&ret, sysno, (struct __sysctl_args*)_rdi);
-        unimplemented_syscall(sysno);
-        break;
-
     case SYS_uname:
         ocall_syscall_1_To(&ret, sysno, (void *)_rdi, len_utsname);
         break;
@@ -341,11 +319,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
 
     case SYS_sysinfo:
         ocall_syscall_1_To(&ret, sysno, (void *)_rdi, len_sysinfo);
-        break;
-
-    case SYS_adjtimex:
-        //ocall_syscall_1_timex(&ret, sysno, (struct timex*)_rdi);
-        unimplemented_syscall(sysno);
         break;
 
     default:
@@ -677,7 +650,7 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         break;
 
     case SYS_epoll_wait:
-        ocall_syscall_4_NTioNN(&ret, sysno, _rdi, (void*)_rsi, _rdx, _r10, len_epoll_event * MAX_EPOLL_EVENTS);
+        ocall_syscall_4_NTioNN(&ret, sysno, _rdi, (void*)_rsi, _rdx, _r10, len_epoll_event * _rdx/*MAX_EPOLL_EVENTS*/);
         break;
 
     case SYS_accept4:
