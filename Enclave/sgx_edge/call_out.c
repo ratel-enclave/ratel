@@ -462,7 +462,10 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
         /* free the enclave copy */
         if (t != s)
+        {
             free(t);
+            t = NULL;
+        }
         break;
 
     case SYS_tgkill:
@@ -522,8 +525,8 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             ocall_syscall_3_NTiNP(&ret, sysno, _rdi, (void*)_rsi, _rdx * len_iovec, _rdx, (void*)iovb, size + 1);
 
-            // free(iov_addr);
-            // iov_addr = NULL;
+            free((char*)iovb);
+            iovb = 0;
             break;
         }
 
@@ -591,8 +594,8 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             ocall_syscall_3_NTiNPTi(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, (void*)iovb, size + 1, iov, msg->msg_iovlen * len_iovec);
 
-            // free(iov_addr);
-            // iov_addr = NULL;
+            free((char*)iovb);
+            iovb = 0;
             break;
         }
 

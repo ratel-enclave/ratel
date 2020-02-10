@@ -26,7 +26,7 @@ size_t count_iovlen(iovec *iov, size_t c_msg)
 unsigned long scattering_shadow_iov(iovec *iov, size_t size, size_t c_msg)
 {
     char *iov_addr = (char *)malloc(size + 1);
-    ASSERT((NULL != iov_addr ? 1 : 0));
+    ASSERT((NULL != iov_addr ? 1 : 0) && "malloc with NULL!");
     memset(iov_addr, 0, size + 1);
     unsigned long iovb = (unsigned long)iov_addr;
 
