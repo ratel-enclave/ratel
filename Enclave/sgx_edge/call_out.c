@@ -114,7 +114,8 @@ long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
 #define F_SETFL 4 /* set file status flags, F_SETFL (int) */
 #define F_GETLK 5
 #define F_SETLK 6
-#define len_flock 64
+#define F_SETLKW 7 /* Set record locking info (blocking).        */
+#define len_flock 32
     long ret = -1;
 
     switch (cmd)
@@ -130,6 +131,7 @@ long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
         ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, 0); /* tricky */
         break;
 
+    case F_SETLKW:
     case F_SETLK:
         ocall_syscall_3_NNTi(&ret, SYS_fcntl, fd, cmd, (void *)arg1, len_flock);
         break;
@@ -150,7 +152,7 @@ long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
 long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
 {
     long ret = -1;
-    
+
     switch (cmd)
     {
     case FIONREAD:
@@ -618,8 +620,6 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             
             ocall_syscall_3_NTiNPP(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, msg_name, msg_namelen, iov->iov_base, iov->iov_len);
 
-            // free(iov_addr);
-            // iov_addr = NULL;
             break;
         }
 
@@ -653,7 +653,7 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         break;
 
     case SYS_epoll_wait:
-        ocall_syscall_4_NTioNN(&ret, sysno, _rdi, (void*)_rsi, _rdx, _r10, len_epoll_event * _rdx/*MAX_EPOLL_EVENTS*/);
+        ocall_syscall_4_NTioNN(&ret, sysno, _rdi, (void*)_rsi, _rdx, _r10, len_epoll_event * _rdx /*MAX_EPOLL_EVENTS*/);
         break;
 
     case SYS_accept4:
@@ -785,6 +785,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_getegid:
     case SYS_sched_yield:
     case SYS_sync:
+    case SYS_restart_syscall:
         return sgx_ocall_syscall_0(sysno);
         break;
 

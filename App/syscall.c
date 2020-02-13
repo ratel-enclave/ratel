@@ -438,6 +438,7 @@ long ocall_syscall_0(long sysno)
     case SYS_getgid:
     case SYS_sched_yield:
     case SYS_sync:
+    case SYS_restart_syscall:
         ret = syscall(sysno);
         b = true;
         break;
@@ -945,7 +946,6 @@ long ocall_syscall_3_NNTi(long sysno, long N1, long N2, void *T3, int l3)
     {
     case SYS_fcntl:
         ret = syscall(sysno, N1, N2, T3);
-
         b = true;
         break;
     }
@@ -1034,8 +1034,8 @@ long ocall_syscall_3_NTiNP(long sysno, long N1, void *T2, int bsize, long N3, vo
             ret = syscall(sysno, N1, T2, N3);
             T2 = (void *)iov_bank;
 
-            // free(iov_shd);
-            // iov_shd = NULL;
+            free((char*)iov_shd_addr);
+            iov_shd_addr = 0;
 
             b = true;
             break;
@@ -1087,8 +1087,8 @@ long ocall_syscall_3_NTiNPP(long sysno, long N1, void *T2, int l2, long N3, void
             msg->msg_name = msg_name_bank;
             msg->msg_iov = msg_iov_bank;
 
-            // free(msg_iov_shd);
-            // msg_iov_shd = NULL;
+            free((char*)iov_shd);
+            iov_shd = NULL;
 
             b = true;
             break;
@@ -1124,8 +1124,8 @@ long ocall_syscall_3_NTiNPTi(long sysno, long N1, void *T2, int bsize, long N3, 
             ret = syscall(sysno, N1, T2, N3);
             msg->msg_iov = msg_iov_bank;
 
-            // free(msg_iov_shd);
-            // msg_iov_shd = NULL;
+            free((char*)msg_iov_shd_addr);
+            msg_iov_shd_addr = 0;
 
             b = true;
             break;
@@ -1342,8 +1342,8 @@ long ocall_syscall_4_NNNTio(long sysno, long N1, long N2, long N3, void* Tio, lo
 }
 
 /* epoll_wait() */
-static volatile int epoll_wait_flag = 0;
-static unsigned long epoll_wait_event = 0;
+// static volatile int epoll_wait_flag = 0;
+// static unsigned long epoll_wait_event = 0;
 long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, long l1)
 {
     long ret = 0;
@@ -1354,30 +1354,34 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
         {
             #define sizeof_epoll_event       12
             int size = N3 * sizeof_epoll_event;
-            char *pevents = NULL;
-            if (!epoll_wait_flag)
-            {
-                epoll_wait_flag = 1;
+            // char *pevents = NULL;
+            // if (!epoll_wait_flag)
+            // {
+            //     epoll_wait_flag = 1;
 
-                pevents = (char *)mmap(NULL, size + 1, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-                memset(pevents, 0, size + 1);
-                epoll_wait_event = (unsigned long)pevents;
-            }
-            else
-                pevents = (char *)epoll_wait_event;
-            
+            //     pevents = (char *)mmap(NULL, size + 1, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+            //     memset(pevents, 0x9c, size + 1);
+            //     epoll_wait_event = (unsigned long)pevents;
+            // }
+            // else
+            //     pevents = (char *)epoll_wait_event;
+
+            char *pevents = malloc(size + 1);
             assert(MAP_FAILED != pevents && NULL != pevents);
-            memcpy(pevents, Tio, l1);
+            memcpy(pevents, Tio, size);
 
             ret = syscall(sysno, N1, (void*)pevents, N3, N4);
 
             if (ret > 0)
             {
-                if (ret > 10)   ret = 10;
-                memcpy(Tio, pevents, ret * sizeof_epoll_event);
+                if (ret > 32)   assert(false && "too many events!!");
+                // memcpy(Tio, pevents, ret * sizeof_epoll_event);
+                memcpy(Tio, pevents, size);
             }
-            else
-                ret = 0;
+
+            free(pevents);
+            pevents = NULL;
+            
             b = true;
             break;
         }

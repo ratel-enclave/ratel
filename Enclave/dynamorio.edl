@@ -218,7 +218,7 @@ enclave {
         long ocall_syscall_4_NNNTio(long sysno, long N1, long N2, long N3, [in, out, size=l1] void* Tio, long l1);
 
         /* int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout); */
-        long ocall_syscall_4_NTioNN(long sysno, long N1, [in, out, size=l1] void* Tio, long N2, long N3, long l1);
+        long ocall_syscall_4_NTioNN(long sysno, long N1, [out, size=l1] void* Tio, long N2, long N3, long l1);
 
 
         /****************************syscalls with 5 paramters**********************************************/
