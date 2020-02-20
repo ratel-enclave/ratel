@@ -1070,7 +1070,7 @@ long ocall_syscall_3_NTiNPP(long sysno, long N1, void *T2, int l2, long N3, void
             int c_iov = msg->msg_iovlen;
             struct iovec *iov_shd = (struct iovec*)malloc(c_iov * s_iov + 1);
             assert(NULL != iov_shd);
-            memset(iov_shd, 0, c_iov * s_iov + 1);
+            // memset(iov_shd, 0, c_iov * s_iov + 1);   //cdd --
             unsigned long iov_shd_addr = (unsigned long)iov_shd;
 
             /* use the outside addresses to receive msg */
