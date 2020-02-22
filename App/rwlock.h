@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2018-2020 Ratel Authors.  All rights reserved.
  * Copyright (C) 2011-2018 Intel Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
