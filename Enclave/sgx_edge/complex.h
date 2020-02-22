@@ -57,7 +57,7 @@ static inline unsigned long scattering_shadow_iov(iovec *iov, size_t size, size_
 {
     char *iov_addr = (char *)malloc(size + 1);
     ASSERT((NULL != iov_addr ? 1 : 0) && "malloc with NULL!");
-    // memset(iov_addr, 0, size + 1);	//cdd --
+    memset(iov_addr, 0, size + 1);	//cdd --
     unsigned long iovb = (unsigned long)iov_addr;
 
     for (int i = 0; i < c_msg; i++)

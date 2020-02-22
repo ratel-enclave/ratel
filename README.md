@@ -3,11 +3,11 @@ Ratel
 
 Introduction
 ------------
-A system of Ratel which enables Dynamic Binary Interpreter (DBI) on Intel SGX Enclaves for unmodified Linux applications.
+A system of Ratel which enables Dynamic Binary Interpreter (DBI) on Intel SGX Enclaves for unmodified Linux applications. Ratel is built on a robust DBT system for x86_64 binaries called DynamoRIO. The central focus of this work is a design that preserves two-way transparency: the DBT engine runs on top of a SGX-enabled software stack, both of which originally assume direct low-level control of the binary and its OS interfaces. Ratel ensures that the DBT engine maintains its original goal of ensuring transparency to the virtualized application, while hiding from the SGX software stack that the DBT engine interposes between itself and the virtualized application.
 
 License
 -------
-See [License.txt](License.txt) for details.
+See [License.txt](https://github.com/ratel-enclave/ratel/blob/master/LICENSE) for details.
 
 Documentation
 -------------
@@ -58,7 +58,7 @@ Run ***dyrio2sgx.sh*** with sudo, no need of args (even though the scripts says 
   ```
     $ cd misc/ && sudo ./dyrio2sgx.sh
   ```
-Go to the ***cpu_setup*** folder and do make:
+Go to the ***cpu_setup*** folder and do **make**:
   ```
     $ cd misc/cpu_setup/ && make
   ```

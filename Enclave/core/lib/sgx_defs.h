@@ -29,56 +29,28 @@
  *
  */
 
+#ifndef _SGX_DEFS_H_
+#define _SGX_DEFS_H_
+
+/* The following macros are for GCC only */
+
+# define SGXAPI
+
+# ifdef linux
+#  undef linux
+# endif
+# define SGX_CXX_NATIVE_HEADER(header)   <stdc++/linux/header>
+
+# define SGX_CDECL
+# define SGX_STDCALL
+# define SGX_FASTCALL
+
+# define SGX_DLLIMPORT
+# define SGX_UBRIDGE(attr, fname, args...) attr fname args
+
+# define SGX_DEPRECATED __attribute__((deprecated))
 
 
-// rwlock.cpp: wrappers of Slim Reader/Writer (SRW) Locks
+#define SGX_NOCONVENTION /* Empty.  No calling convention specified. */
 
-#include "rwlock.h"
-
-
-#include <stdlib.h>
-void wtlock(prwlock_t lock)
-{
-    int ret = pthread_rwlock_wrlock(lock);
-    if(0 != ret)
-        abort();
-}
-
-void wtunlock(prwlock_t lock)
-{
-    int ret = pthread_rwlock_unlock(lock);
-    if(0 != ret)
-        abort();
-}
-
-
-void rdlock(prwlock_t lock)
-{
-    int ret = pthread_rwlock_rdlock(lock);
-    if(0 != ret)
-        abort();
-}
-
-void rdunlock(prwlock_t lock)
-{
-    int ret = pthread_rwlock_unlock(lock);
-    if(0 != ret)
-        abort();
-}
-
-void init_rwlock(prwlock_t lock)
-{
-    //use the default attribute.
-    int ret = pthread_rwlock_init(lock, NULL);
-    if(0 != ret)
-        abort();
-}
-
-void fini_rwlock(prwlock_t lock)
-{
-    int ret = pthread_rwlock_destroy(lock);
-    if(0 != ret)
-        abort();
-}
-
-
+#endif /* !_SGX_DEFS_H_ */

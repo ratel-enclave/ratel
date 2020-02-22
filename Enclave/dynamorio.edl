@@ -37,7 +37,7 @@
 
 
 enclave {
-    from "sgx_tstdc.edl" import sgx_oc_cpuidex;
+    from "sgx_tstdc.edl" import sgx_oc_cpuidex, sgx_thread_wait_untrusted_event_ocall, sgx_thread_set_untrusted_event_ocall, sgx_thread_setwait_untrusted_events_ocall, sgx_thread_set_multiple_untrusted_events_ocall;
 
     trusted {
 
@@ -245,7 +245,7 @@ enclave {
         long ocall_syscall_6_NPoNNToTo(long sysno, long N1, [out, size=N3] void *P2, long N3, long N4, [in, out, size=l5] void *T5, int l5, [in, out, size=l6] void *T6, int l6);
 
         //int futex(int *uaddr, int futex_op, int val, const struct timespec *timeout, int *uaddr2, int val3);
-        long ocall_syscall_6_TioNNTiNN(long sysno, [in, out, size=l1]void *T1, int l1, long N2, long N3, [in, size=l4] void *T4, int l4, [in, out, size=l5] void *T5, int l5, long N6);
+        //long ocall_syscall_6_TioNNTiNN(long sysno, [in, out, size=l1]void *T1, int l1, long N2, long N3, [in, size=l4] void *T4, int l4, [in, out, size=l5] void *T5, int l5, long N6);
 
 
         void sgxapp_reg_sighandler(int signum);
