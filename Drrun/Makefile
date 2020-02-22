@@ -1,6 +1,6 @@
 #!/bin/make
 
-all: checkdirs pangolin
+all: checkdirs ratel
 
 CC	:= /usr/bin/cc
 CPP	:= /usr/bin/cpp
@@ -115,7 +115,7 @@ $(DRRUN_CC_OBJ): $(BLD_DIR)/%.o: %.c
 .PHONY: all checkdirs clean
 
 
-pangolin: $(DRRUN_CC_OBJ) $(DRLIBS)
+ratel: $(DRRUN_CC_OBJ) $(DRLIBS)
 	$(LD)  $(DRRUN_LD_FLAGS) $(DRRUN_CC_OBJ) -o $@ -rdynamic $(DRLIBS) $(DRRUN_EXTRA_LD_FLAGS)
 	#$(CP) drrun drrun.full
 	#$(OBJCOPY) --only-keep-debug drrun drrun.debug
@@ -133,4 +133,4 @@ $(BUILD_DIR):
 clean:
 	@rm	-rf $(BUILD_DIR)
 	@rm	-rf $(BLD_DIR)
-	@rm	-rf pangolin
+	@rm	-rf ratel

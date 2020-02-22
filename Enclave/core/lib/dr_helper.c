@@ -255,11 +255,12 @@ void sgx_helper_rdtsc(void* drctx)
 }
 
 #include <string.h>
-
+#include "sgx_thread.h"
 #define UNINIT_HCTX                     0x00
 #define OFFSET_CHILD_THREAD_START       0x2A
 #define RET_ADDR_OFFSET                 0x08
 #define RET_VAL_TO_THREAD               0x00
+sgx_thread_mutex_t g_mutex_hctx = SGX_THREAD_MUTEX_INITIALIZER;
 
 unsigned long g_td_hctx_base_addr = 0;
 thread_helper_context td_hctx[MAX_THREAD_NUM_EACH_ENCLAVE] = {0};
@@ -360,6 +361,8 @@ void sgx_helper_syscall(void* drctx)
     #define SYS_clone 56
     if (SYS_clone == sysno)
     {
+        sgx_thread_mutex_lock(&g_mutex_hctx); 
+
         hcn = g_hctx_num;
         g_hctx_num++; 
 
@@ -392,6 +395,8 @@ void sgx_helper_syscall(void* drctx)
     {
         if(sgx_helper_post_clone(drctx, &mctx, &td_hctx[hcn]))
             ASSERT(false && "calling sgx_helper_post_clone failed!");
+
+        sgx_thread_mutex_unlock(&g_mutex_hctx);
     }
 
     dr_set_mcontext(drctx, &mctx);
@@ -420,6 +425,7 @@ bool check_valid_clone_args(sgx_dbi_tls_helper_t *tls_helper_table, thread_helpe
 void start_thread_stub(dr_mcontext_t *dmctx)
 {
     ASSERT(NULL != dmctx && "Invalid Dr. context!");
+    sgx_thread_mutex_unlock(&g_mutex_hctx); 
 
     asm volatile (
         "\tmov  %0, %%rax\n"
@@ -485,6 +491,7 @@ void sgx_thread_prepare(sgx_dbi_tls_helper_t *tls_helper_table)
 
 void sgx_thread_stub(sgx_dbi_tls_helper_t *tls_helper_table)
 {
+    sgx_thread_mutex_lock(&g_mutex_hctx); 
     sgx_thread_prepare(tls_helper_table);
     ASSERT_NOT_REACHED();
 }
