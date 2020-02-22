@@ -324,9 +324,7 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
             ret = 0;
         }
         else
-        {
             ocall_syscall_1_N(&ret, sysno, _rdi);
-        }
         break;
 
     case SYS_get_thread_area:
@@ -777,9 +775,9 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         }
         break;
 
-    case SYS_futex:
-        ocall_syscall_6_TioNNTiNN(&ret, sysno, (int *)_rdi, 4, _rsi, _rdx, (void *)_r10, len_timespec, (int *)_r8, 4, _r9);
-        break;
+    // case SYS_futex:
+    //     ocall_syscall_6_TioNNTiNN(&ret, sysno, (int *)_rdi, 4, _rsi, _rdx, (void *)_r10, len_timespec, (int *)_r8, 4, _r9);
+    //     break;
 
     case SYS_sendto:
         ocall_syscall_6_NPiNNPiN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, _r9);

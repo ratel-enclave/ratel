@@ -64,11 +64,11 @@ ksynch_init(void)
      * From man futex(2): initial futex support was merged in 2.5.7, in current six
      * argument format since 2.6.7.
      */
-    volatile int futex_for_test = 0;
-    ptr_int_t res = dynamorio_syscall(SYS_futex, 6, &futex_for_test, FUTEX_WAKE, 1,
-                                      NULL, NULL, 0);
-    kernel_futex_support = (res >= 0);
-    ASSERT_CURIOSITY(kernel_futex_support);
+    // volatile int futex_for_test = 0;         //cdd --
+    // ptr_int_t res = dynamorio_syscall(SYS_futex, 6, &futex_for_test, FUTEX_WAKE, 1,
+    //                                   NULL, NULL, 0);
+    // kernel_futex_support = (res >= 0);
+    // ASSERT_CURIOSITY(kernel_futex_support);  //cdd --
 }
 
 void

@@ -435,12 +435,7 @@ void ocall_print_syscallname(long sysno)
 /* system calls */
 void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
 {
-    if (implemented)
-    {
-        //ocall_print_syscallname(sysno);
-        //printf("%s: return 0x%lx\n", fname, ret);
-    }
-    else
+    if (!implemented)
     {
         printf("sysno: %-4d not implemented!\n", (int)sysno);
     }
@@ -481,7 +476,7 @@ long ocall_syscall_0(long sysno)
 }
 
 /*-----------------------------------syscalls with 1 parameters--------------------------*/
-#include "rwlock.h"
+#include <pthread.h>
 long ocall_syscall_1_N(long sysno, long N1)
 {
     long ret;
@@ -490,13 +485,7 @@ long ocall_syscall_1_N(long sysno, long N1)
     switch (sysno)
     {
     case SYS_close:
-
     case SYS_exit_group: /* fix-me: allow out-encalve code to do cleanup */
-        if (SYS_exit_group == sysno)
-        {
-            extern rwlock_t lock_t;
-            fini_rwlock(&lock_t);
-        }
     case SYS_exit:
         {
             int tid = syscall(SYS_gettid);
@@ -508,7 +497,7 @@ long ocall_syscall_1_N(long sysno, long N1)
                     #define MAX_THREAD_NUM_EACH_ENCLAVE 10
                     extern sgx_thread_priv_params trd_priv_params[MAX_THREAD_NUM_EACH_ENCLAVE];
                     extern volatile int g_trd_num;
-                    extern rwlock_t lock_t;
+                    extern pthread_mutex_t lock_m;
 
                     int trd_num = 0;
                     unsigned long tid = syscall(SYS_gettid);
@@ -517,9 +506,9 @@ long ocall_syscall_1_N(long sysno, long N1)
                         /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
                         if (trd_priv_params[trd_num].thread_id == tid)
                         {
-                            wtlock(&lock_t);
+                            pthread_mutex_lock(&lock_m);
                             memset(&trd_priv_params[trd_num], 0, sizeof(sgx_thread_priv_params));
-                            wtunlock(&lock_t);
+                            pthread_mutex_unlock(&lock_m);
 
                             break;
                         }
@@ -730,9 +719,6 @@ long ocall_syscall_2_PiN(long sysno, void *P1, long N2)
         ret = syscall(sysno, P1, N2);
         b = true;
         break;
-
-    default:
-        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -751,9 +737,6 @@ long ocall_syscall_2_PoN(long sysno, void *P1, long N2)
     case SYS_set_robust_list:
         ret = syscall(sysno, P1, N2);
         b = true;
-        break;
-
-    default:
         break;
     }
 
@@ -794,9 +777,6 @@ long ocall_syscall_2_STi(long sysno, const char *S1, void *T2, int l2)
         ret = syscall(sysno, S1, T2);
         b = true;
         break;
-
-    default:
-        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -815,9 +795,6 @@ long ocall_syscall_2_STo(long sysno, const char *S1, void *T2, int l2)
     case SYS_lstat:
         ret = syscall(sysno, S1, T2);
         b = true;
-        break;
-
-    default:
         break;
     }
 
@@ -1101,7 +1078,7 @@ long ocall_syscall_3_NTiNPP(long sysno, long N1, void *T2, int l2, long N3, void
             int c_iov = msg->msg_iovlen;
             struct iovec *iov_shd = (struct iovec*)malloc(c_iov * s_iov + 1);
             assert(NULL != iov_shd);
-            memset(iov_shd, 0, c_iov * s_iov + 1);
+            memset(iov_shd, 0, c_iov * s_iov + 1);   //cdd --
             unsigned long iov_shd_addr = (unsigned long)iov_shd;
 
             /* use the outside addresses to receive msg */
@@ -1115,8 +1092,8 @@ long ocall_syscall_3_NTiNPP(long sysno, long N1, void *T2, int l2, long N3, void
             ret = syscall(sysno, N1, T2, N3);
 
             /* retrieve the inside buffer */
-            msg->msg_name = msg_name_bank;
-            msg->msg_iov = msg_iov_bank;
+            msg->msg_name = (void*)msg_name_bank;
+            msg->msg_iov = (struct _iovec *)msg_iov_bank;
 
             free((char*)iov_shd);
             iov_shd = NULL;
@@ -1153,7 +1130,7 @@ long ocall_syscall_3_NTiNPTi(long sysno, long N1, void *T2, int bsize, long N3, 
 
             msg->msg_iov = (struct _iovec *)msg_iov_shd_addr;
             ret = syscall(sysno, N1, T2, N3);
-            msg->msg_iov = msg_iov_bank;
+            msg->msg_iov = (struct _iovec *)msg_iov_bank;
 
             free((char*)msg_iov_shd_addr);
             msg_iov_shd_addr = 0;
@@ -1373,8 +1350,6 @@ long ocall_syscall_4_NNNTio(long sysno, long N1, long N2, long N3, void* Tio, lo
 }
 
 /* epoll_wait() */
-// static volatile int epoll_wait_flag = 0;
-// static unsigned long epoll_wait_event = 0;
 long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, long l1)
 {
     long ret = 0;
@@ -1385,20 +1360,10 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
         {
             #define sizeof_epoll_event       12
             int size = N3 * sizeof_epoll_event;
-            // char *pevents = NULL;
-            // if (!epoll_wait_flag)
-            // {
-            //     epoll_wait_flag = 1;
-
-            //     pevents = (char *)mmap(NULL, size + 1, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-            //     memset(pevents, 0x9c, size + 1);
-            //     epoll_wait_event = (unsigned long)pevents;
-            // }
-            // else
-            //     pevents = (char *)epoll_wait_event;
 
             char *pevents = malloc(size + 1);
             assert(MAP_FAILED != pevents && NULL != pevents);
+            memset(pevents, 0, size + 1);
             memcpy(pevents, Tio, size);
 
             ret = syscall(sysno, N1, (void*)pevents, N3, N4);
@@ -1406,7 +1371,6 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
             if (ret > 0)
             {
                 if (ret > 32)   assert(false && "too many events!!");
-                // memcpy(Tio, pevents, ret * sizeof_epoll_event);
                 memcpy(Tio, pevents, size);
             }
 
@@ -1497,8 +1461,7 @@ long ocall_syscall_5_NPiNPoPoN(long sysno, unsigned long N1, void *Pi, unsigned 
         trd_params.current_eid = dynamo_eid;
 
         ret = thread_setup_agent(&trd_params);
-        if (ret == -1)
-            printf("thread setup failed!\n");
+        assert((ret > 0) && "thread setup failed!");
         
         b = true;
     }
@@ -1555,19 +1518,19 @@ long ocall_syscall_6_NPoNNToTo(long sysno, long N1, void *P2, long N3, long N4, 
     return ret;
 }
 
-long ocall_syscall_6_TioNNTiNN(long sysno, void *T1, int l1, long N2, long N3, void *T4, int l4, void *T5, int l5, long N6)
-{
-    long ret = 0;
-    bool b = false;
+// long ocall_syscall_6_TioNNTiNN(long sysno, void *T1, int l1, long N2, long N3, void *T4, int l4, void *T5, int l5, long N6)
+// {
+//     long ret = 0;
+//     bool b = false;
 
-    if (sysno == SYS_futex)
-    {
-        ret = syscall(sysno, T1, N2, N3, T4, T5, N6);
-        b = true;
-    }
+//     if (sysno == SYS_futex)
+//     {
+//         ret = syscall(sysno, T1, N2, N3, T4, T5, N6);
+//         b = true;
+//     }
 
-    echo_fun_return(sysno, b, __FUNCTION__, ret);
-}
+//     echo_fun_return(sysno, b, __FUNCTION__, ret);
+// }
 
 long set_tid_ntrd(long sysno)
 {

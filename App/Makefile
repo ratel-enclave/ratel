@@ -102,8 +102,8 @@ APP_AS_OBJS	:= $(patsubst %,%.o,$(APP_AS_SRCS))
 APP_AS_FALG	:= $(BASIC_AS_FLAGS)
 
 
-APP_CXX_SRCS 	:= App.c syscall.c iovec_helper.c
-APP_CPP_SRCS	:= thread_helper.cpp rwlock.cpp
+APP_CXX_SRCS 	:= App.c syscall.c
+APP_CPP_SRCS	:= thread_helper.cpp
 APP_CXX_OBJS 	:= $(APP_CXX_SRCS:.c=.o) $(APP_CPP_SRCS:.cpp=.o)
 
 %.asm:

@@ -30,29 +30,28 @@
  *
  */
 
+#ifndef _SGX_DEFS_H_
+#define _SGX_DEFS_H_
+
+/* The following macros are for GCC only */
+
+# define SGXAPI
+
+# ifdef linux
+#  undef linux
+# endif
+# define SGX_CXX_NATIVE_HEADER(header)   <stdc++/linux/header>
+
+# define SGX_CDECL
+# define SGX_STDCALL
+# define SGX_FASTCALL
+
+# define SGX_DLLIMPORT
+# define SGX_UBRIDGE(attr, fname, args...) attr fname args
+
+# define SGX_DEPRECATED __attribute__((deprecated))
 
 
+#define SGX_NOCONVENTION /* Empty.  No calling convention specified. */
 
-#ifndef _RWLOCK_H
-#define _RWLOCK_H
-
-#include <pthread.h>
-typedef pthread_rwlock_t rwlock_t;
-typedef pthread_rwlock_t* prwlock_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    void wtlock(prwlock_t lock);
-    void rdlock(prwlock_t lock);
-    void rdunlock(prwlock_t lock);
-    void wtunlock(prwlock_t lock);
-    void init_rwlock(prwlock_t lock);
-    void fini_rwlock(prwlock_t lock);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif /* !_SGX_DEFS_H_ */
