@@ -1889,6 +1889,7 @@ os_handle_mov_seg(dcontext_t *dcontext, byte *pc)
 #endif /* X86/ARM */
 }
 
+#include "sgx_thread.h"
 /* Initialization for TLS mangling (-mangle_app_seg on x86).
  * Must be called before DR setup its own segment.
  */
@@ -1906,10 +1907,13 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
     app_lib_tls_base = NULL;
     app_alt_tls_base = NULL;
 
-    extern thread_helper_context td_hctx[MAX_THREAD_NUM_EACH_ENCLAVE];
-    if (NULL != td_hctx)
+    extern unsigned long g_td_hctx_base_addr;
+    if (0 != g_td_hctx_base_addr)
     {
         int hcn = 0;
+        extern sgx_thread_mutex_t g_mutex_hctx;
+        sgx_thread_mutex_lock(&g_mutex_hctx);
+        extern thread_helper_context td_hctx[MAX_THREAD_NUM_EACH_ENCLAVE];
         while (hcn < MAX_THREAD_NUM_EACH_ENCLAVE) 
         {
             /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
@@ -1922,8 +1926,10 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
             }
             hcn++;
         }
-    } 
-
+        sgx_thread_mutex_unlock(&g_mutex_hctx);
+        ASSERT(NULL != app_lib_tls_base && "illegal tls base for lib!");
+    }
+    
     /* If we're a non-initial thread, tls will be set to the parent's value,
      * or to &uninit_tls (i#2089), both of which will be is_dynamo_address().
      */

@@ -183,6 +183,9 @@ enclave {
         //int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
         long ocall_syscall_3_NToTio(long sysno, long N1, [out, size=l2] void *T2, int l2, [in, out, size=l3] void *T3, int l3);
 
+        //int madvise(void *addr, size_t length, int advice);
+        long ocall_syscall_3_PiNN(long sysno, [in, size=N2] void *P1, long N2, long N3);
+
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S1, long N2, long N3);

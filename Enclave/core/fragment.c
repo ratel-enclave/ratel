@@ -4375,7 +4375,7 @@ fragment_add_ibl_target(dcontext_t *dcontext, app_pc tag,
                     hashtable_ibl_study(dcontext, ibl_table, 0/*table consistent*/);
                 });
                 STATS_INC(num_ibt_exit_unknown);
-                ASSERT_CURIOSITY_ONCE(false && "fragment_add_ibl_target unknown reason");
+                // ASSERT_CURIOSITY_ONCE(false && "fragment_add_ibl_target unknown reason");  //cdd --
             }
             /* nothing to do, just sanity checking */
             LOG(THREAD, LOG_FRAGMENT, 2,
