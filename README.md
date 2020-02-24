@@ -130,8 +130,9 @@ Contributors
 ------------
 The founders of the Ratel project are
 
-    * xxx and
-    * xxx;
+    * Pinghai Yuan, Satyaki Sen and Prateek Saxena at National University of Singapore; and
+    * Jinhua Cui at National University of Defense Technology and National University of Singapore; and
+    * Shweta Shinde at UC Berkeley.
 
 Any kind of contributions for Ratel are always welcome! We will push a contributing guideline to the source and accept pull requests when the project becomes much better and more stable.
 
