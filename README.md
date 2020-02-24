@@ -87,7 +87,7 @@ Then run **make** in the same directory (e.g., /home/myhome/github/ratel):
 
 How to Run an Application with Ratel?
 -----------------------------------
-**1. Run Built-in Examples in Graphene-SGX**
+**1. Run Built-in Examples with Ratel**
 
 Go to the ***dbi_test*** folder then do **make** to do the test by our existing examples:
   ```
