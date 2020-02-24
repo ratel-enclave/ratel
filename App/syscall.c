@@ -495,25 +495,24 @@ long ocall_syscall_1_N(long sysno, long N1)
                 if (SYS_exit == sysno)   
                 {
                     #define MAX_THREAD_NUM_EACH_ENCLAVE 10
-                    extern sgx_thread_priv_params trd_priv_params[MAX_THREAD_NUM_EACH_ENCLAVE];
-                    extern volatile int g_trd_num;
-                    extern pthread_mutex_t lock_m;
 
                     int trd_num = 0;
                     unsigned long tid = syscall(SYS_gettid);
+                    extern pthread_mutex_t lock_m;
+                    pthread_mutex_lock(&lock_m);
+                    extern sgx_thread_priv_params trd_priv_params[MAX_THREAD_NUM_EACH_ENCLAVE];
+
                     while (trd_num < MAX_THREAD_NUM_EACH_ENCLAVE) 
                     {
                         /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
                         if (trd_priv_params[trd_num].thread_id == tid)
                         {
-                            pthread_mutex_lock(&lock_m);
                             memset(&trd_priv_params[trd_num], 0, sizeof(sgx_thread_priv_params));
-                            pthread_mutex_unlock(&lock_m);
-
                             break;
                         }
                         trd_num++;
                     }
+                    pthread_mutex_unlock(&lock_m);
                 }
             }
         }
@@ -658,6 +657,7 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
     case SYS_ftruncate:
     case SYS_arch_prctl:
     case SYS_dup2:
+    case SYS_shutdown:
     case SYS_kill:
     case SYS_listen:
         ret = syscall(sysno, N1, N2);
@@ -1076,9 +1076,9 @@ long ocall_syscall_3_NTiNPP(long sysno, long N1, void *T2, int l2, long N3, void
             /* shadowing a nested struct iovec */
             int s_iov = sizeof(struct iovec);
             int c_iov = msg->msg_iovlen;
-            struct iovec *iov_shd = (struct iovec*)malloc(c_iov * s_iov + 1);
-            assert(NULL != iov_shd);
-            memset(iov_shd, 0, c_iov * s_iov + 1);   //cdd --
+            struct iovec *iov_shd = (struct iovec*)malloc(c_iov * s_iov);
+            assert(MAP_FAILED != iov_shd && NULL != iov_shd);
+            memset(iov_shd, 0, c_iov * s_iov);   //cdd --
             unsigned long iov_shd_addr = (unsigned long)iov_shd;
 
             /* use the outside addresses to receive msg */
@@ -1190,6 +1190,23 @@ long ocall_syscall_3_NToTio(long sysno, long N1, void *T2, int l2, void *T3, int
     case SYS_getsockname:
         ret = syscall(sysno, N1, T2, T3);
 
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_PiNN(long sysno, void *P1, long N2, long N3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno) {
+    case SYS_madvise:
+        ret = syscall(sysno, P1, N2, N3);
         b = true;
         break;
     }
@@ -1361,9 +1378,9 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
             #define sizeof_epoll_event       12
             int size = N3 * sizeof_epoll_event;
 
-            char *pevents = malloc(size + 1);
+            char *pevents = malloc(size);
             assert(MAP_FAILED != pevents && NULL != pevents);
-            memset(pevents, 0, size + 1);
+            memset(pevents, 0, size);
             memcpy(pevents, Tio, size);
 
             ret = syscall(sysno, N1, (void*)pevents, N3, N4);

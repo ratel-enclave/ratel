@@ -233,7 +233,6 @@ void sgx_helper_cpuid(void* drctx)
     dr_set_mcontext(drctx, &mctx);
 }
 
-
 void sgx_helper_rdtsc(void* drctx)
 {
     // dcontext_t *drctx = get_thread_private_dcontext();
@@ -274,6 +273,7 @@ int sgx_helper_pre_clone(dcontext_t *drctx, dr_mcontext_t *mctx, thread_helper_c
     td_hctx->first_init = true;
     
     ASSERT(UNINIT_HCTX != td_hctx->td_hctx_self);
+    memset(&td_hctx->dmctx, 0, sizeof(dr_mcontext_t));
     memcpy(&td_hctx->dmctx, mctx, sizeof(dr_mcontext_t));
 
     /* store all args for child checking later */
@@ -371,20 +371,21 @@ void sgx_helper_syscall(void* drctx)
 
         /* save last stack frame before walking into next function */
         asm volatile ("mov  %%rbp, %%rax; mov  %%rax, %0" : "=m"(upctx_rbp) :);
+        memset(&td_hctx[hcn], 0, sizeof(thread_helper_context));
         td_hctx[hcn].upctx_rbp = upctx_rbp;
 
         if(sgx_helper_pre_clone(drctx, &mctx, &td_hctx[hcn]))
             ASSERT(false && "calling sgx_helper_pre_clone failed!");
     }
 
-    #define SYS_madvise 28
-    #define SYS_shutdown 48
-    if (SYS_madvise == sysno || SYS_shutdown == sysno)
-    {
-        mctx.rax = 0;
-        dr_set_mcontext(drctx, &mctx);
-        return;
-    }
+    // #define SYS_madvise 28
+    // #define SYS_shutdown 48
+    // if (SYS_madvise == sysno || SYS_shutdown == sysno)
+    // {
+    //     mctx.rax = 0;
+    //     dr_set_mcontext(drctx, &mctx);
+    //     return;
+    // }
 
     res = sgx_instr_syscall_codecache(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
 

@@ -195,16 +195,19 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     return ret;
 }
 
+#include "../sgx_thread.h"
 static inline void cleanup_exited_thread_inside_trace()
 {
-    extern unsigned long g_td_hctx_base_addr;
-
-    thread_helper_context_shadow *td_hctx_shdw = (thread_helper_context_shadow *)g_td_hctx_base_addr;
-    ASSERT((NULL != td_hctx_shdw ? 1 : 0));
-
     int hcn = 0;
     int tid = sgx_ocall_syscall_0(SYS_gettid);
     int found = 0;
+
+    extern sgx_thread_mutex_t g_mutex_hctx;
+    sgx_thread_mutex_lock(&g_mutex_hctx);
+    extern unsigned long g_td_hctx_base_addr;
+    thread_helper_context_shadow *td_hctx_shdw = (thread_helper_context_shadow *)g_td_hctx_base_addr;
+    ASSERT((NULL != td_hctx_shdw ? 1 : 0));
+
     while (hcn < MAX_THREAD_NUM_EACH_ENCLAVE) 
     {
         /* the argument clone_child_stack as an index to find out which td_hctx_shdw[x] belongs to ECALL thread */
@@ -218,6 +221,7 @@ static inline void cleanup_exited_thread_inside_trace()
         }
         hcn++;
     }
+    sgx_thread_mutex_unlock(&g_mutex_hctx); 
 
     int pid = sgx_ocall_syscall_0(SYS_getpid);
     if(tid != pid)
@@ -375,6 +379,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
 
     case SYS_ftruncate:
     case SYS_dup2:
+    case SYS_shutdown:
     case SYS_listen:
     case SYS_kill:
         ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
@@ -558,6 +563,10 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
         }
 
+    case SYS_madvise:   
+        ocall_syscall_3_PiNN(&ret, sysno, (void *)_rdi, _rsi, _rdx);
+        break;
+
     case SYS_poll:
         ocall_syscall_3_ToNN(&ret, sysno, (void *)_rdi, len_pollfd, _rsi, _rdx);
         break;
@@ -697,7 +706,8 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
             ocall_syscall_4_NNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10);
 
-            if (ret != -1 && ret != -ENOMEM) {
+            if (ret != -1 && ret != -ENOMEM) 
+            {
                 // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
                 ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
             }
@@ -871,6 +881,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_kill:
     case SYS_dup2:
     case SYS_listen:
+    case SYS_shutdown:
     case SYS_nanosleep:
     case SYS_rename:
     case SYS_pipe2:
@@ -880,7 +891,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         //Three paramters
     /* FIXME: //cdd here we simply ignore giving advice to kernel as they are different world */
     // off: signals, on: pthread //the root cause lies in out of stack space
-    // case SYS_madvise:
+    case SYS_madvise:
+
     case SYS_tgkill:
     case SYS_open:
     case SYS_read:
