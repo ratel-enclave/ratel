@@ -109,30 +109,29 @@ It is now being developed actively by Ratel Team for enabling more features, suc
 Benchmarks and Applications
 -----------------------------------------------
 Although Ratel surely is not full-featured or stable enough, we have demonstrated the effectiveness of Ratel across more than 6 benchmark suites such as:
-    * Parsec-Splash-2
-    * SPEC CPU
-    * HBench-OS
-    * IOzone
-    * FSCQ File system
-    * FSCQ single-system call, etc.
+  * Parsec-Splash-2
+  * SPEC CPU
+  * HBench-OS
+  * IOzone
+  * FSCQ File system
+  * FSCQ single-system call, etc.
 
 and dozens of real-world applications such as: 
-    * Privado-Torch
-    * Lighttpd
-    * H2O
-    * Memcached
-    * SQLite
-    * CURL, etc.
+  * Privado-Torch
+  * Lighttpd
+  * H2O
+  * Memcached
+  * SQLite
+  * CURL, etc.
 
 The related test cases we did can be seen from [here](https://github.com/ratel-enclave/ratel-tests). Ratel is rendering itself promising for many users and enterprises as it can be deployed or extended in different environments. 
 
 Contributors
 ------------
 The founders of the Ratel project are
-
-    * Pinghai Yuan, Satyaki Sen and Prateek Saxena at National University of Singapore; and
-    * Jinhua Cui at National University of Defense Technology and National University of Singapore; and
-    * Shweta Shinde at UC Berkeley.
+  * Pinghai Yuan, Satyaki Sen and Prateek Saxena at National University of Singapore; and
+  * Jinhua Cui at National University of Defense Technology and National University of Singapore; and
+  * Shweta Shinde at UC Berkeley.
 
 Any kind of contributions for Ratel are always welcome! We will push a contributing guideline to the source and accept pull requests when the project becomes much better and more stable.
 
