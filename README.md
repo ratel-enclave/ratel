@@ -38,7 +38,7 @@ Use the following command(s) to download the latest source code of the SGX Drive
   ```
 Follow the instructions in the [ratel-driver](https://github.com/ratel-enclave/ratel-driver) project to build and install the SGX driver.
 
-**2. Download and Install the Ratel SDK Package**
+**2. Download and Install the Ratel SDK**
 
 Use the following command(s) to download the latest source code of Ratel SDK:
   ```
@@ -46,7 +46,7 @@ Use the following command(s) to download the latest source code of Ratel SDK:
   ```
 Follow the instructions in the [ratel-sdk](https://github.com/ratel-enclave/ratel-sdk) project to build and install the Ratel SDK. Particularly, note that use ***/opt/intel*** as installation location.
 
-**3. Download and Install the Ratel PSW Package**
+**3. Download and Install the Ratel PSW**
 
 Use the following command(s) to download the latest source code of Ratel PSW:
   ```
@@ -55,7 +55,7 @@ Use the following command(s) to download the latest source code of Ratel PSW:
 Follow the instructions in the [ratel-psw](https://github.com/ratel-enclave/ratel-psw) project to build and install the ratel PSW.
 
 ### Building and Setting Ratel-SGX:
-**1. Download and Install the Ratel Package**
+**1. Download and Install the Ratel**
 
 Use the following command(s) to download the latest source code of Ratel:
   ```
