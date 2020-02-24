@@ -3,9 +3,7 @@ Ratel
 
 Introduction
 ------------
-A system of Ratel which enables Dynamic Binary Interpreter (DBI) on Intel(R) SGX Enclaves for unmodified Linux applications.
-
-Ratel is a more lightweight guest OS with benefits comparing to running a rich or complete OS or to other homologous sysytems, elaborated to run and protect user-level applications in isolation from other software on the untrusted system and to even be able to enable re-use of existing DynamoRIO clients for code optimization and introspection (as being a part of our ongoing work).
+A system of Ratel which enables Dynamic Binary Interpreter (DBI) on Intel(R) SGX Enclaves for unmodified Linux applications. Ratel is a more lightweight comparing to running a rich or complete OS, elaborated to run and protect user-level applications in isolation from other software on the untrusted system and to even be able to enable re-use of existing DynamoRIO clients for dynamic code optimization and introspection (as being a part of our ongoing work).
 
 Ratel supports unmodified, native Linux applications with no access to source code, developer effort, or changes to the binaries. Presently, Ratel runs on Linux and Intel(R) SGX enclaves on Linux platforms and can be the ease of porting to different OSes. Rate only works on the x86_64 architecture and is currently tested on Ubuntu 16.04 (both server and desktop version), along with Linux kernel versions 4.x. We recommend building and installing Ratel on the same host platform. If you find problems with Ratel on other Linux distributions, please feel free to contact us with a detailed bug report.
 
