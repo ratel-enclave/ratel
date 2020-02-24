@@ -3,11 +3,11 @@ Ratel
 
 Introduction
 ------------
-A system of Ratel which enables Dynamic Binary Interpreter (DBI) on Intel SGX Enclaves for unmodified Linux applications. Ratel is built on a robust DBT system for x86_64 binaries called DynamoRIO. The central focus of this project is a design that preserves two-way transparency: the DBT engine runs on top of a SGX-enabled software stack, both of which originally assume direct low-level control of the binary and its OS interfaces. Ratel ensures that the DBT engine maintains its original goal of ensuring transparency to the virtualized application, while hiding from the SGX software stack that the DBT engine interposes between itself and the virtualized application.
+A system of Ratel which enables Dynamic Binary Interpreter (DBI) on Intel(R) SGX Enclaves for unmodified Linux applications.
 
 Ratel is a more lightweight guest OS with benefits comparing to running a rich or complete OS or to other homologous sysytems, elaborated to run and protect user-level applications in isolation from other software on the untrusted system and to even be able to enable re-use of existing DynamoRIO clients for code optimization and introspection (as being a part of our ongoing work).
 
-Ratel supports unmodified, native Linux applications with no access to source code, developer effort, or changes to the binaries. Presently, Ratel runs on Linux and Intel SGX enclaves on Linux platforms and can be the ease of porting to different OSes. Rate only works on the x86_64 architecture and is currently tested on Ubuntu 16.04 (both server and desktop version), along with Linux kernel versions 4.x. We recommend building and installing Ratel on the same host platform. If you find problems with Ratel on other Linux distributions, please feel free to contact us with a detailed bug report.
+Ratel supports unmodified, native Linux applications with no access to source code, developer effort, or changes to the binaries. Presently, Ratel runs on Linux and Intel(R) SGX enclaves on Linux platforms and can be the ease of porting to different OSes. Rate only works on the x86_64 architecture and is currently tested on Ubuntu 16.04 (both server and desktop version), along with Linux kernel versions 4.x. We recommend building and installing Ratel on the same host platform. If you find problems with Ratel on other Linux distributions, please feel free to contact us with a detailed bug report.
 
 License
 -------
@@ -23,35 +23,35 @@ How to Build Ratel?
 - Ensure that you have one of the following required operating systems:  
   * Ubuntu\* 16.04.1 LTS Desktop 64bits
   * Ubuntu\* 16.04.1 LTS Server 64bits
-- Ensure that you have a machine with hardware support for Intel SGX:
+- Ensure that you have a machine with hardware support for Intel(R) SGX:
   * Please check [SGX-hardware](https://github.com/ayeks/SGX-hardware) for more details
 
-### Building with Intel SGX Dependencies:
-The Linux Ratel SGX software stack is comprised of the Intel(R) SGX driver, the patched Intel SGX SDK, and the patched Intel SGX Platform Software (PSW). To build all the dependencies for Ratel completely, do the following steps:
+### Building with Intel(R) SGX Dependencies:
+The Linux Ratel SGX software stack is comprised of the Intel(R) SGX driver, the patched Intel(R) SGX SDK, and the patched Intel(R) SGX Platform Software (PSW). To build all the dependencies for Ratel completely, do the following steps:
 
-**1. Download and Install the Intel SGX Driver**
+**1. Download and Install the Intel(R) SGX Driver**
 
-Use the following command(s) to download the latest source code of the SGX Driver. Also, you can download and install it from the official Intel GitHub repositories <https://github.com/01org/linux-sgx-driver>:
+Use the following command(s) to download the latest source code of the SGX Driver. Also, you can download and install it from the official Intel(R) GitHub repositories <https://github.com/01org/linux-sgx-driver>:
   ```
     $ git clone https://github.com/ratel-enclave/ratel-driver.git .
   ```
 Follow the instructions in the [ratel-driver](https://github.com/ratel-enclave/ratel-driver) project to build and install the SGX driver.
 
-**2. Download and Install the patched Intel SDK**
+**2. Download and Install the Intel(R) SDK patched for Ratel**
 
-Use the following command(s) to download the latest source code of the patched Intel SDK:
+Use the following command(s) to download the latest source code of the patched SDK:
   ```
     $ git clone https://github.com/ratel-enclave/ratel-sdk.git .
   ```
-Follow the instructions in the [patched-ratel-sdk](https://github.com/ratel-enclave/ratel-sdk) project to build and install the patched Intel SDK. Particularly, note that use ***/opt/intel*** as installation location.
+Follow the instructions in the [patched-ratel-sdk](https://github.com/ratel-enclave/ratel-sdk) project to build and install the patched SDK. Particularly, note that use ***/opt/intel*** as installation location.
 
-**3. Download and Install the patched Intel PSW**
+**3. Download and Install the Intel(R) PSW patched for Ratel**
 
-Use the following command(s) to download the latest source code of the patched Intel PSW:
+Use the following command(s) to download the latest source code of the patched PSW:
   ```
     $ git clone https://github.com/ratel-enclave/ratel-psw.git .
   ```
-Follow the instructions in the [patched-ratel-psw](https://github.com/ratel-enclave/ratel-psw) project to build and install the patched Intel PSW.
+Follow the instructions in the [patched-ratel-psw](https://github.com/ratel-enclave/ratel-psw) project to build and install the patched PSW.
 
 ### Building and Setting Ratel-SGX:
 **1. Download and Install the Ratel**
