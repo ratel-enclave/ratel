@@ -25,7 +25,7 @@ How to Build Ratel?
   * Please check [SGX-hardware](https://github.com/ayeks/SGX-hardware) for more details
 
 ### Building with Intel(R) SGX Dependencies:
-The Linux Ratel SGX software stack is comprised of the Intel(R) SGX driver, the patched Intel(R) SGX SDK, and the patched Intel(R) SGX Platform Software (PSW). To build all the dependencies for Ratel completely, do the following steps:
+The Linux Ratel SGX software stack is comprised of the Intel(R) SGX driver, the modified Intel(R) SGX SDK, and the modified Intel(R) SGX Platform Software (PSW). To build all the dependencies for Ratel completely, do the following steps:
 
 **1. Download and Install the Intel(R) SGX Driver**
 
@@ -35,21 +35,21 @@ Use the following command(s) to download the latest source code of the SGX Drive
   ```
 Follow the instructions in the [ratel-driver](https://github.com/ratel-enclave/ratel-driver) project to build and install the SGX driver.
 
-**2. Download and Install the Intel(R) SDK patched for Ratel**
+**2. Download and Install the Intel(R) SDK Modified for Ratel**
 
-Use the following command(s) to download the latest source code of the patched SDK:
+Use the following command(s) to download the latest source code of the modified SDK:
   ```
     $ git clone https://github.com/ratel-enclave/ratel-sdk.git .
   ```
-Follow the instructions in the [patched-ratel-sdk](https://github.com/ratel-enclave/ratel-sdk) project to build and install the patched SDK. Particularly, note that use ***/opt/intel*** as installation location.
+Follow the instructions in the [modified-ratel-sdk](https://github.com/ratel-enclave/ratel-sdk) project to build and install the modified SDK. Particularly, note that use ***/opt/intel*** as installation location.
 
-**3. Download and Install the Intel(R) PSW patched for Ratel**
+**3. Download and Install the Intel(R) PSW Modified for Ratel**
 
-Use the following command(s) to download the latest source code of the patched PSW:
+Use the following command(s) to download the latest source code of the modified PSW:
   ```
     $ git clone https://github.com/ratel-enclave/ratel-psw.git .
   ```
-Follow the instructions in the [patched-ratel-psw](https://github.com/ratel-enclave/ratel-psw) project to build and install the patched PSW.
+Follow the instructions in the [modified-ratel-psw](https://github.com/ratel-enclave/ratel-psw) project to build and install the modified PSW.
 
 ### Building and Setting Ratel-SGX:
 **1. Download and Install the Ratel**
