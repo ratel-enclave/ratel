@@ -199,7 +199,7 @@ static bool _generate_sgx_procmaps(big_buffer_t *buf, bool debug)
 /*----------------- functions for reading the virtual procmaps --------------*/
 int sgx_procmaps_read_start(void)
 {
-    bool res;
+    bool res = false;
 
     /* generate a new snapshot of procmaps if debug */
     YPHASSERT(SGX_PROCMAPS.big_buf.data != NULL);
