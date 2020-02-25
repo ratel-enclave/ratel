@@ -1,11 +1,11 @@
-Ratel
+[Ratel Overview Page](https://ratel-enclave.github.io/)
 ================================================
 
 Introduction
 ------------
-A system of Ratel which enables Dynamic Binary Interpreter (DBI) on Intel(R) SGX Enclaves for unmodified Linux applications. Ratel is a more lightweight comparing to running a rich or complete OS, elaborated to run and protect user-level applications in isolation from other software on the untrusted system and to even be able to enable re-use of existing DynamoRIO clients for dynamic code optimization and introspection (as being a part of our ongoing work).
+A system of Ratel which enables Dynamic Binary Tranlation (DBT) on Intel(R) SGX Enclaves for unmodified Linux applications. Ratel is a more lightweight comparing to running a rich or complete OS, elaborated to run and protect user-level applications in isolation from other software on the untrusted system and to even be able to enable re-use of existing DynamoRIO clients for dynamic code optimization and introspection (as being a part of our ongoing work).
 
-Ratel supports unmodified, native Linux applications with no access to source code, developer effort, or changes to the binaries. Presently, Ratel runs on Linux and Intel(R) SGX enclaves on Linux platforms and can be the ease of porting to different OSes. Rate only works on the x86_64 architecture and is currently tested on Ubuntu 16.04 (both server and desktop version), along with Linux kernel versions 4.x. We recommend building and installing Ratel on the same host platform. If you find problems with Ratel on other Linux distributions, please feel free to contact us with a detailed bug report.
+Ratel supports unmodified, native Linux applications with no access to source code, developer effort, or changes to the binaries. Presently, Ratel runs on Linux and Intel(R) SGX enclaves on Linux platforms and can be the ease of porting to different OSes. Rate only works on the x86-64 architecture and is currently tested on Ubuntu 16.04 (both server and desktop version), along with Linux kernel versions 4.15.0. We recommend building and installing Ratel on the same host platform. If you find problems with Ratel on other Linux distributions, please feel free to contact us with a detailed bug report.
 
 License
 -------
@@ -87,13 +87,13 @@ How to Run an Application with Ratel?
 -----------------------------------
 **1. Run Built-in Examples with Ratel**
 
-Go to the ***dbi_test*** folder then do **make** to do the test by our existing examples:
+Go to the ***dbt_test*** folder then do **make** to do the test by our existing examples:
   ```
-    $ cd dbi_test/ && make
+    $ cd dbt_test/ && make
   ```
 Run program with Ratel:
   ```
-    $ ./ratel ./dbi_test/hello
+    $ ./ratel ./dbt_test/hello
     Hello
   ```
 Alternatively, compile your example program with **-pie -fPIC** gcc flags, then run them same as above.
@@ -102,21 +102,17 @@ Alternatively, compile your example program with **-pie -fPIC** gcc flags, then 
   ```
 NOTE: Beginning with Ubuntu 17.10, Ubuntu developers decided to build packages with PIE enabled as the default across all architectures, please check [here](https://en.wikipedia.org/wiki/Position-independent_code) and [here](https://lists.ubuntu.com/archives/ubuntu-devel/2017-June/039816.html) for more.
 
-What is the Status of the Ratel Implementation?
------------------------------------------------
-It is now being developed actively by Ratel Team for enabling more features, such as implementing multi-processing, bridging the Ratel client interface for DBI, supporting multi-language environment and additional functionalities required in various settings.
-
 Benchmarks and Applications
 -----------------------------------------------
-Although Ratel surely is not full-featured or stable enough, we have demonstrated the effectiveness of Ratel across more than 6 benchmark suites such as:
-  * Parsec-Splash-2
+Currently we have tested Ratel with 6 benchmark suites :
+  * [Parsec-Splash-2]
   * SPEC CPU
   * HBench-OS
   * IOzone
   * FSCQ File system
   * FSCQ single-system call, etc.
 
-and dozens of real-world applications such as: 
+We have run following real world applications successfully with Ratel :
   * Privado-Torch
   * Lighttpd
   * H2O
@@ -124,16 +120,7 @@ and dozens of real-world applications such as:
   * SQLite
   * CURL, etc.
 
-The related test cases we did can be seen from [here](https://github.com/ratel-enclave/ratel-tests). Ratel is rendering itself promising for many users and enterprises as it can be deployed or extended in different environments. 
-
-Contributors
-------------
-The founders of the Ratel project are
-  * Pinghai Yuan, Satyaki Sen and Prateek Saxena at National University of Singapore; and
-  * Jinhua Cui at National University of Defense Technology and National University of Singapore; and
-  * Shweta Shinde at UC Berkeley.
-
-Any kind of contributions for Ratel are always welcome! We will push a contributing guideline to the source and accept pull requests when the project becomes much better and more stable.
+The related benchmarks and applications can be accessed from [here](https://github.com/ratel-enclave/ratel-tests).
 
 Contact
 -------
