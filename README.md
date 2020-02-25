@@ -94,7 +94,7 @@ Run program with Ratel:
   ```
 Alternatively, compile your example program with **-pie -fPIC** gcc flags, then run them same as above.
   ```
-    $ ./ratel ./xxx
+    $ ./ratel ./xxx [OPTION]
   ```
 NOTE: Beginning with Ubuntu 17.10, Ubuntu developers decided to build packages with PIE enabled as the default across all architectures, please check [here](https://en.wikipedia.org/wiki/Position-independent_code) and [here](https://lists.ubuntu.com/archives/ubuntu-devel/2017-June/039816.html) for more.
 
