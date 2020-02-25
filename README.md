@@ -58,10 +58,6 @@ Use the following command(s) to download the latest source code of Ratel:
   ```
     $ git clone https://github.com/ratel-enclave/ratel.git .
   ```
-Run ***dyrio2sgx.sh*** with sudo, no need of args (even though the scripts says so):
-  ```
-    $ cd misc/ && sudo ./dyrio2sgx.sh
-  ```
 Go to the ***cpu_setup*** folder and do **make**:
   ```
     $ cd misc/cpu_setup/ && make
@@ -74,7 +70,7 @@ Switch off ASLR with the following command:
   ```
     $ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
   ```
-Or to permanently disable ASLR (across boots). With sudo permission, create/update a file ***/etc/sysctl.d/01-disable-aslr.conf*** to contain:
+Or to permanently disable ASLR (across boots). With sudo permission, create/update a file ***/etc/sysctl.d/01-disable-aslr.conf*** to contain:  
   ```
     kernel.randomize_va_space = 0
   ```
