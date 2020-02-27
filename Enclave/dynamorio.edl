@@ -237,6 +237,9 @@ enclave {
         //long clone(unsigned long flags, void *child_stack, int *ptid, int *ctid, unsigned long newtls);
         long ocall_syscall_5_NPiNPoPoN(long sysno, unsigned long N1, [in, size=child_stack] void *Pi, unsigned long N2, size_t child_stack, [out] int *Po1, [out] int *Po2, unsigned long po12, unsigned long N3);
 
+        //int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+        long ocall_syscall_5_NTioTioTioTi(long sysno, long N1, [in,out, size=l2] void *T2, [in,out, size=l2] void *T3, [in,out, size=l2] void *T4, int l2, [in, size=l5] void *T5, int l5);
+
 
         /****************************syscalls with 6 paramters**********************************************/
         //void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
