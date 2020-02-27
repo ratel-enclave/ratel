@@ -108,5 +108,6 @@
 #define len_socketpair sizeof(int)*2
 #define len_pipefd sizeof(int)*2
 #define len_name 80
+#define len_fd_set 128
 
 #endif  //#define _ST_SIZE_H__
