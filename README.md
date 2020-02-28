@@ -104,7 +104,7 @@ NOTE: Beginning with Ubuntu 17.10, Ubuntu developers decided to build packages w
 Benchmarks and Applications
 -----------------------------------------------
 Currently we have tested Ratel with 6 benchmark suites :
-  * [Parsec-Splash-2]
+  * Parsec-Splash-2
   * SPEC CPU
   * HBench-OS
   * IOzone

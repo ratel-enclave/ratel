@@ -1488,7 +1488,7 @@ long ocall_syscall_5_NPiNPoPoN(long sysno, unsigned long N1, void *Pi, unsigned 
     return ret;
 }
 
-long ocall_syscall_5_NTioTioTioTi(long sysno, long N1, long T2, long T3, long T4, int l1, long T5, int l2)
+long ocall_syscall_5_NTioTioTioTi(long sysno, long N1, void *T2, void *T3, void *T4, int l1, void *T5, int l2)
 {
     long ret = 0;
     bool b = false;
