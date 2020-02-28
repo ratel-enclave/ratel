@@ -184,11 +184,18 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     switch (cmd)
     {
     case FIONREAD:
+    case TCGETS:
         ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_fionread);
         break;
 
+    case TCSETS:
+    case TCSETSW:
+    case TCSETSF:
+        ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
+        break;
+
     default:
-        unimplemented_syscall(SYS_fcntl);
+        unimplemented_syscall(SYS_ioctl);
         break;
     }
 

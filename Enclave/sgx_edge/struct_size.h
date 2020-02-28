@@ -134,12 +134,18 @@
 #define len_socklen_t 4
 #define len_child_stack 0x1000
 #define MAX_EPOLL_EVENTS 10
-#define FIONREAD 0x541B
 #define len_ioctl 512
 #define len_fionread 4
+#define len_termios 60
 #define len_socketpair sizeof(int)*2
 #define len_pipefd sizeof(int)*2
 #define len_name 80
 #define len_fd_set 128
+
+#define TCGETS		0x5401
+#define TCSETS		0x5402
+#define TCSETSW		0x5403
+#define TCSETSF		0x5404
+#define FIONREAD 	0x541B
 
 #endif  //#define _ST_SIZE_H__
