@@ -184,11 +184,18 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     switch (cmd)
     {
     case FIONREAD:
+    case TCGETS:
         ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_fionread);
         break;
 
+    case TCSETS:
+    case TCSETSW:
+    case TCSETSF:
+        ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
+        break;
+
     default:
-        unimplemented_syscall(SYS_fcntl);
+        unimplemented_syscall(SYS_ioctl);
         break;
     }
 
@@ -757,6 +764,10 @@ long sgx_ocall_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         ocall_syscall_5_NPiNPoPoN(&ret, sysno, (ulong)_rdi, (void *)_rsi, _rsi, len_child_stack, (int *)_rdx, (int *)_r10, _r10, (ulong)_r8); 
         break;
 
+    case SYS_select:
+        ocall_syscall_5_NTioTioTioTi(&ret, sysno, _rdi, (void *)_rsi, (void *)_rdx, (void *)_r10, len_fd_set, (void *)_r8, len_timeval);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -938,6 +949,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_setsockopt:
     case SYS_getsockopt:
     case SYS_clone:
+    case SYS_select:
         return sgx_ocall_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
         break;
 
