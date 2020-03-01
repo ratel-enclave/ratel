@@ -68,6 +68,7 @@ To permanently disable ASLR (across boots). With sudo permission, create/update 
   ```
     kernel.randomize_va_space = 0
   ```
+
 Go to the ***cpu_setup*** folder:
   ```
     $ cd misc/cpu_setup/
@@ -81,7 +82,6 @@ To remove the module installed and clean all files generated:
     $ sudo ./setup.sh clean
   ```
 NOTE: You will need to run ***setup.sh install*** whenever you restart your computer or wake it up from sleep after a long time.
-
 
 How to Run an Application with Ratel?
 -----------------------------------
