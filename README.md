@@ -82,15 +82,6 @@ To remove the module installed and clean all files generated:
   ```
 NOTE: You will need to run ***setup.sh install*** whenever you restart your computer or wake it up from sleep after a long time.
 
-Go to the ***cpu_setup*** folder and do **make**:
-  ```
-    $ cd misc/cpu_setup/ && make
-  ```
-Run ***run.sh*** with sudo, which invokes an LKM (Linux kernel module) to set the FSGSBASE bit in CR4 to 1, enabling us to use rdfsbase/rdgsbase and wrfsbase/wrgsbase in **ratel-enclave**. If needed, use command **dmesg** getting the log to check this bit is set successfully or not:
-  ```
-    $ sudo ./run.sh
-  ```
-NOTE: You will need to run run.sh whenever you restart your computer or wake it up from sleep after a long time.
 
 How to Run an Application with Ratel?
 -----------------------------------
