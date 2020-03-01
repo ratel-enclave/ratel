@@ -1,3 +1,5 @@
+
+/* Copyright (c) 2018-2020 Ratel Authors.  All rights reserved. */
 /* **********************************************************
  * Copyright (c) 2011-2017 Google, Inc.  All rights reserved.
  * Copyright (c) 2000-2010 VMware, Inc.  All rights reserved.
@@ -34,6 +36,7 @@
 /* Copyright (c) 2003-2007 Determina Corp. */
 /* Copyright (c) 2001-2003 Massachusetts Institute of Technology */
 /* Copyright (c) 2000-2001 Hewlett-Packard Company */
+
 
 /* decode.c -- a full x86 decoder */
 

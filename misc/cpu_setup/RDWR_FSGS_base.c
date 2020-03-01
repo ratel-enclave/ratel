@@ -1,5 +1,5 @@
 /* **********************************************************
- * Copyright (c) 2014-2015 Google, Inc.  All rights reserved.
+ * Copyright (c) 2018-2020 Ratel Authors.  All rights reserved.
  * **********************************************************/
 
 /*
@@ -13,7 +13,7 @@
  *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
- * * Neither the name of Google, Inc. nor the names of its contributors may be
+ * * Neither the name of the copyright holder nor the names of its contributors may be
  *   used to endorse or promote products derived from this software without
  *   specific prior written permission.
  *
@@ -30,26 +30,42 @@
  * DAMAGE.
  */
 
-/*
- * cross-platform assembly and trampoline code
- */
 
-#include "asm_defines.asm"
-START_FILE
+#include <linux/module.h>
+#include <linux/kernel.h>
 
-DECL_EXTERN(internal_error)
+MODULE_LICENSE("GPL");
 
-/* For debugging: report an error if the function called by call_switch_stack()
- * unexpectedly returns.  Also used elsewhere.
- */
-        DECLARE_FUNC(unexpected_return)
-GLOBAL_LABEL(unexpected_return:)
-        CALLC3(GLOBAL_REF(internal_error), HEX(0), HEX(0), HEX(0))
-        /* internal_error normally never returns */
-        /* Infinite loop is intentional.  Can we do better in release build?
-         * XXX: why not a debug instr?
-         */
-        JUMP  GLOBAL_REF(unexpected_return)
-        END_FUNC(unexpected_return)
+int init_module(void)
+{
+    unsigned long cr4;
 
-END_FILE
+
+    /*unsigned long u = native_read_cr4();*/
+    asm volatile("mov %%cr4,%0\n\t" : "=r" (cr4), "=m" (__force_order));
+    printk(KERN_INFO "CR4: 0x%lx\n", cr4);
+
+    cr4 |= 0x10000;
+    asm volatile("mov %0,%%cr4\n\t" :: "rm" (cr4));
+
+    //Read CR4 again
+    asm volatile("mov %%cr4,%0\n\t" : "=r" (cr4), "=m" (__force_order));
+    printk(KERN_INFO "CR4: 0x%lx\n", cr4);
+
+    unsigned long fsbase;
+
+    asm volatile ( "rdfsbase %0" : "=rm" (fsbase));
+    printk(KERN_INFO "FSBASE: 0x%lx\n", fsbase);
+
+    //Test the useability of wrfsbase
+    asm volatile ( "wrfsbase %0" :: "rm" (fsbase));
+
+    return 0;
+}
+
+
+void cleanup_module(void)
+{
+}
+
+

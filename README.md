@@ -4,6 +4,8 @@
 Introduction
 ------------
 Ratel is a new system which enables Dynamic Binary Tranlation (DBT) on Intel(R) SGX Enclaves to run unmodified Linux binaries. Ratel is more lightweight than running a complete Library OS, elaborated to run and protect user-level applications in isolation from other softwares(e.g., OS kernel, hypervisor etc) on the untrusted system and to even be able to enable use of existing DynamoRIO clients for dynamic code optimization and instrumentation (as being a part of our ongoing work).
+=======
+Ratel is a new system which enables Dynamic Binary Tranlation (DBT) on Intel(R) SGX Enclaves to run unmodified Linux binaries. Ratel is more lightweight than running a complete Library OS, elaborated to run and protect user-level applications in isolation from other softwares(Eg: OS kernel, hypervisor etc) on the untrusted system and to even be able to enable use of existing DynamoRIO clients for dynamic code optimization and instrumentation (as being a part of our ongoing work).
 
 Ratel supports running unmodified, native Linux applications within SGX enclaves with no access to source code, without developer effort, or any changes to the binaries. Presently, Ratel runs on Intel(R) SGX enclaves on Linux platforms and can be the ease of porting to different OSes. Rate only works on the x86-64 architecture and is currently tested on Ubuntu 16.04 (both server and desktop version), along with Linux kernel versions 4.15.0. We recommend building and installing Ratel on the same host platform. If you find problems with Ratel on other Linux distributions, please feel free to contact us with a detailed bug report.
 
@@ -81,6 +83,16 @@ To remove the module installed and clean all files generated:
     $ sudo ./setup.sh clean
   ```
 NOTE: You will need to run ***setup.sh install*** whenever you restart your computer or wake it up from sleep after a long time.
+
+Go to the ***cpu_setup*** folder and do **make**:
+  ```
+    $ cd misc/cpu_setup/ && make
+  ```
+Run ***run.sh*** with sudo, which invokes an LKM (Linux kernel module) to set the FSGSBASE bit in CR4 to 1, enabling us to use rdfsbase/rdgsbase and wrfsbase/wrgsbase in **ratel-enclave**. If needed, use command **dmesg** getting the log to check this bit is set successfully or not:
+  ```
+    $ sudo ./run.sh
+  ```
+NOTE: You will need to run run.sh whenever you restart your computer or wake it up from sleep after a long time.
 
 How to Run an Application with Ratel?
 -----------------------------------

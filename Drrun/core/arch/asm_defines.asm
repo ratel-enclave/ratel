@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2020 Ratel Authors.  All rights reserved. */
 /* **********************************************************
  * Copyright (c) 2011-2016 Google, Inc.  All rights reserved.
  * Copyright (c) 2008-2009 VMware, Inc.  All rights reserved.
