@@ -23,7 +23,7 @@ How to Build Ratel?
 ### Building with Intel(R) SGX Dependencies:
 The Linux Ratel SGX software stack is comprised of the Intel(R) SGX driver, the modified Intel(R) SGX SDK, and the modified Intel(R) SGX Platform Software (PSW). To build all the dependencies for Ratel completely, do the following steps:
 
-**1. Download and Install the Intel(R) SGX Driver**
+**1. Download and install the Intel(R) SGX driver**
 
 Use the following command(s) to download the latest source code of the SGX Driver. Also, you can download and install it from the official Intel(R) GitHub repositories <https://github.com/01org/linux-sgx-driver>:
   ```
@@ -31,7 +31,7 @@ Use the following command(s) to download the latest source code of the SGX Drive
   ```
 Follow the instructions in the [ratel-driver](https://github.com/ratel-enclave/ratel-driver) project to build and install the SGX driver.
 
-**2. Download and Install the Intel(R) SDK for Ratel**
+**2. Download and install the Intel(R) SDK for Ratel**
 
 Use the following command(s) to download the latest source code of the modified SDK:
   ```
@@ -68,7 +68,6 @@ To permanently disable ASLR (across boots). With sudo permission, create/update 
   ```
     kernel.randomize_va_space = 0
   ```
-
 Go to the ***cpu_setup*** folder:
   ```
     $ cd misc/cpu_setup/
