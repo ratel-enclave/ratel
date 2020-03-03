@@ -726,11 +726,15 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         break;
 
     case SYS_pread64:
-        ocall_syscall_4_NToNN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _rdx, _r10);
+        ocall_syscall_4_NPoNN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _rdx, _r10);
         break;
 
     case SYS_socketpair:
         ocall_syscall_4_NNNTo(&ret, sysno, _rdi, _rsi, _rdx, (void *)_r10, len_socketpair);
+        break;
+
+    case SYS_pwrite64:
+        ocall_syscall_4_NPiNN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _rdx, _r10);
         break;
 
     default:
@@ -941,6 +945,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_sendmmsg:
     case SYS_socketpair:
     case SYS_pread64:
+    case SYS_pwrite64:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 

@@ -1308,6 +1308,42 @@ long ocall_syscall_4_NNNTo(long sysno, long N1, long N2, long N3, void *T4, int 
     return ret;
 }
 
+long ocall_syscall_4_NPiNN(long sysno, long N1, void *P2, int l2, long N3, long N4)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_pwrite64:
+        ret = syscall(sysno, N1, P2, N3, N4);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_4_NPoNN(long sysno, long N1, void *P2, int l2, long N3, long N4)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_pread64:
+        ret = syscall(sysno, N1, P2, N3, N4);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_4_NToNN(long sysno, long N1, void *T2, int l2, long N3, long N4)
 {
     long ret = 0;
@@ -1316,7 +1352,6 @@ long ocall_syscall_4_NToNN(long sysno, long N1, void *T2, int l2, long N3, long 
     switch (sysno)
     {
     case SYS_sendmmsg:
-    case SYS_pread64:
         ret = syscall(sysno, N1, T2, N3, N4);
         b = true;
         break;
