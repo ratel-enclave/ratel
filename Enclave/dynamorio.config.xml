@@ -5,8 +5,8 @@
   <HeapMaxSize>0x8000000</HeapMaxSize>
   <DynamorioCodeCacheSize>0x10000000</DynamorioCodeCacheSize>
   <TargetProgramArenaSize>0x80000000</TargetProgramArenaSize>
-  <TCSNum>10</TCSNum>
-  <TCSPolicy>0</TCSPolicy>
+  <TCSNum>11</TCSNum>
+  <TCSPolicy>1</TCSPolicy>
   <!-- Recommend changing 'DisableDebug' to 1 to make the enclave undebuggable for enclave release -->
   <DisableDebug>0</DisableDebug>
   <MiscSelect>0</MiscSelect>

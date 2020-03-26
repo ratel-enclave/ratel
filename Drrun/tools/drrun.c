@@ -111,7 +111,7 @@ static bool nocheck;
 #ifdef DRCONFIG
 # define TOOLNAME "drconfig"
 #elif defined(DRRUN)
-# define TOOLNAME "drrun"
+# define TOOLNAME "ratel"
 #elif defined(DRINJECT)
 # define TOOLNAME "drinject"
 #endif
