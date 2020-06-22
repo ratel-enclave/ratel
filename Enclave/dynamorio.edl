@@ -53,6 +53,7 @@ enclave {
         /* public int sgxdbi_enclave_entry(int argc, [in] char ***p_argv, [in] char ***p_env); */
         public int sgxdbi_enclave_entry(long argc, [user_check] char** p_argv, [user_check] char** p_env);
         public int ecall_thread_entry([in, size=l] void *Ti, size_t l);
+        public int ecall_clear_tcs_dumb(int index);
     };
 
     untrusted {
@@ -88,6 +89,7 @@ enclave {
         /********long ocall_syscall_1_sysctl(long sysno, [in, out] struct __sysctl_args* args);********/
 
         //int unlink(const char *pathname);
+        //int chdir(const char *path);
         long ocall_syscall_1_S(long sysno, [in, string] char *S1);
 
         //???
@@ -112,6 +114,7 @@ enclave {
         long ocall_syscall_2_NN(long sysno, long N1, long N2);
 
         //int fstat(int fd, struct stat *buf);
+        //int fstatfs(int fd, struct statfs *buf);
         //int setrlimit(int resource, const struct rlimit *rlim);
         long ocall_syscall_2_NTi(long sysno, long N1, [in, size=l2] void *T2, int l2);
 
@@ -127,9 +130,11 @@ enclave {
         //int mkdir(const char *pathname, mode_t mode);
         //int creat(const char *pathname, mode_t mode);
         //int chmod(const char *pathname, mode_t mode);
+        //int umount2(const char *target, int flags);
         long ocall_syscall_2_SN(long sysno, [in, string] const char *S1, long N2);
 
         //int utime(const char *filename, const struct utimbuf *times);
+        //int statfs(const char *path, struct statfs *buf);
         long ocall_syscall_2_STi(long sysno, [in, string] const char *S1, [in, size=l2] void *T2, int l2);
 
         //int stat(const char *pathname, struct stat *buf);
@@ -149,11 +154,12 @@ enclave {
         //int mprotect(void *addr, size_t len, int prot);
         //off_t lseek(int fd, off_t offset, int whence);
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
-        //long ocall_syscall_3_NNPio(long sysno, long N1, long N2, [in, out, size=N3] void *P, int l);
+        //long ocall_syscall_3_NNPio(long sysno, long N1, long N2, [in, out, size=l3] void *P3, int l3);
 
         /* int ioctl(int fd, unsigned long request, ...); */
         long ocall_syscall_3_NNPi(long sysno, long N1, long N2, [in, size=l3] void *P3, int l3);
         long ocall_syscall_3_NNPo(long sysno, long N1, long N2, [out, size=l3] void *P3, int l3);
+        long ocall_syscall_3_NNPio(long sysno, long N1, long N2, [in, out, size=l3] void *P3, int l3);
 
         //???
         long ocall_syscall_3_NNTi(long sysno, long N1, long N2, [in, size=l3] void *T3, int l3);
@@ -187,6 +193,12 @@ enclave {
         //int madvise(void *addr, size_t length, int advice);
         long ocall_syscall_3_PiNN(long sysno, [in, size=N2] void *P1, long N2, long N3);
 
+        //int getrandom(void *buf, size_t buflen, unsigned int flags);
+        long ocall_syscall_3_PoNN(long sysno, [in, size=N2] void *P1, long N2, long N3);
+
+        //int execve(const char *filename, char *const argv[], char *const envp[]);
+        long ocall_syscall_3_PiPiPi(long sysno, [in, string] const char *P1, [in, string] char *P2, [in, string] char *P3);
+
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S1, long N2, long N3);
@@ -213,6 +225,9 @@ enclave {
         //ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
         long ocall_syscall_4_NPiNN(long sysno, long N1, [in, size=l2] void *P2, int l2, long N3, long N4);
 
+        //int faccessat(int dirfd, const char *pathname, int mode, int flags);
+        long ocall_syscall_4_NSNN(long sysno, long N1, [in, string] const char *P2, long N3, long N4);
+
         /* ssize_t pread(int fd, void *buf, size_t count, off_t offset); */
         long ocall_syscall_4_NPoNN(long sysno, long N1, [out, size=l2] void *P2, int l2, long N3, long N4);
 
@@ -226,9 +241,17 @@ enclave {
         /* int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event); */
         long ocall_syscall_4_NNNTio(long sysno, long N1, long N2, long N3, [in, out, size=l1] void* Tio, long l1);
 
+        //pid_t wait4(pid_t pid, int *status, int options, struct rusage *rusage);
+        long ocall_syscall_4_NPiNTo(long sysno, long N1, [in, size=l2] void *P2, int l2, long N3, [out, size=l4] void* T4, long l4);
+
         /* int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout); */
         long ocall_syscall_4_NTioNN(long sysno, long N1, [out, size=l1] void* Tio, long N2, long N3, long l1);
 
+        //int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *tmo_p, const sigset_t *sigmask);
+        long ocall_syscall_4_TioNTiTi(long sysno, [in, out, size=l1] void* T1, int l1, long N2, [in, size=l3] void* T3, int l3, [in, size=l4] void* T4, long l4);
+
+        //int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
+        long ocall_syscall_4_NSToN(long sysno, long N1, [in, string] const char *S2, [out, size=l3] void* T3, int l3, long N4);
 
         /****************************syscalls with 5 paramters**********************************************/
         long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5);
@@ -245,6 +268,9 @@ enclave {
         //int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
         long ocall_syscall_5_NTioTioTioTi(long sysno, long N1, [in,out, size=l2] void *T2, [in,out, size=l2] void *T3, [in,out, size=l2] void *T4, int l2, [in, size=l5] void *T5, int l5);
 
+        //int name_to_handle_at(int dirfd, const char *pathname, struct file_handle *handle, int *mount_id, int flags);
+        long ocall_syscall_5_NSTiPiN(long sysno, long N1, [in, string] const char *S2, [out, size=l3] void *T3, int l3, [out, size=l4] void *P4, int l4, long N5);
+
 
         /****************************syscalls with 6 paramters**********************************************/
         //void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
@@ -259,6 +285,8 @@ enclave {
         //int futex(int *uaddr, int futex_op, int val, const struct timespec *timeout, int *uaddr2, int val3);
         //long ocall_syscall_6_TioNNTiNN(long sysno, [in, out, size=l1]void *T1, int l1, long N2, long N3, [in, size=l4] void *T4, int l4, [in, out, size=l5] void *T5, int l5, long N6);
 
+        //long mbind(void *addr, unsigned long len, int mode, const unsigned long *nodemask, unsigned long maxnode, unsigned flags);
+        long ocall_syscall_6_TiNNTiNN(long sysno, long T1, int l1, long N2, long N3, [in, size=l4] void *T4, int l4, long N5, long N6);
 
         void sgxapp_reg_sighandler(int signum);
     };

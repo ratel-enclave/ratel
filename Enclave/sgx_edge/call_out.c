@@ -186,6 +186,7 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     case FIONREAD:
     case TCGETS:
     case TIOCGPGRP:
+    case FIONBIO:
         ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
         break;
     case TIOCGWINSZ:
@@ -196,10 +197,22 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
         ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioctl_wsize);
         break;
 
+    case HCIGETDEVLIST:
+        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 16);
+        break;
+
+    case HCIGETDEVINFO:
+        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 128);
+        break;
+
     case TCSETS:
     case TCSETSW:
     case TCSETSF:
         ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
+        break;
+
+    case TIOCSPGRP:
+        ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
         break;
 
     default:
@@ -257,6 +270,7 @@ long sgx_ocall_syscall_0(long sysno)
 {
     long ret = -1;
 
+    //ocall_print_syscallname(sysno);
     ocall_syscall_0(&ret, sysno);
 
     return ret;
@@ -281,6 +295,7 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
         break;
 
     case SYS_pipe:
+        // unimplemented_syscall(sysno);
         ocall_syscall_1_To(&ret, sysno, (long *)_rdi, len_pipefd);
         break;
 
@@ -403,6 +418,8 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
     case SYS_shutdown:
     case SYS_listen:
     case SYS_kill:
+    case SYS_setpgid:
+    case SYS_getpriority:
         ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
         break;
 
@@ -410,9 +427,20 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         ocall_syscall_2_NTi(&ret, sysno, _rdi, (void *)_rsi, len_rlimit);
         break;
 
+    case SYS_getgroups:
+        ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_gid * _rdi);
+        break;
+
+    case SYS_setgroups:
+        ocall_syscall_2_NTi(&ret, sysno, _rdi, (void *)_rsi, len_gid * _rdi);
+        break;
+
     case SYS_fstat:
         ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_stat);
         break;
+
+    case SYS_fstatfs:
+        ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_statfs);
 
     case SYS_getrlimit:
         ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_rlimit);
@@ -434,11 +462,16 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
     case SYS_access:
     case SYS_creat:
     case SYS_chmod:
+    case SYS_umount2:
         ocall_syscall_2_SN(&ret, sysno, (const char *)_rdi, _rsi);
         break;
 
     case SYS_utime:
         ocall_syscall_2_STi(&ret, sysno, (const char *)_rdi, (void *)_rsi, len_utimbuf);
+        break;
+
+    case SYS_statfs:
+        ocall_syscall_2_STi(&ret, sysno, (const char *)_rdi, (void *)_rsi, len_statfs);
         break;
 
     case SYS_stat:
@@ -526,6 +559,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     case SYS_lseek:
     case SYS_socket:
     case SYS_fchown:
+    case SYS_setpriority:
         ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -745,7 +779,6 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
             if (ret != -1 && ret != -ENOMEM) 
             {
-                // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
                 ret = (long)sgx_mm_mremap(addr, _rsi, (byte*)ret, _rdx, _r10);
             }
             break;
@@ -768,7 +801,20 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         break;
 
     case SYS_faccessat:
+    case SYS_openat:
         ocall_syscall_4_NSNN(&ret, sysno, _rdi, (const char *)_rsi, _rdx, _r10);
+        break;
+
+    case SYS_wait4:
+        ocall_syscall_4_NPiNTo(&ret, sysno, _rdi, (void*)_rsi, len_int, _rdx, (void*)_r10, len_rusage);
+        break;
+
+    case SYS_ppoll:
+        ocall_syscall_4_TioNTiTi(&ret, sysno, (void*)_rdi, len_pollfd, _rsi, (void*)_rdx, len_timespec, (void*)_r10, len_sigset);
+        break;
+
+    case SYS_newfstatat:
+        ocall_syscall_4_NSToN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, len_stat, _r10);
         break;
 
     default:
@@ -806,6 +852,10 @@ long sgx_ocall_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         ocall_syscall_5_NTioTioTioTi(&ret, sysno, _rdi, (void *)_rsi, (void *)_rdx, (void *)_r10, len_fd_set, (void *)_r8, len_timeval);
         break;
 
+    case SYS_name_to_handle_at:
+        ocall_syscall_5_NSTiPiN(&ret, sysno, _rdi, (const char *)_rsi, (void *)_rdx, len_file_handle, (void *)_r10, len_int, _r8);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -829,7 +879,6 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         /* return internal address */
         if (ret != -1)
         {
-            // byte* sgx_mm_mmap(byte* ext_addr, size_t len, ulong prot, ulong flags, int fd, ulong offs)
             ret = (ulong)sgx_mm_mmap((byte *)ret, _rsi, _rdx, _r10, (int)_r8, _r9);
         }
         break;
@@ -841,6 +890,10 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
     case SYS_recvfrom:
         sz = *(int *)_r9;
         ocall_syscall_6_NPoNNToTo(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, sz, (int *)_r9, len_socklen_t);
+        break;
+
+    case SYS_mbind:
+        ocall_syscall_6_TiNNTiNN(&ret, sysno, (ulong)_rdi, len_u64, _rsi, _rdx, (unsigned long *)_r10, (len_u64 * _r8), _r8, _r9);
         break;
 
     default:
@@ -869,6 +922,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_sched_yield:
     case SYS_sync:
     case SYS_restart_syscall:
+    case SYS_vfork:
         return sgx_ocall_syscall_0(sysno);
         break;
 
@@ -888,8 +942,9 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_rt_sigreturn:
     case SYS_pipe:
     case SYS_getpgid:
-        /*case SYS_set_thread_area:*/
-        /*case SYS_get_thread_area:*/
+    case SYS_chdir:
+    case SYS_getsid:
+    case SYS_setgid:
         return sgx_ocall_syscall_1(sysno, _rdi);
         break;
 
@@ -907,6 +962,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
 
         //Two paramters
     case SYS_fstat:
+    case SYS_fstatfs:
     case SYS_munmap:
     case SYS_gettimeofday:
     case SYS_getrlimit:
@@ -920,6 +976,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_creat:
     case SYS_chmod:
     case SYS_utime:
+    case SYS_statfs:
     case SYS_getcwd:
     case SYS_getrusage:
     case SYS_set_robust_list:
@@ -933,10 +990,16 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_rename:
     case SYS_pipe2:
     case SYS_sigaltstack:
+    case SYS_setpgid:
+    case SYS_umount2:
+    case SYS_getgroups:
+    case SYS_setgroups:
+    case SYS_getpriority:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
         //Three paramters
+    case SYS_madvise:
     case SYS_tgkill:
     case SYS_open:
     case SYS_read:
@@ -961,6 +1024,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_sendmsg:
     case SYS_recvmsg:
     case SYS_getrandom:
+    case SYS_sched_getaffinity:
+    case SYS_setpriority:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -976,6 +1041,10 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_pread64:
     case SYS_pwrite64:
     case SYS_faccessat:
+    case SYS_openat:
+    case SYS_wait4:
+    case SYS_ppoll:
+    case SYS_newfstatat:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
@@ -985,6 +1054,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_getsockopt:
     case SYS_clone:
     case SYS_select:
+    case SYS_name_to_handle_at:
         return sgx_ocall_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
         break;
 
@@ -993,6 +1063,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_futex:
     case SYS_sendto:
     case SYS_recvfrom:
+    case SYS_mbind:
         return sgx_ocall_syscall_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
         break;
 

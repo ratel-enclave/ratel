@@ -97,7 +97,6 @@
 #define len_utsname 390
 #define len_perf_event_attr 112
 #define len_pollfd 8
-#define len_pollfd 8
 #define len_pt_regs 168
 #define len_rlimit 16
 #define len_rlimit64 16
@@ -121,6 +120,7 @@
 #define len_timezone 8
 #define len_ustat 32
 #define len_utimbuf 16
+#define len_statfs 120
 #define len_timer_t 4
 #define len_u32 4
 #define len_u64 8
@@ -135,17 +135,31 @@
 #define len_child_stack 0x1000
 #define MAX_EPOLL_EVENTS 10
 #define len_ioctl 512
-#define len_fionread 4
+#define len_ioct_int 4
+#define len_ioctl_wsize 8
+#define len_ioct_long 8
 #define len_termios 60
 #define len_socketpair sizeof(int)*2
 #define len_pipefd sizeof(int)*2
 #define len_name 80
 #define len_fd_set 128
+#define len_cpu_set_t 128
+#define len_rusage 144
+#define len_sigset 128
+#define len_gid 4
 
 #define TCGETS		0x5401
 #define TCSETS		0x5402
 #define TCSETSW		0x5403
 #define TCSETSF		0x5404
 #define FIONREAD 	0x541B
+#define TIOCGPGRP   0x540F
+#define TIOCSPGRP	0x5410
+#define TIOCGWINSZ	0x5413
+#define TIOCSWINSZ	0x5414
+#define FIONBIO		0x5421
+
+#define HCIGETDEVLIST 0x800448d2
+#define HCIGETDEVINFO 0x800448d3
 
 #endif  //#define _ST_SIZE_H__

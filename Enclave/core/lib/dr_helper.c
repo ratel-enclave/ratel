@@ -209,7 +209,6 @@ find_script_interpreter(OUT script_interpreter_t *result,
 #include "sgx_instr.h"
 void sgx_helper_cpuid(void* drctx)
 {
-    // dcontext_t *drctx = get_thread_private_dcontext();
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
     priv_mcontext_t *prictx = (priv_mcontext_t*)&mctx.rdi;
     uint cpuid_res_local[4]; /* eax, ebx, ecx, and edx registers (in that order) */
@@ -235,7 +234,6 @@ void sgx_helper_cpuid(void* drctx)
 
 void sgx_helper_rdtsc(void* drctx)
 {
-    // dcontext_t *drctx = get_thread_private_dcontext();
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
     priv_mcontext_t *prictx = (priv_mcontext_t*)&mctx.rdi;
     uint64 res;
@@ -262,9 +260,11 @@ void sgx_helper_rdtsc(void* drctx)
 #define THREAD_STRUCT_LEN               sizeof(struct _thread_helper_context) //0x330
 #define THREAD_FIRST_INIT               0x0
 
-#define CLONE_VM    0x00000100  /* set if VM shared between processes */
-#define CLONE_FS    0x00000200  /* set if fs info shared between processes */
-#define CLONE_FILES 0x00000400  /* set if open files shared between processes */
+#define CLONE_VM        0x00000100  /* set if VM shared between processes */
+#define CLONE_FS        0x00000200  /* set if fs info shared between processes */
+#define CLONE_FILES     0x00000400  /* set if open files shared between processes */
+#define CLONE_SIGHAND   0x00000800
+#define CLONE_VFORK     0x00004000
 
 sgx_thread_mutex_t g_mutex_hctx = SGX_THREAD_MUTEX_INITIALIZER;
 
@@ -365,7 +365,6 @@ void sgx_helper_syscall(void* drctx)
     dcontext_t *dctx = get_thread_private_dcontext();
     drctx = (NULL != dctx ? dctx : drctx);
     ASSERT(NULL != drctx);
-    // ASSERT(dctx == drctx);
 
     dr_get_mcontext(drctx, &mctx);
     dr_get_mcontext_priv(drctx, NULL, prictx);
@@ -384,12 +383,10 @@ void sgx_helper_syscall(void* drctx)
     }
 
     #define SYS_clone 56
-    if (SYS_clone == sysno)
+    #define SYS_vfork 58
+    if (SYS_clone == sysno || SYS_vfork == sysno)
     {
-        /* busy waiting for a free tcs slot */
-        sgx_thread_queue_spin();
-
-        if (!(arg1 & CLONE_VM))
+        if (!(arg1 & CLONE_VM) && (sysno != SYS_vfork))
         {
             mctx.rax = -1;
             dr_set_mcontext(drctx, &mctx);
@@ -433,20 +430,9 @@ void sgx_helper_syscall(void* drctx)
             ASSERT(false && "calling sgx_helper_pre_clone failed!");
     }
 
-    #define SYS_madvise 28
-    #define SYS_sched_getaffinity 204
     #define SYS_fork 57
-    #define SYS_vfork 58
     #define SYS_execve 59
-    // #define SYS_shutdown 48
-    if (SYS_madvise == sysno || SYS_sched_getaffinity == sysno)
-    {
-        mctx.rax = 0;
-        dr_set_mcontext(drctx, &mctx);
-        return;
-    }
-
-    if (SYS_fork == sysno || SYS_execve == sysno || SYS_vfork == sysno)
+    if (SYS_fork == sysno || SYS_execve == sysno /*|| SYS_vfork == sysno*/)
     {
         mctx.rax = -1;
         dr_set_mcontext(drctx, &mctx);
@@ -458,7 +444,7 @@ void sgx_helper_syscall(void* drctx)
     mctx.rax = res;
 
     /* retrieve info for main thread or the one that was creating thread */
-    if (SYS_clone == sysno)
+    if (SYS_clone == sysno || SYS_vfork == sysno)
     {
         if(sgx_helper_post_clone(drctx, &mctx, &td_hctx[hcn]))
             ASSERT(false && "calling sgx_helper_post_clone failed!");
