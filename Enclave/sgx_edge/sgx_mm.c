@@ -120,7 +120,7 @@ extern void* g_enclave_image_base;
 
 // Ensure the external prog-arena is only with 0x7fffe0000000 ~ 0x7ffff8000000
 // Ensure the external prog-arena is only with 0x7fff80000000 ~ 0x7fffffffffff  //2G
-#define EXTN_MEM_REGION     (byte*)0x7FFF00000000
+#define EXTN_MEM_REGION     (byte*)0x7FFF60000000
 
 
 /* exported out for debugging, we have unit-tests */
@@ -244,67 +244,6 @@ static void _sgx_vma_initialize(sgx_vm_area_t* vma, byte* ext_addr,
 extern long sgx_ocall_syscall_1(long sysno, long _rdi);
 extern long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi);
 extern long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx);
-
-void sgx_mm_init_static(void)
-{
-    sgx_vm_area_t *vma = NULL;
-    sgx_vm_area_t *add = NULL;
-    list_t  *ll = NULL;
-    uint    idx;
-
-    /* hard-allocate a big buffer for loading target program into SGX-enclave*/
-    SGX_MM.heap_offset = (byte*)g_enclave_image_base + g_global_data.heap_offset;
-    SGX_MM.dyRIO_heap_base = (byte*)g_enclave_image_base + g_global_data.dyRIO_cache_offset;
-    SGX_MM.dyRIO_heap_size = g_global_data.dyRIO_cache_size;
-    SGX_MM.prog_arena_base = (byte*)g_enclave_image_base + g_global_data.prog_arena_offset;
-    SGX_MM.prog_arena_size = g_global_data.prog_arena_size;
-    SGX_MM.ext_vmm_base = EXTN_MEM_REGION;
-
-    YPHASSERT(SGX_VMA_MAX_CNT > 2);
-    /* Initialize sgxmm */
-    for (idx = 0, vma = SGX_MM.slots; idx < SGX_VMA_MAX_CNT; idx++, vma++) {
-        ll = &vma->ll;
-        ll->prev = NULL;    /* set prev to NULL if not used */
-        if(idx == SGX_VMA_MAX_CNT - 1) {
-            ll->next = NULL;
-        }
-        else {
-            ll->next = &(SGX_MM.slots[idx+1].ll);
-        }
-    }
-
-    SGX_MM.un = &(SGX_MM.slots[0].ll);
-    SGX_MM.in.prev = &SGX_MM.in;
-    SGX_MM.in.next = &SGX_MM.in;
-
-    SGX_MM.nin = 0;
-    SGX_MM.nun = SGX_VMA_MAX_CNT;
-
-    /* initialized with memlayout_init_encalve */
-    vma = memlayout_init_encalve;
-
-    struct stat s;
-    for (; vma->vm_start != NULL; vma++) {
-        add = _sgx_vma_alloc(SGX_MM.in.prev, &SGX_MM.in);
-        _sgx_vma_initialize(add, vma->vm_start, vma->vm_end-vma->vm_start, vma->perm, -1, vma->offset);
-        if (vma->comment[0] != '\0') {
-            if (vma->comment[0] != '[') {
-                int fd;
-
-                fd = sgx_ocall_syscall_2(SYS_stat, (ulong)vma->comment, (ulong)&s);
-                YPHASSERT(fd == 0);
-
-                add->dev = s.st_dev;
-                add->inode = s.st_ino;
-                add->size = s.st_size;
-            }
-            strncpy(add->comment, vma->comment, 80);
-        }
-    }
-
-    SGX_MM.updated = TRUE;
-}
-
 
 /*--------- initialize program-arena in sgx-enclave && vma management--------*/
 
