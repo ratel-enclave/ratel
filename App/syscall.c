@@ -735,6 +735,23 @@ long ocall_syscall_2_PoN(long sysno, void *P1, long N2)
     switch (sysno)
     {
     case SYS_getcwd:
+        ret = syscall(sysno, P1, N2);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_2_PioN(long sysno, void *P1, long N2)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
     case SYS_set_robust_list:
         ret = syscall(sysno, P1, N2);
         b = true;
@@ -776,6 +793,23 @@ long ocall_syscall_2_STi(long sysno, const char *S1, void *T2, int l2)
     switch (sysno)
     {
     case SYS_utime:
+        ret = syscall(sysno, S1, T2);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_2_STio(long sysno, char *S1, void *T2, int l2)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
     case SYS_statfs:
         ret = syscall(sysno, S1, T2);
         b = true;
@@ -1024,8 +1058,6 @@ long ocall_syscall_3_NPoN(long sysno, long N1, void *P2, long N3)
     switch (sysno)
     {
     case SYS_read:
-    case SYS_getdents:
-    case SYS_getdents64:
     case SYS_connect:
     case SYS_bind:
         ret = syscall(sysno, N1, P2, N3);
@@ -1038,6 +1070,24 @@ long ocall_syscall_3_NPoN(long sysno, long N1, void *P2, long N3)
     return ret;
 }
 
+long ocall_syscall_3_NPioN(long sysno, long N1, void *P2, long N3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_getdents:
+    case SYS_getdents64:
+        ret = syscall(sysno, N1, P2, N3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
 
 long ocall_syscall_3_NSN(long sysno, long N1, const char *S2,  long N3)
 {
@@ -1329,7 +1379,7 @@ long ocall_syscall_3_SPoN(long sysno, const char *S1, void *P2, long N3)
     return ret;
 }
 
-long ocall_syscall_3_ToNN(long sysno, void *T1, int l1, long N2, long N3)
+long ocall_syscall_3_TioNN(long sysno, void *T1, int l1, long N2, long N3)
 {
     long ret = 0;
     bool b = false;
@@ -1353,10 +1403,13 @@ long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_mremap)
+    switch (sysno)
     {
+    case SYS_mremap:
+    case SYS_fadvise64:
         ret = syscall(sysno, N1, N2, N3, N4);
         b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);

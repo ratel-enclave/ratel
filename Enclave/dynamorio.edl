@@ -127,6 +127,9 @@ enclave {
         //int clock_gettime(clockid_t clk_id, struct timespec *tp);
         long ocall_syscall_2_NTo(long sysno, long N1, [out, size=l2] void *T2, int l2);
 
+        //long set_robust_list(struct robust_list_head *head, size_t len);
+        long ocall_syscall_2_PioN(long sysno, [in, out, size=N2] void *P1, long N2);
+
         //char *getcwd(char *buf, size_t size);
         long ocall_syscall_2_PoN(long sysno, [out, size=N2] void *P1, long N2);
         //long ocall_syscall_2_TiN(long sysno, [in, size=l] void *T, int l, long N);
@@ -141,8 +144,10 @@ enclave {
         long ocall_syscall_2_SN(long sysno, [in, string] const char *S1, long N2);
 
         //int utime(const char *filename, const struct utimbuf *times);
-        //int statfs(const char *path, struct statfs *buf);
         long ocall_syscall_2_STi(long sysno, [in, string] const char *S1, [in, size=l2] void *T2, int l2);
+
+        //int statfs(const char *path, struct statfs *buf);
+        long ocall_syscall_2_STio(long sysno, [in, out, string] char *S1, [in, out, size=l2] void *T2, int l2);
 
         //int stat(const char *pathname, struct stat *buf);
         long ocall_syscall_2_STo(long sysno, [in, string] const char *S1, [out, size=l2] void *T2, int l2);
@@ -180,10 +185,12 @@ enclave {
         long ocall_syscall_3_NPiN(long sysno, long N1, [in, size=N3] void *P2, long N3);
 
         //ssize_t read(int fd, void *buf, size_t count);
-        //int getdents(unsigned int fd, struct linux_dirent *dirp, unsigned int count);
         //int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
         //int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
         long ocall_syscall_3_NPoN(long sysno, long N1, [in, out, size=N3] void *P2, long N3);
+
+        //int getdents(unsigned int fd, struct linux_dirent *dirp, unsigned int count);
+        long ocall_syscall_3_NPioN(long sysno, long N1, [in, out, size=N3] void *P2, long N3);
 
         /* long ocall_syscall_3_NPolN(long sysno, long N1, [in, out, size=l1] void *Pio, long l1, long N2); /
         //long ocall_syscall_3_NPolN(long sysno, long N1, [in, out, size=l1] void *Pio, long l1, long N2);
@@ -208,7 +215,7 @@ enclave {
         long ocall_syscall_3_PoNN(long sysno, [in, size=N2] void *P1, long N2, long N3);
 
         //int execve(const char *filename, char *const argv[], char *const envp[]);
-        //long ocall_syscall_3_PiPiPi(long sysno, [in, string] const char *P1, [in, string] char *P2, [in, string] char *P3);
+        long ocall_syscall_3_PiPiPi(long sysno, [in, string] const char *P1, [in, string] char *P2, [in, string] char *P3);
 
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
@@ -221,7 +228,7 @@ enclave {
         long ocall_syscall_3_SPoN(long sysno, [in, string] const char *S1, [out, size=N3] void *P2, long N3);
 
         //int poll(struct pollfd *fds, nfds_t nfds, int timeout);
-        long ocall_syscall_3_ToNN(long sysno, [out, size=l1] void *T1, int l1,long N2, long N3);
+        long ocall_syscall_3_TioNN(long sysno, [in, out, size=l1] void *T1, int l1, long N2, long N3);
 
         /* ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags); */
         long ocall_syscall_3_NTiNPTi(long sysno, long N1, [in, size=l2] void *T2, int l2, long N3, [in, size=l4] void *P4, int l4, [in, size=l5] void *T5, int l5);

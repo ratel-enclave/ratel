@@ -144,20 +144,36 @@ long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
 #define F_SETLK 6
 #define F_SETLKW 7 /* Set record locking info (blocking).        */
 #define F_DUPFD_CLOEXEC 0x406
-#define len_flock 32
 
     long ret = -1;
 
-    if (cmd == F_DUPFD || cmd == F_SETFD || cmd == F_SETFL || cmd == F_DUPFD_CLOEXEC)
+    switch (cmd)
+    {
+    case F_DUPFD:
+    case F_SETFD:
+    case F_SETFL:
+    case F_DUPFD_CLOEXEC:
         ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, arg1);
-    else if (cmd == F_GETFD || cmd == F_GETFL)
+        break;
+
+    case F_GETFD:
+    case F_GETFL:
         ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, 0); /* tricky */
-    else if (cmd == F_SETLKW || cmd == F_SETLK)
+        break;
+
+    case F_SETLKW:
+    case F_SETLK:
         ocall_syscall_3_NNTi(&ret, SYS_fcntl, fd, cmd, (void *)arg1, len_flock);
-    else if (cmd == F_GETLK)
+        break;
+
+    case F_GETLK:
         ocall_syscall_3_NNTo(&ret, SYS_fcntl, fd, cmd, (void *)arg1, len_flock);
-    else
+        break;
+
+    default:
         unimplemented_syscall(SYS_fcntl);
+        break;
+    }
 
     return ret;
 }
@@ -169,36 +185,49 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
 
     switch (cmd)
     {
+    case TCSBRK:
+    case TCSBRKP:
+        ocall_syscall_3_NNN(&ret, SYS_ioctl, fd, cmd, arg1);
+        break;
+
     case FIONREAD:
-    case TCGETS:
     case TIOCGPGRP:
     case FIONBIO:
-        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
         break;
+
+    case TCGETS:
+    case TIOCGLCKTRMIOS:
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
+        break;
+
     case TIOCGWINSZ:
-        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioctl_wsize);
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioctl_wsize);
         break;
 
     case TIOCSWINSZ:
-        ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioctl_wsize);
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioctl_wsize);
         break;
 
     case HCIGETDEVLIST:
-        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 16);
+        unimplemented_syscall(SYS_ioctl);
+        // ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 16);
         break;
 
     case HCIGETDEVINFO:
-        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 128);
+        unimplemented_syscall(SYS_ioctl);
+        // ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 128);
         break;
 
     case TCSETS:
     case TCSETSW:
     case TCSETSF:
-        ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
+    case TIOCSLCKTRMIOS:
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
         break;
 
     case TIOCSPGRP:
-        ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
         break;
 
     default:
@@ -256,7 +285,6 @@ long sgx_ocall_syscall_0(long sysno)
 {
     long ret = -1;
 
-    //ocall_print_syscallname(sysno);
     ocall_syscall_0(&ret, sysno);
 
     return ret;
@@ -355,16 +383,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
                 ocall_syscall_1_N(&ret, sysno, _rdi);
             break;
         }
-
-    case SYS_get_thread_area:
-        /*int get_thread_area(struct user_desc *u_info);*/
-        ocall_syscall_1_To(&ret, sysno, (void *)_rdi, 16);
-        break;
-
-    case SYS_set_thread_area:
-        /*int set_thread_area(struct user_desc *u_info);*/
-        ocall_syscall_1_Ti(&ret, sysno, (void *)_rdi, 16);
-        break;
 
     case SYS_rt_sigsuspend:
         ocall_syscall_1_Ti(&ret, sysno, (void *)_rdi, len_sigset);
@@ -474,7 +492,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         break;
 
     case SYS_statfs:
-        ocall_syscall_2_STi(&ret, sysno, (const char *)_rdi, (void *)_rsi, len_statfs);
+        ocall_syscall_2_STio(&ret, sysno, (char *)_rdi, (void *)_rsi, len_statfs);
         break;
 
     case SYS_stat:
@@ -507,7 +525,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         break;
 
     case SYS_set_robust_list:
-        ocall_syscall_2_PoN(&ret, sysno, (void *)_rdi, _rsi);
+        ocall_syscall_2_PioN(&ret, sysno, (void *)_rdi, _rsi);
         break;
 
     case SYS_nanosleep:
@@ -640,7 +658,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         break;
 
     case SYS_poll:
-        ocall_syscall_3_ToNN(&ret, sysno, (void *)_rdi, len_pollfd, _rsi, _rdx);
+        ocall_syscall_3_TioNN(&ret, sysno, (void *)_rdi, len_pollfd, _rsi, _rdx);
         break;
 
     case SYS_mprotect:
@@ -658,7 +676,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
     case SYS_getdents:
     case SYS_getdents64:
-        ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
+        ocall_syscall_3_NPioN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
         break;
 
     case SYS_setitimer:
@@ -716,7 +734,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             iovec *iov = msg->msg_iov;
             int msg_iovlen = msg->msg_iovlen;
-            ASSERT((msg_iovlen <= 1) && "oversize msg!");
+            // ASSERT((msg_iovlen <= 1) && "oversize msg!");
 
             int size = count_iovlen(iov, msg_iovlen);
             if (size <= 0)
@@ -851,6 +869,10 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
     case SYS_readlinkat:
         ocall_syscall_4_NSPoN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, _r10);
+        break;
+
+    case SYS_fadvise64:
+        ocall_syscall_4_NNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
     default:
@@ -1118,6 +1140,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_ppoll:
     case SYS_newfstatat:
     case SYS_readlinkat:
+    case SYS_fadvise64:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
