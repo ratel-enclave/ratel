@@ -185,7 +185,15 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     {
     case FIONREAD:
     case TCGETS:
-        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_fionread);
+    case TIOCGPGRP:
+        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
+        break;
+    case TIOCGWINSZ:
+        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioctl_wsize);
+        break;
+
+    case TIOCSWINSZ:
+        ocall_syscall_3_NNPi(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioctl_wsize);
         break;
 
     case TCSETS:
@@ -203,6 +211,8 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
 }
 
 #include "../sgx_thread.h"
+#include "string.h"
+volatile int g_hctx_num_helper = 0;
 static inline void cleanup_exited_thread_inside_trace()
 {
     int hcn = 0;
@@ -212,10 +222,11 @@ static inline void cleanup_exited_thread_inside_trace()
     extern sgx_thread_mutex_t g_mutex_hctx;
     sgx_thread_mutex_lock(&g_mutex_hctx);
     extern unsigned long g_td_hctx_base_addr;
+    extern volatile int g_hctx_num;
     thread_helper_context_shadow *td_hctx_shdw = (thread_helper_context_shadow *)g_td_hctx_base_addr;
     ASSERT((NULL != td_hctx_shdw ? 1 : 0));
 
-    while (hcn < MAX_THREAD_NUM_EACH_ENCLAVE) 
+    while (hcn < g_hctx_num)
     {
         /* the argument clone_child_stack as an index to find out which td_hctx_shdw[x] belongs to ECALL thread */
         if (td_hctx_shdw[hcn].thread_id == tid && 0 != td_hctx_shdw[hcn].td_hctx_self)
@@ -223,7 +234,11 @@ static inline void cleanup_exited_thread_inside_trace()
             unsigned long *pctid = (unsigned long *)td_hctx_shdw[hcn].clone_ctid;
             *pctid = ( *pctid & (((unsigned long long)0xFFFFFFFF) << 32) ); 
 
+            memset(&td_hctx_shdw[hcn], 0, sizeof(thread_helper_context_shadow));
+
             found = 1;
+            g_hctx_num_helper++;
+
             break;
         }
         hcn++;
@@ -242,7 +257,6 @@ long sgx_ocall_syscall_0(long sysno)
 {
     long ret = -1;
 
-    //ocall_print_syscallname(sysno);
     ocall_syscall_0(&ret, sysno);
 
     return ret;
@@ -267,7 +281,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
         break;
 
     case SYS_pipe:
-        // unimplemented_syscall(sysno);
         ocall_syscall_1_To(&ret, sysno, (long *)_rdi, len_pipefd);
         break;
 
@@ -293,6 +306,7 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
             int pid = sgx_ocall_syscall_0(SYS_getpid);
             if(tid != pid)
                 cleanup_exited_thread_inside_trace();
+
             /* start cleaning up thread outside trace */
             ocall_syscall_1_N(&ret, sysno, _rdi);
 
@@ -512,7 +526,6 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     case SYS_lseek:
     case SYS_socket:
     case SYS_fchown:
-    case SYS_shmget:
         ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -586,7 +599,6 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             if (ret == 0)
             {
-                // int sgx_mm_mprotect(byte* ext_addr, size_t len, uint prot)
                 ret = sgx_mm_mprotect(addr, _rsi, _rdx);
             }
             break;
@@ -665,6 +677,14 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
             break;
         }
 
+    case SYS_getrandom:
+        ocall_syscall_3_PoNN(&ret, sysno, (void *)_rdi, _rsi, _rdx);
+        break;
+
+    case SYS_sched_getaffinity:
+        ocall_syscall_3_NNTo(&ret, sysno, _rdi, _rsi, (void *)_rdx, len_cpu_set_t);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -681,14 +701,24 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
     switch (sysno)
     {
     case SYS_rt_sigaction:
-        // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
-        ret = ocall_rt_sigaction(_rdi, _rsi, _rdx, _r10);
-        break;
+        {
+            #define SIGKILL      9
+            #define SIGSTOP      19
+            if (SIGKILL == _rdi || SIGSTOP == _rdi)
+                ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
+            else
+                ret = ocall_rt_sigaction(_rdi, _rsi, _rdx, _r10);
+            break;
+        }
 
     case SYS_rt_sigprocmask:
-        // ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
-        ret = ocall_rt_sigprocmask(_rdi, _rsi, _rdx, _r10);
-        break;
+        {
+            if (SIGKILL == _rdi || SIGSTOP == _rdi)
+                ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigset, (void*)_rdx, len_kernel_sigset, _r10);
+            else
+                ret = ocall_rt_sigprocmask(_rdi, _rsi, _rdx, _r10);
+            break;
+        }
 
     case SYS_epoll_ctl:
         ocall_syscall_4_NNNTio(&ret, sysno, _rdi, _rsi, _rdx, (void*)_r10, len_epoll_event);
@@ -735,6 +765,10 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
     case SYS_pwrite64:
         ocall_syscall_4_NPiNN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _rdx, _r10);
+        break;
+
+    case SYS_faccessat:
+        ocall_syscall_4_NSNN(&ret, sysno, _rdi, (const char *)_rsi, _rdx, _r10);
         break;
 
     default:
@@ -800,10 +834,6 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         }
         break;
 
-    // case SYS_futex:
-    //     ocall_syscall_6_TioNNTiNN(&ret, sysno, (int *)_rdi, 4, _rsi, _rdx, (void *)_r10, len_timespec, (int *)_r8, 4, _r9);
-    //     break;
-
     case SYS_sendto:
         ocall_syscall_6_NPiNNPiN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, _r9);
         break;
@@ -829,6 +859,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     {
         //No parameter
     case SYS_getpid:
+    case SYS_getppid:
+    case SYS_getpgrp:
     case SYS_gettid:
     case SYS_geteuid:
     case SYS_getuid:
@@ -900,14 +932,11 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_nanosleep:
     case SYS_rename:
     case SYS_pipe2:
+    case SYS_sigaltstack:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
         //Three paramters
-    /* FIXME: //cdd here we simply ignore giving advice to kernel as they are different world */
-    // off: signals, on: pthread //the root cause lies in out of stack space
-    case SYS_madvise:
-
     case SYS_tgkill:
     case SYS_open:
     case SYS_read:
@@ -922,7 +951,6 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_lseek:
     case SYS_socket:
     case SYS_fchown:
-    case SYS_shmget:
     case SYS_connect:
     case SYS_readlink:
     case SYS_ioctl:
@@ -932,6 +960,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_getsockname:
     case SYS_sendmsg:
     case SYS_recvmsg:
+    case SYS_getrandom:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -946,6 +975,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_socketpair:
     case SYS_pread64:
     case SYS_pwrite64:
+    case SYS_faccessat:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
@@ -977,4 +1007,3 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
         break;
     }
 }
-

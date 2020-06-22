@@ -442,12 +442,6 @@ void echo_fun_return(long sysno, bool implemented, const char *fname, long ret)
     //fflush(stdout);
 }
 
-//void _syscall_exit(void)
-//{
-/* Destroy the enclave */
-//sgx_destroy_enclave(dynamo_eid);
-//}
-
 /*-----------------------------------syscalls with 0 parameters--------------------------*/
 long ocall_syscall_0(long sysno)
 {
@@ -457,6 +451,8 @@ long ocall_syscall_0(long sysno)
     switch (sysno)
     {
     case SYS_getpid:
+    case SYS_getppid:
+    case SYS_getpgrp:
     case SYS_gettid:
     case SYS_geteuid:
     case SYS_getuid:
@@ -477,6 +473,7 @@ long ocall_syscall_0(long sysno)
 
 /*-----------------------------------syscalls with 1 parameters--------------------------*/
 #include <pthread.h>
+volatile int g_trd_num_helper = 0;
 long ocall_syscall_1_N(long sysno, long N1)
 {
     long ret;
@@ -484,7 +481,6 @@ long ocall_syscall_1_N(long sysno, long N1)
 
     switch (sysno)
     {
-    case SYS_close:
     case SYS_exit_group: /* fix-me: allow out-encalve code to do cleanup */
     case SYS_exit:
         {
@@ -493,21 +489,32 @@ long ocall_syscall_1_N(long sysno, long N1)
             if(tid != pid)
             {
                 if (SYS_exit == sysno)   
-                {
-                    #define MAX_THREAD_NUM_EACH_ENCLAVE 10
-
+                {                    
                     int trd_num = 0;
-                    unsigned long tid = syscall(SYS_gettid);
+                    long tid = syscall(SYS_gettid);
                     extern pthread_mutex_t lock_m;
                     pthread_mutex_lock(&lock_m);
-                    extern sgx_thread_priv_params trd_priv_params[MAX_THREAD_NUM_EACH_ENCLAVE];
+                    extern volatile int g_trd_num;
+                    extern sgx_thread_priv_params *trd_priv_params;
 
-                    while (trd_num < MAX_THREAD_NUM_EACH_ENCLAVE) 
+                    while (trd_num < g_trd_num) 
                     {
                         /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
                         if (trd_priv_params[trd_num].thread_id == tid)
                         {
+                            int retval = 0;
+                            #define ECMD_DEL_TCS    2
+                            extern sgx_enclave_id_t dynamo_eid;
+                            ret = ecall_clear_tcs_dumb(dynamo_eid, &retval, ECMD_DEL_TCS);
+                            if (SGX_SUCCESS != ret)
+                            {
+                                printf("SGX_ERROR_ENCLAVE_LOST, ret = %d\n", ret);
+                                assert(false);
+                            }
+
                             memset(&trd_priv_params[trd_num], 0, sizeof(sgx_thread_priv_params));
+                            g_trd_num_helper++;
+
                             break;
                         }
                         trd_num++;
@@ -516,6 +523,7 @@ long ocall_syscall_1_N(long sysno, long N1)
                 }
             }
         }
+    case SYS_close:
     case SYS_alarm:
     case SYS_fdatasync:
     case SYS_fsync:
@@ -610,40 +618,6 @@ long ocall_syscall_1_Tio(long sysno, void *T1, int l1)
 
     return ret;
 }
-
-/*long ocall_syscall_1_not(long sysno, long unimplemented)*/
-/*{*/
-/*return syscall(sysno, unimplemented);*/
-/*}*/
-
-/*long ocall_syscall_1_sysctl(long sysno, struct __sysctl_args* args)*/
-/*{*/
-/*return syscall(sysno, args);*/
-/*}*/
-
-/*long ocall_syscall_1_uname(long sysno, struct old_utsname* uname)*/
-/*{*/
-/*return syscall(sysno, uname);*/
-/*}*/
-
-/*long ocall_syscall_1_sysinfo(long sysno, struct sysinfo* info)*/
-/*{*/
-/*return syscall(sysno, info);*/
-/*}*/
-
-/*long ocall_syscall_1_timex(long sysno, struct timex* time)*/
-/*{*/
-/*return syscall(sysno, time);*/
-/*}*/
-
-/*[> OCall functions <]*/
-/*void ocall_all_syscalls(const char *str)*/
-/*{*/
-/* Proxy/Bridge will check the length and null-terminate
- * the input string to prevent buffer overflow.
- */
-/*printf("%s", str);*/
-/*}*/
 
 /*-----------------------------------syscalls with 2 parameters--------------------------*/
 long ocall_syscall_2_NN(long sysno, long N1, long N2)
@@ -971,6 +945,7 @@ long ocall_syscall_3_NNTo(long sysno, long N1, long N2, void *T3, int l3)
     switch (sysno)
     {
     case SYS_fcntl:
+    case SYS_sched_getaffinity:
         ret = syscall(sysno, N1, N2, T3);
         b = true;
         break;
@@ -1204,8 +1179,27 @@ long ocall_syscall_3_PiNN(long sysno, void *P1, long N2, long N3)
     long ret = 0;
     bool b = false;
 
-    switch (sysno) {
+    switch (sysno) 
+    {
     case SYS_madvise:
+        ret = syscall(sysno, P1, N2, N3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_PoNN(long sysno, void *P1, long N2, long N3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno) 
+    {
+    case SYS_getrandom:
         ret = syscall(sysno, P1, N2, N3);
         b = true;
         break;
@@ -1224,10 +1218,6 @@ long ocall_syscall_3_SNN(long sysno, const char *S1, long N2, long N3)
     switch (sysno)
     {
     case SYS_open:
-        ret = syscall(sysno, S1, N2, N3);
-        b = true;
-        break;
-
     case SYS_chown:
         ret = syscall(sysno, S1, N2, N3);
         b = true;
@@ -1334,6 +1324,24 @@ long ocall_syscall_4_NPoNN(long sysno, long N1, void *P2, int l2, long N3, long 
     switch (sysno)
     {
     case SYS_pread64:
+        ret = syscall(sysno, N1, P2, N3, N4);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_4_NSNN(long sysno, long N1, const char *P2, long N3, long N4)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_faccessat:
         ret = syscall(sysno, N1, P2, N3, N4);
         b = true;
         break;
@@ -1585,20 +1593,6 @@ long ocall_syscall_6_NPoNNToTo(long sysno, long N1, void *P2, long N3, long N4, 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
     return ret;
 }
-
-// long ocall_syscall_6_TioNNTiNN(long sysno, void *T1, int l1, long N2, long N3, void *T4, int l4, void *T5, int l5, long N6)
-// {
-//     long ret = 0;
-//     bool b = false;
-
-//     if (sysno == SYS_futex)
-//     {
-//         ret = syscall(sysno, T1, N2, N3, T4, T5, N6);
-//         b = true;
-//     }
-
-//     echo_fun_return(sysno, b, __FUNCTION__, ret);
-// }
 
 long set_tid_ntrd(long sysno)
 {

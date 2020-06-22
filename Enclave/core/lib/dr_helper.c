@@ -259,11 +259,19 @@ void sgx_helper_rdtsc(void* drctx)
 #define OFFSET_CHILD_THREAD_START       0x2A
 #define RET_ADDR_OFFSET                 0x08
 #define RET_VAL_TO_THREAD               0x00
+#define THREAD_STRUCT_LEN               sizeof(struct _thread_helper_context) //0x330
+#define THREAD_FIRST_INIT               0x0
+
+#define CLONE_VM    0x00000100  /* set if VM shared between processes */
+#define CLONE_FS    0x00000200  /* set if fs info shared between processes */
+#define CLONE_FILES 0x00000400  /* set if open files shared between processes */
+
 sgx_thread_mutex_t g_mutex_hctx = SGX_THREAD_MUTEX_INITIALIZER;
 
 unsigned long g_td_hctx_base_addr = 0;
-thread_helper_context td_hctx[MAX_THREAD_NUM_EACH_ENCLAVE] = {0};
+thread_helper_context *td_hctx = NULL;
 volatile int g_hctx_num = 0;
+volatile int g_total_hctx_len = 0;
 
 int sgx_helper_pre_clone(dcontext_t *drctx, dr_mcontext_t *mctx, thread_helper_context *td_hctx)
 {
@@ -328,6 +336,23 @@ int sgx_helper_post_clone(dcontext_t *drctx, dr_mcontext_t *mctx, thread_helper_
     return 0;
 }
 
+
+static inline void _mm_pause(void)
+{
+    __asm __volatile(
+        "pause"
+    );
+}
+
+void sgx_thread_queue_spin()
+{
+    extern volatile int g_hctx_num_helper;
+    while ((volatile int)g_hctx_num > ((MAX_NUM_THREADS - 2) + g_hctx_num_helper))
+    {
+        _mm_pause();
+    }
+}
+
 void sgx_helper_syscall(void* drctx)
 {
     dr_mcontext_t mctx = {.size = sizeof(dr_mcontext_t), .flags = DR_MC_INTEGER};
@@ -361,7 +386,37 @@ void sgx_helper_syscall(void* drctx)
     #define SYS_clone 56
     if (SYS_clone == sysno)
     {
+        /* busy waiting for a free tcs slot */
+        sgx_thread_queue_spin();
+
+        if (!(arg1 & CLONE_VM))
+        {
+            mctx.rax = -1;
+            dr_set_mcontext(drctx, &mctx);
+            return;
+        }
+
         sgx_thread_mutex_lock(&g_mutex_hctx); 
+        /* first init */
+        if (g_hctx_num == THREAD_FIRST_INIT)
+        {
+            td_hctx = (thread_helper_context *)malloc(THREAD_STRUCT_LEN);
+            ASSERT(td_hctx != NULL && "Malloc failed: likely Out-of-memory!");
+            g_total_hctx_len = THREAD_STRUCT_LEN;   
+        }
+
+        /* expand the thread data struct */
+        int cur_hctx_len = g_hctx_num * THREAD_STRUCT_LEN;
+        if (cur_hctx_len == g_total_hctx_len)
+        {
+            g_total_hctx_len = cur_hctx_len + THREAD_STRUCT_LEN;
+            thread_helper_context *ptd_hctx = NULL;
+            ptd_hctx = (thread_helper_context*)realloc(td_hctx, g_total_hctx_len);
+            if(ptd_hctx == NULL)
+                ASSERT(false && "Realloc failed: likely Out-of-memory!"); 
+            else
+                td_hctx = ptd_hctx;
+        }
 
         hcn = g_hctx_num;
         g_hctx_num++; 
@@ -378,14 +433,25 @@ void sgx_helper_syscall(void* drctx)
             ASSERT(false && "calling sgx_helper_pre_clone failed!");
     }
 
-    // #define SYS_madvise 28
+    #define SYS_madvise 28
+    #define SYS_sched_getaffinity 204
+    #define SYS_fork 57
+    #define SYS_vfork 58
+    #define SYS_execve 59
     // #define SYS_shutdown 48
-    // if (SYS_madvise == sysno || SYS_shutdown == sysno)
-    // {
-    //     mctx.rax = 0;
-    //     dr_set_mcontext(drctx, &mctx);
-    //     return;
-    // }
+    if (SYS_madvise == sysno || SYS_sched_getaffinity == sysno)
+    {
+        mctx.rax = 0;
+        dr_set_mcontext(drctx, &mctx);
+        return;
+    }
+
+    if (SYS_fork == sysno || SYS_execve == sysno || SYS_vfork == sysno)
+    {
+        mctx.rax = -1;
+        dr_set_mcontext(drctx, &mctx);
+        return;
+    }
 
     res = sgx_instr_syscall_codecache(sysno, arg1, arg2, arg3, arg4, arg5, arg6);
 
@@ -458,10 +524,11 @@ void start_thread_stub(dr_mcontext_t *dmctx)
 void sgx_thread_prepare(sgx_dbi_tls_helper_t *tls_helper_table)
 {
     /* obtain DR's addr returning to */
-    extern thread_helper_context td_hctx[MAX_THREAD_NUM_EACH_ENCLAVE];
+    extern thread_helper_context *td_hctx;
+    extern volatile int g_hctx_num;
     int hcn = 0;
     bool found = false;
-    while (hcn < MAX_THREAD_NUM_EACH_ENCLAVE) 
+    while (hcn < g_hctx_num) 
     {
         /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
         if ((td_hctx[hcn].clone_child_stack == tls_helper_table->trd_priv_params.child_stack) && 
