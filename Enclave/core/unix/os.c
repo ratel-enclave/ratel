@@ -1913,8 +1913,9 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
         int hcn = 0;
         extern sgx_thread_mutex_t g_mutex_hctx;
         sgx_thread_mutex_lock(&g_mutex_hctx);
-        extern thread_helper_context td_hctx[MAX_THREAD_NUM_EACH_ENCLAVE];
-        while (hcn < MAX_THREAD_NUM_EACH_ENCLAVE) 
+        extern thread_helper_context *td_hctx;
+        extern volatile int g_hctx_num;
+        while (hcn < g_hctx_num)
         {
             /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
             if (td_hctx[hcn].thread_id == os_tls->tid)
@@ -1927,7 +1928,7 @@ os_tls_app_seg_init(os_local_state_t *os_tls, void *segment)
             hcn++;
         }
         sgx_thread_mutex_unlock(&g_mutex_hctx);
-        ASSERT(NULL != app_lib_tls_base && "illegal tls base for lib!");
+        // ASSERT(NULL != app_lib_tls_base && "illegal tls base for lib!");
     }
     
     /* If we're a non-initial thread, tls will be set to the parent's value,
@@ -4529,10 +4530,16 @@ os_map_file(file_t f, size_t *size INOUT, uint64 offs, app_pc addr, uint prot,
         /* Loop to handle races */
         loop = true;
     }
+    // print_file(STDOUT, "addr = %p, region_start = %p, region_end = %p\n", addr, region_start, region_end);  //cdd
     while (!loop ||
            (addr != NULL && addr >= region_start && addr+*size <= region_end) ||
            find_free_memory_in_region(region_start, region_end, *size, &addr, NULL)) {
 #endif
+        // if (addr <= (byte*)0x400000) //cdd
+        // {
+        //   map = NULL;
+        //   break;
+        // }
         map = mmap_syscall(addr, *size, memprot_to_osprot(prot),
                            flags, f,
                            /* x86 Linux mmap uses offset in pages */
@@ -5053,6 +5060,13 @@ os_normalized_sysnum(int num_raw, instr_t *gateway, dcontext_t *dcontext)
 #endif
 }
 
+//cdd
+long long pre_futex_counter = 0;
+long long post_futex_counter = 0;
+volatile int futex_first = 0;
+volatile uint64 pre_counter = 0, cur_counter = 0;
+volatile uint64 total_us = 0;
+//ddc
 static bool
 ignorable_system_call_normalized(int num)
 {
@@ -5088,6 +5102,7 @@ ignorable_system_call_normalized(int num)
 #ifdef LINUX
     case SYS_futex:
     case SYS_clone:
+    case SYS_vfork: //cdd --
 #elif defined(MACOS)
     case SYS_bsdthread_create:
     case SYS_posix_spawn:
@@ -5095,9 +5110,9 @@ ignorable_system_call_normalized(int num)
 #ifdef SYS_fork
     case SYS_fork:
 #endif
-#ifdef SYS_vfork
-    case SYS_vfork:
-#endif
+// #ifdef SYS_vfork
+//     case SYS_vfork:
+// #endif
     case SYS_kill:
 #if defined(SYS_tkill)
     case SYS_tkill:
@@ -7063,6 +7078,23 @@ pre_system_call(dcontext_t *dcontext)
 #ifdef LINUX
     case SYS_futex: {
         execute_syscall = false;
+    //cdd
+    if (futex_first == 0)
+    {
+        futex_first = 1;
+        pre_counter = query_time_micros();
+    }
+    else
+    {
+        cur_counter = query_time_micros();
+        total_us += (cur_counter - pre_counter);
+        pre_counter = cur_counter;
+    }
+    //ddc
+        
+        //print_file(STDOUT, "%lld, %lld\n", ++pre_futex_counter, total_us); //cdd --
+        // print_file(STDOUT, "pre_futex_counter = %lld\n", ++pre_futex_counter); //cdd --
+        // os_thread_yield();
         break;
     }
     case SYS_clone: {
@@ -7082,6 +7114,10 @@ pre_system_call(dcontext_t *dcontext)
         handle_clone(dcontext, flags);
         if ((flags & CLONE_VM) == 0) {
             LOG(THREAD, LOG_SYSCALLS, 1, "\tWARNING: CLONE_VM not set!\n");
+            //cdd
+            print_file(STDOUT, ">>>> fork\n");
+            
+            //ddc
         }
         /* save for post_system_call */
         dcontext->sys_param0 = (reg_t) flags;
@@ -7141,6 +7177,7 @@ pre_system_call(dcontext_t *dcontext)
         /* treat as if sys_clone with flags just as sys_vfork does */
         /* in /usr/src/linux/arch/i386/kernel/process.c */
         uint flags = CLONE_VFORK | CLONE_VM | SIGCHLD;
+        print_file(STDOUT, "vfork call in OS, flags = %d\n", flags);   //cdd --
         LOG(THREAD, LOG_SYSCALLS, 2, "syscall: vfork\n");
         handle_clone(dcontext, flags);
         cleanup_after_vfork_execve(dcontext);
@@ -8471,6 +8508,8 @@ post_system_call(dcontext_t *dcontext)
 #ifdef LINUX
     case SYS_futex: {
         success = true;
+        // print_file(STDOUT, "post_futex_counter = %lld\n", ++post_futex_counter); //cdd --
+        // os_thread_yield();
         break;
     }
     case SYS_clone: {
@@ -9549,7 +9588,7 @@ mutex_wait_contended_lock(mutex_t *lock _IF_CLIENT_INTERFACE(priv_mcontext_t *mc
          * > LOCK_SET_STATE (we don't rely on paired incs/decs) so that
          * the next unlocker will call mutex_notify_released_lock().
          */
-        ptr_int_t res;
+        ptr_int_t res;   //cdd --
 #ifndef LINUX /* we actually don't use this for Linux: see below */
         KSYNCH_TYPE *event = mutex_get_contended_event(lock);
         ASSERT(event != NULL && ksynch_var_initialized(event));
@@ -9575,10 +9614,12 @@ mutex_wait_contended_lock(mutex_t *lock _IF_CLIENT_INTERFACE(priv_mcontext_t *mc
              * mutex_notify_released_lock() sets lock_requests to LOCK_FREE_STATE.
              */
             res = ksynch_wait(&lock->lock_requests, LOCK_CONTENDED_STATE, 0);
+            // os_thread_yield();    //cdd --
 #else
-            res = ksynch_wait(event, 0, 0);
+            res = ksynch_wait(event, 0, 0);  
+            // os_thread_yield();    //cdd --
 #endif
-            if (res != 0 && res != -EWOULDBLOCK)
+            if (res != 0 && res != -EWOULDBLOCK)   //cdd --
                 os_thread_yield();
 #ifdef CLIENT_INTERFACE
             if (set_client_safe_for_synch)

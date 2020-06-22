@@ -42,6 +42,8 @@ typedef unsigned int    socklen_t;
 typedef unsigned long   size_t;
 #define MAP_FAILED  ((void*)-1)
 
+#define MAX_NUM_THREADS                 65
+
 typedef struct _msghdr {
    void         *msg_name;       /* optional address */
    socklen_t     msg_namelen;    /* size of address */
@@ -60,10 +62,6 @@ typedef struct _iovec {
 #ifndef NULL
 #  define NULL (0)
 #endif
-
-// void ASSERT(int b);
-// size_t count_iovlen(iovec *iov, size_t c_msg);
-// unsigned long scattering_shadow_iov(iovec *iov, size_t size, size_t c_msg);
 
 static inline void ASSERT(int b)
 {
@@ -90,7 +88,7 @@ static inline unsigned long scattering_shadow_iov(iovec *iov, size_t size, size_
 {
     char *iov_addr = (char *)malloc(size);
     ASSERT(MAP_FAILED != iov_addr && NULL != iov_addr && "malloc with NULL!");
-    memset(iov_addr, 0, size);	//cdd --
+    memset(iov_addr, 0, size);  //cdd --
     unsigned long iovb = (unsigned long)iov_addr;
 
     for (int i = 0; i < c_msg; i++)

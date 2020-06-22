@@ -43,8 +43,7 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
 long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, long _r8, long _r9);
 
 typedef unsigned long    sys_word_t;
-#define SIZEOF_DR_MCONTEXT_T			0x2B0 / sizeof(sys_word_t)
-#define MAX_THREAD_NUM_EACH_ENCLAVE 	10
+#define SIZEOF_DR_MCONTEXT_T            0x2B0 / sizeof(sys_word_t)
 
 typedef struct _thread_helper_context_shadow {
     sys_word_t td_hctx_self;

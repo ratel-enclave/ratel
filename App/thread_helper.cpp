@@ -45,14 +45,16 @@
 #include <pthread.h>
 
 #define SYS_gettid     186
-#define MAX_THREAD_NUM_EACH_ENCLAVE 10
+#define THREAD_STRUCT_LEN               sizeof(struct _sgx_thread_priv_params) //0x40
+#define THREAD_FIRST_INIT               0x0
 
 using namespace std;
 
 // Global data
 pthread_mutex_t lock_m = PTHREAD_MUTEX_INITIALIZER;
-sgx_thread_priv_params trd_priv_params[MAX_THREAD_NUM_EACH_ENCLAVE] = {0, 0, 0, 0, 0, 0, 0, 0};
+sgx_thread_priv_params *trd_priv_params = NULL;
 volatile int g_trd_num = 0;
+volatile int g_total_trd_num = 0;
 static volatile long tid_child = 0;
 
 extern "C" long set_tid_ntrd(long sysno);
@@ -60,6 +62,13 @@ extern "C" long set_tid_ntrd(long sysno);
 static inline long get_tid_ntrd()
 {
     return tid_child;
+}
+
+static inline void _mm_pause(void)
+{
+    __asm __volatile(
+        "pause"
+    );
 }
 
 static inline void do_agent()
@@ -78,11 +87,12 @@ static inline void do_agent()
     memset(&tls_helper_table->trd_priv_params, 0, sizeof(sgx_thread_priv_params));
     memcpy(&tls_helper_table->trd_priv_params, &trd_priv_params[trd_num], sizeof(sgx_thread_priv_params));
     
-    tls_helper_table->thread_id = set_tid_ntrd(SYS_gettid); 
+    tls_helper_table->thread_id = set_tid_ntrd(SYS_gettid);
     assert(tls_helper_table->thread_id && "wrong thread id!");
     tid_child = tls_helper_table->thread_id;
 
     tls_helper_table->trd_priv_params.thread_id = tls_helper_table->thread_id;
+    trd_priv_params[trd_num].thread_id = tls_helper_table->thread_id;
     tls_helper_table->first_init = 1;
     tls_helper_table->next_tls_helper_t = NULL;
     pthread_mutex_unlock(&lock_m);
@@ -105,6 +115,27 @@ static inline long thread_setup(sgx_thread_priv_params *trd_params)
     int trd_num = 0;
 
     pthread_mutex_lock(&lock_m);
+    /* first init */
+    if (g_trd_num == THREAD_FIRST_INIT)
+    {
+        trd_priv_params = (sgx_thread_priv_params *)malloc(THREAD_STRUCT_LEN);
+        assert(trd_priv_params != NULL && "Malloc failed: likely Out-of-memory!");
+        g_total_trd_num = THREAD_STRUCT_LEN;   
+    }
+
+    /* expand the thread data struct */
+    int cur_hctx_len = g_trd_num * THREAD_STRUCT_LEN;
+    if (cur_hctx_len == g_total_trd_num)
+    {
+        g_total_trd_num = cur_hctx_len + THREAD_STRUCT_LEN;
+        sgx_thread_priv_params *ptrd_priv_params = NULL;
+        ptrd_priv_params = (sgx_thread_priv_params*)realloc(trd_priv_params, g_total_trd_num);
+        if(ptrd_priv_params == NULL)
+            assert(false && "Realloc failed: likely Out-of-memory!"); 
+        else
+            trd_priv_params = ptrd_priv_params;
+    }
+    
     trd_num = g_trd_num;
     memset(&trd_priv_params[trd_num], 0, sizeof(sgx_thread_priv_params));
     memcpy(&trd_priv_params[trd_num], trd_params, sizeof(sgx_thread_priv_params));
@@ -126,5 +157,12 @@ static inline long thread_setup(sgx_thread_priv_params *trd_params)
 
 long thread_setup_agent(sgx_thread_priv_params *trd_params)
 {
+    extern volatile int g_trd_num_helper;
+    /* busy waiting for a free tcs slot */
+    while ((volatile int)g_trd_num > ((MAX_NUM_THREADS - 2) + g_trd_num_helper))
+    {
+        _mm_pause();
+    }
+
     return thread_setup(trd_params);
 }

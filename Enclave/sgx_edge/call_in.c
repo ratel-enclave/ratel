@@ -73,6 +73,8 @@ int sgxdbi_enclave_entry(long argc, char** argv, char** envp)
 {
     sgx_mm_init();
 
+    // ocall_print_str("inited successfully\n");    //cdd
+
     ulong new_stack_base;   // the start address of new stack
     ulong *pStack, *pt;
     char *argvs;
@@ -163,6 +165,18 @@ int ecall_thread_entry(void *tls_helper_table, size_t size)
     sgx_thread_stub((sgx_dbi_tls_helper_t *)tls_helper_table);
 
     assert(0 && "Not reached!");
+
+    return ret;
+}
+
+int ecall_clear_tcs_dumb(int index)
+{
+    long ret = 0;
+
+    if (2 != index)
+    {
+        ret = -1;
+    }
 
     return ret;
 }

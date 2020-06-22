@@ -35,6 +35,8 @@
 #ifndef __THREAD_EXTERN_C_H__
 #define __THREAD_EXTERN_C_H__
 
+#define MAX_NUM_THREADS                 65
+
 typedef struct _sgx_thread_priv_params {
     int flags;
     size_t child_stack; 

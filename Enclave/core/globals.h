@@ -342,7 +342,7 @@ typedef struct _thread_helper_context {
     dr_mcontext_t dmctx;
 } thread_helper_context;
 
-#define MAX_THREAD_NUM_EACH_ENCLAVE 10
+#define MAX_NUM_THREADS                 65
 
 /* we don't include dr_api.h, that's for external use, we only need _app
  * (everything in dr_defines.h is duplicated in our own header files)

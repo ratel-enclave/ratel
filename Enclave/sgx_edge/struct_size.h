@@ -92,11 +92,9 @@
 #define len_mq_attr 32
 #define len_msgbuf 16
 #define len_msghdr 88
-// #define len_msghdr 56
 #define len_msqid_ds 104
 #define len_utsname 390
 #define len_perf_event_attr 112
-#define len_pollfd 8
 #define len_pollfd 8
 #define len_pt_regs 168
 #define len_rlimit 16
@@ -112,7 +110,6 @@
 #define len_siginfo 128
 #define len_sockaddr 16
 #define len_stat 144
-#define len_statfs 120
 #define len___sysctl_args 80
 #define len_sysinfo 112
 #define len_task_struct 6848
@@ -135,17 +132,39 @@
 #define len_child_stack 0x1000
 #define MAX_EPOLL_EVENTS 10
 #define len_ioctl 512
-#define len_fionread 4
+#define len_ioct_int 4
+#define len_ioctl_wsize 8
+#define len_ioct_long 8
 #define len_termios 60
 #define len_socketpair sizeof(int)*2
 #define len_pipefd sizeof(int)*2
 #define len_name 80
 #define len_fd_set 128
+#define len_cpu_set_t 128
+#define len_rusage 144
+#define len_sigset 128
+#define len_gid 4
+#define len_flock 32
 
 #define TCGETS		0x5401
 #define TCSETS		0x5402
 #define TCSETSW		0x5403
 #define TCSETSF		0x5404
 #define FIONREAD 	0x541B
+#define TIOCGPGRP   0x540F
+#define TIOCSPGRP	0x5410
+#define TIOCGWINSZ	0x5413
+#define TIOCSWINSZ	0x5414
+#define FIONBIO		0x5421
+#define TCSBRK            0x5409
+#define TCSBRKP           0x5425
+#define TIOCGLCKTRMIOS    0x5456
+#define TIOCSLCKTRMIOS    0x5457
+#define FS_IOC_FIEMAP 0xC020660B
+
+#define HCIGETDEVLIST 0x800448d2
+#define HCIGETDEVINFO 0x800448d3
+
+#define PAGE_SIZE 4096
 
 #endif  //#define _ST_SIZE_H__
