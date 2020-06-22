@@ -111,6 +111,9 @@ enclave {
         //long ocall_syscall_2_V0N(long sysno, [user_check] void *V, long N);
         //int munmap(void *addr, size_t length);
         //int ftruncate(int fd, off_t length);
+        //int flock(int fd, int operation);
+        //int fchmod(int fd, mode_t mode);
+        //int timerfd_create(int clockid, int flags);
         long ocall_syscall_2_NN(long sysno, long N1, long N2);
 
         //int fstat(int fd, struct stat *buf);
@@ -120,12 +123,16 @@ enclave {
 
         //int getrlimit(int resource, struct rlimit *rlim);
         //int getrusage(int who, struct rusage *usage);
+        //int clock_getres(clockid_t clk_id, struct timespec *res);
         //int clock_gettime(clockid_t clk_id, struct timespec *tp);
         long ocall_syscall_2_NTo(long sysno, long N1, [out, size=l2] void *T2, int l2);
 
         //char *getcwd(char *buf, size_t size);
         long ocall_syscall_2_PoN(long sysno, [out, size=N2] void *P1, long N2);
         //long ocall_syscall_2_TiN(long sysno, [in, size=l] void *T, int l, long N);
+
+        //int mlock(const void *addr, size_t len);
+        long ocall_syscall_2_PiN(long sysno, [in, size=dumb] void *P1, long N2, int dumb);
 
         //int mkdir(const char *pathname, mode_t mode);
         //int creat(const char *pathname, mode_t mode);
@@ -147,17 +154,21 @@ enclave {
         long ocall_syscall_2_TiTo(long sysno, [in, size=l] void *T1, [out, size=l] void *T2, int l);
 
         /* int rename(const char *oldpath, const char *newpath); */
-        long ocall_syscall_2_TiTi(long sysno, [in, size=l] void *T1, [in, size=l] void *T2, int l);
+        /* int link(const char *oldpath, const char *newpath); */
+        long ocall_syscall_2_SiSi(long sysno, [in, string] const char *S1, [in, string] const char *S2);
 
 
         /****************************syscalls with 3 paramters**********************************************/
         //int mprotect(void *addr, size_t len, int prot);
         //off_t lseek(int fd, off_t offset, int whence);
+        //int fchown(int fd, uid_t owner, gid_t group);
+        //int ioperm(unsigned long from, unsigned long num, int turn_on);
         long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3);
         //long ocall_syscall_3_NNPio(long sysno, long N1, long N2, [in, out, size=l3] void *P3, int l3);
 
         /* int ioctl(int fd, unsigned long request, ...); */
         long ocall_syscall_3_NNPi(long sysno, long N1, long N2, [in, size=l3] void *P3, int l3);
+        //int mincore(void *addr, size_t length, unsigned char *vec);
         long ocall_syscall_3_NNPo(long sysno, long N1, long N2, [out, size=l3] void *P3, int l3);
         long ocall_syscall_3_NNPio(long sysno, long N1, long N2, [in, out, size=l3] void *P3, int l3);
 
@@ -203,6 +214,9 @@ enclave {
         //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S1, long N2, long N3);
 
+        //int inotify_add_watch(int fd, const char *pathname, uint32_t mask);
+        long ocall_syscall_3_NSN(long sysno, long N1, [in, string] const char *S2,  long N3);
+
         //ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
         long ocall_syscall_3_SPoN(long sysno, [in, string] const char *S1, [out, size=N3] void *P2, long N3);
 
@@ -214,6 +228,9 @@ enclave {
 
         /* ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags); */
         long ocall_syscall_3_NTiNPP(long sysno, long N1, [in, size=l2] void *T2, int l2, long N3, [out, size=l4] void *P4, int l4, [out, size=l5] void *P5, int l5);
+
+        //int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+        long ocall_syscall_3_PoPoPo(long sysno, [out, size=l1] void *P1, [out, size=l1] void *P2, [out, size=l1] void *P3, int l1);
 
         /****************************syscalls with 4 paramters**********************************************/
         //void *mremap(void *old_address, size_t old_size, size_t new_size, int flags);
@@ -227,6 +244,9 @@ enclave {
 
         //int faccessat(int dirfd, const char *pathname, int mode, int flags);
         long ocall_syscall_4_NSNN(long sysno, long N1, [in, string] const char *P2, long N3, long N4);
+
+        //ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz);
+        long ocall_syscall_4_NSPoN(long sysno, long N1, [in, string] const char *S2, [out, size=N4] void *P3, long N4);
 
         /* ssize_t pread(int fd, void *buf, size_t count, off_t offset); */
         long ocall_syscall_4_NPoNN(long sysno, long N1, [out, size=l2] void *P2, int l2, long N3, long N4);
@@ -248,7 +268,7 @@ enclave {
         long ocall_syscall_4_NTioNN(long sysno, long N1, [out, size=l1] void* Tio, long N2, long N3, long l1);
 
         //int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *tmo_p, const sigset_t *sigmask);
-        long ocall_syscall_4_TioNTiTi(long sysno, [in, out, size=l1] void* T1, int l1, long N2, [in, size=l3] void* T3, int l3, [in, size=l4] void* T4, long l4);
+        long ocall_syscall_4_TioNTiTi(long sysno, [in, out, size=l1] void* T1, int l1, long N2, [in, size=l3] void* T3, int l3, [in, out, size=l4] void* T4, long l4);
 
         //int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
         long ocall_syscall_4_NSToN(long sysno, long N1, [in, string] const char *S2, [out, size=l3] void* T3, int l3, long N4);
@@ -287,6 +307,9 @@ enclave {
 
         //long mbind(void *addr, unsigned long len, int mode, const unsigned long *nodemask, unsigned long maxnode, unsigned flags);
         long ocall_syscall_6_TiNNTiNN(long sysno, long T1, int l1, long N2, long N3, [in, size=l4] void *T4, int l4, long N5, long N6);
+
+        //int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout, const sigset_t *sigmask);
+        long ocall_syscall_6_NPiPiPiTiTio(long sysno, long N1, [in, size=l1] void *P2, [in, size=l1] void *P3, [in, size=l1] void *P4, int l1, [in, size=l5] void *T5, int l5, [in, out, size=l6] void *T6, int l6);
 
         void sgxapp_reg_sighandler(int signum);
     };

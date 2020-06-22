@@ -143,35 +143,21 @@ long sgx_ocall_syscall_fcntl(long fd, long cmd, long arg1)
 #define F_GETLK 5
 #define F_SETLK 6
 #define F_SETLKW 7 /* Set record locking info (blocking).        */
+#define F_DUPFD_CLOEXEC 0x406
 #define len_flock 32
+
     long ret = -1;
 
-    switch (cmd)
-    {
-    case F_DUPFD:
-    case F_SETFD:
-    case F_SETFL:
+    if (cmd == F_DUPFD || cmd == F_SETFD || cmd == F_SETFL || cmd == F_DUPFD_CLOEXEC)
         ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, arg1);
-        break;
-
-    case F_GETFD:
-    case F_GETFL:
+    else if (cmd == F_GETFD || cmd == F_GETFL)
         ocall_syscall_3_NNN(&ret, SYS_fcntl, fd, cmd, 0); /* tricky */
-        break;
-
-    case F_SETLKW:
-    case F_SETLK:
+    else if (cmd == F_SETLKW || cmd == F_SETLK)
         ocall_syscall_3_NNTi(&ret, SYS_fcntl, fd, cmd, (void *)arg1, len_flock);
-        break;
-
-    case F_GETLK:
+    else if (cmd == F_GETLK)
         ocall_syscall_3_NNTo(&ret, SYS_fcntl, fd, cmd, (void *)arg1, len_flock);
-        break;
-
-    default:
+    else
         unimplemented_syscall(SYS_fcntl);
-        break;
-    }
 
     return ret;
 }
@@ -295,7 +281,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
         break;
 
     case SYS_pipe:
-        // unimplemented_syscall(sysno);
         ocall_syscall_1_To(&ret, sysno, (long *)_rdi, len_pipefd);
         break;
 
@@ -313,19 +298,21 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_eventfd:
     case SYS_io_destroy:
     case SYS_exit:
-        /* clean up occupying global inside and outside resources once one thread exited */
-        if (SYS_exit == sysno)
         {
-            /* start cleaning up thread inside trace */
-            int tid = sgx_ocall_syscall_0(SYS_gettid);
-            int pid = sgx_ocall_syscall_0(SYS_getpid);
-            if(tid != pid)
-                cleanup_exited_thread_inside_trace();
+            /* clean up occupying global inside and outside resources once one thread exited */
+            if (SYS_exit == sysno)
+            {
+                /* start cleaning up thread inside trace */
+                int tid = sgx_ocall_syscall_0(SYS_gettid);
+                int pid = sgx_ocall_syscall_0(SYS_getpid);
+                if(tid != pid)
+                    cleanup_exited_thread_inside_trace();
 
-            /* start cleaning up thread outside trace */
-            ocall_syscall_1_N(&ret, sysno, _rdi);
+                /* start cleaning up thread outside trace */
+                ocall_syscall_1_N(&ret, sysno, _rdi);
 
-            break;
+                break;
+            }
         }
     case SYS_exit_group:
     case SYS_fchdir:
@@ -333,8 +320,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_fsync:
     case SYS_syncfs:
     case SYS_dup:
-    case SYS_epoll_create1:
-    case SYS_inotify_init1:
     case SYS_mlockall:
     case SYS_setfsgid:
     case SYS_umask:
@@ -350,6 +335,8 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_setfsuid:
     case SYS_setuid:
     case SYS_unshare:
+    case SYS_epoll_create1:
+    case SYS_inotify_init1:
         ocall_syscall_1_N(&ret, sysno, _rdi);
         break;
 
@@ -358,14 +345,16 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
         break;
 
     case SYS_close:
-        if (sgx_mm_initialized && _rdi == SGX_PROCMAPS_FD)
         {
-            close_procmaps_file();
-            ret = 0;
+            if (sgx_mm_initialized && _rdi == SGX_PROCMAPS_FD)
+            {
+                close_procmaps_file();
+                ret = 0;
+            }
+            else
+                ocall_syscall_1_N(&ret, sysno, _rdi);
+            break;
         }
-        else
-            ocall_syscall_1_N(&ret, sysno, _rdi);
-        break;
 
     case SYS_get_thread_area:
         /*int get_thread_area(struct user_desc *u_info);*/
@@ -375,6 +364,10 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_set_thread_area:
         /*int set_thread_area(struct user_desc *u_info);*/
         ocall_syscall_1_Ti(&ret, sysno, (void *)_rdi, 16);
+        break;
+
+    case SYS_rt_sigsuspend:
+        ocall_syscall_1_Ti(&ret, sysno, (void *)_rdi, len_sigset);
         break;
 
     case SYS_uname:
@@ -407,11 +400,13 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
     switch (sysno)
     {
     case SYS_munmap:
-        /* free external block */
-        addr = sgx_mm_itn2ext((byte *)_rdi);
-        sgx_mm_munmap(addr, _rsi);
-        ocall_syscall_2_NN(&ret, sysno, (ulong)addr, _rsi);
-        break;
+        {
+            /* free external block */
+            addr = sgx_mm_itn2ext((byte *)_rdi);
+            sgx_mm_munmap(addr, _rsi);
+            ocall_syscall_2_NN(&ret, sysno, (ulong)addr, _rsi);
+            break;
+        }
 
     case SYS_ftruncate:
     case SYS_dup2:
@@ -420,6 +415,12 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
     case SYS_kill:
     case SYS_setpgid:
     case SYS_getpriority:
+    case SYS_eventfd2:
+    case SYS_flock:
+    case SYS_fchmod:
+    case SYS_setreuid:
+    case SYS_setregid:
+    case SYS_timerfd_create:
         ocall_syscall_2_NN(&ret, sysno, _rdi, _rsi);
         break;
 
@@ -441,6 +442,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
 
     case SYS_fstatfs:
         ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_statfs);
+        break;
 
     case SYS_getrlimit:
         ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_rlimit);
@@ -455,6 +457,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         break;
 
     case SYS_clock_gettime:
+    case SYS_clock_getres:
         ocall_syscall_2_NTo(&ret, sysno, _rdi, (void *)_rsi, len_timespec);
         break;
 
@@ -483,6 +486,10 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         ocall_syscall_2_PoN(&ret, sysno, (void *)_rdi, _rsi);
         break;
 
+    case SYS_mlock:
+        ocall_syscall_2_PiN(&ret, sysno, (void *)_rdi, _rsi, len_long);
+        break;
+
     case SYS_gettimeofday:
         ocall_syscall_2_ToN(&ret, sysno, (void *)_rdi, 16, _rsi);
         break;
@@ -508,7 +515,8 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         break;
 
     case SYS_rename:
-        ocall_syscall_2_TiTi(&ret, sysno, (void*)_rdi, (void*)_rsi, len_name);
+    case SYS_link:
+        ocall_syscall_2_SiSi(&ret, sysno, (const char*)_rdi, (const char*)_rsi);
         break;
 
     default:
@@ -530,49 +538,57 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     switch (sysno)
     {
     case SYS_open:
-        s = (char *)_rdi;
-        t = gen_enclave_copy(s, strlen(s) + 1);
-
-        if (sgx_mm_initialized && strcmp(t, "/proc/self/maps") == 0 /*|| strcmp(t, "/proc//tid//maps") == 0*/)
         {
-            open_procmaps_file();
-            ret = SGX_PROCMAPS_FD;
-        }
-        else
-        {
-            ocall_syscall_3_SNN(&ret, sysno, t, _rsi, _rdx);
+            s = (char *)_rdi;
+            t = gen_enclave_copy(s, strlen(s) + 1);
 
-            /* bind the fid with filename */
-            if (ret != -1)
-                sgx_vma_set_cmt(ret, t);
-        }
+            if (sgx_mm_initialized && strcmp(t, "/proc/self/maps") == 0 /*|| strcmp(t, "/proc//tid//maps") == 0*/)
+            {
+                open_procmaps_file();
+                ret = SGX_PROCMAPS_FD;
+            }
+            else
+            {
+                ocall_syscall_3_SNN(&ret, sysno, t, _rsi, _rdx);
 
-        /* free the enclave copy */
-        if (t != s)
-        {
-            free(t);
-            t = NULL;
+                /* bind the fid with filename */
+                if (ret != -1)
+                    sgx_vma_set_cmt(ret, t);
+            }
+
+            /* free the enclave copy */
+            if (t != s)
+            {
+                free(t);
+                t = NULL;
+            }
+            break;
         }
-        break;
 
     case SYS_tgkill:
     case SYS_lseek:
     case SYS_socket:
     case SYS_fchown:
     case SYS_setpriority:
+    case SYS_setresuid:
+    case SYS_setresgid:
+    case SYS_ioperm:
+    case SYS_dup3:
         ocall_syscall_3_NNN(&ret, sysno, _rdi, _rsi, _rdx);
         break;
 
     case SYS_read:
-        if (sgx_mm_initialized && _rdi == SGX_PROCMAPS_FD)
         {
-            ret = read_procmaps_file((char *)_rsi, _rdx);
+            if (sgx_mm_initialized && _rdi == SGX_PROCMAPS_FD)
+            {
+                ret = read_procmaps_file((char *)_rsi, _rdx);
+            }
+            else
+            {
+                ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
+            }
+            break;
         }
-        else
-        {
-            ocall_syscall_3_NPoN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
-        }
-        break;
 
     case SYS_write:
         ocall_syscall_3_NPiN(&ret, sysno, _rdi, (void *)_rsi, _rdx);
@@ -589,9 +605,11 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
     case SYS_getpeername:
     case SYS_getsockname:
-        sz = *(int *)_rdx;
-        ocall_syscall_3_NToTio(&ret, sysno, _rdi, (void *)_rsi, sz, (int *)_rdx, len_socklen_t);
-        break;
+        {
+            sz = *(int *)_rdx;
+            ocall_syscall_3_NToTio(&ret, sysno, _rdi, (void *)_rsi, sz, (int *)_rdx, len_socklen_t);
+            break;
+        }
 
     case SYS_writev:
         {
@@ -644,6 +662,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         break;
 
     case SYS_setitimer:
+    case SYS_accept:
         ocall_syscall_3_NTiTo(&ret, sysno, _rdi, (void *)_rsi, len_itimerval, (void *)_rdx, len_itimerval);
         break;
 
@@ -717,6 +736,19 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
     case SYS_sched_getaffinity:
         ocall_syscall_3_NNTo(&ret, sysno, _rdi, _rsi, (void *)_rdx, len_cpu_set_t);
+        break;
+
+    case SYS_getresuid:
+    case SYS_getresgid:
+        ocall_syscall_3_PoPoPo(&ret, sysno, (void *)_rdi, (void *)_rsi, (void *)_rdx, len_uid_t);
+        break;
+
+    case SYS_inotify_add_watch:
+        ocall_syscall_3_NSN(&ret, sysno, _rdi, (const char *)_rsi, _rdx);
+        break;
+
+    case SYS_mincore:
+        ocall_syscall_3_NNPo(&ret, sysno, _rdi, _rsi, (unsigned char *)_rdx, ((_rsi + PAGE_SIZE - 1) / PAGE_SIZE));
         break;
 
     default:
@@ -817,6 +849,10 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         ocall_syscall_4_NSToN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, len_stat, _r10);
         break;
 
+    case SYS_readlinkat:
+        ocall_syscall_4_NSPoN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, _r10);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -873,27 +909,38 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
     switch (sysno)
     {
     case SYS_mmap:
-        addr = sgx_mm_itn2ext((byte *)_rdi);
-
-        ocall_syscall_6_NNNNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10, _r8, _r9);
-        /* return internal address */
-        if (ret != -1)
         {
-            ret = (ulong)sgx_mm_mmap((byte *)ret, _rsi, _rdx, _r10, (int)_r8, _r9);
+            addr = sgx_mm_itn2ext((byte *)_rdi);
+
+            ocall_syscall_6_NNNNNN(&ret, sysno, (ulong)addr, _rsi, _rdx, _r10, _r8, _r9);
+            /* return internal address */
+            if (ret != -1)
+            {
+                ret = (ulong)sgx_mm_mmap((byte *)ret, _rsi, _rdx, _r10, (int)_r8, _r9);
+            }
+            break;
         }
-        break;
 
     case SYS_sendto:
         ocall_syscall_6_NPiNNPiN(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, _r9);
         break;
 
     case SYS_recvfrom:
-        sz = *(int *)_r9;
-        ocall_syscall_6_NPoNNToTo(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, sz, (int *)_r9, len_socklen_t);
-        break;
+        {
+            if ((void *)_r8 != NULL && (int *)_r9 != NULL)
+            {
+                sz = *(int *)_r9;
+            }
+            ocall_syscall_6_NPoNNToTo(&ret, sysno, _rdi, (void *)_rsi, _rdx, _r10, (void *)_r8, sz, (int *)_r9, len_socklen_t);
+            break;
+        }
 
     case SYS_mbind:
         ocall_syscall_6_TiNNTiNN(&ret, sysno, (ulong)_rdi, len_u64, _rsi, _rdx, (unsigned long *)_r10, (len_u64 * _r8), _r8, _r9);
+        break;
+
+    case SYS_pselect6:
+        ocall_syscall_6_NPiPiPiTiTio(&ret, sysno, _rdi, (void*)_rsi, (void*)_rdx, (void*)_r10, len_fd_set, (void*)_r8, len_timespec, (void*)_r9, len_sigset);
         break;
 
     default:
@@ -943,8 +990,13 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_pipe:
     case SYS_getpgid:
     case SYS_chdir:
+    case SYS_fchdir:
     case SYS_getsid:
     case SYS_setgid:
+    case SYS_epoll_create1:
+    case SYS_rt_sigsuspend:
+    case SYS_setuid:
+    case SYS_inotify_init1:
         return sgx_ocall_syscall_1(sysno, _rdi);
         break;
 
@@ -995,6 +1047,15 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_getgroups:
     case SYS_setgroups:
     case SYS_getpriority:
+    case SYS_eventfd2:
+    case SYS_clock_getres:
+    case SYS_flock:
+    case SYS_link:
+    case SYS_fchmod:
+    case SYS_mlock:
+    case SYS_setreuid:
+    case SYS_setregid:
+    case SYS_timerfd_create:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
@@ -1013,19 +1074,30 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_chown:
     case SYS_lseek:
     case SYS_socket:
-    case SYS_fchown:
     case SYS_connect:
     case SYS_readlink:
     case SYS_ioctl:
+    case SYS_fcntl:
     case SYS_bind:
     case SYS_poll:
     case SYS_getpeername:
     case SYS_getsockname:
     case SYS_sendmsg:
     case SYS_recvmsg:
+    // case SYS_execve:
     case SYS_getrandom:
     case SYS_sched_getaffinity:
     case SYS_setpriority:
+    case SYS_getresuid:
+    case SYS_getresgid:
+    case SYS_fchown:
+    case SYS_setresuid:
+    case SYS_setresgid:
+    case SYS_accept:
+    case SYS_inotify_add_watch:
+    case SYS_mincore:
+    case SYS_ioperm:
+    case SYS_dup3:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -1045,6 +1117,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_wait4:
     case SYS_ppoll:
     case SYS_newfstatat:
+    case SYS_readlinkat:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
@@ -1064,12 +1137,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_sendto:
     case SYS_recvfrom:
     case SYS_mbind:
+    case SYS_pselect6:
         return sgx_ocall_syscall_6(sysno, _rdi, _rsi, _rdx, _r10, _r8, _r9);
-        break;
-
-        //variable parameters
-    case SYS_fcntl:
-        return sgx_ocall_syscall_fcntl(_rdi, _rsi, _rdx);
         break;
 
     default:

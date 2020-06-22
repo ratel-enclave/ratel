@@ -98,7 +98,6 @@ void ocall_rdtsc_To(void *T, int l)
     unsigned long long *t = T;
     unsigned hi, lo;
 
-    // *t = __rdtsc();
     __asm__ __volatile__("rdtsc"
                          : "=a"(lo), "=d"(hi));
     *t = ((unsigned long long)lo) | (((unsigned long long)hi) << 32);
@@ -533,6 +532,10 @@ long ocall_syscall_1_N(long sysno, long N1)
     case SYS_epoll_create:
     case SYS_getsid:
     case SYS_setgid:
+    case SYS_epoll_create1:
+    case SYS_fchdir:
+    case SYS_setuid:
+    case SYS_inotify_init1:
         ret = syscall(sysno, N1);
         b = true;
         break;
@@ -577,6 +580,7 @@ long ocall_syscall_1_Ti(long sysno, void *T1, int l1)
     {
     case SYS_uname:
     case SYS_set_thread_area:
+    case SYS_rt_sigsuspend:
         ret = syscall(sysno, T1);
         b = true;
         break;
@@ -645,6 +649,12 @@ long ocall_syscall_2_NN(long sysno, long N1, long N2)
     case SYS_listen:
     case SYS_setpgid:
     case SYS_getpriority:
+    case SYS_eventfd2:
+    case SYS_flock:
+    case SYS_fchmod:
+    case SYS_setreuid:
+    case SYS_setregid:
+    case SYS_timerfd_create:
         ret = syscall(sysno, N1, N2);
         b = true;
         break;
@@ -688,6 +698,7 @@ long ocall_syscall_2_NTo(long sysno, long N1, void *T2, int l2)
     case SYS_getrusage:
     case SYS_clock_gettime:
     case SYS_getgroups:
+    case SYS_clock_getres:
         ret = syscall(sysno, N1, T2);
         b = true;
         break;
@@ -698,14 +709,14 @@ long ocall_syscall_2_NTo(long sysno, long N1, void *T2, int l2)
     return ret;
 }
 
-long ocall_syscall_2_PiN(long sysno, void *P1, long N2)
+long ocall_syscall_2_PiN(long sysno, void *P1, long N2, int dumb)
 {
     long ret = 0;
     bool b = false;
 
     switch (sysno)
     {
-    case SYS_set_robust_list:
+    case SYS_mlock:
         ret = syscall(sysno, P1, N2);
         b = true;
         break;
@@ -845,14 +856,18 @@ long ocall_syscall_2_TiTo(long sysno, void *T1, void *T2, int l)
     return ret;
 }
 
-long ocall_syscall_2_TiTi(long sysno, void *T1, void *T2, int l)
+long ocall_syscall_2_SiSi(long sysno, const char *S1, const char *S2)
 {
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_rename) {
-        ret = syscall(sysno, T1, T2);
+    switch (sysno)
+    {
+    case SYS_link:
+    case SYS_rename:
+        ret = syscall(sysno, S1, S2);
         b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -874,6 +889,11 @@ long ocall_syscall_3_NNN(long sysno, long N1, long N2, long N3)
     case SYS_mprotect:
     case SYS_fcntl:
     case SYS_setpriority:
+    case SYS_fchown:
+    case SYS_setresuid:
+    case SYS_setresgid:
+    case SYS_ioperm:
+    case SYS_dup3:
         ret = syscall(sysno, N1, N2, N3);
         b = true;
         break;
@@ -910,6 +930,9 @@ long ocall_syscall_3_NNPo(long sysno, long N1, long N2, void *P3, int l3)
     switch (sysno)
     {
     case SYS_ioctl:
+
+    /* FIX-ME: The addr argument N1 must be a multiple of the system page size. */
+    case SYS_mincore:
         ret = syscall(sysno, N1, N2, P3);
         b = true;
         break;
@@ -1006,6 +1029,25 @@ long ocall_syscall_3_NPoN(long sysno, long N1, void *P2, long N3)
     case SYS_connect:
     case SYS_bind:
         ret = syscall(sysno, N1, P2, N3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+
+long ocall_syscall_3_NSN(long sysno, long N1, const char *S2,  long N3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_inotify_add_watch:
+        ret = syscall(sysno, N1, S2, N3);
         b = true;
         break;
     }
@@ -1162,8 +1204,10 @@ long ocall_syscall_3_NTiTo(long sysno, long N1, void *T2, int l2, void *T3, int 
     long ret = 0;
     bool b = false;
 
-    if (sysno == SYS_setitimer)
+    switch (sysno)
     {
+    case SYS_setitimer:
+    case SYS_accept:
         ret = syscall(sysno, N1, T2, T3);
         b = true;
     }
@@ -1220,6 +1264,25 @@ long ocall_syscall_3_PoNN(long sysno, void *P1, long N2, long N3)
     {
     case SYS_getrandom:
         ret = syscall(sysno, P1, N2, N3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_3_PoPoPo(long sysno, void *P1, void *P2, void *P3, int l1)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_getresuid:
+    case SYS_getresgid:
+        ret = syscall(sysno, P1, P2, P3);
         b = true;
         break;
     }
@@ -1447,7 +1510,6 @@ long ocall_syscall_4_NNNTio(long sysno, long N1, long N2, long N3, void* Tio, lo
     return ret;
 }
 
-/* epoll_wait() */
 long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, long l1)
 {
     long ret = 0;
@@ -1478,6 +1540,23 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
             b = true;
             break;
         }
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_4_NSPoN(long sysno, long N1, const char *S2, void *P3, long N4)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_readlinkat:
+        ret = syscall(sysno, N1, S2, P3, N4);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
@@ -1665,6 +1744,7 @@ long ocall_syscall_6_NPiNNPiN(long sysno, long N1, void *P2, long N3, long N4, v
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
+
     return ret;
 }
 
@@ -1680,6 +1760,24 @@ long ocall_syscall_6_NPoNNToTo(long sysno, long N1, void *P2, long N3, long N4, 
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_6_NPiPiPiTiTio(long sysno, long N1, void *P2, void *P3, void *P4, int l1, void *T5, int l5, void *T6, int l6)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_pselect6:
+        ret = syscall(sysno, N1, P2, P3, P4, T5, T6);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
     return ret;
 }
 
@@ -1693,7 +1791,9 @@ long ocall_syscall_6_TiNNTiNN(long sysno, long T1, int l1, long N2, long N3, voi
         ret = syscall(sysno, T1, N2, N3, T4, N5, N6);
         b = true;
     }
+
     echo_fun_return(sysno, b, __FUNCTION__, ret);
+
     return ret;
 }
 
@@ -1708,5 +1808,6 @@ long set_tid_ntrd(long sysno)
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
+
     return ret;
 }
