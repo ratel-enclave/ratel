@@ -507,7 +507,7 @@ long ocall_syscall_1_N(long sysno, long N1)
                             ret = ecall_clear_tcs_dumb(dynamo_eid, &retval, ECMD_DEL_TCS);
                             if (SGX_SUCCESS != ret)
                             {
-                                printf("SGX_ERROR_ENCLAVE_LOST, ret = %d\n", ret);
+                                printf("SGX_ERROR, ret = %ld\n", ret);
                                 assert(false);
                             }
 
@@ -803,7 +803,7 @@ long ocall_syscall_2_STi(long sysno, const char *S1, void *T2, int l2)
     return ret;
 }
 
-long ocall_syscall_2_STio(long sysno, char *S1, void *T2, int l2)
+long ocall_syscall_2_STio(long sysno, const char *S1, void *T2, int l2)
 {
     long ret = 0;
     bool b = false;

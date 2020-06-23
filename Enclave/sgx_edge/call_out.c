@@ -210,13 +210,18 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
         break;
 
     case HCIGETDEVLIST:
-        unimplemented_syscall(SYS_ioctl);
-        // ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 16);
+        {
+            int dev_num = *(int*)arg1;
+            ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, (len_hcidevlistreq + dev_num * len_hcidevreq));
+            break;
+        }
+
+    case HCIINQUIRY:
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_hciinquiry);
         break;
 
     case HCIGETDEVINFO:
-        unimplemented_syscall(SYS_ioctl);
-        // ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, 128);
+        ocall_syscall_3_NNPo(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_hcidevinfo);
         break;
 
     case TCSETS:
@@ -229,6 +234,17 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     case TIOCSPGRP:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
         break;
+
+    case FS_IOC_FIEMAP:
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_fiemap);
+        break;
+
+    case RFCOMMGETDEVLIST:
+        {
+            int dev_num = *(int*)arg1;
+            ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, (len_rfcommdevlistreq + dev_num * len_rfcommdevinfo));
+            break;
+        }
 
     default:
         unimplemented_syscall(SYS_ioctl);
@@ -492,7 +508,7 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
         break;
 
     case SYS_statfs:
-        ocall_syscall_2_STio(&ret, sysno, (char *)_rdi, (void *)_rsi, len_statfs);
+        ocall_syscall_2_STio(&ret, sysno, (const char *)_rdi, (void *)_rsi, len_statfs);
         break;
 
     case SYS_stat:
