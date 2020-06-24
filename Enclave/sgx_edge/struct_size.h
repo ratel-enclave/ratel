@@ -145,6 +145,14 @@
 #define len_sigset 128
 #define len_gid 4
 #define len_flock 32
+#define len_hcidevlistreq 4
+#define len_hcidevreq 8
+#define len_hcidevinfo 92
+#define len_hciinquiry 10
+#define len_fiemap 32
+#define len_rfcommdevlistreq 4
+#define len_rfcommdevinfo 24
+
 
 #define TCGETS		0x5401
 #define TCSETS		0x5402
@@ -164,6 +172,9 @@
 
 #define HCIGETDEVLIST 0x800448d2
 #define HCIGETDEVINFO 0x800448d3
+#define HCIINQUIRY 0x800448f0
+
+#define RFCOMMGETDEVLIST 0x800452d2
 
 #define PAGE_SIZE 4096
 
