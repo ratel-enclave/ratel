@@ -536,6 +536,8 @@ long ocall_syscall_1_N(long sysno, long N1)
     case SYS_fchdir:
     case SYS_setuid:
     case SYS_inotify_init1:
+    case SYS_setfsgid:
+    case SYS_setfsuid:
         ret = syscall(sysno, N1);
         b = true;
         break;

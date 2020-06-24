@@ -365,7 +365,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_syncfs:
     case SYS_dup:
     case SYS_mlockall:
-    case SYS_setfsgid:
     case SYS_umask:
     case SYS_personality:
     case SYS_getpgid:
@@ -376,11 +375,12 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_alarm:
     case SYS_epoll_create:
     case SYS_timer_delete:
-    case SYS_setfsuid:
     case SYS_setuid:
     case SYS_unshare:
     case SYS_epoll_create1:
     case SYS_inotify_init1:
+    case SYS_setfsgid:
+    case SYS_setfsuid:
         ocall_syscall_1_N(&ret, sysno, _rdi);
         break;
 
@@ -1035,6 +1035,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_rt_sigsuspend:
     case SYS_setuid:
     case SYS_inotify_init1:
+    case SYS_setfsgid:
+    case SYS_setfsuid:
         return sgx_ocall_syscall_1(sysno, _rdi);
         break;
 
