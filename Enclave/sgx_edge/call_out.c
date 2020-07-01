@@ -785,6 +785,10 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         ocall_syscall_3_NNPo(&ret, sysno, _rdi, _rsi, (unsigned char *)_rdx, ((_rsi + PAGE_SIZE - 1) / PAGE_SIZE));
         break;
 
+    case SYS_signalfd4:
+        ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void *)_rsi, len_cpu_set_t, _rdx);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -1138,6 +1142,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_mincore:
     case SYS_ioperm:
     case SYS_dup3:
+    case SYS_signalfd4:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 

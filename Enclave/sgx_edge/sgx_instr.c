@@ -36,8 +36,10 @@
 #include "call_out.h"
 #include "sgx_instr.h"
 
-void crash_me(void)
+void CRASHME(int sysno)
 {
+    ocall_print_syscallname(sysno);
+    ocall_print_str("Unsuppoted syscall parameters!");
     __asm__ __volatile__("int3"); // ASSERT(false);
 }
 
@@ -83,7 +85,7 @@ long sgx_instr_syscall_dr_generic(long sysnum, long num_args,
         return sgx_ocall_syscall_6(sysnum, arg1, arg2, arg3, arg4, arg5, arg6);
 
     default:
-        crash_me();
+        CRASHME(sysnum);
         return -1;
     }
 }

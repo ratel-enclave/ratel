@@ -1233,6 +1233,24 @@ long ocall_syscall_3_NTiNPTi(long sysno, long N1, void *T2, int bsize, long N3, 
     return ret;
 }
 
+long ocall_syscall_3_NTiN(long sysno, long N1, void *T2, int l2, long N3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_signalfd4:
+        ret = syscall(sysno, N1, T2, N3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_3_NToN(long sysno, long N1, void *T2, int l2, long N3)
 {
     long ret = 0;
