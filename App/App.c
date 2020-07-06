@@ -247,7 +247,7 @@ int SGX_CDECL main(int argc, char* argv[], char* envp[])
     sgx_destroy_DBI_enclave(dynamo_eid);
 
     float t = (t2.tv_sec - t1.tv_sec) + (t2.tv_nsec - t1.tv_nsec) * 1.0/1000000000;
-    printf("Enclave-code real-time: %fs\n", t);
+    // printf("Enclave-code real-time: %fs\n", t);
 
     return ret;
 }

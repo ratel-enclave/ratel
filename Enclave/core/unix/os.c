@@ -6255,7 +6255,7 @@ handle_close_pre(dcontext_t *dcontext)
 
     /* prevent app from closing our files */
     if (fd_is_dr_owned(fd)) {
-        SYSLOG_INTERNAL_WARNING_ONCE("app trying to close DR file(s)");
+        // SYSLOG_INTERNAL_WARNING_ONCE("app trying to close DR file(s)");  //cdd --
         LOG(THREAD, LOG_TOP|LOG_SYSCALLS, 1,
             "WARNING: app trying to close DR file %d!  Not allowing it.\n", fd);
         if (DYNAMO_OPTION(fail_on_stolen_fds)) {

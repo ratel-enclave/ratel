@@ -317,10 +317,10 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_chroot:
     case SYS_acct:
     case SYS_rmdir:
-    case SYS_unlink:
     case SYS_shmdt:
     case SYS_swapoff:
     case SYS_mq_unlink:
+    case SYS_unlink:
         ocall_syscall_1_S(&ret, sysno, (char *)_rdi);
         break;
 
@@ -550,7 +550,8 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
 
     case SYS_rename:
     case SYS_link:
-        ocall_syscall_2_SiSi(&ret, sysno, (const char*)_rdi, (const char*)_rsi);
+    case SYS_symlink:
+        ocall_syscall_2_SS(&ret, sysno, (const char*)_rdi, (const char*)_rsi);
         break;
 
     default:
@@ -778,6 +779,8 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         break;
 
     case SYS_inotify_add_watch:
+    case SYS_mkdirat:
+    case SYS_unlinkat:
         ocall_syscall_3_NSN(&ret, sysno, _rdi, (const char *)_rsi, _rdx);
         break;
 
@@ -787,6 +790,10 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
     case SYS_signalfd4:
         ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void *)_rsi, len_cpu_set_t, _rdx);
+        break;
+
+    case SYS_symlinkat:
+        ocall_syscall_3_SNS(&ret, sysno, (const char *)_rdi, _rsi, (const char *)_rdx);
         break;
 
     default:
@@ -895,6 +902,15 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         ocall_syscall_4_NNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
+    case SYS_fgetxattr:
+        ocall_syscall_4_NSPioN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, _r10);
+        break;
+
+    case SYS_getxattr:
+    case SYS_lgetxattr:
+        ocall_syscall_4_SSPioN(&ret, sysno, (const char *)_rdi, (const char *)_rsi, (void*)_rdx, _r10);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -932,6 +948,15 @@ long sgx_ocall_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
 
     case SYS_name_to_handle_at:
         ocall_syscall_5_NSTiPiN(&ret, sysno, _rdi, (const char *)_rsi, (void *)_rdx, len_file_handle, (void *)_r10, len_int, _r8);
+        break;
+
+    case SYS_fsetxattr:
+        ocall_syscall_5_NSPioNN(&ret, sysno, _rdi, (const char *)_rsi, (void *)_rdx, _r10, _r8);
+        break;
+
+    case SYS_setxattr:
+    case SYS_lsetxattr:
+        ocall_syscall_5_SSPioNN(&ret, sysno, (const char *)_rdi, (const char *)_rsi, (void *)_rdx, _r10, _r8);
         break;
 
     default:
@@ -1100,6 +1125,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_setreuid:
     case SYS_setregid:
     case SYS_timerfd_create:
+    case SYS_symlink:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
@@ -1143,6 +1169,9 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_ioperm:
     case SYS_dup3:
     case SYS_signalfd4:
+    case SYS_mkdirat:
+    case SYS_symlinkat:
+    case SYS_unlinkat:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -1164,6 +1193,9 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_newfstatat:
     case SYS_readlinkat:
     case SYS_fadvise64:
+    case SYS_fgetxattr:
+    case SYS_getxattr:
+    case SYS_lgetxattr:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
@@ -1174,6 +1206,9 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_clone:
     case SYS_select:
     case SYS_name_to_handle_at:
+    case SYS_fsetxattr:
+    case SYS_setxattr:
+    case SYS_lsetxattr:
         return sgx_ocall_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
         break;
 

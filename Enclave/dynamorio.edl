@@ -90,6 +90,7 @@ enclave {
 
         //int unlink(const char *pathname);
         //int chdir(const char *path);
+        //int unlink(const char *pathname);
         long ocall_syscall_1_S(long sysno, [in, string] char *S1);
 
         //???
@@ -160,7 +161,8 @@ enclave {
 
         /* int rename(const char *oldpath, const char *newpath); */
         /* int link(const char *oldpath, const char *newpath); */
-        long ocall_syscall_2_SiSi(long sysno, [in, string] const char *S1, [in, string] const char *S2);
+        /* int symlink(const char *target, const char *linkpath); */
+        long ocall_syscall_2_SS(long sysno, [in, string] const char *S1, [in, string] const char *S2);
 
 
         /****************************syscalls with 3 paramters**********************************************/
@@ -224,8 +226,13 @@ enclave {
         //int chown(const char *pathname, uid_t owner, gid_t group);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S1, long N2, long N3);
 
+        //int symlinkat(const char *target, int newdirfd, const char *linkpath);
+        long ocall_syscall_3_SNS(long sysno, [in, string] const char *S1, long N2, [in, string] const char *S3);
+
         //int inotify_add_watch(int fd, const char *pathname, uint32_t mask);
-        long ocall_syscall_3_NSN(long sysno, long N1, [in, string] const char *S2,  long N3);
+        //int mkdirat(int dirfd, const char *pathname, mode_t mode);
+        //int unlinkat(int dirfd, const char *pathname, int flags);
+        long ocall_syscall_3_NSN(long sysno, long N1, [in, string] const char *S2, long N3);
 
         //ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
         long ocall_syscall_3_SPoN(long sysno, [in, string] const char *S1, [out, size=N3] void *P2, long N3);
@@ -283,6 +290,13 @@ enclave {
         //int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
         long ocall_syscall_4_NSToN(long sysno, long N1, [in, string] const char *S2, [out, size=l3] void* T3, int l3, long N4);
 
+        //ssize_t getxattr(const char *path, const char *name, void *value, size_t size);
+        //ssize_t lgetxattr(const char *path, const char *name, void *value, size_t size);
+        long ocall_syscall_4_SSPioN(long sysno, [in, string] const char *S1, [in, string] const char *S2, [in, out, size=N4] void* P3, long N4);
+
+        //ssize_t fgetxattr(int fd, const char *name, void *value, size_t size);
+        long ocall_syscall_4_NSPioN(long sysno, long N1, [in, string] const char *S2, [in, out, size=N4] void *P3, long N4);
+
         /****************************syscalls with 5 paramters**********************************************/
         long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5);
 
@@ -300,6 +314,13 @@ enclave {
 
         //int name_to_handle_at(int dirfd, const char *pathname, struct file_handle *handle, int *mount_id, int flags);
         long ocall_syscall_5_NSTiPiN(long sysno, long N1, [in, string] const char *S2, [out, size=l3] void *T3, int l3, [out, size=l4] void *P4, int l4, long N5);
+
+        //int fsetxattr(int fd, const char *name, const void *value, size_t size, int flags);
+        long ocall_syscall_5_NSPioNN(long sysno, long N1, [in, string] const char *S2, [in, out, size=N4] void *P3, long N4, long N5);
+
+        //int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
+        //int lsetxattr(const char *path, const char *name, const void *value, size_t size, int flags);
+        long ocall_syscall_5_SSPioNN(long sysno, [in, string] const char *S1, [in, string] const char *S2, [in, out, size=N4] void *P3, long N4, long N5);
 
 
         /****************************syscalls with 6 paramters**********************************************/

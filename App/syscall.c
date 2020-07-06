@@ -892,7 +892,7 @@ long ocall_syscall_2_TiTo(long sysno, void *T1, void *T2, int l)
     return ret;
 }
 
-long ocall_syscall_2_SiSi(long sysno, const char *S1, const char *S2)
+long ocall_syscall_2_SS(long sysno, const char *S1, const char *S2)
 {
     long ret = 0;
     bool b = false;
@@ -901,6 +901,7 @@ long ocall_syscall_2_SiSi(long sysno, const char *S1, const char *S2)
     {
     case SYS_link:
     case SYS_rename:
+    case SYS_symlink:
         ret = syscall(sysno, S1, S2);
         b = true;
         break;
@@ -1099,6 +1100,8 @@ long ocall_syscall_3_NSN(long sysno, long N1, const char *S2,  long N3)
     switch (sysno)
     {
     case SYS_inotify_add_watch:
+    case SYS_mkdirat:
+    case SYS_unlinkat:
         ret = syscall(sysno, N1, S2, N3);
         b = true;
         break;
@@ -1381,6 +1384,24 @@ long ocall_syscall_3_SNN(long sysno, const char *S1, long N2, long N3)
     return ret;
 }
 
+long ocall_syscall_3_SNS(long sysno, const char *S1, long N2, const char *S3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_symlinkat:
+        ret = syscall(sysno, S1, N2, S3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_3_SPoN(long sysno, const char *S1, void *P2, long N3)
 {
     long ret = 0;
@@ -1654,6 +1675,41 @@ long ocall_syscall_4_NSToN(long sysno, long N1, const char *S2, void* T3, int l3
     return ret;
 }
 
+long ocall_syscall_4_NSPioN(long sysno, long N1, const char *S2, void *P3, long N4)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_fgetxattr:
+        ret = syscall(sysno, N1, S2, P3, N4);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_4_SSPioN(long sysno, const char *S1, const char *S2, void* P3, long N4)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_getxattr:
+    case SYS_lgetxattr:
+        ret = syscall(sysno, S1, S2, P3, N4);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_4_TioNTiTi(long sysno, void* T1, int l1, long N2, void* T3, int l3, void* T4, long l4)
 {
     long ret = 0;
@@ -1781,6 +1837,41 @@ long ocall_syscall_5_NTioTioTioTi(long sysno, long N1, void *T2, void *T3, void 
     {
         ret = syscall(sysno, N1, T2, T3, T4, T5);
         b = true;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_5_NSPioNN(long sysno, long N1, const char *S2, void *P3, long N4, long N5)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_fsetxattr:
+        ret = syscall(sysno, N1, S2, P3, N4, N5);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_5_SSPioNN(long sysno, const char *S1, const char *S2, void *P3, long N4, long N5)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_setxattr:
+    case SYS_lsetxattr:
+        ret = syscall(sysno, S1, S2, P3, N4, N5);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);
