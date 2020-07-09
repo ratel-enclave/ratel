@@ -187,12 +187,27 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     {
     case TCSBRK:
     case TCSBRKP:
+    case TIOCNOTTY:
+    case TIOCSBRK:
+    case TIOCCBRK:
+    case TCFLSH:
+    case TIOCCONS:
+    case TIOCSCTTY:
+    case TIOCEXCL:
+    case TIOCNXCL:
+    case TIOCSIG:
         ocall_syscall_3_NNN(&ret, SYS_ioctl, fd, cmd, arg1);
         break;
 
     case FIONREAD:
     case TIOCGPGRP:
     case FIONBIO:
+    case TIOCSETD:
+    case TIOCGETD:
+    case TIOCGPTN:
+    case TIOCGPKT:
+    case TIOCGDEV:
+    case TIOCSPTLCK:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
         break;
 
@@ -245,6 +260,11 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
             ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, (len_rfcommdevlistreq + dev_num * len_rfcommdevinfo));
             break;
         }
+
+    case RFCOMMCREATEDEV:
+    case RFCOMMRELEASEDEV:
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_rfcommdevreq); 
+        break;
 
     default:
         unimplemented_syscall(SYS_ioctl);
@@ -702,6 +722,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         break;
 
     case SYS_chown:
+    case SYS_mknod:
         ocall_syscall_3_SNN(&ret, sysno, (const char *)_rdi, _rsi, _rdx);
         break;
 
@@ -720,6 +741,9 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     case SYS_sendmsg:
         {
             msghdr *msg = (msghdr*)_rsi;
+            void *msg_name = msg->msg_name;
+            void *msg_control = msg->msg_control;
+
             iovec *iov = msg->msg_iov;
             int c_msg = msg->msg_iovlen;
             int size = count_iovlen(iov, c_msg);
@@ -736,7 +760,9 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             iov = msg->msg_iov;
 
-            ocall_syscall_3_NTiNPTi(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, (void*)iovb, size + 1, iov, msg->msg_iovlen * len_iovec);
+            ocall_syscall_3_NTiNPTi(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, (void*)iovb, size + 1, iov, msg->msg_iovlen * len_iovec, msg_name, msg->msg_namelen, msg_control, msg->msg_controllen);
+            msg->msg_name = msg_name;
+            msg->msg_control = msg_control;
 
             free((char*)iovb);
             iovb = 0;
@@ -879,6 +905,7 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
     case SYS_faccessat:
     case SYS_openat:
+    case SYS_mknodat:
         ocall_syscall_4_NSNN(&ret, sysno, _rdi, (const char *)_rsi, _rdx, _r10);
         break;
 
@@ -909,6 +936,10 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
     case SYS_getxattr:
     case SYS_lgetxattr:
         ocall_syscall_4_SSPioN(&ret, sysno, (const char *)_rdi, (const char *)_rsi, (void*)_rdx, _r10);
+        break;
+
+    case SYS_utimensat:
+        ocall_syscall_4_NSTioN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, 2 * len_timespec, _r10);
         break;
 
     default:
@@ -1036,7 +1067,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_sched_yield:
     case SYS_sync:
     case SYS_restart_syscall:
-    case SYS_vfork:
+    // case SYS_vfork:
+    case SYS_setsid:
         return sgx_ocall_syscall_0(sysno);
         break;
 
@@ -1172,6 +1204,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_mkdirat:
     case SYS_symlinkat:
     case SYS_unlinkat:
+    case SYS_mknod:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -1196,6 +1229,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_fgetxattr:
     case SYS_getxattr:
     case SYS_lgetxattr:
+    case SYS_mknodat:
+    case SYS_utimensat:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 

@@ -128,6 +128,8 @@ enclave {
         //int fstatfs(int fd, struct statfs *buf);
         long ocall_syscall_2_NTo(long sysno, long N1, [out, size=l2] void *T2, int l2);
 
+        //long ocall_syscall_2_NTio(long sysno, long N1, [in, out, size=l2] void *T2, int l2);
+
         //long set_robust_list(struct robust_list_head *head, size_t len);
         long ocall_syscall_2_PioN(long sysno, [in, out, size=N2] void *P1, long N2);
 
@@ -224,6 +226,7 @@ enclave {
 
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
+        //int mknod(const char *pathname, mode_t mode, dev_t dev);
         long ocall_syscall_3_SNN(long sysno, [in, string] const char *S1, long N2, long N3);
 
         //int symlinkat(const char *target, int newdirfd, const char *linkpath);
@@ -241,7 +244,7 @@ enclave {
         long ocall_syscall_3_TioNN(long sysno, [in, out, size=l1] void *T1, int l1, long N2, long N3);
 
         /* ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags); */
-        long ocall_syscall_3_NTiNPTi(long sysno, long N1, [in, size=l2] void *T2, int l2, long N3, [in, size=l4] void *P4, int l4, [in, size=l5] void *T5, int l5);
+        long ocall_syscall_3_NTiNPTi(long sysno, long N1, [in, size=l2] void *T2, int l2, long N3, [in, size=l4] void *P4, int l4, [in, size=l5] void *T5, int l5, [in, size=l6] void *P6, int l6, [in, size=l7] void *P7, int l7);
 
         /* ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags); */
         long ocall_syscall_3_NTiNPP(long sysno, long N1, [in, size=l2] void *T2, int l2, long N3, [out, size=l4] void *P4, int l4, [out, size=l5] void *P5, int l5);
@@ -260,6 +263,7 @@ enclave {
         long ocall_syscall_4_NPiNN(long sysno, long N1, [in, size=l2] void *P2, int l2, long N3, long N4);
 
         //int faccessat(int dirfd, const char *pathname, int mode, int flags);
+        //int mknodat(int dirfd, const char *pathname, mode_t mode, dev_t dev);
         long ocall_syscall_4_NSNN(long sysno, long N1, [in, string] const char *P2, long N3, long N4);
 
         //ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz);
@@ -296,6 +300,9 @@ enclave {
 
         //ssize_t fgetxattr(int fd, const char *name, void *value, size_t size);
         long ocall_syscall_4_NSPioN(long sysno, long N1, [in, string] const char *S2, [in, out, size=N4] void *P3, long N4);
+
+        //int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
+        long ocall_syscall_4_NSTioN(long sysno, long N1, [in, string] const char *S2, [in, out, size=l3] void *T3, int l3, long N4);
 
         /****************************syscalls with 5 paramters**********************************************/
         long ocall_syscall_5_NNNNN(long sysno, long N1, long N2, long N3, long N4, long N5);

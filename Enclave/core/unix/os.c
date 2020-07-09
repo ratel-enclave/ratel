@@ -5102,7 +5102,7 @@ ignorable_system_call_normalized(int num)
 #ifdef LINUX
     case SYS_futex:
     case SYS_clone:
-    case SYS_vfork: //cdd --
+    //case SYS_vfork: //cdd --
 #elif defined(MACOS)
     case SYS_bsdthread_create:
     case SYS_posix_spawn:
@@ -6256,14 +6256,14 @@ handle_close_pre(dcontext_t *dcontext)
     /* prevent app from closing our files */
     if (fd_is_dr_owned(fd)) {
         // SYSLOG_INTERNAL_WARNING_ONCE("app trying to close DR file(s)");  //cdd --
-        LOG(THREAD, LOG_TOP|LOG_SYSCALLS, 1,
-            "WARNING: app trying to close DR file %d!  Not allowing it.\n", fd);
-        if (DYNAMO_OPTION(fail_on_stolen_fds)) {
-            set_failure_return_val(dcontext, EBADF);
-            DODEBUG({ dcontext->expect_last_syscall_to_fail = true; });
-        } else
-            set_success_return_val(dcontext, 0);
-        return false; /* do not execute syscall */
+        // LOG(THREAD, LOG_TOP|LOG_SYSCALLS, 1,
+        //     "WARNING: app trying to close DR file %d!  Not allowing it.\n", fd);
+        // if (DYNAMO_OPTION(fail_on_stolen_fds)) {
+        //     set_failure_return_val(dcontext, EBADF);
+        //     DODEBUG({ dcontext->expect_last_syscall_to_fail = true; });
+        // } else
+        //     set_success_return_val(dcontext, 0);
+        // return false; /* do not execute syscall */
     }
 
     /* Xref PR 258731 - duplicate STDOUT/STDERR when app closes them so we (or
