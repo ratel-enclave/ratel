@@ -53,6 +53,7 @@ functions according to the syscall_no and parameters_count.
 
 #include "call_out.h"
 #include "complex.h"
+#include "def_ioctl.h"
 
 extern void load_segment_fs(void *tls_segment);
 extern void load_segment_gs(void *tls_segment);
@@ -208,11 +209,23 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     case TIOCGPKT:
     case TIOCGDEV:
     case TIOCSPTLCK:
+    case TIOCOUTQ:
+    case TIOCMGET:
+    case TIOCMSET:
+    case TIOCMBIC:
+    case TIOCMBIS:
+    case TIOCGSOFTCAR:
+    case TIOCSSOFTCAR:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
+        break;
+
+    case TIOCSTI:
+        ocall_syscall_3_NNS(&ret, SYS_ioctl, fd, cmd, (const char *)arg1);
         break;
 
     case TCGETS:
     case TIOCGLCKTRMIOS:
+    case TCGETA:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
         break;
 
@@ -243,6 +256,9 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     case TCSETSW:
     case TCSETSF:
     case TIOCSLCKTRMIOS:
+    case TCSETA:
+    case TCSETAW:
+    case TCSETAF:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
         break;
 
@@ -1002,7 +1018,7 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
 {
     long ret = -1;
     byte *addr;
-    int sz;
+    int sz = 0;
 
     switch (sysno)
     {

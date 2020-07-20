@@ -154,55 +154,6 @@
 #define len_rfcommdevinfo 24
 #define len_rfcommdevreq 24
 
-
-#define TCGETS				0x5401
-#define TCSETS				0x5402
-#define TCSETSW				0x5403
-#define TCSETSF				0x5404
-#define TCSBRK      		0x5409
-#define TCXONC              0x540A
-#define TCFLSH              0x540B
-#define TIOCEXCL        	0x540C
-#define TIOCNXCL        	0x540D
-#define TIOCSCTTY        	0x540E
-#define TIOCGPGRP   		0x540F
-#define TIOCSPGRP			0x5410
-#define TIOCGWINSZ			0x5413
-#define TIOCSWINSZ			0x5414
-#define FIONREAD 			0x541B
-#define TIOCCONS        	0x541D
-#define FIONBIO				0x5421
-#define TIOCNOTTY       	0x5422
-#define TIOCSETD        	0x5423
-#define TIOCGETD        	0x5424
-#define TCSBRKP           	0x5425
-
-#define TIOCSBRK        	0x5427  /* BSD compatibility */
-#define TIOCCBRK        	0x5428  /* BSD compatibility */
-#define TIOCGSID        	0x5429  /* Return the session ID of FD */
-
-#define TIOCGLCKTRMIOS    	0x5456
-#define TIOCSLCKTRMIOS    	0x5457
-
-#define RFCOMMCREATEDEV		0x400452c8
-#define RFCOMMRELEASEDEV	0x400452c9
-#define RFCOMMSTEALDLC		0x400452dc
-
-#define TIOCSPTLCK			0x40045431
-#define TIOCSIG 			0x40045436
-
-#define TIOCGPTN			0x80045430
-#define TIOCGDEV			0x80045432
-#define TIOCGPKT			0x80045438
-
-#define HCIGETDEVLIST 		0x800448d2
-#define HCIGETDEVINFO 		0x800448d3
-#define HCIINQUIRY 			0x800448f0
-
-#define RFCOMMGETDEVLIST 	0x800452d2
-
-#define FS_IOC_FIEMAP 		0xC020660B
-
 #define PAGE_SIZE 4096
 
 #endif  //#define _ST_SIZE_H__

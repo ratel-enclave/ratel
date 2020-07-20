@@ -36,7 +36,7 @@ ifeq ($(SGX_DEBUG), 1)
 endif
 
 ifeq ($(SGX_DEBUG), 1)
-	PLATFORM_DEBUG_FLAGS += -ggdb3
+	PLATFORM_DEBUG_FLAGS += #-ggdb3
 else
 	PLATFORM_DEBUG_FLAGS += -O2
 endif

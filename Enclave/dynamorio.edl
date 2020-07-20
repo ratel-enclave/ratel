@@ -181,6 +181,8 @@ enclave {
         long ocall_syscall_3_NNPo(long sysno, long N1, long N2, [out, size=l3] void *P3, int l3);
         long ocall_syscall_3_NNPio(long sysno, long N1, long N2, [in, out, size=l3] void *P3, int l3);
 
+        long ocall_syscall_3_NNS(long sysno, long N1, long N2, [in, string] const char *S3);
+
         //???
         long ocall_syscall_3_NNTi(long sysno, long N1, long N2, [in, size=l3] void *T3, int l3);
         long ocall_syscall_3_NNTo(long sysno, long N1, long N2, [out, size=l3] void *T3, int l3);

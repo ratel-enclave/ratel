@@ -91,9 +91,9 @@ MODULES 	:= core core/unix core/lib core/arch core/arch/x86 third_party/libgcc
 BUILD_DIR   := $(addprefix $(BLD_DIR)/,$(MODULES))
 
 ifeq ($(SGX_ARCH), x86)
-	BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --32 --noexecstack -g
+	BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --32 --noexecstack #-g
 else
-	BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --64 --noexecstack -g
+	BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --64 --noexecstack #-g
 endif
 
 BASIC_CC_FLAGS	:= -fno-strict-aliasing -fno-stack-protector -fvisibility=internal  -std=gnu99 -fno-omit-frame-pointer -fno-builtin-strcmp -Wall -Werror -Wwrite-strings -Wno-unused-but-set-variable
@@ -118,7 +118,8 @@ DYNAMORIO_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DYNAMORIO_CC_SRC))
 
 
 $(DYNAMORIO_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
-	${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
+	#${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
+	${CPP} -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
 	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
 	$(AS) $(DYNAMORIO_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
 

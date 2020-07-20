@@ -1000,6 +1000,24 @@ long ocall_syscall_3_NNPio(long sysno, long N1, long N2, void *P3, int l3)
     return ret;
 }
 
+long ocall_syscall_3_NNS(long sysno, long N1, long N2, const char *S3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_ioctl:
+        ret = syscall(sysno, N1, N2, S3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_3_NNTi(long sysno, long N1, long N2, void *T3, int l3)
 {
     long ret = 0;

@@ -38,8 +38,6 @@
 #include <sys/socket.h>
 #include <stddef.h>
 
-#define MAP_FAILED  ((void*)-1)
-
 static inline unsigned long shadowing_iovec(struct iovec *iov, char *iovb, int c_iov)
 {
     int s_iov = sizeof(struct iovec);
