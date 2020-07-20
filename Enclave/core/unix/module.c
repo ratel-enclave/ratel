@@ -476,7 +476,7 @@ module_add_segment_data(OUT os_module_data_t *out_data,
         out_data->alignment = alignment;
     } else {
         /* We expect all segments to have the same alignment */
-        ASSERT_CURIOSITY(out_data->alignment == alignment);
+        ;// ASSERT_CURIOSITY(out_data->alignment == alignment);  //cdd --
     }
     /* Add segments to the module vector (i#160/PR 562667).
      * For !HAVE_MEMINFO we should combine w/ the segment

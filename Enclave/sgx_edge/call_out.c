@@ -53,6 +53,7 @@ functions according to the syscall_no and parameters_count.
 
 #include "call_out.h"
 #include "complex.h"
+#include "def_ioctl.h"
 
 extern void load_segment_fs(void *tls_segment);
 extern void load_segment_gs(void *tls_segment);
@@ -187,17 +188,44 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     {
     case TCSBRK:
     case TCSBRKP:
+    case TIOCNOTTY:
+    case TIOCSBRK:
+    case TIOCCBRK:
+    case TCFLSH:
+    case TIOCCONS:
+    case TIOCSCTTY:
+    case TIOCEXCL:
+    case TIOCNXCL:
+    case TIOCSIG:
         ocall_syscall_3_NNN(&ret, SYS_ioctl, fd, cmd, arg1);
         break;
 
     case FIONREAD:
     case TIOCGPGRP:
     case FIONBIO:
+    case TIOCSETD:
+    case TIOCGETD:
+    case TIOCGPTN:
+    case TIOCGPKT:
+    case TIOCGDEV:
+    case TIOCSPTLCK:
+    case TIOCOUTQ:
+    case TIOCMGET:
+    case TIOCMSET:
+    case TIOCMBIC:
+    case TIOCMBIS:
+    case TIOCGSOFTCAR:
+    case TIOCSSOFTCAR:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
+        break;
+
+    case TIOCSTI:
+        ocall_syscall_3_NNS(&ret, SYS_ioctl, fd, cmd, (const char *)arg1);
         break;
 
     case TCGETS:
     case TIOCGLCKTRMIOS:
+    case TCGETA:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
         break;
 
@@ -228,6 +256,9 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     case TCSETSW:
     case TCSETSF:
     case TIOCSLCKTRMIOS:
+    case TCSETA:
+    case TCSETAW:
+    case TCSETAF:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_termios);
         break;
 
@@ -245,6 +276,11 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
             ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, (len_rfcommdevlistreq + dev_num * len_rfcommdevinfo));
             break;
         }
+
+    case RFCOMMCREATEDEV:
+    case RFCOMMRELEASEDEV:
+        ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_rfcommdevreq); 
+        break;
 
     default:
         unimplemented_syscall(SYS_ioctl);
@@ -317,10 +353,10 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_chroot:
     case SYS_acct:
     case SYS_rmdir:
-    case SYS_unlink:
     case SYS_shmdt:
     case SYS_swapoff:
     case SYS_mq_unlink:
+    case SYS_unlink:
         ocall_syscall_1_S(&ret, sysno, (char *)_rdi);
         break;
 
@@ -365,7 +401,6 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_syncfs:
     case SYS_dup:
     case SYS_mlockall:
-    case SYS_setfsgid:
     case SYS_umask:
     case SYS_personality:
     case SYS_getpgid:
@@ -376,11 +411,12 @@ long sgx_ocall_syscall_1(long sysno, long _rdi)
     case SYS_alarm:
     case SYS_epoll_create:
     case SYS_timer_delete:
-    case SYS_setfsuid:
     case SYS_setuid:
     case SYS_unshare:
     case SYS_epoll_create1:
     case SYS_inotify_init1:
+    case SYS_setfsgid:
+    case SYS_setfsuid:
         ocall_syscall_1_N(&ret, sysno, _rdi);
         break;
 
@@ -550,7 +586,8 @@ long sgx_ocall_syscall_2(long sysno, long _rdi, long _rsi)
 
     case SYS_rename:
     case SYS_link:
-        ocall_syscall_2_SiSi(&ret, sysno, (const char*)_rdi, (const char*)_rsi);
+    case SYS_symlink:
+        ocall_syscall_2_SS(&ret, sysno, (const char*)_rdi, (const char*)_rsi);
         break;
 
     default:
@@ -701,6 +738,7 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         break;
 
     case SYS_chown:
+    case SYS_mknod:
         ocall_syscall_3_SNN(&ret, sysno, (const char *)_rdi, _rsi, _rdx);
         break;
 
@@ -719,6 +757,9 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
     case SYS_sendmsg:
         {
             msghdr *msg = (msghdr*)_rsi;
+            void *msg_name = msg->msg_name;
+            void *msg_control = msg->msg_control;
+
             iovec *iov = msg->msg_iov;
             int c_msg = msg->msg_iovlen;
             int size = count_iovlen(iov, c_msg);
@@ -735,7 +776,9 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
 
             iov = msg->msg_iov;
 
-            ocall_syscall_3_NTiNPTi(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, (void*)iovb, size + 1, iov, msg->msg_iovlen * len_iovec);
+            ocall_syscall_3_NTiNPTi(&ret, sysno, _rdi, (void*)_rsi, len_msghdr, _rdx, (void*)iovb, size + 1, iov, msg->msg_iovlen * len_iovec, msg_name, msg->msg_namelen, msg_control, msg->msg_controllen);
+            msg->msg_name = msg_name;
+            msg->msg_control = msg_control;
 
             free((char*)iovb);
             iovb = 0;
@@ -778,11 +821,21 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         break;
 
     case SYS_inotify_add_watch:
+    case SYS_mkdirat:
+    case SYS_unlinkat:
         ocall_syscall_3_NSN(&ret, sysno, _rdi, (const char *)_rsi, _rdx);
         break;
 
     case SYS_mincore:
         ocall_syscall_3_NNPo(&ret, sysno, _rdi, _rsi, (unsigned char *)_rdx, ((_rsi + PAGE_SIZE - 1) / PAGE_SIZE));
+        break;
+
+    case SYS_signalfd4:
+        ocall_syscall_3_NTiN(&ret, sysno, _rdi, (void *)_rsi, len_cpu_set_t, _rdx);
+        break;
+
+    case SYS_symlinkat:
+        ocall_syscall_3_SNS(&ret, sysno, (const char *)_rdi, _rsi, (const char *)_rdx);
         break;
 
     default:
@@ -868,6 +921,7 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
     case SYS_faccessat:
     case SYS_openat:
+    case SYS_mknodat:
         ocall_syscall_4_NSNN(&ret, sysno, _rdi, (const char *)_rsi, _rdx, _r10);
         break;
 
@@ -889,6 +943,19 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
     case SYS_fadvise64:
         ocall_syscall_4_NNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10);
+        break;
+
+    case SYS_fgetxattr:
+        ocall_syscall_4_NSPioN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, _r10);
+        break;
+
+    case SYS_getxattr:
+    case SYS_lgetxattr:
+        ocall_syscall_4_SSPioN(&ret, sysno, (const char *)_rdi, (const char *)_rsi, (void*)_rdx, _r10);
+        break;
+
+    case SYS_utimensat:
+        ocall_syscall_4_NSTioN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, 2 * len_timespec, _r10);
         break;
 
     default:
@@ -930,6 +997,15 @@ long sgx_ocall_syscall_5(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
         ocall_syscall_5_NSTiPiN(&ret, sysno, _rdi, (const char *)_rsi, (void *)_rdx, len_file_handle, (void *)_r10, len_int, _r8);
         break;
 
+    case SYS_fsetxattr:
+        ocall_syscall_5_NSPioNN(&ret, sysno, _rdi, (const char *)_rsi, (void *)_rdx, _r10, _r8);
+        break;
+
+    case SYS_setxattr:
+    case SYS_lsetxattr:
+        ocall_syscall_5_SSPioNN(&ret, sysno, (const char *)_rdi, (const char *)_rsi, (void *)_rdx, _r10, _r8);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -942,7 +1018,7 @@ long sgx_ocall_syscall_6(long sysno, long _rdi, long _rsi, long _rdx, long _r10,
 {
     long ret = -1;
     byte *addr;
-    int sz;
+    int sz = 0;
 
     switch (sysno)
     {
@@ -1007,7 +1083,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_sched_yield:
     case SYS_sync:
     case SYS_restart_syscall:
-    case SYS_vfork:
+    // case SYS_vfork:
+    case SYS_setsid:
         return sgx_ocall_syscall_0(sysno);
         break;
 
@@ -1035,6 +1112,8 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_rt_sigsuspend:
     case SYS_setuid:
     case SYS_inotify_init1:
+    case SYS_setfsgid:
+    case SYS_setfsuid:
         return sgx_ocall_syscall_1(sysno, _rdi);
         break;
 
@@ -1094,6 +1173,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_setreuid:
     case SYS_setregid:
     case SYS_timerfd_create:
+    case SYS_symlink:
         return sgx_ocall_syscall_2(sysno, _rdi, _rsi);
         break;
 
@@ -1136,6 +1216,11 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_mincore:
     case SYS_ioperm:
     case SYS_dup3:
+    case SYS_signalfd4:
+    case SYS_mkdirat:
+    case SYS_symlinkat:
+    case SYS_unlinkat:
+    case SYS_mknod:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -1157,6 +1242,11 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_newfstatat:
     case SYS_readlinkat:
     case SYS_fadvise64:
+    case SYS_fgetxattr:
+    case SYS_getxattr:
+    case SYS_lgetxattr:
+    case SYS_mknodat:
+    case SYS_utimensat:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
@@ -1167,6 +1257,9 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_clone:
     case SYS_select:
     case SYS_name_to_handle_at:
+    case SYS_fsetxattr:
+    case SYS_setxattr:
+    case SYS_lsetxattr:
         return sgx_ocall_syscall_5(sysno, _rdi, _rsi, _rdx, _r10, _r8);
         break;
 

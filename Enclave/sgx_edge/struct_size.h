@@ -152,29 +152,7 @@
 #define len_fiemap 32
 #define len_rfcommdevlistreq 4
 #define len_rfcommdevinfo 24
-
-
-#define TCGETS		0x5401
-#define TCSETS		0x5402
-#define TCSETSW		0x5403
-#define TCSETSF		0x5404
-#define FIONREAD 	0x541B
-#define TIOCGPGRP   0x540F
-#define TIOCSPGRP	0x5410
-#define TIOCGWINSZ	0x5413
-#define TIOCSWINSZ	0x5414
-#define FIONBIO		0x5421
-#define TCSBRK            0x5409
-#define TCSBRKP           0x5425
-#define TIOCGLCKTRMIOS    0x5456
-#define TIOCSLCKTRMIOS    0x5457
-#define FS_IOC_FIEMAP 0xC020660B
-
-#define HCIGETDEVLIST 0x800448d2
-#define HCIGETDEVINFO 0x800448d3
-#define HCIINQUIRY 0x800448f0
-
-#define RFCOMMGETDEVLIST 0x800452d2
+#define len_rfcommdevreq 24
 
 #define PAGE_SIZE 4096
 

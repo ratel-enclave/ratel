@@ -21,8 +21,9 @@ MODULES := core core/unix core/lib core/arch core/arch/x86 libutil tools
 BUILD_DIR   := $(addprefix $(BLD_DIR)/,$(MODULES))
 
 
-BASIC_CC_FLAGS	:= -m64  -fno-strict-aliasing -fno-stack-protector -fvisibility=internal  -std=gnu99 -ggdb3 -fno-omit-frame-pointer -fno-builtin-strcmp -Wall -Werror -Wwrite-strings -Wno-unused-but-set-variable
-BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --64 --noexecstack -g
+#BASIC_CC_FLAGS	:= -m64  -fno-strict-aliasing -fno-stack-protector -fvisibility=internal  -std=gnu99 -ggdb3 -fno-omit-frame-pointer -fno-builtin-strcmp -Wall -Werror -Wwrite-strings -Wno-unused-but-set-variable
+BASIC_CC_FLAGS	:= -m64  -fno-strict-aliasing -fno-stack-protector -fvisibility=internal  -std=gnu99 -fno-omit-frame-pointer -fno-builtin-strcmp -Wall -Werror -Wwrite-strings -Wno-unused-but-set-variable
+BASIC_AS_FLAGS = -mmnemonic=intel -msyntax=intel -mnaked-reg --64 --noexecstack #-g
 
 #Built target drhelper
 DRHELPER_AS_SRC	:= core/arch/asm_shared.asm core/arch/x86/x86_shared.asm
@@ -33,7 +34,8 @@ DRHELPER_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DRHELPER_CC_SRC))
 DRHELPER_CC_FLAGS := $(BASIC_CC_FLAGS) -fPIC
 
 $(DRHELPER_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
-	${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
+	#${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
+	${CPP} -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
 	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
 	$(AS) $(DRHELPER_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
 
