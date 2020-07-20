@@ -196,7 +196,7 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     case TIOCSCTTY:
     case TIOCEXCL:
     case TIOCNXCL:
-    case TIOCSIG:
+    // case TIOCSIG:
         ocall_syscall_3_NNN(&ret, SYS_ioctl, fd, cmd, arg1);
         break;
 
@@ -211,11 +211,11 @@ long sgx_ocall_syscall_ioctl(long fd, long cmd, long arg1)
     case TIOCSPTLCK:
     case TIOCOUTQ:
     case TIOCMGET:
-    case TIOCMSET:
-    case TIOCMBIC:
-    case TIOCMBIS:
-    case TIOCGSOFTCAR:
-    case TIOCSSOFTCAR:
+    // case TIOCMSET:
+    // case TIOCMBIC:
+    // case TIOCMBIS:
+    // case TIOCGSOFTCAR:
+    // case TIOCSSOFTCAR:
         ocall_syscall_3_NNPio(&ret, SYS_ioctl, fd, cmd, (void*)arg1, len_ioct_int);
         break;
 
