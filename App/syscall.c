@@ -502,15 +502,16 @@ long ocall_syscall_1_N(long sysno, long N1)
                         /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
                         if (trd_priv_params[trd_num].thread_id == tid)
                         {
-                            int retval = 0;
-                            #define ECMD_DEL_TCS    2
-                            extern sgx_enclave_id_t dynamo_eid;
-                            ret = ecall_clear_tcs_dumb(dynamo_eid, &retval, ECMD_DEL_TCS);
-                            if (SGX_SUCCESS != ret)
-                            {
-                                printf("SGX_ERROR, ret = %ld\n", ret);
-                                assert(false);
-                            }
+                            /* optional features for more TCS slots */
+                            // int retval = 0;
+                            // #define ECMD_DEL_TCS    2
+                            // extern sgx_enclave_id_t dynamo_eid;
+                            // ret = ecall_clear_tcs_dumb(dynamo_eid, &retval, ECMD_DEL_TCS);
+                            // if (SGX_SUCCESS != ret)
+                            // {
+                            //     printf("SGX_ERROR, ret = %ld\n", ret);
+                            //     assert(false);
+                            // }
 
                             memset(&trd_priv_params[trd_num], 0, sizeof(sgx_thread_priv_params));
                             g_trd_num_helper++;
