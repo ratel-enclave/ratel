@@ -20,6 +20,21 @@ How to Build Ratel?
 - Ensure that you have a machine with hardware support for Intel(R) SGX:
   * Please check [SGX-hardware](https://github.com/ayeks/SGX-hardware) for a list of supported hardwares.
 
+### Building Intel(R) SGX Dependencies and Ratel with auto installation script:
+Follow these instructions to download, build and install Intel(R) SGX driver, the modified Intel(R) SGX SDK, the modified Intel(R) SGX Platform Software (PSW) and 
+Ratel.
+
+**1. Download, build and install Intel(R) SGX Dependencies and Ratel**
+
+Use the following command(s) to download the latest source code of Ratel:
+  ```
+    $ git clone https://github.com/ratel-enclave/ratel.git .
+  ```
+Then run the **install.sh** script with **sudo** in the same directory (e.g., /home/myhome/github/ratel) and folow the installation procedure:
+  ```
+    $ sudo ./install.sh
+  ```
+
 ### Building with Intel(R) SGX Dependencies:
 The Linux Ratel SGX software stack is comprised of the Intel(R) SGX driver, the modified Intel(R) SGX SDK, and the modified Intel(R) SGX Platform Software (PSW). To build all the dependencies for Ratel completely, do the following steps:
 
@@ -47,7 +62,7 @@ Use the following command(s) to download the latest source code of the modified 
   ```
 Follow the instructions in the [modified-ratel-psw](https://github.com/ratel-enclave/ratel-psw) project to build and install.
 
-### Building and Setting Ratel-SGX:
+### Building and Setting Ratel:
 **1. Download and build the Ratel**
 
 Use the following command(s) to download the latest source code of Ratel:
