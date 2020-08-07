@@ -73,8 +73,6 @@ int sgxdbi_enclave_entry(long argc, char** argv, char** envp)
 {
     sgx_mm_init();
 
-    // ocall_print_str("inited successfully\n");    //cdd
-
     ulong new_stack_base;   // the start address of new stack
     ulong *pStack, *pt;
     char *argvs;

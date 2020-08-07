@@ -891,7 +891,6 @@ standalone_init(void)
         get_dynamo_options_string(&dynamo_options,
                                   initial_options, sizeof(initial_options), true);
         // SYSLOG_INTERNAL_INFO("Initial options = %s", initial_options);
-        // print_file(main_logfile, "\n");      //cdd --
     }
 # endif /* DEBUG */
 #else
