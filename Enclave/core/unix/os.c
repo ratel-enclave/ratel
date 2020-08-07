@@ -4530,16 +4530,11 @@ os_map_file(file_t f, size_t *size INOUT, uint64 offs, app_pc addr, uint prot,
         /* Loop to handle races */
         loop = true;
     }
-    // print_file(STDOUT, "addr = %p, region_start = %p, region_end = %p\n", addr, region_start, region_end);  //cdd
     while (!loop ||
            (addr != NULL && addr >= region_start && addr+*size <= region_end) ||
            find_free_memory_in_region(region_start, region_end, *size, &addr, NULL)) {
 #endif
-        // if (addr <= (byte*)0x400000) //cdd
-        // {
-        //   map = NULL;
-        //   break;
-        // }
+
         map = mmap_syscall(addr, *size, memprot_to_osprot(prot),
                            flags, f,
                            /* x86 Linux mmap uses offset in pages */
@@ -5060,13 +5055,6 @@ os_normalized_sysnum(int num_raw, instr_t *gateway, dcontext_t *dcontext)
 #endif
 }
 
-//cdd
-long long pre_futex_counter = 0;
-long long post_futex_counter = 0;
-volatile int futex_first = 0;
-volatile uint64 pre_counter = 0, cur_counter = 0;
-volatile uint64 total_us = 0;
-//ddc
 static bool
 ignorable_system_call_normalized(int num)
 {
@@ -7078,23 +7066,7 @@ pre_system_call(dcontext_t *dcontext)
 #ifdef LINUX
     case SYS_futex: {
         execute_syscall = false;
-    //cdd
-    if (futex_first == 0)
-    {
-        futex_first = 1;
-        pre_counter = query_time_micros();
-    }
-    else
-    {
-        cur_counter = query_time_micros();
-        total_us += (cur_counter - pre_counter);
-        pre_counter = cur_counter;
-    }
-    //ddc
-        
-        //print_file(STDOUT, "%lld, %lld\n", ++pre_futex_counter, total_us); //cdd --
-        // print_file(STDOUT, "pre_futex_counter = %lld\n", ++pre_futex_counter); //cdd --
-        // os_thread_yield();
+    
         break;
     }
     case SYS_clone: {
@@ -7505,14 +7477,14 @@ pre_system_call(dcontext_t *dcontext)
     case SYS_rt_sigtimedwait: /* 177 */
     case SYS_rt_sigqueueinfo: /* 178 */
 #endif
-    case IF_MACOS_ELSE(SYS_sigpending,SYS_rt_sigpending): { /* 176 */
-        /* FIXME i#92: handle all of these syscalls! */
-        LOG(THREAD, LOG_ASYNCH|LOG_SYSCALLS, 1,
-            "WARNING: unhandled signal system call %d\n", dcontext->sys_num);
-        SYSLOG_INTERNAL_WARNING_ONCE("unhandled signal system call %d",
-                                     dcontext->sys_num);
-        break;
-    }
+    // case IF_MACOS_ELSE(SYS_sigpending,SYS_rt_sigpending): { /* 176 */  //cdd --
+    //     /* FIXME i#92: handle all of these syscalls! */
+    //     LOG(THREAD, LOG_ASYNCH|LOG_SYSCALLS, 1,
+    //         "WARNING: unhandled signal system call %d\n", dcontext->sys_num);
+    //     SYSLOG_INTERNAL_WARNING_ONCE("unhandled signal system call %d",
+    //                                  dcontext->sys_num);
+    //     break;
+    // }                                                                  //cdd --
 
     /****************************************************************************/
     /* FILES */
@@ -8508,8 +8480,7 @@ post_system_call(dcontext_t *dcontext)
 #ifdef LINUX
     case SYS_futex: {
         success = true;
-        // print_file(STDOUT, "post_futex_counter = %lld\n", ++post_futex_counter); //cdd --
-        // os_thread_yield();
+
         break;
     }
     case SYS_clone: {

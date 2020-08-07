@@ -24,7 +24,7 @@ void *thread_main(void *parg)
 
 int main()
 {
-	#define NUM_THREAD 10
+	#define NUM_THREAD 16
 	/* this variable is our reference to the second thread */
 	pthread_t tid[NUM_THREAD];
 	int i, ret;

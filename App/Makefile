@@ -109,7 +109,7 @@ APP_CXX_OBJS 	:= $(APP_CXX_SRCS:.c=.o) $(APP_CPP_SRCS:.cpp=.o)
 %.asm:
 $(APP_AS_OBJS): %.asm.o: %.asm
 	#@${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $<.s
-	@${CPP} -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $<.s
+	@${CPP} -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $<.s #cdd --
 	@${CMAKE} -Dfile=$<.s -P "CMake_asm.cmake"
 	$(AS) $(APP_AS_FALG) -c $<.s -o $@
 

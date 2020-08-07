@@ -502,15 +502,16 @@ long ocall_syscall_1_N(long sysno, long N1)
                         /* the argument clone_child_stack as an index to find out which td_hctx[x] belongs to ECALL thread */
                         if (trd_priv_params[trd_num].thread_id == tid)
                         {
-                            int retval = 0;
-                            #define ECMD_DEL_TCS    2
-                            extern sgx_enclave_id_t dynamo_eid;
-                            ret = ecall_clear_tcs_dumb(dynamo_eid, &retval, ECMD_DEL_TCS);
-                            if (SGX_SUCCESS != ret)
-                            {
-                                printf("SGX_ERROR, ret = %ld\n", ret);
-                                assert(false);
-                            }
+                            /* optional features for more TCS slots */
+                            // int retval = 0;
+                            // #define ECMD_DEL_TCS    2
+                            // extern sgx_enclave_id_t dynamo_eid;
+                            // ret = ecall_clear_tcs_dumb(dynamo_eid, &retval, ECMD_DEL_TCS);
+                            // if (SGX_SUCCESS != ret)
+                            // {
+                            //     printf("SGX_ERROR, ret = %ld\n", ret);
+                            //     assert(false);
+                            // }
 
                             memset(&trd_priv_params[trd_num], 0, sizeof(sgx_thread_priv_params));
                             g_trd_num_helper++;
@@ -1055,6 +1056,24 @@ long ocall_syscall_3_NNTo(long sysno, long N1, long N2, void *T3, int l3)
     return ret;
 }
 
+long ocall_syscall_3_NNTio(long sysno, long N1, long N2, void *T3, int l3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_rt_sigqueueinfo:
+        ret = syscall(sysno, N1, N2, T3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_3_NPiN(long sysno, long N1, void *P2, long N3)
 {
     long ret = 0;
@@ -1475,6 +1494,7 @@ long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
     {
     case SYS_mremap:
     case SYS_fadvise64:
+    case SYS_fallocate:
         ret = syscall(sysno, N1, N2, N3, N4);
         b = true;
         break;
