@@ -12,6 +12,7 @@ CXX_CC      := gcc
 CPP_CC      := g++
 CXX_FLAGS	:= -g -fPIC -pie
 CPP_FLAGS	:= $(CXX_FLAGS)
+LDFLAGS		= -lpthread
 
 
 .PHONY: all
@@ -21,7 +22,7 @@ all: $(TGTS)
 
 
 $(TGTS_CXX) : %: %.c
-	$(CXX_CC) $(CXX_FLAGS) -o $@ $<
+	$(CXX_CC) $(CXX_FLAGS) -o $@ $< $(LDFLAGS)
 
 
 $(TGTS_CPP) : %: %.cpp

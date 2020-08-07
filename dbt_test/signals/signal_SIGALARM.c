@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 // This function will handle a signal.
-void HandleSignal(int sig, siginfo_t *si, void *context);
+void handle_sig(int sig, siginfo_t *si, void *context);
 static int locked;
 
 int main(int argc, char *argv[])
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     sVal.sa_flags = SA_SIGINFO;
 
     // Indicate which function is the signal handler.
-    sVal.sa_sigaction = HandleSignal;
+    sVal.sa_sigaction = handle_sig;
 
     myPID = getpid();
     printf("\nPID = %d\n", myPID);
@@ -28,21 +28,18 @@ int main(int argc, char *argv[])
 
     locked = 1;
     alarm(2);
-    while (locked)
-    {
-    }
+    while (locked) {}
 
     printf("Exit\n");
     return (0);
 }
 
-void HandleSignal(int sig, siginfo_t *si, void *context)
+void handle_sig(int sig, siginfo_t *si, void *context)
 {
     switch (sig)
     {
-
         case SIGALRM:
-            printf("Get a SIGALRM\n");
+            fputs("Catch a SIGALRM\n", stdout);
             locked = 0;
             break;
     }

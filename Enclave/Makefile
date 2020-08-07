@@ -119,7 +119,7 @@ DYNAMORIO_CC_OBJ	:= $(patsubst %.c,$(BLD_DIR)/%.o,$(DYNAMORIO_CC_SRC))
 
 $(DYNAMORIO_AS_OBJ): $(BLD_DIR)/%.asm.o: %.asm
 	#${CPP} -g -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
-	${CPP} -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s
+	${CPP} -fPIC $(INCLUDES)  -DCPP2ASM -E $< -o $(BLD_DIR)/$<.s #cdd --
 	${CMAKE} -Dfile=$(BLD_DIR)/$<.s -P "CMake_asm.cmake"
 	$(AS) $(DYNAMORIO_AS_FLAGS) -c $(BLD_DIR)/$<.s -o $@
 
