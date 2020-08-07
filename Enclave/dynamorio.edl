@@ -187,6 +187,9 @@ enclave {
         long ocall_syscall_3_NNTi(long sysno, long N1, long N2, [in, size=l3] void *T3, int l3);
         long ocall_syscall_3_NNTo(long sysno, long N1, long N2, [out, size=l3] void *T3, int l3);
 
+        //int rt_sigqueueinfo(pid_t tgid, int sig, siginfo_t *uinfo);
+        long ocall_syscall_3_NNTio(long sysno, long N1, long N2, [in, out, size=l3] void *T3, int l3);
+
         //ssize_t write(int fd, const void *buf, size_t count);
         long ocall_syscall_3_NPiN(long sysno, long N1, [in, size=N3] void *P2, long N3);
 
@@ -256,6 +259,7 @@ enclave {
 
         /****************************syscalls with 4 paramters**********************************************/
         //void *mremap(void *old_address, size_t old_size, size_t new_size, int flags);
+        //int fallocate(int fd, int mode, off_t offset, off_t len);
         long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4);
 
         //int socketpair(int domain, int type, int protocol, int sv[2]);

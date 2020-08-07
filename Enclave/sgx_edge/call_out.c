@@ -838,6 +838,10 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         ocall_syscall_3_SNS(&ret, sysno, (const char *)_rdi, _rsi, (const char *)_rdx);
         break;
 
+    case SYS_rt_sigqueueinfo:
+        ocall_syscall_3_NNTio(&ret, sysno, _rdi, _rsi, (void *)_rdx, len_siginfo_t);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -857,10 +861,15 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         {
             #define SIGKILL      9
             #define SIGSTOP      19
-            if (SIGKILL == _rdi || SIGSTOP == _rdi)
+            #define SIGRTMIN     34
+            if (SIGKILL == _rdi || SIGSTOP == _rdi) /* these two signals cannot be caught */
+            {
                 ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
+            }
             else
+            {
                 ret = ocall_rt_sigaction(_rdi, _rsi, _rdx, _r10);
+            }
             break;
         }
 
@@ -942,6 +951,7 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         break;
 
     case SYS_fadvise64:
+    case SYS_fallocate:
         ocall_syscall_4_NNNN(&ret, sysno, _rdi, _rsi, _rdx, _r10);
         break;
 
@@ -1221,6 +1231,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_symlinkat:
     case SYS_unlinkat:
     case SYS_mknod:
+    case SYS_rt_sigqueueinfo:
         return sgx_ocall_syscall_3(sysno, _rdi, _rsi, _rdx);
         break;
 
@@ -1247,6 +1258,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_lgetxattr:
     case SYS_mknodat:
     case SYS_utimensat:
+    case SYS_fallocate:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 

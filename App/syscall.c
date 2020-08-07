@@ -1056,6 +1056,24 @@ long ocall_syscall_3_NNTo(long sysno, long N1, long N2, void *T3, int l3)
     return ret;
 }
 
+long ocall_syscall_3_NNTio(long sysno, long N1, long N2, void *T3, int l3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_rt_sigqueueinfo:
+        ret = syscall(sysno, N1, N2, T3);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_3_NPiN(long sysno, long N1, void *P2, long N3)
 {
     long ret = 0;
@@ -1476,6 +1494,7 @@ long ocall_syscall_4_NNNN(long sysno, long N1, long N2, long N3, long N4)
     {
     case SYS_mremap:
     case SYS_fadvise64:
+    case SYS_fallocate:
         ret = syscall(sysno, N1, N2, N3, N4);
         b = true;
         break;
