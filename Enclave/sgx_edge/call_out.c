@@ -968,6 +968,10 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         ocall_syscall_4_NSTioN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, 2 * len_timespec, _r10);
         break;
 
+    case SYS_prlimit64:
+        ocall_syscall_4_NNTioTio(&ret, sysno, _rdi, _rsi, (void*)_rdx, (void*)_r10, len_rlimit64);
+        break;
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -1259,6 +1263,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_mknodat:
     case SYS_utimensat:
     case SYS_fallocate:
+    case SYS_prlimit64:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 

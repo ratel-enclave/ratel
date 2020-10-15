@@ -206,7 +206,7 @@ typedef struct _intelsdi_exception_info_t
 
 typedef struct _intelsdk_sigcxt_pkg_t {
     int                 signum;
-    struct ucontext     ctx;
+    struct ucontext     *ctx;
     siginfo_t           info;
 }intelsdk_sigcxt_pkg_t;
 /* End: Added by Pinghai */

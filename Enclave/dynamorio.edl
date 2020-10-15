@@ -294,6 +294,9 @@ enclave {
         /* int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout); */
         long ocall_syscall_4_NTioNN(long sysno, long N1, [out, size=l1] void* Tio, long N2, long N3, long l1);
 
+        //int prlimit(pid_t pid, int resource, const struct rlimit *new_limit, struct rlimit *old_limit);
+        long ocall_syscall_4_NNTioTio(long sysno, long N1, long N2, [in, out, size=l3] void* T3, [in, out, size=l3] void* T4, long l3);
+
         //int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *tmo_p, const sigset_t *sigmask);
         long ocall_syscall_4_TioNTiTi(long sysno, [in, out, size=l1] void* T1, int l1, long N2, [in, size=l3] void* T3, int l3, [in, out, size=l4] void* T4, long l4);
 
