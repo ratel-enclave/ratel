@@ -5841,6 +5841,7 @@ handle_sigreturn(dcontext_t *dcontext, void *ucxt_param, int style)
         sigframe_rt_t *frame = (sigframe_rt_t *) (xsp IF_X86(- sizeof(char*)));
         /* use si_signo instead of sig, less likely to be clobbered by app */
         sig = frame->info.si_signo;
+	sig = (sig == 0) ? dcontext->sys_param0 : sig;
 # ifdef X86_32
         LOG(THREAD, LOG_ASYNCH, 3, "\tsignal was %d (did == param %d)\n",
             sig, frame->sig);

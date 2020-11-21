@@ -1689,6 +1689,23 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
     return ret;
 }
 
+long ocall_syscall_4_NNTioTio(long sysno, long N1, long N2, void* T3, void* T4, long l3)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_prlimit64:
+        ret = syscall(sysno, N1, N2, T3, T4);
+        b = true;
+        break;
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_4_NSPoN(long sysno, long N1, const char *S2, void *P3, long N4)
 {
     long ret = 0;

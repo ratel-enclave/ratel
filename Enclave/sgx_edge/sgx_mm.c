@@ -420,7 +420,7 @@ static int _sgx_mm_init_byreffing_external_procmaps(void)
     sgx_ocall_syscall_1(SYS_close, fd);
 
 
-    YPHASSERT(nSGXVMARgn >= 22);
+    YPHASSERT(nSGXVMARgn >= 21);
 
     return 0;
 }
