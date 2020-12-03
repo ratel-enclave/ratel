@@ -201,12 +201,21 @@ typedef struct _intelsdi_exception_info_t
     int     exception_type;
     /* Begin: Added by Pinghai */
     void*   sigcxt_pkg;  /* pointing to external structure that keeps all informaiton */
-	/* End: Added by Pinghai */
+    /* End: Added by Pinghai */
 } intelsdk_exception_info_t;
 
+#define X64_U16x     1   /*cdd FIXME: temporary choice to avoid compiling errors, 1: suitable for <= Ubuntu 16.04; 0: for >= Ubuntu 18.04 */ 
 typedef struct _intelsdk_sigcxt_pkg_t {
     int                 signum;
+<<<<<<< HEAD
     struct ucontext     *ctx;
+=======
+#ifdef X64_U16x
+    struct ucontext     ctx;
+#else
+    struct ucontext     *ctx;
+#endif
+>>>>>>> 7c96af0... Fix signal bugs & support both POSIX standard signals and POSIX real-time signals
     siginfo_t           info;
 }intelsdk_sigcxt_pkg_t;
 /* End: Added by Pinghai */

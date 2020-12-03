@@ -277,9 +277,17 @@ dump_sigset(dcontext_t *dcontext, kernel_sigset_t *set);
 static bool
 is_sys_kill(dcontext_t *dcontext, byte *pc, byte *xsp, siginfo_t *info);
 
+/* cdd: The two below are reserved for use by Glibc, applications never touch them. */
+#define SIGUNUSED1  32
+#define SIGUNUSED2  33
+
 int
 sigaction_syscall(int sig, kernel_sigaction_t *act, kernel_sigaction_t *oact)
 {
+    /* cdd: skip over the two real-time signals */
+    if (sig == SIGUNUSED1 || sig == SIGUNUSED2)
+        return 0;
+
 #if defined(X64) && !defined(VMX86_SERVER) && defined(LINUX)
     /* PR 305020: must have SA_RESTORER for x64 */
     if (act != NULL && !TEST(SA_RESTORER, act->flags)) {
@@ -1636,11 +1644,13 @@ handle_sigaction(dcontext_t *dcontext, int sig, const kernel_sigaction_t *act,
         }
     }
     /* i#1135: app may pass invalid signum to find MAX_SIGNUM */
-    if (sig <= 0 || sig > MAX_SIGNUM ||
+    // if (sig <= 0 || sig > MAX_SIGNUM ||
+    if (sig <= 0 || sig == SIGUNUSED1 || sig == SIGUNUSED2 ||    /* cdd: skip over two reserved rt-signal */
         (act != NULL && !signal_is_interceptable(sig))) {
         *result = EINVAL;
         return false;
     }
+
     if (act != NULL) {
         /* app is installing a new action */
         while (info->num_unstarted_children > 0) {
@@ -1753,7 +1763,7 @@ handle_post_sigaction(dcontext_t *dcontext, bool success, int sig,
     }
     if (!success)
         return 0; /* don't change return value */
-    ASSERT(sig <= MAX_SIGNUM && sig > 0);
+    // ASSERT(sig <= MAX_SIGNUM && sig > 0);  //cdd --
     if (oact != NULL) {
         if (info->use_kernel_prior_sigaction) {
             /* Real syscall succeeded with oact so it must be readable, barring races. */
@@ -3033,6 +3043,7 @@ copy_frame_to_stack(dcontext_t *dcontext, int sig, sigframe_rt_t *frame, byte *s
         DEBUG_DECLARE(bool ok = )
             get_memory_info(check_pc, NULL, NULL, &prot);
         ASSERT(ok);
+        prot |= DR_MEMTYPE_DATA;  /*cdd FIXME: make it accessible but potential buffer overflow in signal-handling  */
         if (!TEST(MEMPROT_WRITE, prot)) {
             size_t rest = (byte *)sp + size - check_pc;
             if (is_executable_area_writable(check_pc)) {
@@ -4944,7 +4955,7 @@ master_signal_handler_C(byte *xsp)
 
     case SIGALRM:
     case SIGVTALRM:
-    case SIGPROF:
+    // case SIGPROF:      /*cdd: Keep the transparency without touch */
         if (handle_alarm(dcontext, sig, ucxt))
             record_pending_signal(dcontext, sig, ucxt, frame, false _IF_CLIENT(NULL));
         /* else, don't deliver to app */
@@ -4993,15 +5004,15 @@ _master_signal_handler(void * arg)
     /* switch back to the original stack */
 }
 
-#define    INTELSDK_EXCEPTION_INFO_rax	0
-#define    INTELSDK_EXCEPTION_INFO_rcx	1
-#define    INTELSDK_EXCEPTION_INFO_rdx	2
-#define    INTELSDK_EXCEPTION_INFO_rbx	3
-#define    INTELSDK_EXCEPTION_INFO_rsp	4
-#define    INTELSDK_EXCEPTION_INFO_rbp	5
-#define    INTELSDK_EXCEPTION_INFO_rsi	6
-#define    INTELSDK_EXCEPTION_INFO_rdi	7
-#define    INTELSDK_EXCEPTION_INFO_rip	17
+#define    INTELSDK_EXCEPTION_INFO_rax  0
+#define    INTELSDK_EXCEPTION_INFO_rcx  1
+#define    INTELSDK_EXCEPTION_INFO_rdx  2
+#define    INTELSDK_EXCEPTION_INFO_rbx  3
+#define    INTELSDK_EXCEPTION_INFO_rsp  4
+#define    INTELSDK_EXCEPTION_INFO_rbp  5
+#define    INTELSDK_EXCEPTION_INFO_rsi  6
+#define    INTELSDK_EXCEPTION_INFO_rdi  7
+#define    INTELSDK_EXCEPTION_INFO_rip  17
 
 int master_signal_handler(void *sgx_info)
 {
@@ -5019,7 +5030,8 @@ int master_signal_handler(void *sgx_info)
     tmp = (unsigned long)info->sigstack.ss_sp + info->sigstack.ss_size - sizeof(sigcxt_pkg_t);
     pkg = (sigcxt_pkg_t *)(tmp & (unsigned long)(-0xf));
 #else
-    pkg = (sigcxt_pkg_t *)calloc(sizeof(sigcxt_pkg_t));
+    if((pkg = (sigcxt_pkg_t *)calloc(sizeof(sigcxt_pkg_t))) == NULL)
+      ASSERT(false && "calloc failed!");
 #endif
 
     pkg->signum = ext_pkg->signum;
