@@ -321,10 +321,10 @@ bool is_DR_segment_reader_entry(app_pc pc);
 # define NUM_RT     0 /* no RT signals */
 #endif
 /* MAX_SIGNUM is the highest valid signum. */
-// #define MAX_SIGNUM  ((OFFS_RT) + (NUM_RT) - 1)
+#define MAX_SIGNUM  ((OFFS_RT) + (NUM_RT) - 1)
 
 /* but our SGX-dr doesn't support rt-signal */
-#define MAX_SIGNUM ((OFFS_RT) - 1)
+// #define MAX_SIGNUM ((OFFS_RT) - 1)   //cdd -- we now like to support rt-signal
 
 /* i#336: MAX_SIGNUM is a valid signal, so we must allocate space for it.
  */
