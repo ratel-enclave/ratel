@@ -793,9 +793,17 @@ vmm_heap_unit_init(vm_heap_t *vmh, size_t size)
         //              + get_random_offset(DYNAMO_OPTION(vm_max_offset) /
         //                                  DYNAMO_OPTION(vmm_block_size)) *
         //              DYNAMO_OPTION(vmm_block_size));
-        preferred = (ptr_uint_t)sgx_mm_dyRIO_heap_offset();
+
+        // preferred = (ptr_uint_t)sgx_mm_dyRIO_heap_offset();
+        /*cdd: Instead of a fixed address of heap region wihch can be allocated as code cache or used by Dr itself,
+        here randomizing the heap address for security every time initialization */
+        preferred = ((ptr_uint_t)sgx_mm_dyRIO_heap_offset() + get_random_offset(DYNAMO_OPTION(vm_max_offset) /
+                                       DYNAMO_OPTION(vmm_block_size)) *
+                         DYNAMO_OPTION(vmm_block_size));
+
         // preferred = ALIGN_FORWARD(preferred, DYNAMO_OPTION(vmm_block_size));
         preferred = ALIGN_BACKWARD(preferred, DYNAMO_OPTION(vmm_block_size));
+
         /* overflow check: w/ vm_base shouldn't happen so debug-only check */
         ASSERT(!POINTER_OVERFLOW_ON_ADD(preferred, size));
 
