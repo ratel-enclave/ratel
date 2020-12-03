@@ -842,6 +842,24 @@ long sgx_ocall_syscall_3(long sysno, long _rdi, long _rsi, long _rdx)
         ocall_syscall_3_NNTio(&ret, sysno, _rdi, _rsi, (void *)_rdx, len_siginfo_t);
         break;
 
+    case SYS_execve:
+        {
+            nsattri *nsav = count_pptype_len((char**)_rsi);
+            int size_v = nsav->cnt_first_l + nsav->len_second_l + 1;
+            char *argv = (char *)malloc(size_v);
+            memset(argv, 0, size_v);
+            covert_to_ptype((char**)_rsi, argv, 1);
+
+            nsattri *nsae = count_pptype_len((char**)_rdx);
+            int size_e = nsae->cnt_first_l + nsae->len_second_l + 1;
+            char *arge = (char *)malloc(size_e);
+            memset(arge, 0, size_e);
+            covert_to_ptype((char**)_rdx, arge, 1);
+
+            ocall_syscall_3_PiPiPi(&ret, sysno, (const char*)_rdi, (char*)argv, nsav->cnt_first_l, size_v, (char*)arge, nsae->cnt_first_l, size_e);
+            break;
+        }
+
     default:
         unimplemented_syscall(sysno);
         break;
@@ -861,7 +879,6 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
         {
             #define SIGKILL      9
             #define SIGSTOP      19
-            #define SIGRTMIN     34
             if (SIGKILL == _rdi || SIGSTOP == _rdi) /* these two signals cannot be caught */
             {
                 ocall_syscall_4_NTiToN(&ret, sysno, _rdi, (void*)_rsi, len_kernel_sigaction, (void*)_rdx, len_kernel_sigaction, _r10);
@@ -966,6 +983,10 @@ long sgx_ocall_syscall_4(long sysno, long _rdi, long _rsi, long _rdx, long _r10)
 
     case SYS_utimensat:
         ocall_syscall_4_NSTioN(&ret, sysno, _rdi, (const char *)_rsi, (void*)_rdx, 2 * len_timespec, _r10);
+        break;
+
+    case SYS_prlimit64:
+        ocall_syscall_4_NNTioTio(&ret, sysno, _rdi, _rsi, (void*)_rdx, (void*)_r10, len_rlimit64);
         break;
 
     default:
@@ -1126,7 +1147,6 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_setfsuid:
         return sgx_ocall_syscall_1(sysno, _rdi);
         break;
-
     case SYS_epoll_create:
         return sgx_ocall_syscall_1(sysno, _rdi);
         break;
@@ -1212,7 +1232,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_getsockname:
     case SYS_sendmsg:
     case SYS_recvmsg:
-    // case SYS_execve:
+    case SYS_execve:
     case SYS_getrandom:
     case SYS_sched_getaffinity:
     case SYS_setpriority:
@@ -1259,6 +1279,7 @@ long sgx_ocall_syscall(long sysno, long _rdi, long _rsi, long _rdx, long _r10, l
     case SYS_mknodat:
     case SYS_utimensat:
     case SYS_fallocate:
+    case SYS_prlimit64:
         return sgx_ocall_syscall_4(sysno, _rdi, _rsi, _rdx, _r10);
         break;
 

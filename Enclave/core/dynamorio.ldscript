@@ -43,7 +43,7 @@ SECTIONS
   }
   .plt            : { *(.plt) *(.iplt) }
 .plt.got        : { *(.plt.got) }
-.plt.bnd        : { *(.plt.bnd) }
+.plt.sec        : { *(.plt.sec) }
   .text           :
   {
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
@@ -216,6 +216,7 @@ SECTIONS
   .debug_ranges   0 : { *(.debug_ranges) }
   /* DWARF Extension.  */
   .debug_macro    0 : { *(.debug_macro) }
+  .debug_addr     0 : { *(.debug_addr) }
   .gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
   /DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) }
   PROVIDE(dynamorio_so_start = __executable_start); PROVIDE(dynamorio_so_end = end);

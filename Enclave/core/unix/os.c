@@ -6049,7 +6049,7 @@ handle_execve(dcontext_t *dcontext)
         "\n");
     DODEBUG({
         int i;
-        SYSLOG_INTERNAL_INFO("-- execve %s --", fname);
+        // SYSLOG_INTERNAL_INFO("-- execve %s --", fname);
         LOG(THREAD, LOG_SYSCALLS, 1, "syscall: execve %s\n", fname);
         LOG(GLOBAL, LOG_TOP|LOG_SYSCALLS, 1, "execve %s\n", fname);
         if (stats->loglevel >= 3) {
@@ -7086,10 +7086,7 @@ pre_system_call(dcontext_t *dcontext)
         handle_clone(dcontext, flags);
         if ((flags & CLONE_VM) == 0) {
             LOG(THREAD, LOG_SYSCALLS, 1, "\tWARNING: CLONE_VM not set!\n");
-            //cdd
-            print_file(STDOUT, ">>>> fork\n");
-            
-            //ddc
+            print_file(STDOUT, ">>>> unsupported fork\n");
         }
         /* save for post_system_call */
         dcontext->sys_param0 = (reg_t) flags;
@@ -7477,14 +7474,14 @@ pre_system_call(dcontext_t *dcontext)
     case SYS_rt_sigtimedwait: /* 177 */
     case SYS_rt_sigqueueinfo: /* 178 */
 #endif
-    // case IF_MACOS_ELSE(SYS_sigpending,SYS_rt_sigpending): { /* 176 */  //cdd --
-    //     /* FIXME i#92: handle all of these syscalls! */
-    //     LOG(THREAD, LOG_ASYNCH|LOG_SYSCALLS, 1,
-    //         "WARNING: unhandled signal system call %d\n", dcontext->sys_num);
-    //     SYSLOG_INTERNAL_WARNING_ONCE("unhandled signal system call %d",
-    //                                  dcontext->sys_num);
-    //     break;
-    // }                                                                  //cdd --
+    case IF_MACOS_ELSE(SYS_sigpending,SYS_rt_sigpending): { /* 176 */
+        /* FIXME i#92: handle all of these syscalls! */
+        // LOG(THREAD, LOG_ASYNCH|LOG_SYSCALLS, 1,
+        //     "WARNING: unhandled signal system call %d\n", dcontext->sys_num);
+        // SYSLOG_INTERNAL_WARNING_ONCE("unhandled signal system call %d",
+        //                              dcontext->sys_num);
+        break;
+    }                                                                  
 
     /****************************************************************************/
     /* FILES */
