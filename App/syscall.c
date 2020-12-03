@@ -461,6 +461,7 @@ long ocall_syscall_0(long sysno)
     case SYS_sync:
     case SYS_restart_syscall:
     case SYS_setsid:
+    // case SYS_vfork:
         ret = syscall(sysno);
         b = true;
         break;
@@ -1391,6 +1392,62 @@ long ocall_syscall_3_PoNN(long sysno, void *P1, long N2, long N3)
     return ret;
 }
 
+long ocall_syscall_3_PiPiPi(long sysno, const char *P1, char *P2, int l2, int t2, char *P3, int l3, int t3)
+{
+    long ret = 0;
+    bool b = false;
+
+    switch (sysno)
+    {
+    case SYS_execve:    /* execl, execlp, execle, execv, execvp, execve */
+        {
+            char *argv[l2 + 1];
+            argv[0] = NULL;
+            parse_args(argv, P2, ",", 1);
+            argv[l2 + 1] = NULL;
+
+            char *arge[l3];
+            parse_args(arge, P3, ",", 0);
+            arge[l3] = NULL;
+
+            #include <unistd.h>
+            #include <limits.h>
+            int child_pro;
+
+            if((child_pro = vfork()) < 0)
+            {
+                perror("vfork error: ");
+                ret = -1;
+
+                return ret;
+            }
+            else if(child_pro == 0)     //vfork return 0 in the child process because child can get PID by getpid()
+            {
+                char *ratel_name = TOOLNAME;
+
+                argv[0] = (char *)malloc(strlen(ratel_name));
+                strcpy(argv[0], ratel_name);
+
+                if(execv(ratel_name, argv) < 0) {
+                     perror("execv error");
+                     exit(1);
+                }
+
+                exit(0);
+            }
+            else
+                return -1;  /* -1 will tell Dr not to handle more */
+
+            b = true;
+            break;
+        }
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
 long ocall_syscall_3_PoPoPo(long sysno, void *P1, void *P2, void *P3, int l1)
 {
     long ret = 0;
@@ -1682,6 +1739,23 @@ long ocall_syscall_4_NTioNN(long sysno, long N1, void* Tio, long N3, long N4, lo
             b = true;
             break;
         }
+    }
+
+    echo_fun_return(sysno, b, __FUNCTION__, ret);
+
+    return ret;
+}
+
+long ocall_syscall_4_NNTioTio(long sysno, long N1, long N2, void* T3, void* T4, long l3)
+{
+    long ret = 0;
+    bool b = false;
+    switch (sysno)
+    {
+    case SYS_prlimit64:
+        ret = syscall(sysno, N1, N2, T3, T4);
+        b = true;
+        break;
     }
 
     echo_fun_return(sysno, b, __FUNCTION__, ret);

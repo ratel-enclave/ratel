@@ -69,7 +69,49 @@ static inline void ASSERT(int b)
         __asm__ __volatile__ ("int3");
 }
 
-static inline size_t count_iovlen(iovec *iov, size_t c_msg)
+typedef struct _nested_structure_attri {
+    int cnt_first_l;
+    int len_second_l;
+}nsattri;
+
+static nsattri *count_pptype_len(char** argv)
+{
+    int cnt = 0, len = 0;
+    unsigned long p = 0;
+    nsattri *nsa = (nsattri*)malloc(sizeof(struct _nested_structure_attri));
+
+    while((p = (*(unsigned long*)(argv + cnt))) != 0)
+    {
+        len += strlen((char*)p);
+        cnt++;
+    }
+
+    nsa->cnt_first_l = cnt;
+    nsa->len_second_l = len;
+
+    return nsa;
+}
+
+static void covert_to_ptype(char **argv, char *argvp, int flag)
+{
+    if (flag == 1)  /* for char, FIX-ME */
+    {
+        int cnt = 0;
+        unsigned long p = 0;
+        char brk[1] = ",";
+        while((p = (*(unsigned long*)(argv + cnt))) != 0)
+        {
+            if (strlen((char*)p) > 0)
+            {
+                strncat(argvp, (char*)p, strlen((char*)p));
+                strncat(argvp, brk, 1);
+            }
+            cnt++;
+        }
+    }
+}
+
+static size_t count_iovlen(iovec *iov, size_t c_msg)
 {
     int size = 0;
     for (int i = 0; ; ) 
@@ -88,7 +130,7 @@ static inline unsigned long scattering_shadow_iov(iovec *iov, size_t size, size_
 {
     char *iov_addr = (char *)malloc(size);
     ASSERT(MAP_FAILED != iov_addr && NULL != iov_addr && "malloc with NULL!");
-    memset(iov_addr, 0, size);  //cdd --
+    memset(iov_addr, 0, size);
     unsigned long iovb = (unsigned long)iov_addr;
 
     for (int i = 0; i < c_msg; i++)

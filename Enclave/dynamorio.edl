@@ -227,7 +227,7 @@ enclave {
         long ocall_syscall_3_PoNN(long sysno, [in, size=N2] void *P1, long N2, long N3);
 
         //int execve(const char *filename, char *const argv[], char *const envp[]);
-        //long ocall_syscall_3_PiPiPi(long sysno, [in, string] const char *P1, [in, string] char *P2, [in, string] char *P3);
+        long ocall_syscall_3_PiPiPi(long sysno, [in, string] const char *P1, [in, size=t2] char *P2, int l2, int t2, [in, size=t3] char *P3, int l3, int t3);
 
         //int open(const char *pathname, int flags, mode_t mode);
         //int chown(const char *pathname, uid_t owner, gid_t group);
@@ -293,6 +293,9 @@ enclave {
 
         /* int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout); */
         long ocall_syscall_4_NTioNN(long sysno, long N1, [out, size=l1] void* Tio, long N2, long N3, long l1);
+
+        //int prlimit(pid_t pid, int resource, const struct rlimit *new_limit, struct rlimit *old_limit);
+        long ocall_syscall_4_NNTioTio(long sysno, long N1, long N2, [in, out, size=l3] void* T3, [in, out, size=l3] void* T4, long l3);
 
         //int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *tmo_p, const sigset_t *sigmask);
         long ocall_syscall_4_TioNTiTi(long sysno, [in, out, size=l1] void* T1, int l1, long N2, [in, size=l3] void* T3, int l3, [in, out, size=l4] void* T4, long l4);
