@@ -432,7 +432,7 @@ void sgx_helper_syscall(void* drctx)
 
     #define SYS_fork 57
     #define SYS_execve 59
-    if (SYS_fork == sysno || SYS_execve == sysno /*|| SYS_vfork == sysno*/)
+    if (SYS_fork == sysno /*|| SYS_execve == sysno*/ /*|| SYS_vfork == sysno*/)
     {
         mctx.rax = -1;
         dr_set_mcontext(drctx, &mctx);

@@ -38,12 +38,14 @@
 #include <sys/socket.h>
 #include <stddef.h>
 
+#define TOOLNAME    "ratel"
+
 static inline unsigned long shadowing_iovec(struct iovec *iov, char *iovb, int c_iov)
 {
     int s_iov = sizeof(struct iovec);
     struct iovec *iov_shd = (struct iovec*)malloc(c_iov * s_iov);
     assert(MAP_FAILED != iov_shd && NULL != iov_shd);
-    memset(iov_shd, 0, c_iov * s_iov);	//cdd --
+    memset(iov_shd, 0, c_iov * s_iov);
     unsigned long iov_shd_addr = (unsigned long)iov_shd;
     
     char *iov_base = (char *)iovb;
@@ -53,7 +55,7 @@ static inline unsigned long shadowing_iovec(struct iovec *iov, char *iovb, int c
 
         char *iovb_shd = (char *)malloc(s_iovb);
         assert(MAP_FAILED != iovb_shd && NULL != iovb_shd);
-        memset(iovb_shd, 0, s_iovb);		//cdd --
+        memset(iovb_shd, 0, s_iovb);
         memcpy(iovb_shd, iov_base, s_iovb);
 
         iov_shd->iov_base = (void*)iovb_shd;
@@ -70,6 +72,20 @@ static inline unsigned long shadowing_iovec(struct iovec *iov, char *iovb, int c
     }
 
     return iov_shd_addr;
+}
+
+void parse_args(char **dst, char* str, const char* spl, int idx)
+{
+    int n = idx;
+    char *words = NULL;
+    words = strtok(str, spl);
+    while(words != NULL)
+    {
+        dst[n] = (char *)malloc(strlen(words));
+        memset(dst[n], 0, sizeof(dst[n]));
+        strcpy(dst[n++], words);
+        words = strtok(NULL, spl);
+    }
 }
  
 #ifdef  __cplusplus
