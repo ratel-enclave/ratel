@@ -5036,6 +5036,10 @@ int master_signal_handler(void *sgx_info)
 
     pkg->signum = ext_pkg->signum;
     memcpy(&pkg->ctx, &ext_pkg->ctx, sizeof(sigctx_knl_t));
+
+    pkg->info.si_signo = pkg->signum;
+    /*cdd: the pkg->info is actually passed into the enclave from outside to gain compatibility,
+    but it may not be necessarily needed in handling many signals, so can be removed for the sake of security. */
     memcpy(&pkg->info, &ext_pkg->info, sizeof(siginfo_t));
 
 #ifdef HAVE_SIGALTSTACK
@@ -5853,7 +5857,6 @@ handle_sigreturn(dcontext_t *dcontext, void *ucxt_param, int style)
         sigframe_rt_t *frame = (sigframe_rt_t *) (xsp IF_X86(- sizeof(char*)));
         /* use si_signo instead of sig, less likely to be clobbered by app */
         sig = frame->info.si_signo;
-	sig = (sig == 0) ? dcontext->sys_param0 : sig;
 # ifdef X86_32
         LOG(THREAD, LOG_ASYNCH, 3, "\tsignal was %d (did == param %d)\n",
             sig, frame->sig);
