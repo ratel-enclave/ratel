@@ -188,7 +188,7 @@ typedef struct _sigcxt_pkg_t {
 }sigcxt_pkg_t;
 
 /* Begin: Added by Pinghai */
-typedef struct _intelsdi_exception_info_t
+typedef struct _intelsdk_exception_info_t
 {
 #if defined (_M_X64) || defined (__x86_64__)
     //typedef unsigned long uint64_t;
