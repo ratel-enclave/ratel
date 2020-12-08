@@ -5036,6 +5036,10 @@ int master_signal_handler(void *sgx_info)
 
     pkg->signum = ext_pkg->signum;
     memcpy(&pkg->ctx, &ext_pkg->ctx, sizeof(sigctx_knl_t));
+
+    pkg->info.si_signo = pkg->signum;
+    /*cdd: the pkg->info is actually passed into the enclave from outside to gain compatibility,
+    but it may not be necessarily needed in handling many signals, so can be removed for the sake of security. */
     memcpy(&pkg->info, &ext_pkg->info, sizeof(siginfo_t));
 
 #ifdef HAVE_SIGALTSTACK

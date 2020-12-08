@@ -1166,6 +1166,7 @@ byte* sgx_mm_ext2itn(byte *ext_addr)
 // Allocate a sgx-vma whether the given external memory region can be casted into a sgx-mm-buffer.
 // If yes, allocates a sgx-mm-buffer. Test the vma->vm_sgx field for checking.
 // ext_addr: external address, maybe NULL; should not be internal address
+/*cdd FIXME: the prot properties specified by user application are not strictly enforced by the mmap inside the enclave, this is buggy */
 byte* sgx_mm_mmap(byte *ext_addr, size_t len,
         ulong prot, ulong flags, int fd, ulong offs)
 {
