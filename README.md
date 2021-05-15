@@ -28,7 +28,7 @@ Ratel.
 
 Use the following command(s) to download the latest source code of Ratel:
   ```
-    $ git clone https://github.com/ratel-enclave/ratel.git .
+    $ git clone https://github.com/ratel-enclave/ratel.git
   ```
 Then run the **install.sh** script with **sudo** in the same directory (e.g., /home/myhome/github/ratel) and folow the installation procedure:
   ```
@@ -42,7 +42,7 @@ The Linux Ratel SGX software stack is comprised of the Intel<sup>®</sup> SGX dr
 
 Use the following command(s) to download the latest source code of the SGX Driver. Also, you can download and install it from the official Intel<sup>®</sup> GitHub repositories <https://github.com/01org/linux-sgx-driver>:
   ```
-    $ git clone https://github.com/ratel-enclave/ratel-driver.git .
+    $ git clone https://github.com/ratel-enclave/ratel-driver.git
   ```
 Follow the instructions in the [ratel-driver](https://github.com/ratel-enclave/ratel-driver) project to build and install the SGX driver.
 
@@ -50,7 +50,7 @@ Follow the instructions in the [ratel-driver](https://github.com/ratel-enclave/r
 
 Use the following command(s) to download the latest source code of the modified SDK:
   ```
-    $ git clone https://github.com/ratel-enclave/ratel-sdk.git .
+    $ git clone https://github.com/ratel-enclave/ratel-sdk.git
   ```
 Follow the instructions in the [modified-ratel-sdk](https://github.com/ratel-enclave/ratel-sdk) project to build and install the modified SDK. Particularly, note that use ***/opt/intel*** as installation location.
 
@@ -58,7 +58,7 @@ Follow the instructions in the [modified-ratel-sdk](https://github.com/ratel-enc
 
 Use the following command(s) to download the latest source code of the modified PSW:
   ```
-    $ git clone https://github.com/ratel-enclave/ratel-psw.git .
+    $ git clone https://github.com/ratel-enclave/ratel-psw.git
   ```
 Follow the instructions in the [modified-ratel-psw](https://github.com/ratel-enclave/ratel-psw) project to build and install.
 
@@ -67,7 +67,7 @@ Follow the instructions in the [modified-ratel-psw](https://github.com/ratel-enc
 
 Use the following command(s) to download the latest source code of Ratel:
   ```
-    $ git clone https://github.com/ratel-enclave/ratel.git .
+    $ git clone https://github.com/ratel-enclave/ratel.git
   ```
 Then run **make** in the same directory (e.g., /home/myhome/github/ratel) to build Ratel:
   ```
