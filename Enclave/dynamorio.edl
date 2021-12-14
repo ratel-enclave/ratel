@@ -326,7 +326,7 @@ enclave {
         long ocall_syscall_5_NPiNPoPoN(long sysno, unsigned long N1, [in, size=child_stack] void *Pi, unsigned long N2, size_t child_stack, [out] int *Po1, [out] int *Po2, unsigned long po12, unsigned long N3);
 
         //int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-        long ocall_syscall_5_NTioTioTioTi(long sysno, long N1, [in,out, size=l2] void *T2, [in,out, size=l2] void *T3, [in,out, size=l2] void *T4, int l2, [in, size=l5] void *T5, int l5);
+        long ocall_syscall_5_NTioTioTioTi(long sysno, long N1, [in,out, size=l2] void *T2, [in,out, size=l2] void *T3, [in,out, size=l2] void *T4, int l2, [in,out, size=l5] void *T5, int l5);
 
         //int name_to_handle_at(int dirfd, const char *pathname, struct file_handle *handle, int *mount_id, int flags);
         long ocall_syscall_5_NSTiPiN(long sysno, long N1, [in, string] const char *S2, [out, size=l3] void *T3, int l3, [out, size=l4] void *P4, int l4, long N5);
