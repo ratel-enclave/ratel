@@ -3,7 +3,7 @@
 
 Introduction
 ------------
-**NEWS**: Our paper "Dynamic Binary Translation for SGX Enclaves" has been accepted by ACM TOPS' 22. This research paper presents the design of Ratel, which enables dynamic binary translation inside SGX enclaves. It offers the ability to interpose on all the instruction executed in an enclave, which serves as a foundation for implementing other security monitors to safeguard enclaves from bugs and from the untrusted OS. Ratel also provides the first evidence that binary compatibility with existing Linux software on SGX is feasible. The full paper can be found on [ACM Digital Library](https://dl.acm.org/doi/10.1145/3532862).
+**NEWS**: Our paper "Dynamic Binary Translation for SGX Enclaves" has been accepted by ACM TOPS' 22 (formerly TISSEC). The full paper can be found on [ACM Digital Library](https://dl.acm.org/doi/10.1145/3532862).
 
 Ratel is a new framework which enables dynamic binary translation on Intel<sup>®</sup> SGX. Ratel offers ***complete interposition***, the ability to interpose on all executed instructions in the enclave and monitor all interactions with the OS. Ratel demonstrates its effectiveness by both building a binary compatibility layer for Linux legacy applications and enabling instrumentation options for monitoring runtime code behaviors. Ratel achieves better binary compatibility and has a comparable trusted codebase in the enclave. Further, Ratel is able to serve as a general foundation for implementing a large variety of inline security monitors to safeguard enclaves from bugs and from the untrusted OS.
 
